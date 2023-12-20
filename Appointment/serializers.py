@@ -995,50 +995,50 @@ class NoteSerializer(serializers.ModelSerializer):
 
 class SingleNoteSerializer(serializers.ModelSerializer):
     
-    notes = serializers.SerializerMethodField(read_only=True)
-    customer_note = serializers.SerializerMethodField(read_only=True)
-    appointmnet_service = serializers.SerializerMethodField(read_only=True)
-    appointment_tips = serializers.SerializerMethodField(read_only=True)
-    client = serializers.SerializerMethodField(read_only=True)
+    # notes = serializers.SerializerMethodField(read_only=True)
+    # customer_note = serializers.SerializerMethodField(read_only=True)
+    # appointmnet_service = serializers.SerializerMethodField(read_only=True)
+    # appointment_tips = serializers.SerializerMethodField(read_only=True)
+    # client = serializers.SerializerMethodField(read_only=True)
 
-    def get_appointment_tips(self, obj):
-        tips = AppointmentEmployeeTip.objects.filter(
-            appointment = obj
-        ).annotate(
-            member_name = F('member__full_name')
-        ).values('member_name', 'tip')
-        return list(tips)
+    # def get_appointment_tips(self, obj):
+    #     tips = AppointmentEmployeeTip.objects.filter(
+    #         appointment = obj
+    #     ).annotate(
+    #         member_name = F('member__full_name')
+    #     ).values('member_name', 'tip')
+    #     return list(tips)
     
-    def get_customer_note(self, obj):
-        try:
-            note = Client.objects.get(id=obj.client)
-            return note.customer_note
-            #serializers = NoteSerializer(note)
-        except:
-            return None
+    # def get_customer_note(self, obj):
+    #     try:
+    #         note = Client.objects.get(id=obj.client)
+    #         return note.customer_note
+    #         #serializers = NoteSerializer(note)
+    #     except:
+    #         return None
         
-    def get_notes(self, obj):
-        try:
-            note = AppointmentNotes.objects.get(appointment=obj)
-            serializers = NoteSerializer(note)
-            return serializers.data
-        except:
-            return None
+    # def get_notes(self, obj):
+    #     try:
+    #         note = AppointmentNotes.objects.get(appointment=obj)
+    #         serializers = NoteSerializer(note)
+    #         return serializers.data
+    #     except:
+    #         return None
         
-    def get_appointmnet_service(self, obj):
-            note = AppointmentService.objects.filter(appointment=obj)
-            return AllAppoinment_EmployeeSerializer(note, many = True).data
+    # def get_appointmnet_service(self, obj):
+    #         note = AppointmentService.objects.filter(appointment=obj)
+    #         return AllAppoinment_EmployeeSerializer(note, many = True).data
     
-    def get_client(self, obj):
-        """
-        If is_mobile is true send complete client 
-        object, otherwise just send client ID.
-        """
-        is_mobile = self.context.get('is_mobile', False)
-        if is_mobile:
-            return ClientSerializer(obj.client).data if obj.client else None
-        else:
-            return obj.client.id if obj.client else None
+    # def get_client(self, obj):
+    #     """
+    #     If is_mobile is true send complete client
+    #     object, otherwise just send client ID.
+    #     """
+    #     is_mobile = self.context.get('is_mobile', False)
+    #     if is_mobile:
+    #         return ClientSerializer(obj.client).data if obj.client else None
+    #     else:
+    #         return obj.client.id if obj.client else None
         
     class Meta:
         model = Appointment

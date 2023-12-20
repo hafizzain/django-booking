@@ -3526,3 +3526,100 @@ def cancel_appointment(request):
             }
     }, status=status.HTTP_200_OK)
 
+
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_available_appointments(request):
+    appointment_status = request.GET.get('appointment_status', None)
+    appointment_id = request.GET.get('appointment_id', None)
+    client_id = request.GET.get('client_id', None)
+    employee_id = request.GET.get('employee_id', None)
+    booking_id = request.GET.get('booking_id', None)
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
+    no_pagination = request.GET.get('no_pagination', None)
+    location_id = request.GET.get('location', None)
+    paginator = CustomPagination()
+    paginator.page_size = 10
+    upcoming_flags = ['Appointment_Booked', 'Appointment Booked', 'Arrived', 'In Progress']
+    completed_flags = ['Done', 'Paid']
+    cancelled_flags = ['Cancel']
+    paginator = CustomPagination()
+    paginator.page_size = 10
+    try:
+        query = Q(is_deleted=False)
+        if client_id is not None:
+            query &= Q(client__id=client_id)
+        if employee_id is not None:
+            query &= Q(member__id=employee_id)
+        if start_date and end_date:
+            start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
+            end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
+            query &= (Q(start_time__range=(start_datetime, end_datetime)) |
+                      Q(end_time__range=(start_datetime, end_datetime)))
+        if location_id is not None:
+            query &= Q(business__id=location_id)
+        if appointment_id is not None:
+            query &= Q(id=appointment_id)
+        if booking_id is not None:
+            query &= Q(appointment_services__id=booking_id)
+        if appointment_status is not None:
+            if appointment_status == 'Upcomming':
+                pass
+                # query &= Q(status__in=upcoming_flags)
+            elif appointment_status == 'Completed':
+                pass
+                # query &= Q(status__in=completed_flags)
+            elif appointment_status == 'Cancelled':
+                pass
+                # query &= Q(status__in=cancelled_flags)
+        appointment = Appointment.objects.filter(query)
+    except Exception as err:
+        return Response(
+            {
+                'status': False,
+                'status_code': StatusCodes.INVALID_APPOINMENT_ID_4038,
+                'status_code_text': 'INVALID_APPOINMENT_ID_4038',
+                'response': {
+                    'message': 'Appointment Not Found',
+                    'error_message': str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    if no_pagination:
+        serialized = SingleNoteSerializer(appointment, many=True)
+        return Response(
+            {
+                'status': True,
+                'status_code': 200,
+                'status_code_text': '200',
+                'response': {
+                    'message': 'All Appointments',
+                    'error_message': None,
+                    'appointment': serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    else:
+        serialized = SingleNoteSerializer(appointment, many=True)
+        data = {
+            'status': True,
+            'status_code': 200,
+            'status_code_text': '200',
+            "response": {
+                "message": "Segment get Successfully",
+                "error_message": None,
+                "data": serialized.data,
+                'count': paginator.page.paginator.count,
+                'next': paginator.get_next_link(),
+                'previous': paginator.get_previous_link(),
+                'current_page': paginator.page.number,
+                'per_page': paginator.page_size,
+                'total_pages': paginator.page.paginator.num_pages,
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)
