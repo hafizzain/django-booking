@@ -1061,6 +1061,7 @@ class AppointmentServiceResponseSeriailzer(serializers.ModelSerializer):
 
 
 
+
     class Meta:
         model = AppointmentService
         fields = ['id','status','duration','price','service_start_time','service_end_time', 'user', 'service_end_time', 'member']
