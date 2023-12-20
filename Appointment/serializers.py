@@ -146,28 +146,33 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
             first_appointment = None
             if client:
                 client_appointments = Appointment.objects.filter(client = client)
-                total_spend = AppointmentCheckout.objects.filter(appointment__client = client)
-                price = 0
-                for ck in total_spend:
-                    price = price + ck.total_price
+                
                 if len(client_appointments) > 0:
+                    total_spend = AppointmentCheckout.objects.filter(appointment__client = client)
+                    price = 0
+                    for ck in total_spend:
+                        price = price + ck.total_price
+
+
                     first_appointment = client_appointments.order_by('created_at').last()
+                    first_month = first_appointment.created_at.strftime('%m')
+
+
                     last_app = client_appointments[0]
+                    last_month = last_app.created_at.strftime('%m')
+                    months = 0
 
-                    if len(client_appointments) == 1:
+                    if len(client_appointments) == 1 or int(first_month) == int(last_month):
                         months = 1
-                        return {
-
-                        }
-
 
                     return {
                         # 'first_appointment': first_appointment.created_at if first_appointment else None,
+                        'months' : months,
                         'first_appointment': {
-                            'month' : first_appointment.created_at.strftime('%Y %m %d %H:%M:%s')
+                            'month' : first_month
                         },
                         'last_appointment' : {
-                            'month' : last_app.created_at.strftime('%Y %m %d %H:%M:%s')
+                            'month' : last_month
                         },
                         'spend_amount' : {
                             'count' : price
