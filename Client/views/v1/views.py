@@ -193,7 +193,7 @@ def get_client_dropdown(request):
     number_visit = request.GET.get('number_visit', None)
     spend_amount = request.GET.get('spend_amount', None)
     query = Q(is_deleted=False, is_blocked=False, is_active=True)
-    is_filtered = False
+    isFiltered = False
     
     if start_date and end_date:
         appoint_client_ids = list(AppointmentCheckout.objects\
@@ -207,23 +207,23 @@ def get_client_dropdown(request):
         # appoint_client_ids.extend(checkout_client_ids)
         merged_client_ids_list = list(set(appoint_client_ids+checkout_client_ids))
         query &= Q(id__in=merged_client_ids_list)
-        is_filtered = True 
+        isFiltered = True 
     
         
     if gender:
         query &= Q(gender=gender)
-        is_filtered = True
+        isFiltered = True
     
     if number_visit:
         query &= Q(total_visit=number_visit)
-        is_filtered = True
+        isFiltered = True
         
     if spend_amount:
         total_spend_amount = list(AppointmentCheckout.objects \
                     .filter(total_price = spend_amount) \
                     .values_list('appointment__client__id', flat=True))
         query &= Q(id__in=total_spend_amount)
-        is_filtered = True
+        isFiltered = True
         
     if search_text:
         query &= Q(full_name__icontains=search_text) | \
@@ -231,7 +231,7 @@ def get_client_dropdown(request):
                  Q(email__icontains=search_text) | \
                  Q(client_id__icontains=search_text)        
         is_searched = True
-        is_filtered = True
+        isFiltered = True
         
     all_client = Client.objects \
                     .count_total_visit(start_date, end_date) \
@@ -242,7 +242,8 @@ def get_client_dropdown(request):
     paginator = CustomPagination()
     paginator.page_size = 10 if page else 100000
     paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'clients', invoice_translations=None, current_page=page, is_searched=is_searched , is_filtered=is_filtered)
+    response = paginator.get_paginated_response(paginated_data, 'clients', invoice_translations=None,
+                                                current_page=page, is_searched=is_searched , is_filtered=isFiltered)
     return response
 
 
