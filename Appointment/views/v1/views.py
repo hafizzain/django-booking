@@ -1,7 +1,7 @@
 from Appointment.Constants.Reschedulen import reschedule_appointment_n
 from Appointment.Constants.Reschedulen import reschedule_appointment_n
 from Appointment.Constants.ConvertTime import convert_24_to_12
-
+from django.utils import timezone
 from Appointment.Constants.Reschedule import reschedule_appointment
 from Appointment.Constants.AddAppointment import Add_appointment
 from Appointment.Constants.cancelappointment import cancel_appointment
@@ -3538,8 +3538,8 @@ def get_available_appointments(request):
         if start_date and end_date:
             start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
             end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
-            query &= (Q(start_time__range=(start_datetime, end_datetime)) |
-                      Q(end_time__range=(start_datetime, end_datetime)))
+            end_datetime = end_datetime + timezone.timedelta(days=1)  # Adjust for end of day
+            query &= Q(created_at__range=(start_datetime, end_datetime))
         if location_id is not None:
             query &= Q(business_address__id=location_id)
         if appointment_id is not None:
