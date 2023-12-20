@@ -3557,6 +3557,8 @@ def get_available_appointments(request):
                 pass
                 # query &= Q(status__in=cancelled_flags)
         appointment = Appointment.objects.filter(query)
+        if appointment:
+            appointment = appointment.order_by('-created_at')
     except Exception as err:
         return Response(
             {
