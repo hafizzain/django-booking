@@ -1059,7 +1059,7 @@ class AppointmentServiceResponseSeriailzer(serializers.ModelSerializer):
 
     class Meta:
         model = AppointmentService
-        fields = ['id', 'member', 'price', 'appointment_date', 'appointment_time', 'service_start_time', 'status']
+        fields = ['id','service_end_time', 'member', 'price', 'appointment_date', 'appointment_time', 'status']
 
 
 

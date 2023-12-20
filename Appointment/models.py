@@ -156,7 +156,6 @@ class AppointmentService(models.Model):
 
     
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
-    
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_appointment_services', verbose_name='Creator ( User )')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, null=True, blank=True, related_name='business_appointment_services')
     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True, blank=True, related_name='appointment_services')
