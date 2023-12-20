@@ -3542,7 +3542,7 @@ def get_available_appointments(request):
             query &= (Q(start_time__range=(start_datetime, end_datetime)) |
                       Q(end_time__range=(start_datetime, end_datetime)))
         if location_id is not None:
-            query &= Q(business__id=location_id)
+            query &= Q(business_address__id=location_id)
         if appointment_id is not None:
             query &= Q(id=appointment_id)
         if booking_id is not None:
