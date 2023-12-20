@@ -181,14 +181,14 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                         'months' : months,
                         'tag' : tag,
                         'monthly_spending' : monthly_spending,
-                        'first_appointment': {
-                            'date' : last_app.created_at.strftime('%Y %m %d')
-                        },
-                        'last_appointment' : {
-                            'date' : first_appointment.created_at.strftime('%Y %m %d')
-                        },
-                        'total_spend' : price,
-                        'appointments' : client_appointments.count()
+                        # 'first_appointment': {
+                            # 'date' : last_app.created_at.strftime('%Y %m %d')
+                        # },
+                        # 'last_appointment' : {
+                            # 'date' : first_appointment.created_at.strftime('%Y %m %d')
+                        # },
+                        # 'total_spend' : price,
+                        # 'appointments' : client_appointments.count()
                     }
                 else:
                     return {}
