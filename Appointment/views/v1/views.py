@@ -3364,15 +3364,15 @@ def create_missed_opportunity(request):
     note = request.data.get('notes', None)
     dependency = request.data.get('dependency', None)
     services_data = format_json_string(request.data.get('services', None))
+    location_id = request.data.get('location_id', None)
 
     services_list = []
 
-    if client_id:
-        client = Client.objects.get(id=client_id)
-    else:
-        client = None
+    location = BusinessAddress.objects.get(id=location_id)
+    client = Client.objects.get(id=client_id)
 
     client_opportunity = ClientMissedOpportunity.objects.create(
+        location=location,
         client=client,
         client_type=client_type,
         date_time=opportunity_date,
