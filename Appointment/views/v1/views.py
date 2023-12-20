@@ -3593,7 +3593,6 @@ def get_available_appointments(request):
         serialized = SingleNoteResponseSerializer(paginated_appointments, many=True)
         # serialized = SingleNoteResponseSerializer(appointment, many=True)
 
-
         data = {
             'status': True,
             'status_code': 200,
