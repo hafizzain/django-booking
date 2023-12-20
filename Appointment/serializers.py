@@ -154,12 +154,12 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                         price = price + ck.total_price
 
 
-                    first_appointment = client_appointments.order_by('created_at').last()
-                    first_month = int(first_appointment.created_at.strftime('%m'))
-
-
-                    last_app = client_appointments[0]
+                    last_app = client_appointments.order_by('created_at').last()
                     last_month = int(last_app.created_at.strftime('%m'))
+
+
+                    first_appointment = client_appointments[0]
+                    first_month = int(first_appointment.created_at.strftime('%m'))
 
                     months = 0
                     monthly_spending = 0
@@ -170,7 +170,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                         monthly_spending = price
                         tag = 'Lest Visitor'
                     else:
-                        months = last_month - first_month
+                        months = first_month - last_month
                         monthly_spending = price / months
                         if monthly_spending >= 100:
                             tag = 'Most Spender'
@@ -183,10 +183,10 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                         'tag' : tag,
                         'monthly_spending' : monthly_spending,
                         'first_appointment': {
-                            'date' : first_appointment.created_at.strftime('%Y %m %d')
+                            'date' : last_app.created_at.strftime('%Y %m %d')
                         },
                         'last_appointment' : {
-                            'date' : last_app.created_at.strftime('%Y %m %d')
+                            'date' : first_appointment.created_at.strftime('%Y %m %d')
                         },
                         'spend_amount' : {
                             'count' : price
