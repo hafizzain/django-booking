@@ -3366,15 +3366,15 @@ def create_missed_opportunity(request):
     note = request.data.get('notes', None)
     dependency = request.data.get('dependency', None)
     services_data = format_json_string(request.data.get('services', None))
+    location_id = request.data.get('location_id', None)
 
     services_list = []
 
-    if client_id:
-        client = Client.objects.get(id=client_id)
-    else:
-        client = None
+    location = BusinessAddress.objects.get(id=location_id)
+    client = Client.objects.get(id=client_id)
 
     client_opportunity = ClientMissedOpportunity.objects.create(
+        location=location,
         client=client,
         client_type=client_type,
         date_time=opportunity_date,
@@ -3426,9 +3426,13 @@ class MissedOpportunityListCreate(generics.ListAPIView,
         search_text = request.query_params.get('search_text', None)
         start_date = request.query_params.get('start_date', None)
         end_date = request.query_params.get('end_date', None)
+        location_id = request.query_params.get('location_id', None)
+
 
         query = Q()
 
+        if location_id:
+            query &= Q(location__id=location_id)
         if search_text:
             query &= Q(client__full_name__icontains=search_text)
 

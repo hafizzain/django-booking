@@ -25,17 +25,17 @@ class ClientSerializer(serializers.ModelSerializer):
         
         
 class SegmentSerializer(serializers.ModelSerializer):
-    client_data = ClientSerializer(many=True, read_only=True, source='client')
-    
+    client_data = serializers.SerializerMethodField(read_only=True)
+    def get_client_data(self, obj):
+        request = self.context.get('request')
+        clients = obj.client.all()
+        serializer = ClientSerializer(clients, many=True, context={'request': request})
+        return serializer.data 
     class Meta:
         model =  Segment
-        fields = '__all__'
-    
-    def get_client_data(self, obj):
-        return [{'full_name': client.full_name,
-                    'image': client.image} for client in obj.client.all()]
-
-        
+        fields = ['id', 'name', 'segment_type', 'description',
+                  'client_data', 'created_at', 'is_active', 'client', 'business', 'user']
+           
 class SegmentDropdownSerializer(serializers.ModelSerializer):
     
     class Meta:

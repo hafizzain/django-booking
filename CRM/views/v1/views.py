@@ -66,7 +66,7 @@ class SegmentAPIView(APIView):
                 filtered_queryset = filtered_queryset.filter(is_active=is_active)
               
             if no_pagination:
-                serializer = SegmentSerializer(filtered_queryset, many=True)
+                serializer = SegmentSerializer(filtered_queryset, many=True,context={'request': request})
                 data = {
                         "success": True,
                         "status_code" : 200,
@@ -80,7 +80,7 @@ class SegmentAPIView(APIView):
             else:
                 paginator = self.pagination_class()
                 result_page = paginator.paginate_queryset(filtered_queryset, request)
-                serializer = SegmentSerializer(result_page, many=True)
+                serializer = SegmentSerializer(result_page, many=True, context={'request': request})
                 data = {
                         'count': paginator.page.paginator.count,
                         'next': paginator.get_next_link(),
