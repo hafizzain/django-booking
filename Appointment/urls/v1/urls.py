@@ -2,8 +2,8 @@ from django.urls import path, include
 from Appointment.views.v1 import views
 from rest_framework.routers import DefaultRouter
 
-router = DefaultRouter()
-router.register('get_all_appointments/', views.AppointmentModelViewSet, basename='get_all_appointments')
+# router = DefaultRouter()
+# router.register('get_all_appointments/', views.AppointmentModelViewSet, basename='get_all_appointments')
 
 urlpatterns = [
     # Appointment
