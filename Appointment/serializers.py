@@ -178,9 +178,9 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                             tag = 'Most Visitor'
                             
                     return {
-                        'months' : months,
+                        # 'months' : months,
                         'tag' : tag,
-                        'monthly_spending' : monthly_spending,
+                        # 'monthly_spending' : monthly_spending,
                         # 'first_appointment': {
                             # 'date' : last_app.created_at.strftime('%Y %m %d')
                         # },
