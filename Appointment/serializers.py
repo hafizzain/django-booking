@@ -162,17 +162,21 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                     last_month = last_app.created_at.strftime('%m')
                     months = 0
 
+                    tag = ''
                     if len(client_appointments) == 1 or int(first_month) == int(last_month):
                         months = 1
+                    else:
+                        months = 10
 
                     return {
                         # 'first_appointment': first_appointment.created_at if first_appointment else None,
                         'months' : months,
+                        'tag' : tag,
                         'first_appointment': {
-                            'month' : first_month
+                            'date' : first_appointment.created_at.strftime('%Y %m %d')
                         },
                         'last_appointment' : {
-                            'month' : last_month
+                            'date' : last_app.created_at.strftime('%Y %m %d')
                         },
                         'spend_amount' : {
                             'count' : price
