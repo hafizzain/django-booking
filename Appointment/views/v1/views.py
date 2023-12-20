@@ -3593,7 +3593,7 @@ def get_available_appointments(request):
                 "message": "Segment get Successfully",
                 "error_message": None,
                 "data": serialized.data,
-                'count': paginator.page.paginator.count,
+                # 'count': paginator.count,
                 'next': paginator.get_next_link(),
                 'previous': paginator.get_previous_link(),
                 'current_page': paginator.page.number,
