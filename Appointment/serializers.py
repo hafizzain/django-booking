@@ -1055,7 +1055,7 @@ class EmployeeSerializerResponse(serializers.ModelSerializer):
 
 
 class AppointmentServiceResponseSeriailzer(serializers.ModelSerializer):
-    member = EmployeeSerializerResponse(many=True)
+    # member = EmployeeSerializerResponse(many=True)
 
     class Meta:
         model = AppointmentService
@@ -1065,7 +1065,7 @@ class AppointmentServiceResponseSeriailzer(serializers.ModelSerializer):
 
 class SingleNoteResponseSerializer(serializers.ModelSerializer):
     # client = ClientSerializerresponse(read_only=True, many=True)
-    # appointment_services = AppointmentServiceResponseSeriailzer(many=True)
+    appointment_services = AppointmentServiceResponseSeriailzer(many=True)
 
     class Meta:
         model = Appointment
