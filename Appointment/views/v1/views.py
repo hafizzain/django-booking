@@ -3531,6 +3531,8 @@ def get_available_appointments(request):
     cancelled_flags = ['Cancel']
     try:
         query = Q(is_deleted=False)
+        if appointment_status is not None:
+            query &= Q(status__icontains=appointment_status)
         if search_text:
             query &= (Q(client__full_name__icontains=search_text)
                       | Q(member__full_name__icontains=search_text)
@@ -3540,7 +3542,6 @@ def get_available_appointments(request):
                       | Q(appointment_services__service__name__icontains=search_text)
                       | Q(appointment_services__id=search_text)
                       | Q(id=search_text)
-
                       )
 
         if client_id is not None:
@@ -3558,8 +3559,6 @@ def get_available_appointments(request):
             query &= Q(id=appointment_id)
         if booking_id is not None:
             query &= Q(appointment_services__id=booking_id)
-        if appointment_status is not None:
-            query &= Q(status__icontains=appointment_status)
 
         appointment = Appointment.objects.filter(query)
         if appointment:
