@@ -21,33 +21,65 @@ from Utility.models import CommonField
 class AppointmentCheckoutManager(models.QuerySet):
 
     def with_total_service_price(self, currency):
-        
-        # service_ids = AppointmentService.objects \
-        #             .filter(appointment=OuterRef('appointment')) \
-        #             .values_list('service__id', flat=True)
 
-        service_ids = OuterRef('appointment_services__service_id')
+        outer_query_alias = Subquery(
+            self.filter(id=OuterRef('pk')).values('appointment')[:1]
+        )
+
+        service_ids = AppointmentService.objects \
+            .filter(appointment=outer_query_alias) \
+            .values_list('service__id', flat=True)
+
+        total_price_subquery = Subquery(
+            PriceService.objects \
+                .filter(service__id__in=service_ids, currency=currency) \
+                .annotate(total_price=Sum('price')) \
+                .order_by('-created_at') \
+                .values('total_price')[:1]
+        )
+
         return self.annotate(
             subtotal=Coalesce(
                 Appointment.objects \
                     .filter(id=OuterRef('pk')) \
                     .annotate(
-                    total_price=Coalesce(
-                        Subquery(
-                            PriceService.objects \
-                            .filter(service__id__in=service_ids, currency=currency) \
-                            .annotate(total_price=Sum('price')) \
-                            .order_by('-created_at') \
-                            .values('total_price')[:1]
-                        ),
-                        0.0,
-                        output_field=FloatField()
+                        total_price=Coalesce(total_price_subquery, 0.0, output_field=FloatField())
                     )
-                ).values('total_price')[:1],
+                    .values('total_price')[:1],
                 0.0,
                 output_field=FloatField()
             )
         )
+
+        # outer_query_alias = Subquery(
+        #     self.filter(id=OuterRef('pk')).values('appointment')[:1]
+        # )
+        
+        # service_ids = AppointmentService.objects \
+        #             .filter(appointment=OuterRef('appointment')) \
+        #             .values_list('service__id', flat=True)
+
+        # return self.annotate(
+        #     subtotal=Coalesce(
+        #         Appointment.objects \
+        #             .filter(id=OuterRef('pk')) \
+        #             .annotate(
+        #             total_price=Coalesce(
+        #                 Subquery(
+        #                     PriceService.objects \
+        #                     .filter(service__id__in=service_ids, currency=currency) \
+        #                     .annotate(total_price=Sum('price')) \
+        #                     .order_by('-created_at') \
+        #                     .values('total_price')[:1]
+        #                 ),
+        #                 0.0,
+        #                 output_field=FloatField()
+        #             )
+        #         ).values('total_price')[:1],
+        #         0.0,
+        #         output_field=FloatField()
+        #     )
+        # )
     
     def with_payment_status(self):
         return self.annotate(
