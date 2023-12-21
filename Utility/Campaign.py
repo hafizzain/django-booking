@@ -4,9 +4,6 @@ from django.conf import settings
 
 class CampaignUtility:
     def run_campaign(self, campaign=None):
-        """
-        Send email for the given campaign.
-        """
         message = campaign.content
         subject = campaign.title
             
@@ -23,8 +20,8 @@ class CampaignUtility:
             pass
         
     def campaign_async(self, campaign=None):
-            """
-            Send email for the given campaign asynchronously in a separate thread.
-            """
-            thread = Thread(target=self.run_campaign, args=[campaign])
-            thread.start()
+        """
+        Send email for the given campaign asynchronously in a separate thread.
+        """
+        thread = Thread(target=self.run_campaign, args=[campaign])
+        thread.start()
