@@ -41,7 +41,9 @@ class AppointmentCheckoutManager(models.QuerySet):
                         0.0,
                         output_field=FloatField()
                     )
-                ).values('total_price')[:1]
+                ).values('total_price')[:1],
+                0.0,
+                output_field=FloatField()
             )
         )
     
