@@ -376,7 +376,7 @@
             <hr class="border" />
             <div class="flex flex-col gap-1">
               <div>
-                <p class="font-semibold text-lg">Nstyle Policy</p>
+                <p class="font-semibold text-lg">{{business_address.address_name |default:"Nstyle Policy"}}</p>
                 <p class="text-left">
                   {{ business_address.privacy_policy|default:"We collect minimal personal information, like client details and transaction data, solely for the purpose of generating and managing invoices to ensure accurate billing for services provided. Your information is securely handled, and we do not share it with third parties unless required by law. You have the right to access and correct your data, and we prioritize its security against unauthorized access. Our policy may be updated, so please check periodically for the latest information. For any concerns or questions, feel free to contact us." }}
                   <br/>
