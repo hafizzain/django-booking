@@ -30,29 +30,6 @@ class CampaignUtility:
         th = Thread(target=CampaignUtility.run_campaign, args=(campaign,))
         th.start()
         
-def send_campaign_email(campaign=None):
-    """
-    Send email for the given campaign asynchronously in a separate thread.
-    """
-    ExceptionRecord.objects.create(text=str('calling send_campaign_email function '),
-                                        status_code=str(500),
-                                        method=str('send_campaign_email'),
-                                        path=str('send_campaign_email')
-                                    )
-    try:
-        th = Thread(target=run_campaign, args=[campaign])
-        th.start()
-    except Exception as err:
-        ExceptionRecord.objects.create(text=str('it is Thread error'+str(err)),
-                                        status_code=str(500),
-                                        method=str('send_campaign_email'),
-                                        path=str('send_campaign_email')
-                                    )
-    ExceptionRecord.objects.create(text=str('after Thread'),
-                                        status_code=str(500),
-                                        method=str('send_campaign_email'),
-                                        path=str('send_campaign_email')
-                                    )
 
 def run_campaign(campaign=None):
     ExceptionRecord.objects.create(text=str('calling run_campaign function '),
@@ -84,3 +61,26 @@ def run_campaign(campaign=None):
                                             path=str('send_mail')
                                         )
         
+def send_campaign_email(campaign=None):
+    """
+    Send email for the given campaign asynchronously in a separate thread.
+    """
+    ExceptionRecord.objects.create(text=str('calling send_campaign_email function '),
+                                        status_code=str(500),
+                                        method=str('send_campaign_email'),
+                                        path=str('send_campaign_email')
+                                    )
+    try:
+        th = Thread(target=run_campaign, args=[campaign])
+        th.start()
+    except Exception as err:
+        ExceptionRecord.objects.create(text=str('it is Thread error'+str(err)),
+                                        status_code=str(500),
+                                        method=str('send_campaign_email'),
+                                        path=str('send_campaign_email')
+                                    )
+    ExceptionRecord.objects.create(text=str('after Thread'),
+                                        status_code=str(500),
+                                        method=str('send_campaign_email'),
+                                        path=str('send_campaign_email')
+                                    )
