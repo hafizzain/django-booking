@@ -30,23 +30,17 @@ class AppointmentCheckoutManager(models.QuerySet):
 
         return self.annotate(
             subtotal=Coalesce(
-                Appointment.objects \
-                    .filter(id=OuterRef('pk')) \
-                    .annotate(
-                    total_price=Coalesce(
-                        Subquery(
-                            PriceService.objects \
-                            .filter(service__id__in=service_ids, currency=currency) \
-                            .annotate(total_price=Sum('price')) \
-                            .order_by('-created_at') \
-                            .values('total_price')[:1]
-                        ),
-                        0.0,
-                        output_field=FloatField()
-                    )
-                ).values('total_price')[:1],
-                0.0,
-                output_field=FloatField()
+                total_price=Coalesce(
+                    Subquery(
+                        PriceService.objects \
+                        .filter(service__id__in=service_ids, currency=currency) \
+                        .annotate(total_price=Sum('price')) \
+                        .order_by('-created_at') \
+                        .values('total_price')[:1]
+                    ),
+                    0.0,
+                    output_field=FloatField()
+                )
             )
         )
     
