@@ -1,4 +1,4 @@
-import threading
+from threading import Thread
 from django.core.mail import send_mail
 from django.conf import settings
 
@@ -26,6 +26,5 @@ class CampaignUtility:
             """
             Send email for the given campaign asynchronously in a separate thread.
             """
-            thread = threading.Thread(target=self.run_campaign, args=(campaign,))
+            thread = Thread(target=self.run_campaign, args=[campaign])
             thread.start()
-
