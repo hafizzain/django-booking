@@ -50,7 +50,7 @@ from Appointment.serializers import (CheckoutSerializer, AppoinmentSerializer, S
                                      AppointmenttLogSerializer, AppointmentSerializerDashboard,
                                      AppointmentServiceSerializerBasic,
                                      PaidUnpaidAppointmentSerializer, MissedOpportunityBasicSerializer,
-                                     OpportunityEmployeeServiceSerializer,
+                                     OpportunityEmployeeServiceSerializer, PaidUnpaidAppointmentCheckoutSerializer,
                                      AppointmentSerializerForStatus, SingleNoteResponseSerializer)
 from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
@@ -1279,10 +1279,11 @@ def update_appointment_service(request):
                     service_appointment.user = request.user
                     service_appointment.business = appointment.business
                     service_appointment.business_address = appointment.business_address
+                    service_appointment.status = choices.AppointmentServiceStatus.BOOKED
 
                     # If a new service is added change the status of 
                     # appointment to started
-                    appointment.status = choices.AppointmentStatus.STARTED
+                    appointment.status = choices.AppointmentStatus.BOOKED
                     appointment.save()
 
                 service_appointment.appointment_date = appointment_date
@@ -3288,12 +3289,9 @@ def appointment_service_status_update(request):
     appoint_service_statuses = list(
         AppointmentService.objects.filter(appointment=appointment).values_list('status', flat=True))
 
-    is_all_finished = all(
-        [True if status == choices.AppointmentServiceStatus.FINISHED else False for status in appoint_service_statuses])
-    is_all_void = all(
-        [True if status == choices.AppointmentServiceStatus.VOID else False for status in appoint_service_statuses])
-    is_all_started = all(
-        [True if status == choices.AppointmentServiceStatus.STARTED else False for status in appoint_service_statuses])
+    is_all_finished = all([True if status == choices.AppointmentServiceStatus.FINISHED else False for status in appoint_service_statuses])
+    is_all_void = all([True if status == choices.AppointmentServiceStatus.VOID else False for status in appoint_service_statuses])
+    is_all_started = all([True if status == choices.AppointmentServiceStatus.STARTED else False for status in appoint_service_statuses])
 
     if (is_all_finished or is_all_void) or (not is_all_started):
         appointment.status = choices.AppointmentStatus.FINISHED
@@ -3326,13 +3324,15 @@ def paid_unpaid_clients(request):
     start_date = request.GET.get('start_date', None)
     end_date = request.GET.get('end_date', None)
 
+    currency = BusinessAddress.objects.get(id=location_id).currency
+
     query = Q()
 
     if is_paid == 'paid':
-        query &= Q(status=choices.AppointmentStatus.DONE)
+        query &= Q(appointment__status=choices.AppointmentStatus.DONE)
 
     if is_paid == 'unpaid':
-        query &= ~Q(status=choices.AppointmentStatus.DONE)
+        query &= ~Q(appointment__status=choices.AppointmentStatus.DONE)
 
     if location_id:
         query &= Q(business_address__id=location_id)
@@ -3340,15 +3340,15 @@ def paid_unpaid_clients(request):
     if start_date and end_date:
         query &= Q(created_at__range=(start_date, end_date))
 
-    appointments = Appointment.objects \
+    appointment_checkouts = AppointmentCheckout.objects \
         .filter(query) \
-        .select_related('client',
-                        'business',
-                        'business_address',
-                        'business_address__currency') \
+        .with_total_service_price(currency) \
+        .with_payment_status() \
+        .with_client_name() \
+        .with_payment_date() \
         .order_by('-created_at')
 
-    serialized = list(PaidUnpaidAppointmentSerializer(appointments, many=True).data)
+    serialized = list(PaidUnpaidAppointmentCheckoutSerializer(appointment_checkouts, many=True).data)
 
     paginator = CustomPagination()
     paginator.page_size = 100000 if no_pagination else 10
@@ -3367,11 +3367,13 @@ def create_missed_opportunity(request):
     dependency = request.data.get('dependency', None)
     services_data = format_json_string(request.data.get('services', None))
     location_id = request.data.get('location_id', None)
+    client = None
 
     services_list = []
 
     location = BusinessAddress.objects.get(id=location_id)
-    client = Client.objects.get(id=client_id)
+    if client_id:
+        client = Client.objects.get(id=client_id)
 
     client_opportunity = ClientMissedOpportunity.objects.create(
         location=location,
