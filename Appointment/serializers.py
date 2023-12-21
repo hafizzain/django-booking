@@ -893,7 +893,7 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
                   'duration', 'notes', 'is_favourite'
                   )
 
-
+# Not Using below Serializer
 class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
     client_name = serializers.SerializerMethodField(read_only=True)
     booking_id = serializers.SerializerMethodField(read_only=True)
@@ -977,6 +977,30 @@ class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
         fields = ['id', 'booking_id', 'client_name', 'booking_date', 'subtotal', 'payment_status', 'payment_date']
+
+
+class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
+
+    subtotal = serializers.FloatField()
+    client_name = serializers.CharField()
+    payment_status = serializers.CharField()
+    payment_date = serializers.DateTimeField()
+    booking_id = serializers.SerializerMethodField()
+    booking_date = serializers.SerializerMethodField()
+
+    def get_booking_id(self, obj):
+        return obj.obj.appointment.get_booking_id()
+
+    def get_booking_date(self, obj):
+        return obj.appointment.created_at
+    
+    class Meta:
+        model = AppointmentCheckout
+        fields = ['id', 'booking_id', 'client_name', 'booking_date', 'subtotal', 'payment_status', 'payment_date']
+
+
+
+
 
 
 class NoteSerializer(serializers.ModelSerializer):

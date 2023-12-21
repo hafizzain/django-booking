@@ -2,13 +2,13 @@ from datetime import datetime, timedelta
 import uuid
 from xml.parsers.expat import model
 from django.db import models
-from django.db.models import Sum, Subquery, OuterRef
+from django.db.models import Sum, Subquery, OuterRef, FloatField, Case, When, Value, CharField, F, DateTimeField
 from django.db.models.functions import Coalesce
 
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
 from django.utils.timezone import now
-from Service.models import Service
+from Service.models import Service, PriceService
 from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs
 from Employee.models import Employee
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
@@ -20,12 +20,47 @@ from Utility.models import CommonField
 
 class AppointmentCheckoutManager(models.QuerySet):
 
-    Subquery
-    def with_total_service_price(self):
-
+    def with_total_service_price(self, currency):
+        
+        service_ids = AppointmentService.objects \
+                    .filter(appointment=OuterRef('appointment')) \
+                    .values_list('service__id', flat=True)
+        # if the checkout is not done
         return self.annotate(
-            total_service_price=Coalesce(
-                Subquery
+            subtotal=Coalesce(
+                Subquery(
+                    PriceService.objects \
+                    .filter(service__id__in=service_ids, currency=currency) \
+                    .annotate(total_price=Sum('price')) \
+                    .order_by('-created_at') \
+                    .values('total_price')
+                ),
+                0.0,
+                output_field=FloatField()
+            )
+        )
+    
+    def with_payment_status(self):
+        return self.annotate(
+            payment_status=Case(
+                    When(appointment__status=choices.AppointmentStatus.DONE, then=Value(choices.PaymentChoices.PAID)),
+                    default=Value(choices.PaymentChoices.UNPAID)
+                )
+            )
+    
+    def with_client_name(self):
+        return self.annotate(
+            client_name=Coalesce(F('appointment__client__full_name'), Value(None), output_field=CharField())
+        )
+    
+    def with_payment_date(self):
+        return self.annotate(
+            payment_date=Coalesce(
+                Case(
+                    When(appointment__status=choices.AppointmentStatus.DONE, then=F('updated_at')),
+                    default=Value(None)
+                ),
+                output_field=DateTimeField()
             )
         )
 
