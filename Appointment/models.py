@@ -29,7 +29,7 @@ class AppointmentCheckoutManager(models.QuerySet):
                     .values_list('service__id', flat=True)
 
         return self.annotate(
-            total_price=Coalesce(
+            subtotal=Coalesce(
                 Subquery(
                     PriceService.objects \
                     .filter(service__id__in=service_ids, currency=currency) \
