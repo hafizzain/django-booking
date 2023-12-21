@@ -2547,7 +2547,8 @@ def get_client_sale(request):
         appointment_checkout_5 = appointment_checkout_all[:5]
 
     appointment = ServiceClientSaleSerializer(appointment_checkout_5[:5], many=True)
-
+    quick_sale_count = len(product.data) + len(services_data.data)
+    total_sale = total_sale + quick_sale_count
     return Response(
         {
             'status': True,
@@ -2561,7 +2562,7 @@ def get_client_sale(request):
                 'appointment': appointment.data,
                 'appointments_count': appointment_checkout_all.count(),
                 'total_sales': total_sale,
-                'quick_sale_count': len(product.data) + len(services_data.data),
+                'quick_sale_count': quick_sale_count,
                 'voucher_count': len(voucher_membership)
             }
         },
