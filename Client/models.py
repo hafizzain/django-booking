@@ -59,16 +59,23 @@ class ClientManager(models.QuerySet):
         )
         
     def count_total_visit(self, start_date=None, end_date=None):
-        
-        appointment_filter = Q(created_at__range=(start_date, end_date))
-        return self.annotate(
-            total_visit = Coalesce(
-                Count('client_appointments', filter=appointment_filter),
-                0,
-                output_field=IntegerField()
+        if start_date and end_date:
+            appointment_filter = Q(created_at__range=(start_date, end_date))
+            return self.annotate(
+                total_visit = Coalesce(
+                    Count('client_appointments', filter=appointment_filter),
+                    0,
+                    output_field=IntegerField()
+                )
             )
-        )
-        
+        else:
+            return self.annotate(
+                total_visit = Coalesce(
+                    Count('client_appointments'),
+                    0,
+                    output_field=IntegerField()
+                )
+            )
 
         
 class Client(models.Model):
