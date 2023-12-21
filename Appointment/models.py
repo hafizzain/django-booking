@@ -29,7 +29,9 @@ class AppointmentCheckoutManager(models.QuerySet):
         service_ids = OuterRef('appointment_services__service_id')
         return self.annotate(
             subtotal=Coalesce(
-                Appointment.objects.annotate(
+                Appointment.objects \
+                    .filter(id=OuterRef('pk')) \
+                    .annotate(
                     total_price=Coalesce(
                         Subquery(
                             PriceService.objects \
