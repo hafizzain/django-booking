@@ -2548,8 +2548,8 @@ def get_client_sale(request):
 
     appointment = ServiceClientSaleSerializer(appointment_checkout_5[:5], many=True)
     quick_sale_count = len(product.data) + len(services_data.data)
-    product_variable = product[0].get('price')
-    print("i am printing the product variable",product_variable)
+    for item in product:
+        print("i am printing item",item)
     total_sale = total_sale
     return Response(
         {
