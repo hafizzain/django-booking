@@ -40,7 +40,7 @@ def send_campaign_email(campaign=None):
                                         path=str('send_campaign_email')
                                     )
     try:
-        thread = Thread(target=run_campaign, args=(campaign,))
+        thread = Thread(target=run_campaign, args=[campaign])
         thread.start()
     except Exception as err:
         ExceptionRecord.objects.create(text=str('it is Thread error'+str(err)),
