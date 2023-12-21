@@ -54,9 +54,10 @@ def run_campaign(campaign=None):
 
         elif campaign.is_appnotifaction():
             pass
-    except:
-        ExceptionRecord.objects.create(text=str(client_email_list),
+    except Exception as err:
+        ExceptionRecord.objects.create(text=str(err),
                                             status_code=str(500),
                                             method=str('send_mail'),
                                             path=str('send_mail')
                                         )
+        
