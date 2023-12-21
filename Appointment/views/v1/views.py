@@ -3526,21 +3526,24 @@ def get_available_appointments(request):
     no_pagination = request.GET.get('no_pagination', None)
     location_id = request.GET.get('location', None)
     search_text = request.GET.get('search_text', None)
-    upcoming_flags = ['Appointment_Booked', 'Appointment Booked', 'Arrived', 'In Progress']
-    completed_flags = ['Done', 'Paid']
-    cancelled_flags = ['Cancel']
     try:
         query = Q(is_deleted=False)
+        if appointment_status is not None:
+            query &= Q(status__icontains=appointment_status)
         if search_text:
-            query &= (Q(client__full_name__icontains=search_text)
-                      | Q(member__full_name__icontains=search_text)
-                      | Q(user__full_name__icontains=search_text)
-                      )
+            search_text = search_text.replace('#', '')
+            or_query = Q(client__full_name__icontains=search_text) | \
+                       Q(client__full_name__icontains=search_text) | \
+                       Q(user__full_name__icontains=search_text) | \
+                       Q(appointment_services__service__name__icontains=search_text) | \
+                       Q(member__id__icontains=search_text) | \
+                       Q(member__id__icontains=search_text) | \
+                       Q(client__id__icontains=search_text) | \
+                       Q(appointment_services__id__icontains=search_text) | \
+                       Q(id__icontains=search_text) | \
+                       Q(client_type__icontains=search_text)
 
-        if client_id is not None:
-            query &= Q(client__id=client_id)
-        if employee_id is not None:
-            query &= Q(member__id=employee_id)
+            query &= or_query
         if start_date and end_date:
             start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
             end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
@@ -3552,8 +3555,7 @@ def get_available_appointments(request):
             query &= Q(id=appointment_id)
         if booking_id is not None:
             query &= Q(appointment_services__id=booking_id)
-        if appointment_status is not None:
-            query &= Q(status____icontains=cancelled_flags)
+
         appointment = Appointment.objects.filter(query)
         if appointment:
             appointment = appointment.order_by('-created_at')
