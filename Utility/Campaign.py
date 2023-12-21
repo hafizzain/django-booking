@@ -39,8 +39,15 @@ def send_campaign_email(campaign=None):
                                         method=str('send_campaign_email'),
                                         path=str('send_campaign_email')
                                     )
-    thread = Thread(target=run_campaign, args=(campaign,))
-    thread.start()
+    try:
+        thread = Thread(target=run_campaign, args=(campaign,))
+        thread.start()
+    except Exception as err:
+        ExceptionRecord.objects.create(text=str('it is Thread error'+str(err)),
+                                        status_code=str(500),
+                                        method=str('send_campaign_email'),
+                                        path=str('send_campaign_email')
+                                    )
 
 def run_campaign(campaign=None):
     ExceptionRecord.objects.create(text=str('calling run_campaign function '),
