@@ -3537,6 +3537,7 @@ def get_available_appointments(request):
                       | Q(user__full_name__icontains=search_text)
                       | Q(member__id=search_text)
                       | Q(client__id=search_text)
+                      | Q(appointment_services__service__name__icontains=search_text)
 
                       )
 
@@ -3556,7 +3557,7 @@ def get_available_appointments(request):
         if booking_id is not None:
             query &= Q(appointment_services__id=booking_id)
         if appointment_status is not None:
-            query &= Q(status____icontains=cancelled_flags)
+            query &= Q(status____icontains=appointment_status)
         appointment = Appointment.objects.filter(query)
         if appointment:
             appointment = appointment.order_by('-created_at')
