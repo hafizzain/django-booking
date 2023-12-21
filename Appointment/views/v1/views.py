@@ -3535,6 +3535,9 @@ def get_available_appointments(request):
             query &= (Q(client__full_name__icontains=search_text)
                       | Q(member__full_name__icontains=search_text)
                       | Q(user__full_name__icontains=search_text)
+                      | Q(member__id=search_text)
+                      | Q(client__id=search_text)
+
                       )
 
         if client_id is not None:
