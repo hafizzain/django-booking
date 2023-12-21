@@ -26,17 +26,28 @@ class CampaignUtility:
         """
         Send email for the given campaign asynchronously in a separate thread.
         """
+        
         thread = Thread(target=CampaignUtility.run_campaign, args=(campaign,))
         thread.start()
         
 def send_campaign_email(campaign=None):
-        """
-        Send email for the given campaign asynchronously in a separate thread.
-        """
-        thread = Thread(target=run_campaign, args=(campaign,))
-        thread.start()
+    """
+    Send email for the given campaign asynchronously in a separate thread.
+    """
+    ExceptionRecord.objects.create(text=str('calling send_campaign_email function '),
+                                        status_code=str(500),
+                                        method=str('send_campaign_email'),
+                                        path=str('send_campaign_email')
+                                    )
+    thread = Thread(target=run_campaign, args=(campaign,))
+    thread.start()
 
 def run_campaign(campaign=None):
+    ExceptionRecord.objects.create(text=str('calling run_campaign function '),
+                                            status_code=str(500),
+                                            method=str('run_campaign'),
+                                            path=str('run_campaign')
+                                        )
     try:
         message = campaign.content
         subject = campaign.title
