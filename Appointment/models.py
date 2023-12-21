@@ -25,18 +25,21 @@ class AppointmentCheckoutManager(models.QuerySet):
         service_ids = AppointmentService.objects \
                     .filter(appointment=OuterRef('appointment')) \
                     .values_list('service__id', flat=True)
-        # if the checkout is not done
         return self.annotate(
             subtotal=Coalesce(
-                Subquery(
-                    PriceService.objects \
-                    .filter(service__id__in=service_ids, currency=currency) \
-                    .annotate(total_price=Sum('price')) \
-                    .order_by('-created_at') \
-                    .values('total_price')
-                ),
-                0.0,
-                output_field=FloatField()
+                Appointment.objects.annotate(
+                    total_price=Coalesce(
+                        Subquery(
+                            PriceService.objects \
+                            .filter(service__id__in=service_ids, currency=currency) \
+                            .annotate(total_price=Sum('price')) \
+                            .order_by('-created_at') \
+                            .values('total_price')[:1]
+                        ),
+                        0.0,
+                        output_field=FloatField()
+                    )
+                )
             )
         )
     
