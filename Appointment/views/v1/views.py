@@ -3558,6 +3558,7 @@ def get_available_appointments(request):
             query &= Q(appointment_services__id=booking_id)
         if appointment_status is not None:
             query &= Q(status____icontains=appointment_status)
+
         appointment = Appointment.objects.filter(query)
         if appointment:
             appointment = appointment.order_by('-created_at')
