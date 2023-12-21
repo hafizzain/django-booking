@@ -3536,6 +3536,7 @@ def get_available_appointments(request):
                        Q(client__full_name__icontains=search_text) | \
                        Q(user__full_name__icontains=search_text) | \
                        Q(member__full_name__icontains=search_text) | \
+                       Q(appointment_services__member__full_name__icontains=search_text) | \
                        Q(appointment_services__service__name__icontains=search_text) | \
                        Q(member__id__icontains=search_text) | \
                        Q(client__id__icontains=search_text) | \
