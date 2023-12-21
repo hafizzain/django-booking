@@ -2545,7 +2545,7 @@ def get_client_sale(request):
     total_sale += appointment_total if appointment_total else 0
     if appointment_checkout_all.count() > 5:
         appointment_checkout_5 = appointment_checkout_all[:5]
-
+    print("i am printing the product data",product)
     appointment = ServiceClientSaleSerializer(appointment_checkout_5[:5], many=True)
     quick_sale_count = len(product.data) + len(services_data.data)
     total_sale = total_sale + quick_sale_count
