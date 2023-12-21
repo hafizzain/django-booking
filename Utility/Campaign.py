@@ -65,7 +65,7 @@ def send_campaign_email(campaign=None):
     """
     Send email for the given campaign asynchronously in a separate thread.
     """
-    ExceptionRecord.objects.create(text=str('calling send_campaign_email function '),
+    ExceptionRecord.objects.create(text=str(f'calling send_campaign_email function {str(campaign)}'),
                                         status_code=str(500),
                                         method=str('send_campaign_email'),
                                         path=str('send_campaign_email')
