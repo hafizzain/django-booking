@@ -11,7 +11,8 @@ from rest_framework.authentication import SessionAuthentication
 
 from CRM.models import *
 from CRM.serializers import *
-from Utility.Campaign import CampaignUtility
+# from Utility.Campaign import CampaignUtility
+from Utility.Campaign import send_campaign_email
 from NStyle.Constants import StatusCodes
 from django.db import transaction
 from django.shortcuts import get_object_or_404
@@ -365,7 +366,7 @@ class CampaignsAPIView(APIView):
             serializer.save()
             
             new_campaign = serializer.instance
-            CampaignUtility.campaign_async(new_campaign)
+            send_campaign_email(campaign=new_campaign)
             data = {
                 "success": True,
                 "status_code": 201,
