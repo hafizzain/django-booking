@@ -2,6 +2,7 @@ from threading import Thread
 from django.core.mail import send_mail
 from django.conf import settings
 from Utility.models import ExceptionRecord
+import json
 # class CampaignUtility:
 
 #     @staticmethod
@@ -51,7 +52,7 @@ def run_campaign(campaign=None):
                 client_email_list,
                 fail_silently=False,
             )
-            ExceptionRecord.objects.create(text='Email sent run_campaign',
+            ExceptionRecord.objects.create(text=f'Email sent run_campaign {json.dumps(client_email_list)}',
                                             status_code=str(500),
                                             method=str('send_mail'),
                                             path=str('send_mail')
