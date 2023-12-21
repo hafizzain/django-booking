@@ -366,11 +366,7 @@ class CampaignsAPIView(APIView):
             serializer.save()
             
             new_campaign = serializer.instance
-            message = new_campaign.content
-            subject = new_campaign.title
-            
-            client_email_list = list(new_campaign.segment.client.all().values_list('email', flat=True))
-            send_campaign_email(message=message, subject=subject, client_email_list=client_email_list)
+            send_campaign_email(new_campaign=new_campaign)
             data = {
                 "success": True,
                 "status_code": 201,

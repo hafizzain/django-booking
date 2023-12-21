@@ -15,10 +15,17 @@ def run_campaign(message=None, subject=None, client_email_list=None):
             fail_silently=False,
         )
     
-def send_campaign_email(message=None, subject=None, client_email_list=None):
+def send_campaign_email(new_campaign=None):
     """
     Send email for the given campaign asynchronously in a separate thread.
     """
+    message = new_campaign.content
+    subject = new_campaign.title
+    client_email_list = list(new_campaign.segment \
+                                .client.all() \
+                                .values_list('email', flat=True)
+                            )
+    
     th = Thread(target=run_campaign, args=[], kwargs={'message' : message,
                                                       'subject' : subject,
                                                       'client_email_list' : client_email_list})
