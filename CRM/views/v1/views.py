@@ -149,7 +149,7 @@ class SegmentAPIView(APIView):
     @transaction.atomic
     def put(self, request, pk):
         segment = get_object_or_404(Segment, id=pk)
-        serializer = SegmentSerializer(segment, data=request.data)
+        serializer = SegmentSerializer(segment, data=request.data, context={'request': request})
         name = request.data.get('name')
         existing_segment = Segment.objects.filter(name=name) \
                             .exclude(id=pk).first()
