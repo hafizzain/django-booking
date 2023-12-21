@@ -3538,6 +3538,7 @@ def get_available_appointments(request):
                       | Q(member__id=search_text)
                       | Q(client__id=search_text)
                       | Q(appointment_services__service__name__icontains=search_text)
+                      | Q( appointment_services__id=search_text)
 
                       )
 
@@ -3557,7 +3558,7 @@ def get_available_appointments(request):
         if booking_id is not None:
             query &= Q(appointment_services__id=booking_id)
         if appointment_status is not None:
-            query &= Q(status____icontains=appointment_status)
+            query &= Q(status__icontains=appointment_status)
 
         appointment = Appointment.objects.filter(query)
         if appointment:
