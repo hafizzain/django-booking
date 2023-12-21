@@ -124,6 +124,7 @@ class CreatedAtAppointmentSerializer(serializers.ModelSerializer):
 class ClientDropdownSerializer(serializers.ModelSerializer):
 
     image = serializers.SerializerMethodField()
+    total_visits = serializers.IntegerField(read_only=True)
 
     def get_image(self, obj):
         if obj.image:
@@ -137,7 +138,7 @@ class ClientDropdownSerializer(serializers.ModelSerializer):
 
     class Meta:
         model  = Client
-        fields = ['id', 'full_name', 'email', 'client_id', 'image']
+        fields = ['id', 'full_name', 'email', 'client_id', 'image', 'total_visits']
 
 class ClientSerializer(serializers.ModelSerializer):
     country = CountrySerializer(read_only=True)
