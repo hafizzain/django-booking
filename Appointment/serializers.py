@@ -989,7 +989,7 @@ class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
     booking_date = serializers.SerializerMethodField()
 
     def get_booking_id(self, obj):
-        return obj.obj.appointment.get_booking_id()
+        return obj.appointment.get_booking_id()
 
     def get_booking_date(self, obj):
         return obj.appointment.created_at
