@@ -22,9 +22,11 @@ class AppointmentCheckoutManager(models.QuerySet):
 
     def with_total_service_price(self, currency):
         
-        service_ids = AppointmentService.objects \
-                    .filter(appointment=OuterRef('appointment')) \
-                    .values_list('service__id', flat=True)
+        # service_ids = AppointmentService.objects \
+        #             .filter(appointment=OuterRef('appointment')) \
+        #             .values_list('service__id', flat=True)
+
+        service_ids = OuterRef('appointment__appointment_services__service_id')
         return self.annotate(
             subtotal=Coalesce(
                 Appointment.objects.annotate(
@@ -39,7 +41,7 @@ class AppointmentCheckoutManager(models.QuerySet):
                         0.0,
                         output_field=FloatField()
                     )
-                )
+                ).values('total_price')[:1]
             )
         )
     
