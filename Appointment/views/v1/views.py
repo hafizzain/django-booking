@@ -2494,7 +2494,7 @@ def get_client_sale(request):
     total_sale += product_total if product_total else 0
     if product_order.count() > 5:
         product_order = product_order[:5]
-    product = POSerializerForClientSale(product_order, many=True, context={'request': request,})
+    product = POSerializerForClientSale(product_order, many=True, context={'request': request, })
 
     # Service Orders----------------------
     service_orders = ServiceOrder.objects \
@@ -2548,9 +2548,7 @@ def get_client_sale(request):
 
     appointment = ServiceClientSaleSerializer(appointment_checkout_5[:5], many=True)
     quick_sale_count = len(product.data) + len(services_data.data)
-    for item in product:
-        print("i am printing item",item)
-    total_sale = total_sale
+    total_sale = total_sale + quick_sale_count
     return Response(
         {
             'status': True,
