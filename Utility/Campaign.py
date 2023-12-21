@@ -1,7 +1,7 @@
 from threading import Thread
 from django.core.mail import send_mail
 from django.conf import settings
-
+from Utility.models import ExceptionRecord
 class CampaignUtility:
 
     @staticmethod
@@ -37,11 +37,13 @@ def send_campaign_email(campaign=None):
         thread.start()
 
 def run_campaign(campaign=None):
+    try:
         message = campaign.content
         subject = campaign.title
             
         if campaign.is_email():
             client_email_list = list(campaign.segment.client.all().values_list('email', flat=True))
+           
             send_mail(
                 subject,
                 message,
@@ -49,5 +51,12 @@ def run_campaign(campaign=None):
                 client_email_list,
                 fail_silently=False,
             )
+
         elif campaign.is_appnotifaction():
             pass
+    except:
+        ExceptionRecord.objects.create(text=str(client_email_list),
+                                            status_code=str(500),
+                                            method=str('send_mail'),
+                                            path=str('send_mail')
+                                        )
