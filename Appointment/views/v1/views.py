@@ -3532,7 +3532,11 @@ def get_available_appointments(request):
     try:
         query = Q(is_deleted=False)
         if search_text:
-            query &= Q(client__full_name__icontains=search_text) | Q(member__full_name__icontains=search_text)
+            query &= (Q(client__full_name__icontains=search_text)
+                      | Q(member__full_name__icontains=search_text)
+                      | Q(user__full_name__icontains=search_text)
+                      )
+
         if client_id is not None:
             query &= Q(client__id=client_id)
         if employee_id is not None:
@@ -3586,8 +3590,6 @@ def get_available_appointments(request):
         paginator.page_size = 10
         paginated_appointments = paginator.paginate_queryset(appointment, request)
         serialized = SingleNoteResponseSerializer(paginated_appointments, many=True)
-        # serialized = SingleNoteResponseSerializer(appointment, many=True)
-
         data = {
             'status': True,
             'status_code': 200,
