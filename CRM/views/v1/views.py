@@ -367,7 +367,6 @@ class CampaignsAPIView(APIView):
             
             new_campaign = serializer.instance
             send_campaign_email(new_campaign)
-            CampaignUtility.campaign_async(new_campaign)
             data = {
                 "success": True,
                 "status_code": 201,
