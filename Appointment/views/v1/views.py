@@ -1930,7 +1930,7 @@ def create_checkout(request):
                     commission_category='Service',
                     commission_type=commission.comission_choice,
                     sale_value=service_appointment.discount_price if service_appointment.discount_price else (
-                                service_appointment.total_price or service_appointment.price),
+                            service_appointment.total_price or service_appointment.price),
                     commission_rate=commission.commission_percentage,
                     commission_amount=calculated_commission,
                     symbol=commission.symbol,
@@ -3428,7 +3428,6 @@ class MissedOpportunityListCreate(generics.ListAPIView,
         end_date = request.query_params.get('end_date', None)
         location_id = request.query_params.get('location_id', None)
 
-
         query = Q()
 
         if location_id:
@@ -3526,12 +3525,14 @@ def get_available_appointments(request):
     end_date = request.GET.get('end_date', None)
     no_pagination = request.GET.get('no_pagination', None)
     location_id = request.GET.get('location', None)
-    search_text = request.GET.get('search_text',None)
+    search_text = request.GET.get('search_text', None)
     upcoming_flags = ['Appointment_Booked', 'Appointment Booked', 'Arrived', 'In Progress']
     completed_flags = ['Done', 'Paid']
     cancelled_flags = ['Cancel']
     try:
         query = Q(is_deleted=False)
+        if search_text:
+            query &= Q(client__full_name__icontains=search_text) | Q(member__full_name__icontains=search_text)
         if client_id is not None:
             query &= Q(client__id=client_id)
         if employee_id is not None:
