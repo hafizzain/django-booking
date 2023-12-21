@@ -367,17 +367,6 @@ class CampaignsAPIView(APIView):
             campaign_utility = CampaignUtility()
             new_campaign = serializer.instance
             campaign_utility.campaign_async(new_campaign)
-            message = new_campaign.content
-            subject = new_campaign.title
-            client_email_list = new_campaign.segment.client.all().values_list('email', flat=True)
-            send_mail(
-                subject,
-                message,
-                settings.EMAIL_HOST_USER,
-                client_email_list,
-                fail_silently=False,
-            )
-            
             data = {
                 "success": True,
                 "status_code": 201,
