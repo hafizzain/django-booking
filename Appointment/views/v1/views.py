@@ -3542,10 +3542,10 @@ def get_available_appointments(request):
                      Q(member__id__icontains=search_text) | \
                      Q(member__id__icontains=search_text) | \
                      Q(client__id__icontains=search_text) | \
-                     Q(appointment_services__id__icontains=search_text)
+                     Q(appointment_services__id__icontains=search_text) | \
+                     Q(id__icontains=search_text)
             query &= or_query
-        # if search_text:
-        #     query &= Q(id__icontains=search_text)
+
 
         if client_id is not None:
             query &= Q(client__id=client_id)
