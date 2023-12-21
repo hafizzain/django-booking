@@ -31,7 +31,7 @@ from Utility.models import ExceptionRecord
 #         th.start()
         
 
-def run_campaign(campaign):
+def run_campaign(campaign=None):
     ExceptionRecord.objects.create(text=str('calling run_campaign function '),
                                             status_code=str(500),
                                             method=str('run_campaign'),
@@ -71,7 +71,7 @@ def send_campaign_email(campaign=None):
                                         path=str('send_campaign_email')
                                     )
     try:
-        th = Thread(target=run_campaign, args=[campaign])
+        th = Thread(target=run_campaign, args=[], kwargs={'campaign' : campaign})
         th.start()
     except Exception as err:
         ExceptionRecord.objects.create(text=str('it is Thread error'+str(err)),
