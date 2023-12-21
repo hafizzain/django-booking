@@ -13,7 +13,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework import status
-
+from django.conf import settings
+from django.core.mail import send_mail
 
 from .serializers import CurrencySerializer, SoftwareSerializer, CountrySerializer, StateSerializer, CitySerializer
 

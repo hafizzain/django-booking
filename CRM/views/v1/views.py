@@ -11,6 +11,7 @@ from rest_framework.authentication import SessionAuthentication
 
 from CRM.models import *
 from CRM.serializers import *
+from Utility.Campaign import CampaignUtility
 from NStyle.Constants import StatusCodes
 from django.db import transaction
 from django.shortcuts import get_object_or_404
@@ -18,6 +19,8 @@ from django.db.models import Q
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
 from Notification.notification_processor import NotificationProcessor
+from django.conf import settings
+from django.core.mail import send_mail
 
 
 class SegmentAPIView(APIView):
@@ -360,6 +363,11 @@ class CampaignsAPIView(APIView):
         serializer = CampaignsSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
+            
+            new_campaign = serializer.instance
+            campaign_utility = CampaignUtility()
+            campaign_utility.campaign_async(new_campaign)
+            
             data = {
                 "success": True,
                 "status_code": 201,
@@ -439,34 +447,3 @@ class CampaignsAPIView(APIView):
                 }
             }
         return Response(data, status=status.HTTP_200_OK)
-
-
-# class RunCampaign(APIView):
-#     def check_campaign(self,request,pk=None):
-#         campaign = get_object_or_404(Campaign, id=pk)
-#         serialized = CampaignsSerializer(campaign)
-#         if campaign.is_start_date() and campaign.is_past_end_date():
-#             if campaign.is_email():
-#                 email = list(Campaign.objects \
-#                         .filter(id=pk) \
-#                         .values_list(
-#                             'segment__client__email', flat=True
-#                         )
-#                     )
-#                 content = Campaign.objects \
-#                         .filter(id=pk) \
-#                         .values(
-#                             'content',
-#                         )
-#                 title = Campaign.objects \
-#                         .filter(id=pk) \
-#                         .values(
-#                             'title',
-#                         )
-#                 email_campaign = EmailMultiAlternatives(
-#                                 title,
-#                                 content,
-#                                 settings.EMAIL_HOST_USER,
-#                                 to = [email],                           
-#                             )
-#                 email_campaign.send()
