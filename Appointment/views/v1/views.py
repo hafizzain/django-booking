@@ -3538,10 +3538,10 @@ def get_available_appointments(request):
                     Q(client__full_name__icontains=search_text) | \
                     Q(member__id=search_text) | \
                     Q(user__full_name__icontains=search_text) | \
-                    Q(member__id=search_text) | \
-                    Q(client__id=search_text) | \
+                    Q(member__id__icontains=search_text) | \
+                    Q(client__id__icontains=search_text) | \
                     Q(appointment_services__service__name__icontains=search_text) | \
-                    Q(appointment_services__id=search_text)
+                    Q(appointment_services__id__icontains=search_text)
         # if search_text:
         #     query &= Q(id__icontains=search_text)
 
