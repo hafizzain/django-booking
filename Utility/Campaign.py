@@ -51,9 +51,16 @@ def run_campaign(campaign=None):
                 client_email_list,
                 fail_silently=False,
             )
+            ExceptionRecord.objects.create(text='Email sent run_campaign',
+                                            status_code=str(500),
+                                            method=str('send_mail'),
+                                            path=str('send_mail')
+                                        )
 
         elif campaign.is_appnotifaction():
             pass
+
+        
     except Exception as err:
         ExceptionRecord.objects.create(text=str(err),
                                             status_code=str(500),
