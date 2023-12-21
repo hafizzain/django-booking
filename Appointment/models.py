@@ -62,13 +62,10 @@ class AppointmentCheckoutManager(models.QuerySet):
     
     def with_payment_date(self):
         return self.annotate(
-            payment_date=Coalesce(
-                Case(
+            payment_date=Case(
                     When(appointment__status=choices.AppointmentStatus.DONE, then=F('updated_at')),
                     default=Value(None)
-                ),
-                output_field=DateTimeField()
-            )
+                    ),
         )
 
 class AppointmentLogs(models.Model):
