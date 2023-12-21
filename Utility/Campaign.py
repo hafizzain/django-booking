@@ -26,5 +26,5 @@ class CampaignUtility:
         """
         Send email for the given campaign asynchronously in a separate thread.
         """
-        thread = Thread(target=CampaignUtility.run_campaign, args=[], kwargs={'campaign':campaign})
+        thread = Thread(target=CampaignUtility.run_campaign, args=(campaign,))
         thread.start()
