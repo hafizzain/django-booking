@@ -11,7 +11,7 @@ from rest_framework.authentication import SessionAuthentication
 
 from CRM.models import *
 from CRM.serializers import *
-from Utility import CampaignUtility
+from Utility.Campaign import CampaignUtility
 from NStyle.Constants import StatusCodes
 from django.db import transaction
 from django.shortcuts import get_object_or_404
