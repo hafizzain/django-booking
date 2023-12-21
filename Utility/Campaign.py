@@ -31,7 +31,7 @@ class CampaignUtility:
         th.start()
         
 
-def run_campaign(campaign=None):
+def run_campaign(campaign):
     ExceptionRecord.objects.create(text=str('calling run_campaign function '),
                                             status_code=str(500),
                                             method=str('run_campaign'),
