@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 import uuid
 from xml.parsers.expat import model
 from django.db import models
+from django.db.models import Sum, Subquery, OuterRef
+from django.db.models.functions import Coalesce
 
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
@@ -13,6 +15,19 @@ from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Order.models import Checkout
 from . import choices
 from Utility.models import CommonField
+
+
+
+class AppointmentCheckoutManager(models.QuerySet):
+
+    Subquery
+    def with_total_service_price(self):
+
+        return self.annotate(
+            total_service_price=Coalesce(
+                Subquery
+            )
+        )
 
 class AppointmentLogs(models.Model):
     LOG_TYPE_CHOICES =[

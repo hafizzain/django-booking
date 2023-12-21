@@ -3,7 +3,9 @@ from django.core.mail import send_mail
 from django.conf import settings
 
 class CampaignUtility:
-    def run_campaign(self, campaign=None):
+
+    @staticmethod
+    def run_campaign(campaign=None):
         message = campaign.content
         subject = campaign.title
             
@@ -18,10 +20,11 @@ class CampaignUtility:
             )
         elif campaign.is_appnotifaction():
             pass
-        
-    def campaign_async(self, campaign=None):
+    
+    @staticmethod
+    def campaign_async(campaign=None):
         """
         Send email for the given campaign asynchronously in a separate thread.
         """
-        thread = Thread(target=self.run_campaign, args=[campaign])
+        thread = Thread(target=CampaignUtility.run_campaign, args=[], kwargs={'campaign':campaign})
         thread.start()
