@@ -3526,6 +3526,7 @@ def get_available_appointments(request):
     end_date = request.GET.get('end_date', None)
     no_pagination = request.GET.get('no_pagination', None)
     location_id = request.GET.get('location', None)
+    search_text = request.GET.get('search_text',None)
     upcoming_flags = ['Appointment_Booked', 'Appointment Booked', 'Arrived', 'In Progress']
     completed_flags = ['Done', 'Paid']
     cancelled_flags = ['Cancel']
@@ -3547,15 +3548,7 @@ def get_available_appointments(request):
         if booking_id is not None:
             query &= Q(appointment_services__id=booking_id)
         if appointment_status is not None:
-            if appointment_status == 'Upcomming':
-                pass
-                # query &= Q(status__in=upcoming_flags)
-            elif appointment_status == 'Completed':
-                pass
-                # query &= Q(status__in=completed_flags)
-            elif appointment_status == 'Cancelled':
-                pass
-                # query &= Q(status__in=cancelled_flags)
+            query &= Q(status____icontains=cancelled_flags)
         appointment = Appointment.objects.filter(query)
         if appointment:
             appointment = appointment.order_by('-created_at')
