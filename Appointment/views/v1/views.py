@@ -3323,7 +3323,8 @@ def appointment_service_status_update(request):
     # If all Void then don't create the checkout.
     if appointment_service_status == choices.AppointmentServiceStatus.STARTED:
         checkout, created = AppointmentCheckout.objects.get_or_create(
-            appointment=appointment
+            appointment=appointment,
+            business_address=appointment.business_address
         )
 
         if created:
