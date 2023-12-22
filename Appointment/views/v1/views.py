@@ -1747,15 +1747,15 @@ def create_checkout(request):
     member = request.data.get('member', None)
     business_address = request.data.get('business_address', None)
 
-    tip = request.data.get('tip', [])
+    tax_name = request.data.get('tax_name', '')
+    tax_name1 = request.data.get('tax_name1', '')
     gst = request.data.get('gst', 0)
     gst1 = request.data.get('gst1', 0)
     gst_price = request.data.get('gst_price', 0)
     gst_price1 = request.data.get('gst_price1', 0)
     service_price = request.data.get('service_price', None)
     total_price = request.data.get('total_price', 0)
-    tax_name = request.data.get('tax_name', '')
-    tax_name1 = request.data.get('tax_name1', '')
+    tip = request.data.get('tip', [])
 
     is_promotion_availed = request.data.get('is_promotion_availed', False)
 
@@ -2494,7 +2494,7 @@ def get_client_sale(request):
     total_sale += product_total if product_total else 0
     if product_order.count() > 5:
         product_order = product_order[:5]
-    product = POSerializerForClientSale(product_order, many=True, context={'request': request, })
+    product = POSerializerForClientSale(product_order, many=True, context={'request': request,})
 
     # Service Orders----------------------
     service_orders = ServiceOrder.objects \
@@ -2516,7 +2516,7 @@ def get_client_sale(request):
                            .filter(checkout__client=client) \
                            .select_related('membership', 'user', 'member') \
                            .order_by('-created_at')[:5]
-    voucher_total = voucher_order.aggregate(total_sale=Sum('voucher__price'))['total_sale']
+    voucher_total = voucher_order.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += voucher_total if voucher_total else 0
     if voucher_order.count() > 5:
         voucher_order = voucher_order[:5]
@@ -2545,13 +2545,12 @@ def get_client_sale(request):
     total_sale += appointment_total if appointment_total else 0
     if appointment_checkout_all.count() > 5:
         appointment_checkout_5 = appointment_checkout_all[:5]
-    print("i am printing the product data", product)
+
     appointment = ServiceClientSaleSerializer(appointment_checkout_5[:5], many=True)
     quick_sale_count = len(product.data) + len(services_data.data)
-    price_values = sum(item.get('price', 0) for item in product.data)
-    voucher_total_price = 0
-    voucher_total_price = sum(item.get('price', 0) for item in voucher.data)
-    total_sale = total_sale + price_values + voucher_total_price
+    for item in product:
+        print("i am printing item",item)
+    total_sale = total_sale
     return Response(
         {
             'status': True,
@@ -3278,6 +3277,12 @@ def appointment_service_status_update(request):
     appointment_id = request.data.get('appointment_id', None)
     appointment_service_id = request.data.get('appointment_service_id', None)
     appointment_service_status = request.data.get('status', None)
+    gst = request.data.get('gst', None)
+    gst1 = request.data.get('gst1', None)
+    gst_price = request.data.get('gst_price', None)
+    gst_price1 = request.data.get('gst_price1', None)
+    tax_name = request.data.get('tax_name', None)
+    tax_name1 = request.data.get('tax_name1', None)
 
     # changing the status
     appointment = Appointment.objects.get(id=appointment_id)
@@ -3293,12 +3298,9 @@ def appointment_service_status_update(request):
     appoint_service_statuses = list(
         AppointmentService.objects.filter(appointment=appointment).values_list('status', flat=True))
 
-    is_all_finished = all(
-        [True if status == choices.AppointmentServiceStatus.FINISHED else False for status in appoint_service_statuses])
-    is_all_void = all(
-        [True if status == choices.AppointmentServiceStatus.VOID else False for status in appoint_service_statuses])
-    is_all_started = all(
-        [True if status == choices.AppointmentServiceStatus.STARTED else False for status in appoint_service_statuses])
+    is_all_finished = all([True if status == choices.AppointmentServiceStatus.FINISHED else False for status in appoint_service_statuses])
+    is_all_void = all([True if status == choices.AppointmentServiceStatus.VOID else False for status in appoint_service_statuses])
+    is_all_started = all([True if status == choices.AppointmentServiceStatus.STARTED else False for status in appoint_service_statuses])
 
     if (is_all_finished or is_all_void) or (not is_all_started):
         appointment.status = choices.AppointmentStatus.FINISHED
@@ -3306,6 +3308,17 @@ def appointment_service_status_update(request):
     else:
         appointment.status = choices.AppointmentStatus.STARTED
         appointment.save()
+
+    if appointment_service_status == choices.AppointmentServiceStatus.STARTED:
+        AppointmentCheckout.objects.create(
+            appointment=appointment,
+            gst=gst,
+            gst1=gst1,
+            gst_price=gst_price,
+            gst_price1=gst_price1,
+            tax_name=tax_name,
+            tax_name1=tax_name1,
+        )
 
     serialized = AppointmentServiceSerializerBasic(appointment_service)
 
