@@ -1974,7 +1974,6 @@ def create_checkout(request):
     checkout = AppointmentCheckout.objects.filter(
         appointment=appointment
     ).first()
-    checkout.appointment=appointment,
     checkout.appointment_service=service_appointment,
     checkout.payment_method=payment_method,
     checkout.service=service,
