@@ -33,8 +33,8 @@ class AppointmentCheckoutManager(models.QuerySet):
                 Subquery(
                     PriceService.objects \
                     .filter(service__id__in=service_ids, currency=currency) \
+                    .values('service__id') \
                     .annotate(total_price=Sum('price')) \
-                    .order_by('-created_at') \
                     .values('total_price')[:1]
                 ),
                 0.0,
