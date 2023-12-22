@@ -415,27 +415,46 @@ class AppointmentCheckout(models.Model):
     
     def total_service_price(self):
         currency = self.business_address.currency
-        query_for_price = Q(service=OuterRef('pk'), currency=currency)
-        service_ids = list(self.appointment.appointment_services.values_list('service__id', flat=True))
+        query_for_price = Q(service=OuterRef('service'), currency=currency)
+        query_for_appointment_service = Q(appointment=OuterRef('appointment'))
+        
+        appointment_service_subquery = AppointmentService.objects \
+                                        .filter(query_for_appointment_service) \
+                                        .annotate(
+                                            service_price=Coalesce(
+                                                PriceService.objects \
+                                                .filter(query_for_price) \
+                                                .order_by('-created_at') \
+                                                .values('price')[:1],
+                                                0.0,
+                                                output_field=FloatField()
+                                            )
+                                            
+                                        ).aggregate(
+                                            final_price=Sum('service_price')
+                                        )
 
-        services_prices = Service.objects \
-            .filter(id__in=service_ids) \
-            .annotate(
-                currency_price=Coalesce(
-                Subquery(
-                    PriceService.objects \
-                        .filter(query_for_price)
-                        .order_by('-created_at')
-                        .values('price')[:1]
-                ),
-                0.0,
-                output_field=FloatField()
-            )
-        ).aggregate(
-            final_price=Sum('currency_price')
-        )
+        return appointment_service_subquery['final_price']
+        # service_ids = list(self.appointment.appointment_services.values_list('service__id', flat=True))
 
-        return services_prices['final_price']
+        # services_prices = Service.objects \
+        #     .filter(id__in=service_ids) \
+        #     .annotate(
+        #         currency_price=Coalesce(
+        #         Subquery(
+        #             PriceService.objects \
+        #                 .filter(query_for_price)
+        #                 .order_by('-created_at')
+        #                 .values('price')[:1]
+        #         ),
+        #         0.0,
+        #         output_field=FloatField()
+        #     )
+        # ).aggregate(
+        #     final_price=Sum('currency_price')
+        # )
+
+        # return services_prices['final_price']
     
     @property
     def fun():
