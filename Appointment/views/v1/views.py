@@ -2545,13 +2545,13 @@ def get_client_sale(request):
     total_sale += appointment_total if appointment_total else 0
     if appointment_checkout_all.count() > 5:
         appointment_checkout_5 = appointment_checkout_all[:5]
-    print("i am printing the product data",product)
+    print("i am printing the product data", product)
     appointment = ServiceClientSaleSerializer(appointment_checkout_5[:5], many=True)
     quick_sale_count = len(product.data) + len(services_data.data)
-    price_values = product.data[0]['price'] if product.data else 0
-    voucher_total_price=0
+    price_values = sum(item.get('price', 0) for item in product.data)
+    voucher_total_price = 0
     voucher_total_price = sum(item.get('price', 0) for item in voucher.data)
-    total_sale = total_sale + price_values+voucher_total_price
+    total_sale = total_sale + price_values + voucher_total_price
     return Response(
         {
             'status': True,
@@ -3293,9 +3293,12 @@ def appointment_service_status_update(request):
     appoint_service_statuses = list(
         AppointmentService.objects.filter(appointment=appointment).values_list('status', flat=True))
 
-    is_all_finished = all([True if status == choices.AppointmentServiceStatus.FINISHED else False for status in appoint_service_statuses])
-    is_all_void = all([True if status == choices.AppointmentServiceStatus.VOID else False for status in appoint_service_statuses])
-    is_all_started = all([True if status == choices.AppointmentServiceStatus.STARTED else False for status in appoint_service_statuses])
+    is_all_finished = all(
+        [True if status == choices.AppointmentServiceStatus.FINISHED else False for status in appoint_service_statuses])
+    is_all_void = all(
+        [True if status == choices.AppointmentServiceStatus.VOID else False for status in appoint_service_statuses])
+    is_all_started = all(
+        [True if status == choices.AppointmentServiceStatus.STARTED else False for status in appoint_service_statuses])
 
     if (is_all_finished or is_all_void) or (not is_all_started):
         appointment.status = choices.AppointmentStatus.FINISHED
