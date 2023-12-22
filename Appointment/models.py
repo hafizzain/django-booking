@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import uuid
 from xml.parsers.expat import model
 from django.db import models
-from django.db.models import Sum, Subquery, OuterRef, FloatField, Case, When, Value, CharField, F, DateTimeField
+from django.db.models import Sum, Subquery, OuterRef, FloatField, Case, When, Value, CharField, F, DateTimeField, Q
 from django.db.models.functions import Coalesce
 
 from Authentication.models import User
@@ -412,6 +412,30 @@ class AppointmentCheckout(models.Model):
         if self.gst_price1:
             total += self.gst_price1
         return total
+    
+    def total_service_price(self):
+        currency = self.business_address.currency
+        query_for_price = Q(service=OuterRef('pk'), currency=currency)
+        service_ids = list(self.appointment.appointment_services.values_list('service__id', flat=True))
+
+        services_prices = Service.objects \
+            .filter(id__in=service_ids) \
+            .annotate(
+                currency_price=Coalesce(
+                Subquery(
+                    PriceService.objects \
+                        .filter(query_for_price)
+                        .order_by('-created_at')
+                        .values('price')[:1]
+                ),
+                0.0,
+                output_field=FloatField()
+            )
+        ).aggregate(
+            final_price=Sum('currency_price')
+        )
+
+        return services_prices['final_price']
     
     @property
     def fun():
