@@ -23,84 +23,10 @@ class AppointmentCheckoutManager(models.QuerySet):
     # not using this method, tries very hard way, But nothing worked
     def with_total_service_price(self, currency):
 
-        # Subquery to get the sum of the latest service prices for each appointment
-        # latest_prices_subquery = PriceService.objects.filter(
-        #     service=OuterRef('appointment__appointment_services__service'),
-        #     currency=currency
-        # ).order_by('-created_at').values('service').annotate(
-        #     total_price=Sum('price')
-        # ).values('total_price')[:1]
-
-        # return self.annotate(
-        #     subtotal=Coalesce(
-        #         Subquery(latest_prices_subquery),
-        #         0.0,
-        #         output_field=FloatField()
-        #     )
-        # )
-
         price_query = Q(appointment__appointment_services__service__service_priceservice__currency=currency)
         return self.annotate(
             subtotal=Coalesce(
                 Sum('appointment__appointment_services__service__service_priceservice__price', filter=price_query),
-                0.0,
-                output_field=FloatField()
-            )
-        )
-
-        price_subquery = PriceService.objects \
-                            .filter(service=OuterRef('service'), currency=currency) \
-                            .order_by('-created_at') \
-                            .values('price')[:1]
-        
-        appointment_service_subquery = AppointmentService.objects \
-                                        .filter(appointment=OuterRef('appointment')) \
-                                        .annotate(
-                                            service_price=Coalesce(
-                                                Subquery(price_subquery),
-                                                0.0,
-                                                output_field=FloatField()
-                                            )
-                                        ).annotate(
-                                            final_service_price=Sum('service_price')
-                                        ).values('final_service_price')[:1]
-
-        # appointment_subquery = Appointment.objects \
-        #                         .filter(id=OuterRef('appointment'))
-
-        return self.annotate(
-            subtotal=Subquery(appointment_service_subquery)
-        )
-
-        AppointmentService.objects \
-            .filter(appointment=self.appointment) \
-            .annotate(
-                service_price=Coalesce(
-                    PriceService.objects \
-                    .filter(query_for_price) \
-                    .order_by('-created_at') \
-                    .values('price')[:1],
-                    0.0,
-                    output_field=FloatField()
-                )
-                
-            ).aggregate(
-                final_price=Sum('service_price')
-            )
-        
-        service_ids = AppointmentService.objects \
-                    .filter(appointment=OuterRef(OuterRef('appointment'))) \
-                    .values_list('service__id', flat=True)
-
-        return self.annotate(
-            subtotal=Coalesce(
-                Subquery(
-                    PriceService.objects \
-                    .filter(service__id__in=service_ids, currency=currency) \
-                    .values('service__id') \
-                    .annotate(total_price=Sum('price')) \
-                    .values('total_price')[:1]
-                ),
                 0.0,
                 output_field=FloatField()
             )
