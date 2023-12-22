@@ -2549,6 +2549,7 @@ def get_client_sale(request):
     appointment = ServiceClientSaleSerializer(appointment_checkout_5[:5], many=True)
     quick_sale_count = len(product.data) + len(services_data.data)
     price_values = product.data[0]['price'] if product.data else 0
+    voucher_total_price=0
     voucher_total_price = sum(item.get('price', 0) for item in voucher)
 
     total_sale = total_sale + price_values + voucher_total_price
