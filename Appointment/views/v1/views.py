@@ -1972,21 +1972,21 @@ def create_checkout(request):
     api and feeding all the other data here.
     """
     checkout = AppointmentCheckout.objects.get(appointment=appointment)
-    checkout.appointment_service=service_appointment,
-    checkout.payment_method=payment_method,
-    checkout.service=service,
-    checkout.member=member,
-    checkout.business_address=business_address,
-    checkout.gst=gst,
-    checkout.gst1=gst1,
-    checkout.gst_price=gst_price,
-    checkout.gst_price1=gst_price1,
-    checkout.tax_name=tax_name,
-    checkout.tax_name1=tax_name1,
-    checkout.service_price=service_price,
-    checkout.total_price=total_price,
-    checkout.service_commission=float(service_commission),
-    checkout.service_commission_type=service_commission_type,
+    checkout.appointment_service=service_appointment
+    checkout.payment_method=payment_method
+    checkout.service=service
+    checkout.member=member
+    checkout.business_address=business_address
+    checkout.gst=gst
+    checkout.gst1=gst1
+    checkout.gst_price=gst_price
+    checkout.gst_price1=gst_price1
+    checkout.tax_name=tax_name
+    checkout.tax_name1=tax_name1
+    checkout.service_price=service_price
+    checkout.total_price=total_price
+    checkout.service_commission=float(service_commission)
+    checkout.service_commission_type=service_commission_type
     checkout.save()
     
 
@@ -3325,7 +3325,7 @@ def appointment_service_status_update(request):
         checkout, created = AppointmentCheckout.objects.get_or_create(
             appointment=appointment
         )
-        
+
         if created:
             checkout.gst=gst,
             checkout.gst1=gst1,
