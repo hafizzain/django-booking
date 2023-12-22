@@ -1971,9 +1971,7 @@ def create_checkout(request):
     Updating the unpaid checkout created in the appointment_service_status_update/
     api and feeding all the other data here.
     """
-    checkout = AppointmentCheckout.objects.filter(
-        appointment=appointment
-    ).first()
+    checkout = AppointmentCheckout.objects.get(appointment=appointment)
     checkout.appointment_service=service_appointment,
     checkout.payment_method=payment_method,
     checkout.service=service,
