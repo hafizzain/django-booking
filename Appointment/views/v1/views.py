@@ -3322,15 +3322,19 @@ def appointment_service_status_update(request):
     # to monitor paid and unpaid appointment checkouts.
     # If all Void then don't create the checkout.
     if appointment_service_status == choices.AppointmentServiceStatus.STARTED:
-        AppointmentCheckout.objects.create(
-            appointment=appointment,
-            gst=gst,
-            gst1=gst1,
-            gst_price=gst_price,
-            gst_price1=gst_price1,
-            tax_name=tax_name,
-            tax_name1=tax_name1,
+        checkout, created = AppointmentCheckout.objects.get_or_create(
+            appointment=appointment
         )
+        
+        if created:
+            checkout.gst=gst,
+            checkout.gst1=gst1,
+            checkout.gst_price=gst_price,
+            checkout.gst_price1=gst_price1,
+            checkout.tax_name=tax_name,
+            checkout.tax_name1=tax_name1,
+            checkout.save()
+        
 
     serialized = AppointmentServiceSerializerBasic(appointment_service)
 
