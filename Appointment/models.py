@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import uuid
 from xml.parsers.expat import model
 from django.db import models
-from django.db.models import Sum, Subquery, OuterRef, FloatField, Case, When, Value, CharField, F, DateTimeField
+from django.db.models import Sum, Subquery, OuterRef, FloatField, Case, When, Value, CharField, F, DateTimeField, Q
 from django.db.models.functions import Coalesce
 
 from Authentication.models import User
@@ -20,9 +20,48 @@ from Utility.models import CommonField
 
 class AppointmentCheckoutManager(models.QuerySet):
 
+    # not using this method, tries very hard way, But nothing worked
     def with_total_service_price(self, currency):
 
+        price_subquery = PriceService.objects \
+                            .filter(service=OuterRef('service'), currency=currency) \
+                            .order_by('-created_at') \
+                            .values('price')[:1]
         
+        appointment_service_subquery = AppointmentService.objects \
+                                        .filter(appointment=OuterRef('appointment')) \
+                                        .annotate(
+                                            service_price=Coalesce(
+                                                Subquery(price_subquery),
+                                                0.0,
+                                                output_field=FloatField()
+                                            )
+                                        ).annotate(
+                                            final_service_price=Sum('service_price')
+                                        ).values('final_service_price')[:1]
+
+        # appointment_subquery = Appointment.objects \
+        #                         .filter(id=OuterRef('appointment'))
+
+        return self.annotate(
+            subtotal=Subquery(appointment_service_subquery)
+        )
+
+        AppointmentService.objects \
+            .filter(appointment=self.appointment) \
+            .annotate(
+                service_price=Coalesce(
+                    PriceService.objects \
+                    .filter(query_for_price) \
+                    .order_by('-created_at') \
+                    .values('price')[:1],
+                    0.0,
+                    output_field=FloatField()
+                )
+                
+            ).aggregate(
+                final_price=Sum('service_price')
+            )
         
         service_ids = AppointmentService.objects \
                     .filter(appointment=OuterRef(OuterRef('appointment'))) \
@@ -412,6 +451,26 @@ class AppointmentCheckout(models.Model):
         if self.gst_price1:
             total += self.gst_price1
         return total
+    
+    def total_service_price(self):
+        currency = self.business_address.currency
+        query_for_price = Q(service=OuterRef('service'), currency=currency)        
+        appointment_service = AppointmentService.objects \
+                                        .filter(appointment=self.appointment) \
+                                        .annotate(
+                                            service_price=Coalesce(
+                                                PriceService.objects \
+                                                .filter(query_for_price) \
+                                                .order_by('-created_at') \
+                                                .values('price')[:1],
+                                                0.0,
+                                                output_field=FloatField()
+                                            )
+                                            
+                                        ).aggregate(
+                                            final_price=Sum('service_price')
+                                        )
+        return appointment_service['final_price']
     
     @property
     def fun():

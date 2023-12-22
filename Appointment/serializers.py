@@ -952,7 +952,7 @@ class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
             services_prices = Service.objects \
                 .filter(id__in=service_ids) \
                 .annotate(
-                currency_price=Coalesce(
+                    currency_price=Coalesce(
                     Subquery(
                         PriceService.objects \
                             .filter(query_for_price)
@@ -981,13 +981,16 @@ class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
 
 class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
 
-    subtotal = serializers.FloatField()
+    subtotal = serializers.SerializerMethodField()
     total_tax = serializers.FloatField()
     client_name = serializers.CharField()
     payment_status = serializers.CharField()
     payment_date = serializers.DateTimeField()
     booking_id = serializers.SerializerMethodField()
     booking_date = serializers.SerializerMethodField()
+
+    def get_subtotal(self, obj):
+        return obj.total_service_price()
 
     def get_booking_id(self, obj):
         return obj.appointment.get_booking_id()
