@@ -416,10 +416,10 @@ class AppointmentCheckout(models.Model):
     def total_service_price(self):
         currency = self.business_address.currency
         query_for_price = Q(service=OuterRef('service'), currency=currency)
-        query_for_appointment_service = Q(appointment=OuterRef('appointment'))
+        # query_for_appointment_service = Q(appointment=OuterRef('appointment'))
         
         appointment_service_subquery = AppointmentService.objects \
-                                        .filter(query_for_appointment_service) \
+                                        .filter(appointment=self.appointment) \
                                         .annotate(
                                             service_price=Coalesce(
                                                 PriceService.objects \
