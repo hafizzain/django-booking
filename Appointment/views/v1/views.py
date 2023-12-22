@@ -3374,7 +3374,7 @@ def paid_unpaid_clients(request):
 
     if search_text:
         search_text = search_text.replace('#', '')
-        query &= Q(appointment__client__full_name__icontains=location_id) | \
+        query &= Q(appointment__client__full_name__icontains=search_text) | \
                 Q(appointment__id__icontains=search_text)
 
     if start_date and end_date:
