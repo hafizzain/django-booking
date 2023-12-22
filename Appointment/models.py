@@ -22,7 +22,45 @@ class AppointmentCheckoutManager(models.QuerySet):
 
     def with_total_service_price(self, currency):
 
+        price_subquery = PriceService.objects \
+                            .filter(service=OuterRef('service'), currency=currency) \
+                            .order_by('-created_at') \
+                            .values('price')[:1]
         
+        appointment_service_subquery = AppointmentService.objects \
+                                        .filter(appointment=OuterRef('appointment')) \
+                                        .annotate(
+                                            service_price=Coalesce(
+                                                Subquery(price_subquery),
+                                                0.0,
+                                                output_field=FloatField()
+                                            )
+                                        ).annotate(
+                                            final_service_price=Sum('service_price')
+                                        ).values('final_service_price')[:1]
+
+        # appointment_subquery = Appointment.objects \
+        #                         .filter(id=OuterRef('appointment'))
+
+        return self.annotate(
+            subtotal=Subquery(appointment_service_subquery)
+        )
+
+        AppointmentService.objects \
+            .filter(appointment=self.appointment) \
+            .annotate(
+                service_price=Coalesce(
+                    PriceService.objects \
+                    .filter(query_for_price) \
+                    .order_by('-created_at') \
+                    .values('price')[:1],
+                    0.0,
+                    output_field=FloatField()
+                )
+                
+            ).aggregate(
+                final_price=Sum('service_price')
+            )
         
         service_ids = AppointmentService.objects \
                     .filter(appointment=OuterRef(OuterRef('appointment'))) \
