@@ -23,8 +23,12 @@ from Business.models import Business, BusinessSocial, BusinessAddress, BusinessO
 from Product.models import Brand, Product, ProductStock
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
-from Promotions.models import BlockDate, BundleFixed, CategoryDiscount, ComplimentaryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, DiscountOnFreeService, FixedPriceService, FreeService, MentionedNumberService, PackagesDiscount, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, ServiceDurationForSpecificTime, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount, PromotionExcludedItem
-# from Promotions.serializers import BundleFixedSerializers, ComplimentaryDiscountSerializers, DirectOrFlatDiscountSerializers, FixedPriceServiceSerializers, MentionedNumberServiceSerializers, PackagesDiscountSerializers, PurchaseDiscountSerializers, RetailAndGetServiceSerializers, SpecificBrandSerializers, SpecificGroupDiscountSerializers, SpendDiscountSerializers, SpendSomeAmountSerializers, UserRestrictedDiscountSerializers
+from Promotions.models import BlockDate, BundleFixed, CategoryDiscount, ComplimentaryDiscount, DateRestrictions, \
+    DayRestrictions, DirectOrFlatDiscount, DiscountOnFreeService, FixedPriceService, FreeService, \
+    MentionedNumberService, PackagesDiscount, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, \
+    ServiceDurationForSpecificTime, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, \
+    SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount, PromotionExcludedItem, Coupon, CouponDetails
+from Promotions.serializers import BundleFixedSerializers, ComplimentaryDiscountSerializers, DirectOrFlatDiscountSerializers, FixedPriceServiceSerializers, MentionedNumberServiceSerializers, PackagesDiscountSerializers, PurchaseDiscountSerializers, RetailAndGetServiceSerializers, SpecificBrandSerializers, SpecificGroupDiscountSerializers, SpendDiscountSerializers, SpendSomeAmountSerializers, UserRestrictedDiscountSerializers ,CouponSerializer
 from Service.models import Service, ServiceGroup
 from Tenants.models import Domain, Tenant
 from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleFile, Software, State, City
@@ -6409,3 +6413,84 @@ def delete_packagesdiscount(request):
 # @api_view(['DELETE'])
 # @permission_classes([IsAuthenticated])
 # def get_availability_date(request):
+
+
+
+@transaction.atomic
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def create_coupon(request):
+    name = request.data.get('name', None)
+    short_description = request.data.get('short_description', None)
+    product_brand = request.data.get('product_brand', [])
+    product_brand_discount_percentage = request.data.get('product_brand_discount_percentage', None)
+    service_ids = request.data.get('exclude_service', [])
+    service_group = request.data.get('service_group', [])
+    discount_product = request.data.get('service_group_discount_percentage', None)
+    start_date = request.data.get('start_date', None)
+    end_date = request.data.get('end_date', None)
+    block_day = request.data.get('block_day', None)
+    store_restriction = request.data.get('store_restriction', [])
+    excluded_products = request.data.get('excluded_products', [])
+    usage_limit = request.data.get('usage_limit', None)
+    code = request.data.get('code', None)
+    user_limit = request.data.get('usage_limit', None)
+    coupon_type = request.data.get('coupon_type',None)
+    client = request.data.get('client', [])
+    error = []
+    try:
+        if len(service_ids) > 0 and len(client) > 0 and len(service_group) > 0 and len(excluded_products) > 0 and len(
+                product_brand) > 0 and len(store_restriction) > 0:
+            pass
+        else:
+            return Response({"msg":"Enter valid ids"},status=status.HTTP_400_BAD_REQUEST)
+        code_check = Coupon.objects.filter(code=code)
+        if code_check:
+            return Response({"msg":"Coupon already exists"},status=status.HTTP_400_BAD_REQUEST)
+        coupon = Coupon.objects.create(
+            name=name,
+            short_description=short_description,
+            start_date=datetime.strptime(start_date, '%Y-%m-%d %H:%M:%S') if start_date else None,
+            end_date=datetime.strptime(end_date, '%Y-%m-%d %H:%M:%S') if end_date else None,
+            coupon_type=coupon_type,
+            block_day=block_day,
+            usage_limit=usage_limit,
+            user_limit=user_limit,
+            code=code
+        )
+        coupon_details = CouponDetails.objects.create(coupon=coupon)
+        coupon_details.service_id.set(service_ids)
+        coupon_details.client_id.set(client)
+        coupon_details.service_group_id.set(service_group)
+        coupon_details.excluded_products_id.set(excluded_products)
+        coupon_details.brand_id.set(product_brand)
+        coupon_details.store_target_id.set(store_restriction)
+    except Exception as ex:
+        error = str(ex)
+        return Response(
+            {
+                'status': False,
+                'status_code': 400,
+                'response': {
+                    'message': 'Something went wrong',
+                    'error_message': str(ex),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    serializer = CouponSerializer(coupon, context={'request': request})
+    return Response(
+        {
+            'status': True,
+            'status_code': 201,
+            'response': {
+                'message': 'Coupon created successfully!',
+                'error_message': None,
+                'errors': error,
+                'coupon': serializer.data,
+
+            }
+        },
+        status=status.HTTP_201_CREATED
+    )
