@@ -6420,6 +6420,7 @@ def delete_packagesdiscount(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def create_coupon(request):
+    detail = None
     name = request.data.get('name', None)
     short_description = request.data.get('short_description', None)
     product_brand = request.data.get('product_brand', [])
@@ -6459,6 +6460,7 @@ def create_coupon(request):
             code=code
         )
         coupon_details = CouponDetails.objects.create(coupon_id=coupon.id)
+        detail=coupon_details.id
         coupon_details.service_id.set(service_ids)
         coupon_details.client_id.set(client)
         coupon_details.service_group_id.set(service_group)
@@ -6474,6 +6476,7 @@ def create_coupon(request):
                 'response': {
                     'message': 'Something went wrong',
                     'error_message': str(ex),
+                    'coupon_details':detail
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
