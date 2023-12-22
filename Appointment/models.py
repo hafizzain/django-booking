@@ -24,20 +24,20 @@ class AppointmentCheckoutManager(models.QuerySet):
     def with_total_service_price(self, currency):
 
         # Subquery to get the sum of the latest service prices for each appointment
-        latest_prices_subquery = PriceService.objects.filter(
-            service=OuterRef('appointment__appointment_services__service'),
-            currency=currency
-        ).order_by('-created_at').values('service').annotate(
-            total_price=Sum('price')
-        ).values('total_price')[:1]
+        # latest_prices_subquery = PriceService.objects.filter(
+        #     service=OuterRef('appointment__appointment_services__service'),
+        #     currency=currency
+        # ).order_by('-created_at').values('service').annotate(
+        #     total_price=Sum('price')
+        # ).values('total_price')[:1]
 
-        return self.annotate(
-            subtotal=Coalesce(
-                Subquery(latest_prices_subquery),
-                0.0,
-                output_field=FloatField()
-            )
-        )
+        # return self.annotate(
+        #     subtotal=Coalesce(
+        #         Subquery(latest_prices_subquery),
+        #         0.0,
+        #         output_field=FloatField()
+        #     )
+        # )
 
         price_query = Q(appointment__appointment_services__service__service_priceservice__currency=currency)
         return self.annotate(
