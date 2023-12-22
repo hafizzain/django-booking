@@ -6440,7 +6440,7 @@ def create_coupon(request):
     error = []
     try:
         if len(service_ids) > 0 and len(client) > 0 and len(service_group) > 0 and len(excluded_products) > 0 and len(
-                product_brand) > 0 and len(store_restriction) > 0:
+                product_brand) > 0:
             pass
         else:
             return Response({"msg":"Enter valid ids"},status=status.HTTP_400_BAD_REQUEST)
@@ -6464,7 +6464,7 @@ def create_coupon(request):
         coupon_details.service_group_id.set(service_group)
         coupon_details.excluded_products_id.set(excluded_products)
         coupon_details.brand_id.set(product_brand)
-        coupon_details.store_target_id.set(store_restriction)
+        # coupon_details.store_target_id.set(store_restriction)
     except Exception as ex:
         error = str(ex)
         return Response(
