@@ -6458,7 +6458,7 @@ def create_coupon(request):
             user_limit=user_limit,
             code=code
         )
-        coupon_details = CouponDetails.objects.create(coupon=coupon)
+        coupon_details = CouponDetails.objects.create(coupon_id=coupon.id)
         coupon_details.service_id.set(service_ids)
         coupon_details.client_id.set(client)
         coupon_details.service_group_id.set(service_group)
