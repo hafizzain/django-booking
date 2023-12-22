@@ -1987,6 +1987,7 @@ def create_checkout(request):
     checkout.total_price=total_price,
     checkout.service_commission=float(service_commission),
     checkout.service_commission_type=service_commission_type,
+    checkout.save()
     
 
     # change the status of appointment after checkout
