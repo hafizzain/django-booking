@@ -3357,6 +3357,7 @@ def paid_unpaid_clients(request):
     is_paid = request.GET.get('is_paid', None)
     start_date = request.GET.get('start_date', None)
     end_date = request.GET.get('end_date', None)
+    search_text = request.GET.get('search_text', None)
 
     currency = BusinessAddress.objects.get(id=location_id).currency
 
@@ -3371,8 +3372,13 @@ def paid_unpaid_clients(request):
     if location_id:
         query &= Q(business_address__id=location_id)
 
+    if search_text:
+        search_text = search_text.replace('#', '')
+        query &= Q(appointment__client__full_name__icontains=location_id) | \
+                Q(appointment__id__icontains=search_text)
+
     if start_date and end_date:
-        query &= Q(created_at__range=(start_date, end_date))
+        query &= Q(created_at__date__range=get_date_range_tuple(start_date, end_date))
 
     appointment_checkouts = AppointmentCheckout.objects \
         .filter(query) \
