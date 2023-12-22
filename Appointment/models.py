@@ -23,6 +23,13 @@ class AppointmentCheckoutManager(models.QuerySet):
     # not using this method, tries very hard way, But nothing worked
     def with_total_service_price(self, currency):
 
+
+        return self.annotate(
+            subtotal=Coalesce(
+                Sum('appointment__appointment_services__service__service_priceservice__price', filter=Q(currency=currency))
+            )
+        )
+
         price_subquery = PriceService.objects \
                             .filter(service=OuterRef('service'), currency=currency) \
                             .order_by('-created_at') \
