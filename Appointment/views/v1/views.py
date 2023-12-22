@@ -2516,7 +2516,7 @@ def get_client_sale(request):
                            .filter(checkout__client=client) \
                            .select_related('membership', 'user', 'member') \
                            .order_by('-created_at')[:5]
-    voucher_total = voucher_order.aggregate(total_sale=Sum('price'))['total_sale']
+    voucher_total = voucher_order.aggregate(total_sale=Sum('voucher__price'))['total_sale']
     total_sale += voucher_total if voucher_total else 0
     if voucher_order.count() > 5:
         voucher_order = voucher_order[:5]
