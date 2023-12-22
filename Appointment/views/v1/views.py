@@ -3327,12 +3327,12 @@ def appointment_service_status_update(request):
         )
 
         if created:
-            checkout.gst=gst,
-            checkout.gst1=gst1,
-            checkout.gst_price=gst_price,
-            checkout.gst_price1=gst_price1,
-            checkout.tax_name=tax_name,
-            checkout.tax_name1=tax_name1,
+            checkout.gst=gst
+            checkout.gst1=gst1
+            checkout.gst_price=gst_price
+            checkout.gst_price1=gst_price1
+            checkout.tax_name=tax_name
+            checkout.tax_name1=tax_name1
             checkout.save()
         
 
