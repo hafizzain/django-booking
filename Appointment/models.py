@@ -26,7 +26,7 @@ class AppointmentCheckoutManager(models.QuerySet):
 
         return self.annotate(
             subtotal=Coalesce(
-                Sum('appointment__appointment_services__service__service_priceservice__price', filter=Q(currency=currency)),
+                Sum('appointment__appointment_services__service__service_priceservice__price'),
                 0.0,
                 output_field=FloatField()
             )
