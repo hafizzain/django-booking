@@ -2213,3 +2213,8 @@ class PromotionExcludedItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = PromotionExcludedItem
         fields = ['id', 'excluded_item']
+
+
+class CouponSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = '__all__'
