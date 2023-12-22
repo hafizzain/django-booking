@@ -6439,6 +6439,11 @@ def create_coupon(request):
     client = request.data.get('client', [])
     error = []
     try:
+        if len(service_ids) > 0 and len(client) > 0 and len(service_group) > 0 and len(excluded_products) > 0 and len(
+                product_brand) > 0 and len(store_restriction) > 0:
+            pass
+        else:
+            return Response({"msg":"Enter valid ids"},status=status.HTTP_400_BAD_REQUEST)
         code_check = Coupon.objects.filter(code=code)
         if code_check:
             return Response({"msg":"Coupon already exists"},status=status.HTTP_400_BAD_REQUEST)
