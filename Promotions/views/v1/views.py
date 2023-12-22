@@ -6418,7 +6418,7 @@ def delete_packagesdiscount(request):
 
 @transaction.atomic
 @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def create_coupon(request):
     name = request.data.get('name', None)
     short_description = request.data.get('short_description', None)
