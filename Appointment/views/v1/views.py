@@ -1967,24 +1967,30 @@ def create_checkout(request):
     except Exception as err:
         Errors.append(str(err))
 
-    checkout = AppointmentCheckout.objects.create(
-        appointment=appointment,
-        appointment_service=service_appointment,
-        payment_method=payment_method,
-        service=service,
-        member=member,
-        business_address=business_address,
-        gst=gst,
-        gst1=gst1,
-        gst_price=gst_price,
-        gst_price1=gst_price1,
-        tax_name=tax_name,
-        tax_name1=tax_name1,
-        service_price=service_price,
-        total_price=total_price,
-        service_commission=float(service_commission),
-        service_commission_type=service_commission_type,
-    )
+    """
+    Updating the unpaid checkout created in the appointment_service_status_update/
+    api and feeding all the other data here.
+    """
+    checkout = AppointmentCheckout.objects.filter(
+        appointment=appointment
+    ).first()
+    checkout.appointment=appointment,
+    checkout.appointment_service=service_appointment,
+    checkout.payment_method=payment_method,
+    checkout.service=service,
+    checkout.member=member,
+    checkout.business_address=business_address,
+    checkout.gst=gst,
+    checkout.gst1=gst1,
+    checkout.gst_price=gst_price,
+    checkout.gst_price1=gst_price1,
+    checkout.tax_name=tax_name,
+    checkout.tax_name1=tax_name1,
+    checkout.service_price=service_price,
+    checkout.total_price=total_price,
+    checkout.service_commission=float(service_commission),
+    checkout.service_commission_type=service_commission_type,
+    
 
     # change the status of appointment after checkout
     appointment.status = choices.AppointmentStatus.DONE
@@ -3309,6 +3315,11 @@ def appointment_service_status_update(request):
         appointment.status = choices.AppointmentStatus.STARTED
         appointment.save()
 
+
+    # When there is any appointment started make the appointment checkout here, 
+    # so that we can calculate the tax and the service prices using query
+    # to monitor paid and unpaid appointment checkouts.
+    # If all Void then don't create the checkout.
     if appointment_service_status == choices.AppointmentServiceStatus.STARTED:
         AppointmentCheckout.objects.create(
             appointment=appointment,
@@ -3366,6 +3377,7 @@ def paid_unpaid_clients(request):
         .with_payment_status() \
         .with_client_name() \
         .with_payment_date() \
+        .with_total_tax() \
         .order_by('-created_at')
 
     serialized = list(PaidUnpaidAppointmentCheckoutSerializer(appointment_checkouts, many=True).data)

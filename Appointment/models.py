@@ -63,6 +63,16 @@ class AppointmentCheckoutManager(models.QuerySet):
                     ),
         )
 
+    def with_total_tax(self):
+        return self.annotate(
+            total_tax=Coalesce(
+                F('gst_price') + F('gst_price1'),
+                0.0,
+                output_field=FloatField()
+            )
+        )
+
+
 class AppointmentLogs(models.Model):
     LOG_TYPE_CHOICES =[
         ('Create' , 'Create'),
