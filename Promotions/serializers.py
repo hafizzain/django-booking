@@ -1,6 +1,8 @@
 
 from rest_framework.fields import empty
-from Sale.serializers import AvailPriceServiceSerializers,PriceServiceSerializers
+
+from Appointment.serializers import ClientSerializerresponse
+from Sale.serializers import AvailPriceServiceSerializers, PriceServiceSerializers, ClientSerializer
 from Service.models import PriceService
 from rest_framework import serializers
 
@@ -2221,6 +2223,7 @@ class PromotionExcludedItemSerializer(serializers.ModelSerializer):
 
 
 class CouponSerializer(serializers.ModelSerializer):
+    client = ClientSerializerresponse(many=True)
     class Meta:
         model = Coupon
-        fields = '__all__'
+        fields = ['id','name','client']
