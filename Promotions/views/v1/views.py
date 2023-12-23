@@ -6460,6 +6460,8 @@ def create_coupon(request):
     user_limit = request.data.get('usage_limit', None)
     coupon_type = request.data.get('coupon_type', None)
     days_restriction = request.data.get('days_restriction', None)
+    amount_spent = request.data.get('amount_spent',None)
+    discounted_percentage = request.data.get('discounted_percentage',None)
     client = request.data.get('client', [])
     error = []
 
@@ -6469,6 +6471,8 @@ def create_coupon(request):
             return Response({"msg": "Coupon already exists"}, status=status.HTTP_400_BAD_REQUEST)
         coupon = Coupon.objects.create(
             name=name,
+            amount_spent=amount_spent,
+            discounted_percentage=discounted_percentage,
             coupon_type_value=coupon_type_value,
             short_description=short_description,
             start_date=datetime.strptime(start_date, '%Y-%m-%d %H:%M:%S') if start_date else None,
