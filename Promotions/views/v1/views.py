@@ -6423,6 +6423,7 @@ def create_coupon(request):
     detail = None
     name = request.data.get('name', None)
     short_description = request.data.get('short_description', None)
+    coupon_type_value = request.data.get('coupon_type_value',None)
     product_brand = request.data.get('product_brand', [])
     product_brand_discount_percentage = request.data.get('product_brand_discount_percentage', None)
     service_ids = request.data.get('exclude_service', [])
@@ -6457,6 +6458,7 @@ def create_coupon(request):
             return Response({"msg":"Coupon already exists"},status=status.HTTP_400_BAD_REQUEST)
         coupon = Coupon.objects.create(
             name=name,
+            coupon_type_value=coupon_type_value,
             short_description=short_description,
             start_date=datetime.strptime(start_date, '%Y-%m-%d %H:%M:%S') if start_date else None,
             end_date=datetime.strptime(end_date, '%Y-%m-%d %H:%M:%S') if end_date else None,
