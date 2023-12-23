@@ -3343,7 +3343,7 @@ def appointment_service_status_update(request):
                                         ).aggregate(
                                             final_price=Coalesce(Sum('service_price'), 0.0, output_field=FloatField())
                                         )
-        temp_subtotal = appointment_service['final_price'] + gst_price + gst_price1
+        temp_subtotal = gst_price + gst_price1
 
 
         checkout, created = AppointmentCheckout.objects.get_or_create(
@@ -3371,7 +3371,8 @@ def appointment_service_status_update(request):
             'response': {
                 'message': 'Appointment Service',
                 'error_message': None,
-                'appointment_service': serialized.data
+                'appointment_service': serialized.data,
+                'appointment_service_sum': appointment_service['final_price']
             }
         },
         status=status.HTTP_200_OK
