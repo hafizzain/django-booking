@@ -6444,7 +6444,7 @@ def create_coupon(request):
         # if len(service_ids) > 0 and len(client) > 0 and len(service_group) > 0 and len(excluded_products) > 0 and len(
         #         product_brand) > 0:
         if len(client) > 0:
-            pass
+            client = json.loads(client)
         else:
             return Response({"msg":"Enter valid ids"},status=status.HTTP_400_BAD_REQUEST)
         code_check = Coupon.objects.filter(code=code)
