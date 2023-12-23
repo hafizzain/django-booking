@@ -647,3 +647,8 @@ class CouponDetails(models.Model):
     store_target = models.ForeignKey(StoreTarget, on_delete=models.CASCADE, related_name='coupon_storetarget', null=True)
     excluded_product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='coupon_excluded_product',
                                      null=True)
+
+
+class CouponBlockDays(models.Model):
+    coupon = models.ForeignKey(Coupon , on_delete=models.CASCADE ,null=True, related_name='coupon')
+    days = models.TextField(null=True ,blank=True)
