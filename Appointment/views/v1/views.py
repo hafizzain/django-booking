@@ -3341,7 +3341,7 @@ def appointment_service_status_update(request):
                                             )
                                             
                                         ).aggregate(
-                                            final_price=Sum('service_price')
+                                            final_price=Coalesce(Sum('service_price'), 0.0, output_field=FloatField())
                                         )
         temp_subtotal = appointment_service['final_price'] + gst_price + gst_price1
 
