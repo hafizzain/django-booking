@@ -3288,8 +3288,8 @@ def appointment_service_status_update(request):
     appointment_service_status = request.data.get('status', None)
     gst = request.data.get('gst', None)
     gst1 = request.data.get('gst1', None)
-    gst_price = request.data.get('gst_price', None)
-    gst_price1 = request.data.get('gst_price1', None)
+    gst_price = float(request.data.get('gst_price', None))
+    gst_price1 = float(request.data.get('gst_price1', None))
     tax_name = request.data.get('tax_name', None)
     tax_name1 = request.data.get('tax_name1', None)
 
@@ -3328,7 +3328,7 @@ def appointment_service_status_update(request):
         # Calculating service price total and saving it to checkout 
         currency = appointment.business_address.currency
         query_for_price = Q(service=OuterRef('service'), currency=currency)        
-        appointment_service = AppointmentService.objects \
+        total_service_price = AppointmentService.objects \
                                         .filter(appointment=appointment) \
                                         .annotate(
                                             service_price=Coalesce(
@@ -3341,9 +3341,9 @@ def appointment_service_status_update(request):
                                             )
                                             
                                         ).aggregate(
-                                            final_price=Sum('service_price')
+                                            final_price=Coalesce(Sum('service_price'), 0.0, output_field=FloatField())
                                         )
-        temp_subtotal = appointment_service['final_price'] + gst_price + gst_price1
+        temp_subtotal = total_service_price['final_price'] + gst_price + gst_price1
 
 
         checkout, created = AppointmentCheckout.objects.get_or_create(
@@ -3371,7 +3371,7 @@ def appointment_service_status_update(request):
             'response': {
                 'message': 'Appointment Service',
                 'error_message': None,
-                'appointment_service': serialized.data
+                'appointment_service': serialized.data,
             }
         },
         status=status.HTTP_200_OK
@@ -3410,6 +3410,7 @@ def paid_unpaid_clients(request):
 
     appointment_checkouts = AppointmentCheckout.objects \
         .filter(query) \
+        .with_total_service_price() \
         .with_payment_status() \
         .with_client_name() \
         .with_payment_date() \
