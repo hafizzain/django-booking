@@ -10,6 +10,7 @@ urlpatterns = [
     path('update_directorflat/', views.update_directorflat),
     path('create_coupon/', views.create_coupon),
     path('delete_coupon/<uuid:id>/',views.delete_coupon),
+    path('get_coupon/<uuid:id>/',views.get_coupon),
 
     
     path('get_discount_and_promotions/', views.get_discount_and_promotions),
