@@ -651,4 +651,4 @@ class CouponDetails(models.Model):
 
 class CouponBlockDays(models.Model):
     coupon = models.ForeignKey(Coupon , on_delete=models.CASCADE ,null=True, related_name='coupon_blockdays')
-    days = models.TextField(null=True ,blank=True)
+    day = models.TextField(null=True ,blank=True)
