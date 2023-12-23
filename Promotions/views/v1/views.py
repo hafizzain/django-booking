@@ -6459,14 +6459,13 @@ def create_coupon(request):
             user_limit=user_limit,
             code=code
         )
-        coupon_details = CouponDetails.objects.create(coupon_id=coupon.id)
-        detail=coupon_details.id
-        coupon_details.service_id.set(service_ids)
-        coupon_details.client_id.set(client)
-        coupon_details.service_group_id.set(service_group)
-        coupon_details.excluded_products_id.set(excluded_products)
-        coupon_details.brand_id.set(product_brand)
-        # coupon_details.store_target_id.set(store_restriction)
+        # coupon_details = CouponDetails.objects.create(coupon_id=coupon.id)
+        # detail=coupon_details.id
+        coupon.coupons_service.set(service_ids)
+        coupon.client.set(client)
+        # coupon.coupon_service_group.set(service_group)
+        # coupon_details.excluded_products_id.set(excluded_products)
+        # coupon_details.brand_id.set(product_brand)
     except Exception as ex:
         error = str(ex)
         return Response(
@@ -6475,8 +6474,8 @@ def create_coupon(request):
                 'status_code': 400,
                 'response': {
                     'message': 'Something went wrong',
-                    'error_message': str(ex),
-                    'coupon_details':detail
+                    'error_message': error,
+                    # 'coupon_details':detail
                 }
             },
             status=status.HTTP_400_BAD_REQUEST

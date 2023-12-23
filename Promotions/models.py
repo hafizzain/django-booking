@@ -629,10 +629,12 @@ class Coupon(models.Model):
     usage_limit = models.TextField(null=True)
     user_limit = models.TextField(null=True)
     code = models.TextField(null=True)
-    # brands = models.ManyToManyField(Brand, related_name='coupons_brand')
-    # coupons_service = models.ManyToManyField(Service, related_name='coupons_service')
-    # brands = models.ManyToManyField(ServiceGroup, related_name='coupons_service_group')
-    # brands = models.ManyToManyField(Brand, related_name='coupons_brand')
+    brands = models.ManyToManyField(Brand, related_name='coupons_brand',null=True)
+    coupons_service = models.ManyToManyField(Service, related_name='coupons_service',null=True)
+    coupon_service_group = models.ManyToManyField(ServiceGroup, related_name='coupons_service_group',null=True)
+    client = models.ManyToManyField(Client, related_name='coupons_client',null=True)
+    store_target = models.ManyToManyField(StoreTarget, related_name='coupons_brand',null=True)
+    excluded_product = models.ManyToManyField(Product, related_name='coupons_product',null=True)
 
 
 class CouponDetails(models.Model):
