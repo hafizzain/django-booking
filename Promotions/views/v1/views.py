@@ -6550,7 +6550,7 @@ def delete_coupon(request, id=None):
         return Response({"msg": "Enter a valid id to delete"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['DELETE'])
+@api_view(['GET'])
 @permission_classes([AllowAny])
 def get_coupon(request, id=None):
     if id:
