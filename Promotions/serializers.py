@@ -8,7 +8,7 @@ from rest_framework import serializers
 from Business.models import BusinessAddress, BusinessTax
 from Product.Constants.index import tenant_media_base_url
 from django_tenants.utils import tenant_context
-from Product.models import Product
+from Product.models import Product, Brand
 from Product.serializers import BrandSerializer
 from Promotions.models import BundleFixed, ComplimentaryDiscount, DirectOrFlatDiscount, CategoryDiscount, \
     DateRestrictions, DayRestrictions, BlockDate, DiscountOnFreeService, FixedPriceService, FreeService, \
@@ -2227,12 +2227,41 @@ class Clientcouponresponse(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class Brandcouponresponse(serializers.ModelSerializer):
+    class Meta:
+        model = Brand
+        fields = "__all__"
+
+
+class Servicecouponresponse(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        fields = "__all__"
+
+
+class ServiceGroupcouponresponse(serializers.ModelSerializer):
+
+    class Meta:
+        model = ServiceGroup
+        fields = "__all__"
+
+class Productcouponresponse(serializers.ModelSerializer):
+
+    class Meta:
+        model = Product
+        fields = "__all__"
+
 class CouponSerializer(serializers.ModelSerializer):
-    client = Clientcouponresponse(many=True)
+    clients = Clientcouponresponse(many=True)
+    brands = Brandcouponresponse(many=True)
+    coupons_services = Servicecouponresponse(many=True)
+    coupon_service_groups = ServiceGroupcouponresponse(many=True)
+    excluded_products = Productcouponresponse(many=True)
 
 
     class Meta:
         model = Coupon
         fields = ['id', 'name', 'code', 'short_description', 'start_date', 'end_date', 'coupon_type',
-                  'user_limit', 'usage_limit','client','brands', 'coupons_service', 'coupon_service_group', 'store_target',
-                  'excluded_product']
+                  'user_limit', 'usage_limit', 'clients', 'brands', 'coupons_services', 'coupon_service_groups',
+                  'store_target',
+                  'excluded_products']
