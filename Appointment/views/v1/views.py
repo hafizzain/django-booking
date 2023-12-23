@@ -32,7 +32,9 @@ from Employee.models import CategoryCommission, CommissionSchemeSetting, Employe
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
-from django.db.models import Q
+from django.db.models import Q, OuterRef, Subquery, FloatField
+from django.db.models.functions import Coalesce
+
 from Client.models import Client, ClientPackageValidation, ClientPromotions, LoyaltyPoints, ClientLoyaltyPoint, \
     LoyaltyPointLogs
 from datetime import date, timedelta
@@ -3322,6 +3324,28 @@ def appointment_service_status_update(request):
     # to monitor paid and unpaid appointment checkouts.
     # If all Void then don't create the checkout.
     if appointment_service_status == choices.AppointmentServiceStatus.STARTED:
+
+        # Calculating service price total and saving it to checkout 
+        currency = appointment.business_address.currency
+        query_for_price = Q(service=OuterRef('service'), currency=currency)        
+        appointment_service = AppointmentService.objects \
+                                        .filter(appointment=appointment) \
+                                        .annotate(
+                                            service_price=Coalesce(
+                                                PriceService.objects \
+                                                .filter(query_for_price) \
+                                                .order_by('-created_at') \
+                                                .values('price')[:1],
+                                                0.0,
+                                                output_field=FloatField()
+                                            )
+                                            
+                                        ).aggregate(
+                                            final_price=Sum('service_price')
+                                        )
+        temp_subtotal = appointment_service['final_price'] + gst_price + gst_price1
+
+
         checkout, created = AppointmentCheckout.objects.get_or_create(
             appointment=appointment,
             business_address=appointment.business_address
@@ -3334,6 +3358,7 @@ def appointment_service_status_update(request):
             checkout.gst_price1=gst_price1
             checkout.tax_name=tax_name
             checkout.tax_name1=tax_name1
+            checkout.total_price=temp_subtotal
             checkout.save()
         
 
@@ -3388,7 +3413,6 @@ def paid_unpaid_clients(request):
         .with_payment_status() \
         .with_client_name() \
         .with_payment_date() \
-        .with_total_tax() \
         .order_by('-created_at')
 
     serialized = list(PaidUnpaidAppointmentCheckoutSerializer(appointment_checkouts, many=True).data)
