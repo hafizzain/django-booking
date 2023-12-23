@@ -3288,8 +3288,8 @@ def appointment_service_status_update(request):
     appointment_service_status = request.data.get('status', None)
     gst = request.data.get('gst', None)
     gst1 = request.data.get('gst1', None)
-    gst_price = request.data.get('gst_price', None)
-    gst_price1 = request.data.get('gst_price1', None)
+    gst_price = float(request.data.get('gst_price', None))
+    gst_price1 = float(request.data.get('gst_price1', None))
     tax_name = request.data.get('tax_name', None)
     tax_name1 = request.data.get('tax_name1', None)
 
@@ -3343,7 +3343,7 @@ def appointment_service_status_update(request):
                                         ).aggregate(
                                             final_price=Coalesce(Sum('service_price'), 0.0, output_field=FloatField())
                                         )
-        temp_subtotal = gst_price + gst_price1
+        temp_subtotal = appointment_service['final_price'] + gst_price + gst_price1
 
 
         checkout, created = AppointmentCheckout.objects.get_or_create(
@@ -3372,7 +3372,6 @@ def appointment_service_status_update(request):
                 'message': 'Appointment Service',
                 'error_message': None,
                 'appointment_service': serialized.data,
-                'appointment_service_sum': appointment_service['final_price']
             }
         },
         status=status.HTTP_200_OK
