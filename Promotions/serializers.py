@@ -2230,6 +2230,7 @@ class Clientcouponresponse(serializers.ModelSerializer):
 class CouponSerializer(serializers.ModelSerializer):
     client = Clientcouponresponse(many=True)
 
+
     class Meta:
         model = Coupon
         fields = ['id', 'name', 'code', 'short_description', 'start_date', 'end_date', 'coupon_type',
