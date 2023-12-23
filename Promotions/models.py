@@ -630,25 +630,27 @@ class Coupon(models.Model):
     user_limit = models.TextField(null=True)
     code = models.TextField(null=True)
     coupon_type_value = models.TextField(null=True)
-    brands = models.ManyToManyField(Brand, related_name='coupons_brand',null=True)
-    coupons_services = models.ManyToManyField(Service, related_name='coupons_service',null=True)
-    coupon_service_groups = models.ManyToManyField(ServiceGroup, related_name='coupons_service_group',null=True)
-    clients = models.ManyToManyField(Client, related_name='coupons_client',null=True)
-    store_target = models.ManyToManyField(StoreTarget, related_name='coupons_brand',null=True)
-    excluded_products = models.ManyToManyField(Product, related_name='coupons_product',null=True)
+    brands = models.ManyToManyField(Brand, related_name='coupons_brand', null=True)
+    coupons_services = models.ManyToManyField(Service, related_name='coupons_service', null=True)
+    coupon_service_groups = models.ManyToManyField(ServiceGroup, related_name='coupons_service_group', null=True)
+    clients = models.ManyToManyField(Client, related_name='coupons_client', null=True)
+    store_target = models.ManyToManyField(StoreTarget, related_name='coupons_brand', null=True)
+    excluded_products = models.ManyToManyField(Product, related_name='coupons_product', null=True)
 
 
 class CouponDetails(models.Model):
     coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, null=True, related_name='coupon')
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='coupon_service', null=True)
-    service_group = models.ForeignKey(ServiceGroup,on_delete=models.CASCADE, related_name='coupon_service_group', null=True)
+    service_group = models.ForeignKey(ServiceGroup, on_delete=models.CASCADE, related_name='coupon_service_group',
+                                      null=True)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='coupon_brand', null=True)
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='coupon_client', null=True)
-    store_target = models.ForeignKey(StoreTarget, on_delete=models.CASCADE, related_name='coupon_storetarget', null=True)
-    excluded_product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='coupon_excluded_product',
+    store_target = models.ForeignKey(StoreTarget, on_delete=models.CASCADE, related_name='coupon_storetarget',
                                      null=True)
+    excluded_product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='coupon_excluded_product',
+                                         null=True)
 
 
 class CouponBlockDays(models.Model):
-    coupon = models.ForeignKey(Coupon , on_delete=models.CASCADE ,null=True, related_name='coupon_blockdays')
-    day = models.TextField(null=True ,blank=True)
+    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, null=True, related_name='coupon_blockdays')
+    day = models.TextField(null=True, blank=True)

@@ -6463,18 +6463,6 @@ def create_coupon(request):
     error = []
 
     try:
-        if (len(service_ids) > 0 and len(client) > 0 and len(service_group) > 0
-                and len(excluded_products) > 0 and len(product_brand) > 0 and len(days_restriction) >0
-        ):
-            client = json.loads(client)
-            service_ids = json.loads(service_ids)
-            service_group = json.loads(service_group)
-            excluded_products = json.loads(excluded_products)
-            product_brand = json.loads(product_brand)
-            store_restriction = json.loads(store_restriction)
-            days_restriction = json.loads(days_restriction)
-        else:
-            return Response({"msg":"Enter valid ids"},status=status.HTTP_400_BAD_REQUEST)
         code_check = Coupon.objects.filter(code=code)
         if code_check:
             return Response({"msg": "Coupon already exists"}, status=status.HTTP_400_BAD_REQUEST)
@@ -6490,15 +6478,29 @@ def create_coupon(request):
             user_limit=user_limit,
             code=code
         )
-        for day in days_restriction:
-            day = day.get("day", None)
-            CouponBlockDays.objects.create(day=day, coupon_id=coupon.id)
-        coupon.clients.set(client)
-        coupon.coupons_service.set(service_ids)
-        coupon.coupon_service_group.set(service_group)
-        coupon.excluded_products.set(excluded_products)
-        coupon.brand_id.set(product_brand)
-        coupon.store_target.set(store_restriction)
+        if len(service_ids) > 0:
+            service_ids = json.loads(service_ids)
+            coupon.coupons_service.set(service_ids)
+        if len(client) > 0:
+            client = json.loads(client)
+            coupon.clients.set(client)
+        if len(service_group) > 0:
+            service_ids = json.loads(service_group)
+            coupon.coupon_service_group.set(service_group)
+        if len(excluded_products) > 0:
+            excluded_products = json.loads(excluded_products)
+            coupon.excluded_products.set(excluded_products)
+        if len(product_brand) > 0:
+            product_brand = json.loads(product_brand)
+            coupon.brand_id.set(product_brand)
+        if len(days_restriction) > 0:
+            days_restriction = json.loads(days_restriction)
+            for day in days_restriction:
+                day = day.get("day", None)
+                CouponBlockDays.objects.create(day=day, coupon_id=coupon.id)
+        if len(store_restriction) > 0:
+            store_restriction = json.loads(store_restriction)
+            coupon.store_target.set(store_restriction)
     except Exception as ex:
         error = str(ex)
         return Response(
@@ -6532,18 +6534,18 @@ def create_coupon(request):
 
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
-def delete_coupon(request,id=None):
+def delete_coupon(request, id=None):
     if id:
         coupon = Coupon.objects.filter(id=id)
         coupon.delete()
-        return Response({"msg":"Coupon deleted successfully"},status=status.HTTP_200_OK)
+        return Response({"msg": "Coupon deleted successfully"}, status=status.HTTP_200_OK)
     else:
-        return Response({"msg":"Enter a valid id to delete"},status=status.HTTP_400_BAD_REQUEST)
+        return Response({"msg": "Enter a valid id to delete"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
-def get_coupon(request,id=None):
+def get_coupon(request, id=None):
     if id:
         coupon = Coupon.objects.get(id=id)
         serializer = CouponSerializer(coupon, context={'request': request})
@@ -6561,4 +6563,4 @@ def get_coupon(request,id=None):
             status=status.HTTP_200_OK
         )
     else:
-        return Response({"msg":"Enter a valid id to get"},status=status.HTTP_400_BAD_REQUEST)
+        return Response({"msg": "Enter a valid id to get"}, status=status.HTTP_400_BAD_REQUEST)
