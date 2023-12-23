@@ -6530,7 +6530,7 @@ def create_coupon(request):
     )
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 @permission_classes([AllowAny])
 def delete_coupon(request):
     id = request.GET.get('id','None')
