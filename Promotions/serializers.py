@@ -9,7 +9,12 @@ from Product.Constants.index import tenant_media_base_url
 from django_tenants.utils import tenant_context
 from Product.models import Product 
 from Product.serializers import BrandSerializer
-from Promotions.models import BundleFixed, ComplimentaryDiscount, DirectOrFlatDiscount , CategoryDiscount , DateRestrictions , DayRestrictions, BlockDate, DiscountOnFreeService, FixedPriceService, FreeService, MentionedNumberService, PackagesDiscount, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, ServiceDurationForSpecificTime, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount, Service, ServiceGroup, PromotionExcludedItem
+from Promotions.models import BundleFixed, ComplimentaryDiscount, DirectOrFlatDiscount, CategoryDiscount, \
+    DateRestrictions, DayRestrictions, BlockDate, DiscountOnFreeService, FixedPriceService, FreeService, \
+    MentionedNumberService, PackagesDiscount, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, \
+    ServiceDurationForSpecificTime, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, \
+    SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount, Service, ServiceGroup, \
+    PromotionExcludedItem, Coupon
 from Client.models import Vouchers
 
 from Utility.models import Currency, ExceptionRecord
@@ -2217,4 +2222,5 @@ class PromotionExcludedItemSerializer(serializers.ModelSerializer):
 
 class CouponSerializer(serializers.ModelSerializer):
     class Meta:
+        model = Coupon
         fields = '__all__'
