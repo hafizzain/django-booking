@@ -3328,7 +3328,7 @@ def appointment_service_status_update(request):
         # Calculating service price total and saving it to checkout 
         currency = appointment.business_address.currency
         query_for_price = Q(service=OuterRef('service'), currency=currency)        
-        appointment_service = AppointmentService.objects \
+        total_service_price = AppointmentService.objects \
                                         .filter(appointment=appointment) \
                                         .annotate(
                                             service_price=Coalesce(
@@ -3343,7 +3343,7 @@ def appointment_service_status_update(request):
                                         ).aggregate(
                                             final_price=Coalesce(Sum('service_price'), 0.0, output_field=FloatField())
                                         )
-        temp_subtotal = appointment_service['final_price'] + gst_price + gst_price1
+        temp_subtotal = total_service_price['final_price'] + gst_price + gst_price1
 
 
         checkout, created = AppointmentCheckout.objects.get_or_create(
