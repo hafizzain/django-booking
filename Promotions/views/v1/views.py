@@ -6441,10 +6441,15 @@ def create_coupon(request):
     error = []
 
     try:
-        # if len(service_ids) > 0 and len(client) > 0 and len(service_group) > 0 and len(excluded_products) > 0 and len(
-        #         product_brand) > 0:
-        if len(client) > 0:
+        if (len(service_ids) > 0 and len(client) > 0 and len(service_group) > 0
+                and len(excluded_products) > 0 and len(product_brand) > 0 and len(store_restriction) >0
+        ):
             client = json.loads(client)
+            service_ids = json.loads(service_ids)
+            service_group = json.loads(service_group)
+            excluded_products = json.loads(excluded_products)
+            product_brand = json.loads(product_brand)
+            store_restriction = json.loads(store_restriction)
         else:
             return Response({"msg":"Enter valid ids"},status=status.HTTP_400_BAD_REQUEST)
         code_check = Coupon.objects.filter(code=code)
@@ -6462,12 +6467,11 @@ def create_coupon(request):
             code=code
         )
         coupon.clients.set(client)
-        # coupon_details = CouponDetails.objects.create(coupon_id=coupon.id)
-        # detail=coupon_details.id
-        # coupon.coupons_service.set(service_ids)
-        # coupon.coupon_service_group.set(service_group)
-        # coupon_details.excluded_products_id.set(excluded_products)
-        # coupon_details.brand_id.set(product_brand)
+        coupon.coupons_service.set(service_ids)
+        coupon.coupon_service_group.set(service_group)
+        coupon.excluded_products.set(excluded_products)
+        coupon.brand_id.set(product_brand)
+        coupon.store_target.set(store_restriction)
     except Exception as ex:
         error = str(ex)
         return Response(
@@ -6477,7 +6481,6 @@ def create_coupon(request):
                 'response': {
                     'message': 'Something went wrong',
                     'error_message': error,
-                    # 'coupon_details':detail
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
