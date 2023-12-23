@@ -3410,6 +3410,7 @@ def paid_unpaid_clients(request):
 
     appointment_checkouts = AppointmentCheckout.objects \
         .filter(query) \
+        .with_total_service_price() \
         .with_payment_status() \
         .with_client_name() \
         .with_payment_date() \
