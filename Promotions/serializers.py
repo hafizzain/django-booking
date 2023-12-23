@@ -2275,4 +2275,4 @@ class CouponSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'code', 'short_description', 'start_date', 'end_date', 'coupon_type',
                   'user_limit', 'usage_limit', 'clients', 'brands', 'coupons_services', 'coupon_service_groups',
                   'store_target',
-                  'excluded_products']
+                  'excluded_products','coupon_blockdays']
