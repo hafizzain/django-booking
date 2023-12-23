@@ -2224,7 +2224,7 @@ class PromotionExcludedItemSerializer(serializers.ModelSerializer):
 class Clientcouponresponse(serializers.ModelSerializer):
     class Meta:
         model = Client
-        fields = ['id', 'full_name']
+        fields = "__all__"
 
 
 class CouponSerializer(serializers.ModelSerializer):
