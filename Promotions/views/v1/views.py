@@ -6442,6 +6442,7 @@ def delete_packagesdiscount(request):
 def create_coupon(request):
     detail = None
     name = request.data.get('name', None)
+    business = request.data.get('business', None)
     short_description = request.data.get('short_description', None)
     coupon_type_value = request.data.get('coupon_type_value', None)
     product_brand = request.data.get('product_brand', [])
@@ -6501,6 +6502,8 @@ def create_coupon(request):
         if len(store_restriction) > 0:
             store_restriction = json.loads(store_restriction)
             coupon.store_target.set(store_restriction)
+        if business is not None:
+            coupon.business.set(business)
     except Exception as ex:
         error = str(ex)
         return Response(

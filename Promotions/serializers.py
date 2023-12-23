@@ -5,7 +5,7 @@ from Sale.serializers import AvailPriceServiceSerializers, PriceServiceSerialize
 from Service.models import PriceService
 from rest_framework import serializers
 
-from Business.models import BusinessAddress, BusinessTax
+from Business.models import BusinessAddress, BusinessTax, Business
 from Product.Constants.index import tenant_media_base_url
 from django_tenants.utils import tenant_context
 from Product.models import Product, Brand
@@ -2240,25 +2240,27 @@ class Servicecouponresponse(serializers.ModelSerializer):
 
 
 class ServiceGroupcouponresponse(serializers.ModelSerializer):
-
     class Meta:
         model = ServiceGroup
         fields = "__all__"
 
-class Productcouponresponse(serializers.ModelSerializer):
 
+class Productcouponresponse(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = "__all__"
 
 
-
 class CouponBlockDaysresponse(serializers.ModelSerializer):
-
     class Meta:
         model = CouponBlockDays
         fields = "__all__"
 
+
+class Couponbusinessresponse(serializers.ModelSerializer):
+    class Meta:
+        model = Business
+        fields = "__all__"
 
 
 class CouponSerializer(serializers.ModelSerializer):
@@ -2268,11 +2270,11 @@ class CouponSerializer(serializers.ModelSerializer):
     coupon_service_groups = ServiceGroupcouponresponse(many=True)
     excluded_products = Productcouponresponse(many=True)
     coupon_blockdays = CouponBlockDaysresponse(many=True)
-
+    business = Couponbusinessresponse(many=True)
 
     class Meta:
         model = Coupon
         fields = ['id', 'name', 'code', 'short_description', 'start_date', 'end_date', 'coupon_type',
                   'user_limit', 'usage_limit', 'clients', 'brands', 'coupons_services', 'coupon_service_groups',
-                  'store_target',
-                  'excluded_products','coupon_blockdays']
+                  'store_target','business',
+                  'excluded_products', 'coupon_blockdays']

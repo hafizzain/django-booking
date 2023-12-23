@@ -636,6 +636,7 @@ class Coupon(models.Model):
     clients = models.ManyToManyField(Client, related_name='coupons_client', null=True)
     store_target = models.ManyToManyField(StoreTarget, related_name='coupons_brand', null=True)
     excluded_products = models.ManyToManyField(Product, related_name='coupons_product', null=True)
+    business = models.ManyToManyField(Business, related_name='coupons_Business', null=True)
 
 
 class CouponDetails(models.Model):
