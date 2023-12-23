@@ -6463,19 +6463,18 @@ def create_coupon(request):
     error = []
 
     try:
-        days_restriction = json.loads(days_restriction)
-
-        # if (len(service_ids) > 0 and len(client) > 0 and len(service_group) > 0
-        #         and len(excluded_products) > 0 and len(product_brand) > 0 and len(dayrestrictions) >0
-        # ):
-        #     client = json.loads(client)
-        #     service_ids = json.loads(service_ids)
-        #     service_group = json.loads(service_group)
-        #     excluded_products = json.loads(excluded_products)
-        #     product_brand = json.loads(product_brand)
-        #     store_restriction = json.loads(store_restriction)
-        # else:
-        #     return Response({"msg":"Enter valid ids"},status=status.HTTP_400_BAD_REQUEST)
+        if (len(service_ids) > 0 and len(client) > 0 and len(service_group) > 0
+                and len(excluded_products) > 0 and len(product_brand) > 0 and len(days_restriction) >0
+        ):
+            client = json.loads(client)
+            service_ids = json.loads(service_ids)
+            service_group = json.loads(service_group)
+            excluded_products = json.loads(excluded_products)
+            product_brand = json.loads(product_brand)
+            store_restriction = json.loads(store_restriction)
+            days_restriction = json.loads(days_restriction)
+        else:
+            return Response({"msg":"Enter valid ids"},status=status.HTTP_400_BAD_REQUEST)
         code_check = Coupon.objects.filter(code=code)
         if code_check:
             return Response({"msg": "Coupon already exists"}, status=status.HTTP_400_BAD_REQUEST)
@@ -6494,12 +6493,12 @@ def create_coupon(request):
         for day in days_restriction:
             day = day.get("day", None)
             CouponBlockDays.objects.create(day=day, coupon_id=coupon.id)
-        # coupon.clients.set(client)
-        # coupon.coupons_service.set(service_ids)
-        # coupon.coupon_service_group.set(service_group)
-        # coupon.excluded_products.set(excluded_products)
-        # coupon.brand_id.set(product_brand)
-        # coupon.store_target.set(store_restriction)
+        coupon.clients.set(client)
+        coupon.coupons_service.set(service_ids)
+        coupon.coupon_service_group.set(service_group)
+        coupon.excluded_products.set(excluded_products)
+        coupon.brand_id.set(product_brand)
+        coupon.store_target.set(store_restriction)
     except Exception as ex:
         error = str(ex)
         return Response(
