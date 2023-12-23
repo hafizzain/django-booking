@@ -629,7 +629,7 @@ class Coupon(models.Model):
     usage_limit = models.TextField(null=True)
     user_limit = models.TextField(null=True)
     amount_spent = models.TextField(null=True)
-    discounted_percentage = models.TextField(null=True)
+    discounted_percentage = models.TextField(null=True,blank=True)
     code = models.TextField(null=True)
     coupon_type_value = models.TextField(null=True)
     brands = models.ManyToManyField(Brand, related_name='coupons_brand', null=True)
