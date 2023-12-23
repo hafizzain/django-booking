@@ -6530,7 +6530,7 @@ def create_coupon(request):
     )
 
 
-@api_view(['GET'])
+@api_view(['DELETE'])
 @permission_classes([AllowAny])
 def delete_coupon(request,id=None):
     if id:
@@ -6539,3 +6539,26 @@ def delete_coupon(request,id=None):
         return Response({"msg":"Coupon deleted successfully"},status=status.HTTP_200_OK)
     else:
         return Response({"msg":"Enter a valid id to delete"},status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+@permission_classes([AllowAny])
+def get_coupon(request,id=None):
+    if id:
+        coupon = Coupon.objects.get(id=id)
+        serializer = CouponSerializer(coupon, context={'request': request})
+        return Response(
+            {
+                'status': True,
+                'status_code': 201,
+                'response': {
+                    'message': 'Coupon get successfully!',
+                    'error_message': None,
+                    'coupon': serializer.data,
+
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    else:
+        return Response({"msg":"Enter a valid id to get"},status=status.HTTP_400_BAD_REQUEST)
