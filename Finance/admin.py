@@ -15,4 +15,5 @@ class RefundServicesAdmin(RefundServices):
 @admin.register(Refund)
 class RefundAdmin(admin.ModelAdmin):
     inlines = [RefundProductsAdmin,RefundServicesAdmin,Coupon]
+    ordering = ['-created_at']
     list_display = ['id','user','refund_invoice_id','refund_type','total_refund_amount']
