@@ -3388,10 +3388,10 @@ def paid_unpaid_clients(request):
 
     appointment_checkouts = AppointmentCheckout.objects \
         .filter(query) \
-        .with_subtotal() \
         .with_payment_status() \
         .with_client_name() \
         .with_payment_date() \
+        .with_subtotal() \
         .order_by('-created_at')
 
     serialized = list(PaidUnpaidAppointmentCheckoutSerializer(appointment_checkouts, many=True).data)
