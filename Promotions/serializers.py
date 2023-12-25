@@ -2287,7 +2287,7 @@ class CouponSerializer(serializers.ModelSerializer):
 
     def get_servicegroup_discount(self, obj):
         try:
-            coupon_brand_queryset = CouponBrand.objects.filter(id=obj.id)
+            coupon_brand_queryset = CouponBrand.objects.filter(coupon_id=obj.id)
             brand_serializer = CouponBrandresponse(coupon_brand_queryset ,many=True).data
             # Assuming you want to filter CouponServiceGroup based on obj.id
             coupon_service_group_queryset = CouponServiceGroup.objects.filter(id=obj.id)
