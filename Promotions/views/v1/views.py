@@ -6465,7 +6465,7 @@ def create_coupon(request):
     days_restriction = request.data.get('dayRestrictions', [])
     amount_spent = request.data.get('amount_spent',None)
     discounted_percentage = request.data.get('discounted_percentage',None)
-    client = request.data.get('client', 'all')
+    client = request.data.get('clients', 'all')
     location = request.data.get('location', [])
     requested_status = request.data.get('status',False)
     buyOneGetOne = request.data.get('buyOneGetOne',None)
