@@ -8,7 +8,7 @@ urlpatterns = [
     path('get_directorflat/', views.get_directorflat),
     path('delete_directorflat/', views.delete_directorflat),
     path('update_directorflat/', views.update_directorflat),
-    path('create_coupon/', views.create_coupon),
+    path('create_couponsdiscount/', views.create_coupon),
     path('delete_coupon/<uuid:id>/',views.delete_coupon),
     path('get_coupon/<uuid:id>/',views.get_coupon),
 
