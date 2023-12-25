@@ -628,8 +628,8 @@ class Coupon(models.Model):
     block_day = models.TextField(null=True)
     usage_limit = models.TextField(null=True)
     user_limit = models.TextField(null=True)
-    amount_spent = models.TextField(null=True)
-    discounted_percentage = models.TextField(null=True, blank=True)
+    amount_spent = models.FloatField(null=True)
+    discounted_percentage = models.FloatField(null=True)
     code = models.TextField(null=True)
     coupon_type_value = models.TextField(null=True)
     brands = models.ManyToManyField(Brand, through='CouponBrand', related_name='coupons_brand', null=True)
@@ -644,7 +644,7 @@ class Coupon(models.Model):
 class CouponBrand(models.Model):
     coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
-    brand_discount = models.TextField(null=True)
+    brand_discount = models.FloatField(null=True)
     created_at = models.DateTimeField(null=True)
     updated_at = models.DateTimeField(null=True)
 
@@ -655,7 +655,7 @@ class CouponBrand(models.Model):
 class CouponServiceGroup(models.Model):
     coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
     service_group = models.ForeignKey(ServiceGroup, on_delete=models.CASCADE)
-    service_group_discount = models.TextField(null=True)
+    service_group_discount = models.FloatField(null=True)
     created_at = models.DateTimeField(null=True)
     updated_at = models.DateTimeField(null=True)
 
