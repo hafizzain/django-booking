@@ -6537,8 +6537,8 @@ def create_coupon(request):
         if len(store_restriction) > 0:
             store_restriction = json.loads(store_restriction)
             coupon.store_target.set(store_restriction)
-        if business is not None:
-            coupon.business.set(business)
+        # if business is not None:
+        #     coupon.business.set(business)
     except Exception as ex:
         error = str(ex)
         return Response(
