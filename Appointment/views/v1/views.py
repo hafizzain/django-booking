@@ -1826,8 +1826,6 @@ def create_checkout(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    appointment.status = 'Done'
-    appointment.save()
     if type(tip) == str:
         tip = json.loads(tip)
     if type(tip) == list:
@@ -3606,9 +3604,8 @@ def get_available_appointments(request):
         if booking_id is not None:
             query &= Q(appointment_services__id=booking_id)
 
-        appointment = Appointment.objects.filter(query)
-        if appointment:
-            appointment = appointment.order_by('-created_at')
+        appointment = Appointment.objects.filter(query).distinct('id')
+
     except Exception as err:
         return Response(
             {

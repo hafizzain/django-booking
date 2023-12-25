@@ -47,8 +47,7 @@ from Reports.models import DiscountPromotionSalesReport
 from Service.models import ServiceTranlations
 from Utility.models import Language
 from Business.serializers.v1_serializers import BusinessAddressSerilaizer
-
-from django.db.models import Subquery, OuterRef
+from Appointment import choices
 
     
 @api_view(['GET'])
@@ -1355,7 +1354,7 @@ def get_all_sale_orders_optimized(request):
         range_end = str(range_end)
 
     query = Q()
-    app_queries = Q(business_address__id=location_id)
+    app_queries = Q(business_address__id=location_id, appointment__status=choices.AppointmentStatus.DONE)
     sale_queries = Q(is_deleted=False, location__id=location_id)
 
 

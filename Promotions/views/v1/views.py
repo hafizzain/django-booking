@@ -6472,6 +6472,8 @@ def create_coupon(request):
     buyOneGetOne = request.data.get('buyOneGetOne', [])
     fixedAmount = request.data.get('fixedAmount', [])
     selectedType = request.data.get('selectedType', None)
+    test_data1 =0
+    test_data2=0
     error = []
     try:
         if requested_status == 'true':
@@ -6515,32 +6517,25 @@ def create_coupon(request):
             service_group_brand = json.loads(service_group_brand)
             for item in service_group_brand:
                 service_group = item.get("service_group", None)
+                test_data1 = service_group
                 service_group_discount = float(item.get("discount", 0))
                 brand = item.get("brand", None)
+                test_data2 = brand
                 brand_discount = float(item.get("brand_discount", 0))
                 if brand:
-                    brand = json.loads(brand)
-                    coupon.brands.set(brand)
-                    coupon_brand_instance, created = CouponBrand.objects.create(
+                    coupon.brands.set([brand])
+                    CouponBrand.objects.create(
                         coupon=coupon,
-                        brand=brand,
-                        defaults={'brand_discount': brand_discount}
+                        brand_id=brand,
+                        brand_discount=brand_discount
                     )
-                    # If the instance already exists, update the brand_discount value
-                    if not created:
-                        coupon_brand_instance.brand_discount = brand_discount
-                        coupon_brand_instance.save()
                 if service_group:
-                    brand = json.loads(service_group)
-                    coupon.service_groups.add(service_group)
-                    coupon_service_group_instance, created = CouponServiceGroup.objects.create(
+                    coupon.coupon_service_groups.set([service_group])
+                    CouponServiceGroup.objects.create(
                         coupon=coupon,
-                        service_group=service_group,
-                        defaults={'service_group_discount': service_group_discount}
+                        service_group_id=service_group,
+                        service_group_discount=service_group_discount
                     )
-                    if not created:
-                        coupon_service_group_instance.service_group_discount = service_group_discount
-                        coupon_service_group_instance.save()
         if len(service_ids) > 0:
             service_ids = json.loads(service_ids)
             coupon.coupons_services.set(service_ids)
@@ -6578,6 +6573,9 @@ def create_coupon(request):
                 'response': {
                     'message': 'Something went wrong',
                     'error_message': error,
+                    'test_data1':test_data1,
+                    'test_data2':test_data2,
+                    'service_group_brand':service_group_brand
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
