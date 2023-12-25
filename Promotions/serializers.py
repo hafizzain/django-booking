@@ -2268,6 +2268,10 @@ class Couponbusinessresponse(serializers.ModelSerializer):
         model = Business
         fields = "__all__"
 
+class BusinessAddressresponse(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessAddress
+        fields = "__all__"
 
 class CouponSerializer(serializers.ModelSerializer):
     clients = Clientcouponresponse(many=True)
@@ -2277,7 +2281,8 @@ class CouponSerializer(serializers.ModelSerializer):
     excluded_products = Productcouponresponse(many=True)
     coupon_blockdays = CouponBlockDaysresponse(many=True)
     business = Couponbusinessresponse(many=True)
-    CouponBrandresponse(many=True)
+    # CouponBrandresponse(many=True)
+    store_target = BusinessAddressresponse(many=True)
 
     class Meta:
         model = Coupon

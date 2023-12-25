@@ -6537,7 +6537,6 @@ def create_coupon(request):
                 day = day.get("day", None)
                 CouponBlockDays.objects.create(day=day, coupon_id=coupon.id)
         if len(store_restriction) > 0:
-
             store_restriction = json.loads(store_restriction)
             coupon.store_target.set(store_restriction)
         # if business is not None:
