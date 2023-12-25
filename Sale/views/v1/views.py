@@ -1386,7 +1386,9 @@ def get_all_sale_orders_optimized(request):
 
     appointment_checkout = AppointmentCheckout.objects \
     .filter(app_queries) \
-    .select_related('appointment__client') \
+    .select_related('appointment__client', 'appointment__tips_checkout') \
+    .with_subtotal() \
+    .with_total_tax() \
     .distinct()
 
     checkout_data = list(SaleOrders_CheckoutSerializerOP(checkout_order, many=True).data)

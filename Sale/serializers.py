@@ -2389,27 +2389,8 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
     order_type = serializers.SerializerMethodField(read_only=True)
     invoice = serializers.SerializerMethodField(read_only=True)
     total_tip = serializers.SerializerMethodField(read_only=True)
-    subtotal = serializers.SerializerMethodField(read_only=True)
-    total_tax = serializers.SerializerMethodField(read_only=True)
-
-    def get_total_tax(self, obj):
-        return obj.get_total_tax()
-    
-    def get_subtotal(self, obj):
-        services_prices = AppointmentService.objects.filter(appointment=obj.appointment) \
-            .annotate(
-                final_total=Coalesce(
-                     Case(
-                         When(is_redeemed=True, then="redeemed_price"),
-                         When(discount_price__isnull=False, then="discount_price"),
-                         When(price__isnull=False, then="price"),
-                         default="total_price"
-                     ),
-                     0.0,
-                     output_field=FloatField()
-                     )
-            ).aggregate(sub_total_s=Sum('final_total'))
-        return services_prices['sub_total_s']
+    subtotal = serializers.FloatField()
+    total_tax = serializers.FloatField()
             
     def get_order_type(self, obj):
         return 'Appointment'
