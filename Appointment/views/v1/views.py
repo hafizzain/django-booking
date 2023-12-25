@@ -3373,7 +3373,7 @@ def paid_unpaid_clients(request):
         query &= Q(appointment__status=choices.AppointmentStatus.DONE)
 
     if is_paid == 'unpaid':
-        query &= ~Q(appointment__status__in=[choices.AppointmentStatus.DONE, choices.AppointmentStatus.FINISHED])
+        query &= ~Q(appointment__status=choices.AppointmentStatus.DONE)
 
     if location_id:
         query &= Q(business_address__id=location_id)
