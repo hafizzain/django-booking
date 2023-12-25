@@ -6631,3 +6631,24 @@ def get_coupon(request, id=None):
         )
     else:
         return Response({"msg": "Enter a valid id to get"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+@permission_classes([AllowAny])
+def delete_all_coupon(request):
+        coupon = Coupon.objects.all()
+        coupon.delete()
+        return Response(
+            {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Coupon deleted successfully!',
+                    'error_message': None,
+                    # 'errors': error,
+                    # 'coupon': serializer.data,
+
+                }
+            },
+            status=status.HTTP_200_OK
+        )
