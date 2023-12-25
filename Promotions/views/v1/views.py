@@ -6459,7 +6459,7 @@ def create_coupon(request):
     code = request.data.get('code', None)
     user_limit = request.data.get('usage_limit', None)
     coupon_type = request.data.get('coupon_type', None)
-    days_restriction = request.data.get('days_restriction', None)
+    days_restriction = request.data.get('days_restriction', [])
     amount_spent = request.data.get('amount_spent',None)
     discounted_percentage = request.data.get('discounted_percentage',None)
     client = request.data.get('client', [])
@@ -6492,7 +6492,7 @@ def create_coupon(request):
                 brand_discount = float(item.get("brand_discount", 0))
                 if brand:
                     coupon.brand_id.set(brand)
-                    coupon_brand_instance, created = CouponBrand.objects.get_or_create(
+                    coupon_brand_instance, created = CouponBrand.objects.create(
                         coupon=coupon,
                         brand=brand,
                         defaults={'brand_discount': brand_discount}
@@ -6503,7 +6503,7 @@ def create_coupon(request):
                         coupon_brand_instance.save()
                 if service_group:
                     coupon.service_groups.add(service_group)
-                    coupon_service_group_instance, created = CouponServiceGroup.objects.get_or_create(
+                    coupon_service_group_instance, created = CouponServiceGroup.objects.create(
                         coupon=coupon,
                         service_group=service_group,
                         defaults={'service_group_discount': service_group_discount}
