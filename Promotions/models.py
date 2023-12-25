@@ -642,7 +642,7 @@ class Coupon(models.Model):
 
 
 class CouponBrand(models.Model):
-    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE,related_name='avaliable_coupon_brand')
+    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     brand_discount = models.FloatField(null=True)
     created_at = models.DateTimeField(null=True)
@@ -650,7 +650,6 @@ class CouponBrand(models.Model):
 
     class Meta:
         unique_together = ('coupon', 'brand')  # Ensure a unique combination of coupon and brand
-
 
 class CouponServiceGroup(models.Model):
     coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
