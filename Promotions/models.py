@@ -632,7 +632,7 @@ class Coupon(models.Model):
     discounted_percentage = models.FloatField(null=True)
     code = models.TextField(null=True)
     coupon_type_value = models.TextField(null=True)
-    brands = models.ManyToManyField(Brand, through='CouponBrand', related_name='coupons_brand', null=True)
+    brands = models.ManyToManyField(Brand, related_name='coupons_brand', null=True)
     coupons_services = models.ManyToManyField(Service, related_name='coupons_service', null=True)
     coupon_service_groups = models.ManyToManyField(ServiceGroup, related_name='coupons_service_group', null=True)
     clients = models.ManyToManyField(Client, related_name='coupons_client', null=True)
