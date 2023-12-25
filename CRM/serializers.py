@@ -8,7 +8,6 @@ from Client.models import Client
 class ClientSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
-
     def get_image(self, obj):
         if obj.image:
             try:
@@ -53,3 +52,5 @@ class CampaignsSerializer(serializers.ModelSerializer):
     def get_segment_data(self, obj):
         segment = obj.segment
         return {'id': segment.id, 'name': segment.name}
+    
+    
