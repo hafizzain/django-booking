@@ -3324,10 +3324,6 @@ def appointment_service_status_update(request):
     # If all Void then don't create the checkout.
     if appointment_service_status == choices.AppointmentServiceStatus.STARTED:
 
-        # get the price of service from PriceService model
-        # and add to the checkout total.
-        temp_subtotal = F('total_price') + appointment_service.price + gst_price + gst_price1
-
         checkout, created = AppointmentCheckout.objects.get_or_create(
             appointment=appointment,
             business_address=appointment.business_address
@@ -3340,7 +3336,9 @@ def appointment_service_status_update(request):
             checkout.gst_price1=gst_price1
             checkout.tax_name=tax_name
             checkout.tax_name1=tax_name1
-            checkout.total_price=temp_subtotal
+            # get the price of service from PriceService model
+            # and add to the checkout total.
+            checkout.total_price=F('total_price') + appointment_service.price
             checkout.save()
         
 
