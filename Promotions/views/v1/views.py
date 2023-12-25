@@ -6501,9 +6501,9 @@ def create_coupon(request):
             requested_status=requested_status
         )
         if buy_one_type == 'Service':
-            coupon.coupons_services.set([selectedType])
+            coupon.buy_one_get_one_service.set([selectedType])
         if buy_one_type == 'Product':
-            coupon.excluded_products.set([selectedType])
+            coupon.buy_one_get_one_products.set([selectedType])
         if len(buyOneGetOne) > 0:
             buyOneGetOne = json.loads(buyOneGetOne)
         if len(fixedAmount) > 0:
