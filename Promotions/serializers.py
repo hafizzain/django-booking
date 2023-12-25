@@ -2287,7 +2287,7 @@ class CouponSerializer(serializers.ModelSerializer):
 
     def get_servicegroup_discount(self, obj):
         try:
-            []
+            return []
         except Exception as err:
             return []
 
