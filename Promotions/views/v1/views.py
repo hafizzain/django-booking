@@ -6490,7 +6490,7 @@ def create_coupon(request):
             user_limit=user_limit,
             code=code,
             type='Coupons_Discount',
-            status=requested_status
+            requested_status=requested_status
         )
         if len(buyOneGetOne) >0:
             buyOneGetOne=json.loads(buyOneGetOne)

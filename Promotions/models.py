@@ -640,7 +640,8 @@ class Coupon(models.Model):
     excluded_products = models.ManyToManyField(Product, related_name='coupons_product', null=True)
     business = models.ManyToManyField(Business, related_name='coupons_Business', null=True)
     type = models.TextField(null=True)
-    status = models.BooleanField(default=False)
+    status = models.TextField(default='active')
+    requested_status = models.BooleanField(default=True)
 
 
 class CouponBrand(models.Model):
