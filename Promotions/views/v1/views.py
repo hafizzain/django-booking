@@ -6485,7 +6485,7 @@ def create_coupon(request):
             code=code
         )
         if len(location)>0:
-            coupon.business.set(business)
+            coupon.business.set(location)
         if len(service_group_brand)>0:
             service_group_brand = json.loads(service_group_brand)
             for item in service_group_brand:
