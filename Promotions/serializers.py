@@ -2275,6 +2275,7 @@ class BusinessAddressresponse(serializers.ModelSerializer):
 
 class CouponSerializer(serializers.ModelSerializer):
     # clients = Clientcouponresponse(many=True)
+    servicegroup_discount = serializers.SerializerMethodField(read_only=True)
     brands = Brandcouponresponse(many=True)
     coupons_services = Servicecouponresponse(many=True)
     coupon_service_groups = ServiceGroupcouponresponse(many=True)
@@ -2283,6 +2284,12 @@ class CouponSerializer(serializers.ModelSerializer):
     business = Couponbusinessresponse(many=True)
     aval_coupon_brands = CouponBrandresponse(many=True)
     # locations = BusinessAddressresponse(many=True)
+
+    def get_servicegroup_discount(self, obj):
+        try:
+            []
+        except Exception as err:
+            return []
 
     class Meta:
         model = Coupon
