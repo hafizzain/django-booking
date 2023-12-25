@@ -985,7 +985,7 @@ class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
     statuses = serializers.SerializerMethodField()
 
     def get_statuses(self, checkout):
-        return list(checkout.appoinmnt.appointment_services.all().values_list('status', flat=True))
+        return list(checkout.appointment.appointment_services.all().values_list('status', flat=True))
 
     subtotal = serializers.FloatField()
     client_name = serializers.CharField()
