@@ -6527,7 +6527,7 @@ def create_coupon(request):
                     coupon_brand_instance, created = CouponBrand.objects.create(
                         coupon=coupon,
                         brand_id=brand,
-                        defaults={'brand_discount': brand_discount}
+
                     )
                     # If the instance already exists, update the brand_discount value
                     if not created:
@@ -6538,7 +6538,6 @@ def create_coupon(request):
                     coupon_service_group_instance, created = CouponServiceGroup.objects.create(
                         coupon=coupon,
                         service_group_id=service_group,
-                        defaults={'service_group_discount': service_group_discount}
                     )
                     if not created:
                         coupon_service_group_instance.service_group_discount = service_group_discount
