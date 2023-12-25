@@ -6530,7 +6530,7 @@ def create_coupon(request):
                         brand_discount=brand_discount
                     )
                 if service_group:
-                    coupon.service_groups.set([service_group])
+                    coupon.coupon_service_groups.set([service_group])
                     CouponServiceGroup.objects.create(
                         coupon=coupon,
                         service_group_id=service_group,
