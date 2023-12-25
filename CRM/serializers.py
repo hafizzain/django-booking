@@ -52,5 +52,3 @@ class CampaignsSerializer(serializers.ModelSerializer):
     def get_segment_data(self, obj):
         segment = obj.segment
         return {'id': segment.id, 'name': segment.name}
-    
-    
