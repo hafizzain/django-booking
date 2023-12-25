@@ -3606,7 +3606,7 @@ def get_available_appointments(request):
         if booking_id is not None:
             query &= Q(appointment_services__id=booking_id)
 
-        appointment = Appointment.objects.filter(query)
+        appointment = Appointment.objects.filter(query).distinct('id')
         if appointment:
             appointment = appointment.order_by('-created_at')
     except Exception as err:
