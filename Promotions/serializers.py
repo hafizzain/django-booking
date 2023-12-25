@@ -2265,7 +2265,7 @@ class CouponBlockDaysresponse(serializers.ModelSerializer):
 
 class Couponbusinessresponse(serializers.ModelSerializer):
     class Meta:
-        model = BusinessAddress
+        model = Business
         fields = "__all__"
 
 
