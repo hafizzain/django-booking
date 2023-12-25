@@ -27,7 +27,7 @@ class AppointmentCheckoutManager(models.QuerySet):
         subtotal: total_price + gst_price + gst_price1
         """
         status_list = [AppointmentServiceStatus.STARTED, AppointmentServiceStatus.FINISHED]
-        sum_filter=Q(appointment_checkout__appointment_services__status__in=status_list)
+        sum_filter=Q(appointment__appointment_services__status__in=status_list)
         return self.annotate(
             subtotal=Coalesce(
                 Sum('appointment_checkout__appointment_services__price', filter=sum_filter) + F('gst_price') + F('gst_price1'),
