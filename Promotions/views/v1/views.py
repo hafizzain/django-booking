@@ -6472,6 +6472,8 @@ def create_coupon(request):
     buyOneGetOne = request.data.get('buyOneGetOne', [])
     fixedAmount = request.data.get('fixedAmount', [])
     selectedType = request.data.get('selectedType', None)
+    test_data1 -0
+    test_data2=0
     error = []
     try:
         if requested_status == 'true':
@@ -6515,8 +6517,10 @@ def create_coupon(request):
             service_group_brand = json.loads(service_group_brand)
             for item in service_group_brand:
                 service_group = item.get("service_group", None)
+                test_data1 = service_group
                 service_group_discount = float(item.get("discount", 0))
                 brand = item.get("brand", None)
+                test_data2 = brand
                 brand_discount = float(item.get("brand_discount", 0))
                 if brand:
                     coupon.brands.set(brand)
@@ -6576,6 +6580,8 @@ def create_coupon(request):
                 'response': {
                     'message': 'Something went wrong',
                     'error_message': error,
+                    'test_data1':test_data1,
+                    'test_data2':test_data2
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
