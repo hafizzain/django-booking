@@ -2274,7 +2274,7 @@ class BusinessAddressresponse(serializers.ModelSerializer):
         fields = "__all__"
 
 class CouponSerializer(serializers.ModelSerializer):
-    clients = Clientcouponresponse(many=True)
+    # clients = Clientcouponresponse(many=True)
     brands = Brandcouponresponse(many=True)
     coupons_services = Servicecouponresponse(many=True)
     coupon_service_groups = ServiceGroupcouponresponse(many=True)

@@ -6498,8 +6498,8 @@ def create_coupon(request):
             type='Coupons_Discount',
             requested_status=requested_status
         )
-        # if len(buyOneGetOne) >0:
-        #     buyOneGetOne=json.loads(buyOneGetOne)
+        if len(buyOneGetOne) >0:
+            buyOneGetOne=json.loads(buyOneGetOne)
 
         if len(location)>0:
             location = json.loads(location)
