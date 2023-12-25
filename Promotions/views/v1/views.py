@@ -332,6 +332,9 @@ def get_directorflat(request):
     serialized = PromtoionsSerializers.PackagesDiscountSerializers(package, many=True, context={'request': request})
     data.extend(serialized.data)
 
+    coupon = Coupon.objects.all()
+    serialized = CouponSerializer(coupon, many=True, context={'request': request})
+    data.extend(serialized.data)
     return Response(
         {
             'status': 200,
@@ -6463,7 +6466,7 @@ def create_coupon(request):
     amount_spent = request.data.get('amount_spent',None)
     discounted_percentage = request.data.get('discounted_percentage',None)
     client = request.data.get('client', [])
-    location = request.data.get('storeRestrictions', [])
+    location = request.data.get('location', [])
 
     error = []
 
@@ -6537,7 +6540,6 @@ def create_coupon(request):
                 day = day.get("day", None)
                 CouponBlockDays.objects.create(day=day, coupon_id=coupon.id)
         if len(store_restriction) > 0:
-
             store_restriction = json.loads(store_restriction)
             coupon.store_target.set(store_restriction)
         # if business is not None:
