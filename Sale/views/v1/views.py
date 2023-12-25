@@ -1354,7 +1354,7 @@ def get_all_sale_orders_optimized(request):
         range_end = str(range_end)
 
     query = Q()
-    app_queries = Q(business_address__id=location_id, status=choices.AppointmentStatus.DONE)
+    app_queries = Q(business_address__id=location_id, appointment__status=choices.AppointmentStatus.DONE)
     sale_queries = Q(is_deleted=False, location__id=location_id)
 
 
