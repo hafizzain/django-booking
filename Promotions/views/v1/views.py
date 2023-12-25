@@ -6538,8 +6538,8 @@ def create_coupon(request):
             service_ids = json.loads(service_ids)
             coupon.coupons_services.set(service_ids)
         if client == 'all':
-            client = Client.objects.all()
-            coupon.clients.set(client)
+            aclient = Client.objects.all()
+            coupon.clients.set(aclient)
         if len(client) > 0:
             client = json.loads(client)
             coupon.clients.set(client)
