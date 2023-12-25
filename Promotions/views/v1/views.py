@@ -6463,17 +6463,21 @@ def create_coupon(request):
     user_limit = request.data.get('userLimit', None)
     coupon_type = request.data.get('couponType', None)
     days_restriction = request.data.get('dayRestrictions', [])
-    amount_spent = request.data.get('amount_spent', None)
-    discounted_percentage = request.data.get('discounted_percentage', None)
-    client = request.data.get('client', 'all')
+    amount_spent = request.data.get('amount_spent',None)
+    discounted_percentage = request.data.get('discounted_percentage',None)
+    client = request.data.get('clients', 'all')
     location = request.data.get('location', [])
-    requested_status = request.data.get('status', False)
-    buyOneGetOne = request.data.get('buyOneGetOne', [])
+    requested_status = request.data.get('status',False)
+    buyOneGetOne = request.data.get('buyOneGetOne',[])
 
     error = []
 
     try:
-        code_check = Coupon.objects.filter(code=code)
+        if requested_status == 'true':
+            requested_status = True
+        else:
+            requested_status = False
+        code_check = Coupon.objects.filter(code__icontains=code)
         if code_check:
             return Response({"msg": "Coupon already exists"}, status=status.HTTP_400_BAD_REQUEST)
         coupon = Coupon.objects.create(
@@ -6482,8 +6486,10 @@ def create_coupon(request):
             discounted_percentage=discounted_percentage,
             coupon_type_value=coupon_type_value,
             short_description=short_description,
-            start_date=datetime.strptime(start_date, '%Y-%m-%d') if start_date else None,
-            end_date=datetime.strptime(end_date, '%Y-%m-%d') if end_date else None,
+            # start_date=datetime.strptime(start_date, '%Y-%m-%d') if start_date else None,
+            # end_date=datetime.strptime(end_date, '%Y-%m-%d') if end_date else None,
+            start_date=start_date,
+            end_date=end_date,
             coupon_type=coupon_type,
             block_day=block_day,
             usage_limit=usage_limit,
@@ -6492,24 +6498,18 @@ def create_coupon(request):
             type='Coupons_Discount',
             requested_status=requested_status
         )
-        if len(buyOneGetOne) > 0:
-            buyOneGetOne = json.loads(buyOneGetOne)
-            for buy in buyOneGetOne:
-                selectType = buy.get("selectType", None)
-                type = buy.get("type", None)
-                if type =='service':
-                    coupon.coupons_services.set(selectType)
-                if type =='product':
-                    coupon.excluded_products.set(selectType)
-        if len(location) > 0:
+        if len(buyOneGetOne) >0:
+            buyOneGetOne=json.loads(buyOneGetOne)
+
+        if len(location)>0:
             location = json.loads(location)
             coupon.business.set(location)
-        if len(service_group_brand) > 0:
+        if len(service_group_brand)>0:
             service_group_brand = json.loads(service_group_brand)
             for item in service_group_brand:
-                service_group = item.get("service_group", None)
+                service_group = item.get("service_group",None)
                 service_group_discount = float(item.get("discount", 0))
-                brand = item.get("brand", None)
+                brand = item.get("brand",None)
                 brand_discount = float(item.get("brand_discount", 0))
                 if brand:
                     coupon.brand_id.set(brand)
@@ -6593,13 +6593,10 @@ def create_coupon(request):
 
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
-def delete_coupon(request, id=None):
-    if id:
+def delete_coupon(request):
         coupon = Coupon.objects.all()
         coupon.delete()
         return Response({"msg": "Coupon deleted successfully"}, status=status.HTTP_200_OK)
-    else:
-        return Response({"msg": "Enter a valid id to delete"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
