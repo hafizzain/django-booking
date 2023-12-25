@@ -3330,7 +3330,7 @@ def appointment_service_status_update(request):
                                     ).exists()
     status_started_finished = appointment_service_status in status_list
 
-    if status_started_finished:
+    if any_service_started_or_funished or status_started_finished:
         checkout, created = AppointmentCheckout.objects.get_or_create(
             appointment=appointment,
             business_address=appointment.business_address
