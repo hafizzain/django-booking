@@ -6545,9 +6545,9 @@ def create_coupon(request):
     if len(client) > 0:
         client = json.loads(client)
         coupon.clients.set(client)
-    if len(service_group) > 0:
-        service_group = json.loads(service_group)
-        coupon.coupon_service_group.set(service_group)
+    # if len(service_group) > 0:
+    #     service_group = json.loads(service_group)
+    #     coupon.coupon_service_group.set(service_group)
     if len(excluded_products) > 0:
         excluded_products = json.loads(excluded_products)
         coupon.excluded_products.set(excluded_products)
