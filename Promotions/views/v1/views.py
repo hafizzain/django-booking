@@ -6517,7 +6517,7 @@ def create_coupon(request):
                         coupon_service_group_instance.save()
         if len(service_ids) > 0:
             service_ids = json.loads(service_ids)
-            coupon.coupons_service.set(service_ids)
+            coupon.coupons_services.set(service_ids)
         if len(client) > 0:
             client = json.loads(client)
             coupon.clients.set(client)
