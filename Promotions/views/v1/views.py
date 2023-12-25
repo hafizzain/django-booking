@@ -6587,13 +6587,10 @@ def create_coupon(request):
 
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
-def delete_coupon(request, id=None):
-    if id:
+def delete_coupon(request):
         coupon = Coupon.objects.all()
         coupon.delete()
         return Response({"msg": "Coupon deleted successfully"}, status=status.HTTP_200_OK)
-    else:
-        return Response({"msg": "Enter a valid id to delete"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
