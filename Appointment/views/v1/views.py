@@ -3338,7 +3338,7 @@ def appointment_service_status_update(request):
             checkout.tax_name1=tax_name1
             # get the price of service from PriceService model
             # and add to the checkout total.
-            checkout.total_price=F('total_price') + appointment_service.price
+            # checkout.total_price=F('total_price') + appointment_service.price
             checkout.save()
         
 
