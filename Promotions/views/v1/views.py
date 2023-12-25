@@ -6465,7 +6465,7 @@ def create_coupon(request):
     days_restriction = request.data.get('dayRestrictions', [])
     amount_spent = request.data.get('amount_spent',None)
     discounted_percentage = request.data.get('discounted_percentage',None)
-    client = request.data.get('client', [])
+    client = request.data.get('client', 'all')
     location = request.data.get('location', [])
 
     error = []
@@ -6486,7 +6486,8 @@ def create_coupon(request):
             block_day=block_day,
             usage_limit=usage_limit,
             user_limit=user_limit,
-            code=code
+            code=code,
+            type='Coupons_Discount'
         )
         if len(location)>0:
             location = json.loads(location)
@@ -6522,6 +6523,9 @@ def create_coupon(request):
         if len(service_ids) > 0:
             service_ids = json.loads(service_ids)
             coupon.coupons_services.set(service_ids)
+        if client == 'all':
+            client = Client.objects.all()
+            coupon.clients.set(client)
         if len(client) > 0:
             client = json.loads(client)
             coupon.clients.set(client)
@@ -6541,7 +6545,7 @@ def create_coupon(request):
                 CouponBlockDays.objects.create(day=day, coupon_id=coupon.id)
         if len(store_restriction) > 0:
             store_restriction = json.loads(store_restriction)
-            coupon.store_target.set(store_restriction)
+            coupon.locations.set(store_restriction)
         # if business is not None:
         #     coupon.business.set(business)
     except Exception as ex:
@@ -6579,7 +6583,7 @@ def create_coupon(request):
 @permission_classes([AllowAny])
 def delete_coupon(request, id=None):
     if id:
-        coupon = Coupon.objects.filter(id=id)
+        coupon = Coupon.objects.all()
         coupon.delete()
         return Response({"msg": "Coupon deleted successfully"}, status=status.HTTP_200_OK)
     else:

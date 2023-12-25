@@ -636,9 +636,10 @@ class Coupon(models.Model):
     coupons_services = models.ManyToManyField(Service, related_name='coupons_service', null=True)
     coupon_service_groups = models.ManyToManyField(ServiceGroup, related_name='coupons_service_group', null=True)
     clients = models.ManyToManyField(Client, related_name='coupons_client', null=True)
-    store_target = models.ManyToManyField(BusinessAddress, related_name='coupons_brand_target', null=True)
+    locations = models.ManyToManyField(BusinessAddress, related_name='coupons_brand_target', null=True)
     excluded_products = models.ManyToManyField(Product, related_name='coupons_product', null=True)
     business = models.ManyToManyField(Business, related_name='coupons_Business', null=True)
+    type = models.TextField(null=True)
 
 
 class CouponBrand(models.Model):
