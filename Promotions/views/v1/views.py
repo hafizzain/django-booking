@@ -6453,7 +6453,7 @@ def create_coupon(request):
     start_date = request.data.get('startDate', None)
     end_date = request.data.get('endDate', None)
     block_day = request.data.get('block_day', None)
-    store_restriction = request.data.get('storeRestrictions', [])
+    # store_restriction = request.data.get('storeRestrictions', [])
     excluded_products = request.data.get('excludedProducts', [])
     usage_limit = request.data.get('usageLimit', None)
     code = request.data.get('coupon_code', None)
@@ -6463,7 +6463,7 @@ def create_coupon(request):
     amount_spent = request.data.get('amount_spent',None)
     discounted_percentage = request.data.get('discounted_percentage',None)
     client = request.data.get('client', [])
-    location = request.data.get('location', [])
+    location = request.data.get('storeRestrictions', [])
     error = []
 
     try:
