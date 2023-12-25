@@ -639,6 +639,7 @@ class Coupon(models.Model):
     locations = models.ManyToManyField(BusinessAddress, related_name='coupons_brand_target', null=True)
     excluded_products = models.ManyToManyField(Product, related_name='coupons_product', null=True)
     business = models.ManyToManyField(Business, related_name='coupons_Business', null=True)
+    type = models.TextField(null=True)
 
 
 class CouponBrand(models.Model):

@@ -6486,7 +6486,8 @@ def create_coupon(request):
             block_day=block_day,
             usage_limit=usage_limit,
             user_limit=user_limit,
-            code=code
+            code=code,
+            type='Coupons_Discount'
         )
         if len(location)>0:
             location = json.loads(location)
