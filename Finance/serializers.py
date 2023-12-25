@@ -19,8 +19,11 @@ class RefundSerializer(serializers.ModelSerializer):
         refunded_products_data = validated_data.pop('refunded_products')
         refund = Refund.objects.create(**validated_data)
 
-        for refunded_product_data in refunded_products_data:
-            RefundProduct.objects.create(refund=refund, **refunded_product_data)
+        refund_products_instances = [
+            RefundProduct(refund=refund, **refunded_product_data)
+            for refunded_product_data in refunded_products_data
+        ]
+        RefundProduct.objects.bulk_create(refund_products_instances)
 
         return refund
 
