@@ -333,7 +333,7 @@ def get_directorflat(request):
     data.extend(serialized.data)
 
     coupon = Coupon.objects.all()
-    serialized = CouponSerializer(coupon, context={'request': request})
+    serialized = CouponSerializer(coupon, many=True, context={'request': request})
     data.extend(serialized.data)
     return Response(
         {
