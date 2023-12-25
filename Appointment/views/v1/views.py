@@ -3392,6 +3392,9 @@ def paid_unpaid_clients(request):
         .with_client_name() \
         .with_payment_date() \
         .with_subtotal() \
+        .annotate(
+            just_services_price = Sum(F('appointment__appointment_services__price'))
+        ) \
         .order_by('-created_at')
 
     serialized = list(PaidUnpaidAppointmentCheckoutSerializer(appointment_checkouts, many=True).data)

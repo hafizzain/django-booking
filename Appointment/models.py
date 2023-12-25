@@ -33,7 +33,12 @@ class AppointmentCheckoutManager(models.QuerySet):
                 Sum('appointment__appointment_services__price', filter=sum_filter) + F('gst_price') + F('gst_price1'),
                 0.0,
                 output_field=FloatField()
-            )
+            ),
+            just_services_price_inside=Coalesce(
+                Sum('appointment__appointment_services__price', filter=sum_filter),
+                0.0,
+                output_field=FloatField()
+            ),
         )
     
     def with_payment_status(self):
