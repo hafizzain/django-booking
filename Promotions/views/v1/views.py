@@ -6468,7 +6468,7 @@ def create_coupon(request):
     client = request.data.get('client', 'all')
     location = request.data.get('location', [])
     requested_status = request.data.get('status', False)
-    buyOneGetOne = request.data.get('buyOneGetOne', None)
+    buyOneGetOne = request.data.get('buyOneGetOne', [])
 
     error = []
 
