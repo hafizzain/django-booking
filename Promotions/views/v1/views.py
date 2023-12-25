@@ -6465,7 +6465,7 @@ def create_coupon(request):
     days_restriction = request.data.get('dayRestrictions', [])
     amount_spent = request.data.get('amount_spent',None)
     discounted_percentage = request.data.get('discounted_percentage',None)
-    client = request.data.get('client', [])
+    client = request.data.get('client', 'all')
     location = request.data.get('location', [])
 
     error = []
@@ -6523,6 +6523,9 @@ def create_coupon(request):
         if len(service_ids) > 0:
             service_ids = json.loads(service_ids)
             coupon.coupons_services.set(service_ids)
+        if client == 'all':
+            client = Client.objects.all()
+            coupon.clients.set(client)
         if len(client) > 0:
             client = json.loads(client)
             coupon.clients.set(client)
