@@ -6594,7 +6594,20 @@ def delete_coupon(request,id=None):
     if id:
         coupon = Coupon.objects.filter(id=id)
         coupon.delete()
-        return Response({"msg": "Coupon deleted successfully"}, status=status.HTTP_200_OK)
+        return Response(
+            {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Coupon deleted successfully!',
+                    'error_message': None,
+                    # 'errors': error,
+                    # 'coupon': serializer.data,
+
+                }
+            },
+            status=status.HTTP_200_OK
+        )
 
 
 @api_view(['GET'])
