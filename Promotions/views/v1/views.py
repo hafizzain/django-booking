@@ -6467,7 +6467,8 @@ def create_coupon(request):
     discounted_percentage = request.data.get('discounted_percentage',None)
     client = request.data.get('client', 'all')
     location = request.data.get('location', [])
-    requested_status = request.data.get('status','in_actve')
+    requested_status = request.data.get('status',False)
+    buyOneGetOne = request.data.get('buyOneGetOne',None)
 
     error = []
 
@@ -6491,6 +6492,9 @@ def create_coupon(request):
             type='Coupons_Discount',
             status=requested_status
         )
+        if len(buyOneGetOne) >0:
+            buyOneGetOne=json.loads(buyOneGetOne)
+
         if len(location)>0:
             location = json.loads(location)
             coupon.business.set(location)
