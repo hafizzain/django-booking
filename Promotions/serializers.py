@@ -2298,11 +2298,11 @@ class CouponSerializer(serializers.ModelSerializer):
             coupon_service_group_queryset = CouponServiceGroup.objects.filter(coupon=obj)
             coupon_service = CouponServiceGroupcouponserializerresponse(coupon_service_group_queryset,many=True).data
 
-            return {
+            return [{
                 'id': obj.id,
                 'brand': brand_serializer,
                 'service_group': coupon_service,
-            }
+            }]
         except Exception as err:
             err=str(err)
             return {err}

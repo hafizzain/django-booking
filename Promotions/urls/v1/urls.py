@@ -9,7 +9,8 @@ urlpatterns = [
     path('delete_directorflat/', views.delete_directorflat),
     path('update_directorflat/', views.update_directorflat),
     path('create_couponsdiscount/', views.create_coupon),
-    path('delete_coupon/',views.delete_coupon),
+    path('delete_couponsdiscount/<str:id>/',views.delete_coupon),
+    path('delete_couponsdiscount/',views.delete_all_coupon),
     path('get_coupon/<uuid:id>/',views.get_coupon),
 
     
