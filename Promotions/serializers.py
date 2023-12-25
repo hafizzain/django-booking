@@ -2305,7 +2305,7 @@ class CouponSerializer(serializers.ModelSerializer):
             }
         except Exception as err:
             err=str(err)
-            return {}
+            return {err}
 
     class Meta:
         model = Coupon
