@@ -2304,6 +2304,7 @@ class CouponSerializer(serializers.ModelSerializer):
                 'service_group': coupon_service,
             }
         except Exception as err:
+            err=str(err)
             return {}
 
     class Meta:
