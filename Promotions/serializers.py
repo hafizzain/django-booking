@@ -2281,12 +2281,12 @@ class CouponSerializer(serializers.ModelSerializer):
     excluded_products = Productcouponresponse(many=True)
     coupon_blockdays = CouponBlockDaysresponse(many=True)
     business = Couponbusinessresponse(many=True)
-    # CouponBrandresponse(many=True)
-    store_target = BusinessAddressresponse(many=True)
+    CouponBrandresponse(many=True)
+    locations = BusinessAddressresponse(many=True)
 
     class Meta:
         model = Coupon
         fields = ['id', 'name', 'code', 'short_description', 'start_date', 'end_date', 'coupon_type',
                   'user_limit', 'usage_limit', 'clients', 'brands', 'coupons_services', 'coupon_service_groups',
-                  'store_target','business','amount_spent','discounted_percentage',
+                  'locations','business','amount_spent','discounted_percentage',
                   'excluded_products', 'coupon_blockdays']
