@@ -3325,11 +3325,13 @@ def appointment_service_status_update(request):
     # If all Void then don't create the checkout.
     if appointment_service_status == choices.AppointmentServiceStatus.STARTED:
 
-        # Calculating service price total and saving it to checkout 
+        # Calculating service price total and saving it to checkout
+        services_taken_status = [choices.AppointmentServiceStatus.STARTED, choices.AppointmentServiceStatus.FINISHED]
+        appointment_service_query = Q(appointment=appointment, status__in=[services_taken_status])
         currency = appointment.business_address.currency
         query_for_price = Q(service=OuterRef('service'), currency=currency)        
         total_service_price = AppointmentService.objects \
-                                        .filter(appointment=appointment) \
+                                        .filter(appointment_service_query) \
                                         .annotate(
                                             service_price=Coalesce(
                                                 PriceService.objects \
