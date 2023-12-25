@@ -982,6 +982,8 @@ class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
 class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
 
     subtotal = serializers.FloatField()
+    just_services_price_inside = serializers.FloatField()
+    just_services_price = serializers.FloatField()
     client_name = serializers.CharField()
     payment_status = serializers.CharField()
     payment_date = serializers.DateTimeField()
