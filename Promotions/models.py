@@ -644,6 +644,7 @@ class Coupon(models.Model):
     requested_status = models.BooleanField(default=True)
 
 
+
 class CouponBrand(models.Model):
     coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, related_name='aval_coupon_brands')
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='aval_coupon_brand')
