@@ -6467,6 +6467,7 @@ def create_coupon(request):
     discounted_percentage = request.data.get('discounted_percentage',None)
     client = request.data.get('client', 'all')
     location = request.data.get('location', [])
+    requested_status = request.data.get('status','in_actve')
 
     error = []
 
@@ -6487,7 +6488,8 @@ def create_coupon(request):
             usage_limit=usage_limit,
             user_limit=user_limit,
             code=code,
-            type='Coupons_Discount'
+            type='Coupons_Discount',
+            status=requested_status
         )
         if len(location)>0:
             location = json.loads(location)
