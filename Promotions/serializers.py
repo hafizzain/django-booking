@@ -2268,20 +2268,26 @@ class Couponbusinessresponse(serializers.ModelSerializer):
         model = Business
         fields = "__all__"
 
+class BusinessAddressresponse(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessAddress
+        fields = "__all__"
 
 class CouponSerializer(serializers.ModelSerializer):
-    clients = Clientcouponresponse(many=True)
+    # clients = Clientcouponresponse(many=True)
     brands = Brandcouponresponse(many=True)
     coupons_services = Servicecouponresponse(many=True)
     coupon_service_groups = ServiceGroupcouponresponse(many=True)
     excluded_products = Productcouponresponse(many=True)
     coupon_blockdays = CouponBlockDaysresponse(many=True)
     business = Couponbusinessresponse(many=True)
-    CouponBrandresponse(many=True)
+    aval_coupon_brands = CouponBrandresponse(many=True)
+    # locations = BusinessAddressresponse(many=True)
 
     class Meta:
         model = Coupon
-        fields = ['id', 'name', 'code', 'short_description', 'start_date', 'end_date', 'coupon_type',
+        fields = ['id', 'name','buy_one_type','requested_status','status','code', 'short_description', 'start_date', 'end_date', 'coupon_type',
                   'user_limit', 'usage_limit', 'clients', 'brands', 'coupons_services', 'coupon_service_groups',
-                  'store_target','business','amount_spent','discounted_percentage',
-                  'excluded_products', 'coupon_blockdays']
+                  'locations','business','amount_spent','discounted_percentage','type','aval_coupon_brands','coupon_type_value',
+                  'excluded_products', 'coupon_blockdays','buy_one_get_one_product','buy_one_get_one_service'
+                  ]

@@ -15,15 +15,25 @@ from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Order.models import Checkout
 from . import choices
 from Utility.models import CommonField
+from .choices import AppointmentServiceStatus
 
 
 
 class AppointmentCheckoutManager(models.QuerySet):
 
-    # not using this method, tries very hard way, But nothing worked
-    def with_total_service_price(self):
+    def with_subtotal(self):
+        """
+        Return the subtotal.
+        subtotal: total_price + gst_price + gst_price1
+        """
+        status_list = [AppointmentServiceStatus.STARTED, AppointmentServiceStatus.FINISHED]
+        sum_filter=Q(appointment__appointment_services__status__in=status_list)
         return self.annotate(
-            subtotal=F('total_price')
+            subtotal=Coalesce(
+                Sum('appointment__appointment_services__price', filter=sum_filter) + F('gst_price') + F('gst_price1'),
+                0.0,
+                output_field=FloatField()
+            )
         )
     
     def with_payment_status(self):

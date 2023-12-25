@@ -32,8 +32,7 @@ from Employee.models import CategoryCommission, CommissionSchemeSetting, Employe
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
-from django.db.models import Q, OuterRef, Subquery, FloatField
-from django.db.models.functions import Coalesce
+from django.db.models import Q, F
 
 from Client.models import Client, ClientPackageValidation, ClientPromotions, LoyaltyPoints, ClientLoyaltyPoint, \
     LoyaltyPointLogs
@@ -3293,6 +3292,8 @@ def appointment_service_status_update(request):
     tax_name = request.data.get('tax_name', None)
     tax_name1 = request.data.get('tax_name1', None)
 
+    status_list = [choices.AppointmentServiceStatus.STARTED, choices.AppointmentServiceStatus.FINISHED]
+
     # changing the status
     appointment = Appointment.objects.get(id=appointment_id)
     appointment_service = AppointmentService.objects.get(id=appointment_service_id)
@@ -3323,43 +3324,24 @@ def appointment_service_status_update(request):
     # so that we can calculate the tax and the service prices using query
     # to monitor paid and unpaid appointment checkouts.
     # If all Void then don't create the checkout.
-    if appointment_service_status == choices.AppointmentServiceStatus.STARTED:
+    any_service_started_or_funished = AppointmentService.objects.filter(
+                                        appointment=appointment,
+                                        status__in=status_list
+                                    ).exists()
+    status_started_finished = appointment_service_status in status_list
 
-        # Calculating service price total and saving it to checkout 
-        currency = appointment.business_address.currency
-        query_for_price = Q(service=OuterRef('service'), currency=currency)        
-        total_service_price = AppointmentService.objects \
-                                        .filter(appointment=appointment) \
-                                        .annotate(
-                                            service_price=Coalesce(
-                                                PriceService.objects \
-                                                .filter(query_for_price) \
-                                                .order_by('-created_at') \
-                                                .values('price')[:1],
-                                                0.0,
-                                                output_field=FloatField()
-                                            )
-                                            
-                                        ).aggregate(
-                                            final_price=Coalesce(Sum('service_price'), 0.0, output_field=FloatField())
-                                        )
-        temp_subtotal = total_service_price['final_price'] + gst_price + gst_price1
-
-
+    if any_service_started_or_funished or status_started_finished:
         checkout, created = AppointmentCheckout.objects.get_or_create(
             appointment=appointment,
             business_address=appointment.business_address
         )
-
-        if created:
-            checkout.gst=gst
-            checkout.gst1=gst1
-            checkout.gst_price=gst_price
-            checkout.gst_price1=gst_price1
-            checkout.tax_name=tax_name
-            checkout.tax_name1=tax_name1
-            checkout.total_price=temp_subtotal
-            checkout.save()
+        checkout.gst=gst
+        checkout.gst1=gst1
+        checkout.gst_price=gst_price
+        checkout.gst_price1=gst_price1
+        checkout.tax_name=tax_name
+        checkout.tax_name1=tax_name1
+        checkout.save()
         
 
     serialized = AppointmentServiceSerializerBasic(appointment_service)
@@ -3387,8 +3369,6 @@ def paid_unpaid_clients(request):
     end_date = request.GET.get('end_date', None)
     search_text = request.GET.get('search_text', None)
 
-    currency = BusinessAddress.objects.get(id=location_id).currency
-
     query = Q()
 
     if is_paid == 'paid':
@@ -3410,7 +3390,7 @@ def paid_unpaid_clients(request):
 
     appointment_checkouts = AppointmentCheckout.objects \
         .filter(query) \
-        .with_total_service_price() \
+        .with_subtotal() \
         .with_payment_status() \
         .with_client_name() \
         .with_payment_date() \
@@ -3618,7 +3598,7 @@ def get_available_appointments(request):
             start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
             end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
             end_datetime = end_datetime + timezone.timedelta(days=1)  # Adjust for end of day
-            query &= Q(created_at__range=(start_datetime, end_datetime))
+            query &= Q(appointment_services__appointment_date__range=(start_datetime, end_datetime))
         if location_id is not None:
             query &= Q(business_address__id=location_id)
         if appointment_id is not None:

@@ -622,8 +622,8 @@ class Coupon(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     name = models.TextField(null=True, blank=True)
     short_description = models.TextField(null=True, blank=True)
-    start_date = models.DateTimeField(null=True)
-    end_date = models.DateTimeField(null=True)
+    start_date = models.DateField(null=True)
+    end_date = models.DateField(null=True)
     coupon_type = models.TextField(null=True)
     block_day = models.TextField(null=True)
     usage_limit = models.TextField(null=True)
@@ -636,9 +636,17 @@ class Coupon(models.Model):
     coupons_services = models.ManyToManyField(Service, related_name='coupons_service', null=True)
     coupon_service_groups = models.ManyToManyField(ServiceGroup, related_name='coupons_service_group', null=True)
     clients = models.ManyToManyField(Client, related_name='coupons_client', null=True)
-    store_target = models.ManyToManyField(StoreTarget, related_name='coupons_brand', null=True)
+    locations = models.ManyToManyField(BusinessAddress, related_name='coupons_brand_target', null=True)
     excluded_products = models.ManyToManyField(Product, related_name='coupons_product', null=True)
+    buy_one_get_one_product = models.ManyToManyField(Product, related_name='buy_one_get_one_product', null=True)
+    buy_one_get_one_service = models.ManyToManyField(Service, related_name='buy_one_get_one_service', null=True)
     business = models.ManyToManyField(Business, related_name='coupons_Business', null=True)
+    type = models.TextField(null=True)
+    status = models.TextField(default='active')
+    requested_status = models.BooleanField(default=True)
+    buy_one_type = models.TextField(null=True)
+
+
 
 
 class CouponBrand(models.Model):
