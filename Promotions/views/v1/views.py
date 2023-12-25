@@ -34,7 +34,7 @@ from Promotions.models import BlockDate, BundleFixed, CategoryDiscount, Complime
     MentionedNumberService, PackagesDiscount, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, \
     ServiceDurationForSpecificTime, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, \
     SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount, PromotionExcludedItem, Coupon, \
-    CouponDetails, CouponBlockDays
+    CouponDetails, CouponBlockDays, CouponBrand, CouponServiceGroup
 from Promotions.serializers import BundleFixedSerializers, ComplimentaryDiscountSerializers, \
     DirectOrFlatDiscountSerializers, FixedPriceServiceSerializers, MentionedNumberServiceSerializers, \
     PackagesDiscountSerializers, PurchaseDiscountSerializers, RetailAndGetServiceSerializers, SpecificBrandSerializers, \
@@ -6449,7 +6449,7 @@ def create_coupon(request):
     product_brand_discount_percentage = request.data.get('product_brand_discount_percentage', None)
     service_ids = request.data.get('exclude_service', [])
     service_group = request.data.get('service_group', [])
-    discount_product = request.data.get('service_group_discount_percentage', None)
+    service_group_brand = request.data.get('service_group_brand', [])
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
     block_day = request.data.get('block_day', None)
@@ -6483,6 +6483,34 @@ def create_coupon(request):
             user_limit=user_limit,
             code=code
         )
+        if len(service_group_brand)>0:
+            service_group_brand = json.loads(service_group_brand)
+            for item in service_group_brand:
+                service_group = item.get("service_group",None)
+                service_group_discount = float(item.get("discount", 0))
+                brand = item.get("brand",None)
+                brand_discount = float(item.get("brand_discount", 0))
+                if brand:
+                    coupon.brand_id.set(brand)
+                    coupon_brand_instance, created = CouponBrand.objects.get_or_create(
+                        coupon=coupon,
+                        brand=brand,
+                        defaults={'brand_discount': brand_discount}
+                    )
+                    # If the instance already exists, update the brand_discount value
+                    if not created:
+                        coupon_brand_instance.brand_discount = brand_discount
+                        coupon_brand_instance.save()
+                if service_group:
+                    coupon.service_groups.add(service_group)
+                    coupon_service_group_instance, created = CouponServiceGroup.objects.get_or_create(
+                        coupon=coupon,
+                        service_group=service_group,
+                        defaults={'service_group_discount': service_group_discount}
+                    )
+                    if not created:
+                        coupon_service_group_instance.service_group_discount = service_group_discount
+                        coupon_service_group_instance.save()
         if len(service_ids) > 0:
             service_ids = json.loads(service_ids)
             coupon.coupons_service.set(service_ids)

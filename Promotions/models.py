@@ -629,16 +629,38 @@ class Coupon(models.Model):
     usage_limit = models.TextField(null=True)
     user_limit = models.TextField(null=True)
     amount_spent = models.TextField(null=True)
-    discounted_percentage = models.TextField(null=True,blank=True)
+    discounted_percentage = models.TextField(null=True, blank=True)
     code = models.TextField(null=True)
     coupon_type_value = models.TextField(null=True)
-    brands = models.ManyToManyField(Brand, related_name='coupons_brand', null=True)
+    brands = models.ManyToManyField(Brand, through='CouponBrand', related_name='coupons_brand', null=True)
     coupons_services = models.ManyToManyField(Service, related_name='coupons_service', null=True)
     coupon_service_groups = models.ManyToManyField(ServiceGroup, related_name='coupons_service_group', null=True)
     clients = models.ManyToManyField(Client, related_name='coupons_client', null=True)
     store_target = models.ManyToManyField(StoreTarget, related_name='coupons_brand', null=True)
     excluded_products = models.ManyToManyField(Product, related_name='coupons_product', null=True)
     business = models.ManyToManyField(Business, related_name='coupons_Business', null=True)
+
+
+class CouponBrand(models.Model):
+    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+    brand_discount = models.TextField(null=True)
+    created_at = models.DateTimeField(null=True)
+    updated_at = models.DateTimeField(null=True)
+
+    class Meta:
+        unique_together = ('coupon', 'brand')  # Ensure a unique combination of coupon and brand
+
+
+class CouponServiceGroup(models.Model):
+    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
+    service_group = models.ForeignKey(ServiceGroup, on_delete=models.CASCADE)
+    service_group_discount = models.TextField(null=True)
+    created_at = models.DateTimeField(null=True)
+    updated_at = models.DateTimeField(null=True)
+
+    class Meta:
+        unique_together = ('coupon', 'service_group')
 
 
 class CouponDetails(models.Model):
