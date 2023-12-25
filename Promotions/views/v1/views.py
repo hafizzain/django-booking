@@ -6519,7 +6519,6 @@ def create_coupon(request):
                 brand = item.get("brand", None)
                 brand_discount = float(item.get("brand_discount", 0))
                 if brand:
-                    brand = json.loads(brand)
                     coupon.brands.set(brand)
                     coupon_brand_instance, created = CouponBrand.objects.create(
                         coupon=coupon,
@@ -6531,8 +6530,7 @@ def create_coupon(request):
                         coupon_brand_instance.brand_discount = brand_discount
                         coupon_brand_instance.save()
                 if service_group:
-                    service_group = json.loads(service_group)
-                    coupon.service_groups.set(service_group)
+                    coupon.service_groups.add(service_group)
                     coupon_service_group_instance, created = CouponServiceGroup.objects.create(
                         coupon=coupon,
                         service_group=service_group,
