@@ -2307,7 +2307,7 @@ class CouponSerializer(serializers.ModelSerializer):
             return {
                 'id': obj.id,
                 'brand': brand_serializer,
-                # 'service_group': coupon_service,
+                'service_group': coupon_service,
             }
         except Exception as err:
             err=str(err)
