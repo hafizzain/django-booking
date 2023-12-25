@@ -6471,9 +6471,12 @@ def create_coupon(request):
     buyOneGetOne = request.data.get('buyOneGetOne',None)
 
     error = []
-
+    if requested_status =='true':
+        requested_status=True
+    else:
+        requested_status=False
     try:
-        code_check = Coupon.objects.filter(code=code)
+        code_check = Coupon.objects.filter(code__icontains=code)
         if code_check:
             return Response({"msg": "Coupon already exists"}, status=status.HTTP_400_BAD_REQUEST)
         coupon = Coupon.objects.create(
@@ -6494,8 +6497,11 @@ def create_coupon(request):
             type='Coupons_Discount',
             requested_status=requested_status
         )
-        # if len(buyOneGetOne) >0:
-        #     buyOneGetOne=json.loads(buyOneGetOne)
+        if len(buyOneGetOne) >0:
+            buyOneGetOne=json.loads(buyOneGetOne)
+            for day in buyOneGetOne:
+                day = day.get("day", None)
+                CouponBlockDays.objects.create(day=day, coupon_id=coupon.id)
 
         if len(location)>0:
             location = json.loads(location)
