@@ -3292,6 +3292,8 @@ def appointment_service_status_update(request):
     tax_name = request.data.get('tax_name', None)
     tax_name1 = request.data.get('tax_name1', None)
 
+    status_list = [choices.AppointmentServiceStatus.STARTED, choices.AppointmentServiceStatus.FINISHED]
+
     # changing the status
     appointment = Appointment.objects.get(id=appointment_id)
     appointment_service = AppointmentService.objects.get(id=appointment_service_id)
@@ -3322,24 +3324,18 @@ def appointment_service_status_update(request):
     # so that we can calculate the tax and the service prices using query
     # to monitor paid and unpaid appointment checkouts.
     # If all Void then don't create the checkout.
-    if appointment_service_status == choices.AppointmentServiceStatus.STARTED:
-
+    if appointment_service_status in status_list:
         checkout, created = AppointmentCheckout.objects.get_or_create(
             appointment=appointment,
             business_address=appointment.business_address
         )
-
-        if created:
-            checkout.gst=gst
-            checkout.gst1=gst1
-            checkout.gst_price=gst_price
-            checkout.gst_price1=gst_price1
-            checkout.tax_name=tax_name
-            checkout.tax_name1=tax_name1
-            # get the price of service from PriceService model
-            # and add to the checkout total.
-            # checkout.total_price=F('total_price') + appointment_service.price
-            checkout.save()
+        checkout.gst=gst
+        checkout.gst1=gst1
+        checkout.gst_price=gst_price
+        checkout.gst_price1=gst_price1
+        checkout.tax_name=tax_name
+        checkout.tax_name1=tax_name1
+        checkout.save()
         
 
     serialized = AppointmentServiceSerializerBasic(appointment_service)
