@@ -6523,10 +6523,10 @@ def create_coupon(request):
                 test_data2 = brand
                 brand_discount = float(item.get("brand_discount", 0))
                 if brand:
-                    coupon.brands.set(brand)
+                    coupon.brands.set([brand])
                     coupon_brand_instance, created = CouponBrand.objects.create(
                         coupon=coupon,
-                        brand=brand,
+                        brand_id=brand,
                         defaults={'brand_discount': brand_discount}
                     )
                     # If the instance already exists, update the brand_discount value
@@ -6534,10 +6534,10 @@ def create_coupon(request):
                         coupon_brand_instance.brand_discount = brand_discount
                         coupon_brand_instance.save()
                 if service_group:
-                    coupon.service_groups.add(service_group)
+                    coupon.service_groups.set([service_group])
                     coupon_service_group_instance, created = CouponServiceGroup.objects.create(
                         coupon=coupon,
-                        service_group=service_group,
+                        service_group_id=service_group,
                         defaults={'service_group_discount': service_group_discount}
                     )
                     if not created:
