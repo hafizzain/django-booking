@@ -6519,7 +6519,7 @@ def create_coupon(request):
                 brand = item.get("brand", None)
                 brand_discount = float(item.get("brand_discount", 0))
                 if brand:
-                    coupon.brand_id.set(brand)
+                    coupon.brands.set(brand)
                     coupon_brand_instance, created = CouponBrand.objects.create(
                         coupon=coupon,
                         brand=brand,
