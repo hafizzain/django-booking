@@ -20,10 +20,17 @@ from Utility.models import CommonField
 
 class AppointmentCheckoutManager(models.QuerySet):
 
-    # not using this method, tries very hard way, But nothing worked
-    def with_total_service_price(self):
+    def with_subtotal(self):
+        """
+        Return the subtotal.
+        subtotal: total_price + gst_price + gst_price1
+        """
         return self.annotate(
-            subtotal=F('total_price')
+            subtotal=Coalesce(
+                F('total_price') + F('gst_price') + F('gst_price1'),
+                0.0,
+                output_field=FloatField()
+            )
         )
     
     def with_payment_status(self):

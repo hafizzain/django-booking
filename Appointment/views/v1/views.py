@@ -3374,8 +3374,6 @@ def paid_unpaid_clients(request):
     end_date = request.GET.get('end_date', None)
     search_text = request.GET.get('search_text', None)
 
-    currency = BusinessAddress.objects.get(id=location_id).currency
-
     query = Q()
 
     if is_paid == 'paid':
@@ -3397,7 +3395,7 @@ def paid_unpaid_clients(request):
 
     appointment_checkouts = AppointmentCheckout.objects \
         .filter(query) \
-        .with_total_service_price() \
+        .with_subtotal() \
         .with_payment_status() \
         .with_client_name() \
         .with_payment_date() \
