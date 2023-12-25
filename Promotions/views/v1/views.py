@@ -6529,13 +6529,13 @@ def create_coupon(request):
                         brand_id=brand,
                         brand_discount=brand_discount
                     )
-                if service_group:
-                    coupon.coupon_service_groups.set([service_group])
-                    CouponServiceGroup.objects.create(
-                        coupon=coupon,
-                        service_group_id=service_group,
-                        service_group_discount=service_group_discount
-                    )
+                # if service_group:
+                #     coupon.coupon_service_groups.set([service_group])
+                #     CouponServiceGroup.objects.create(
+                #         coupon=coupon,
+                #         service_group_id=service_group,
+                #         service_group_discount=service_group_discount
+                #     )
         if len(service_ids) > 0:
             service_ids = json.loads(service_ids)
             coupon.coupons_services.set(service_ids)
