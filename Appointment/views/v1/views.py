@@ -3324,7 +3324,10 @@ def appointment_service_status_update(request):
     # so that we can calculate the tax and the service prices using query
     # to monitor paid and unpaid appointment checkouts.
     # If all Void then don't create the checkout.
-    if appointment_service_status in status_list:
+    if AppointmentService.objects.filter(
+        appointment=appointment,
+        status__in=status_list
+    ).exists() or appointment_service_status:
         checkout, created = AppointmentCheckout.objects.get_or_create(
             appointment=appointment,
             business_address=appointment.business_address
