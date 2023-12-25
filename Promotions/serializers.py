@@ -15,7 +15,7 @@ from Promotions.models import BundleFixed, ComplimentaryDiscount, DirectOrFlatDi
     MentionedNumberService, PackagesDiscount, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, \
     ServiceDurationForSpecificTime, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, \
     SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount, Service, ServiceGroup, \
-    PromotionExcludedItem, Coupon, CouponBlockDays, CouponBrand
+    PromotionExcludedItem, Coupon, CouponBlockDays, CouponBrand, CouponServiceGroup
 from Client.models import Vouchers, Client
 
 from Utility.models import Currency, ExceptionRecord
@@ -2287,9 +2287,25 @@ class CouponSerializer(serializers.ModelSerializer):
 
     def get_servicegroup_discount(self, obj):
         try:
-            return []
+            coupon_brand_queryset = CouponBrand.objects.filter(id=obj.id)
+            brand_values = coupon_brand_queryset.values_list('brand', 'brand_discount').first()
+
+            # Assuming you want to filter CouponServiceGroup based on obj.id
+            coupon_service_group_queryset = CouponServiceGroup.objects.filter(id=obj.id)
+
+            # Replace this with the actual logic you need for CouponServiceGroup
+            # For example, you might want to retrieve values from CouponServiceGroup
+            # and include them in the returned dictionary.
+            service_group_values = coupon_service_group_queryset.values_list('service_group',
+                                                                             'service_group_discount').first()
+
+            return {
+                'id': obj.id,
+                'brand_values': brand_values,
+                'service_group_values': service_group_values,
+            }
         except Exception as err:
-            return []
+            return {}
 
     class Meta:
         model = Coupon
