@@ -6503,7 +6503,7 @@ def create_coupon(request):
         if buy_one_type == 'Service':
             coupon.buy_one_get_one_service.set([selectedType])
         if buy_one_type == 'Product':
-            coupon.buy_one_get_one_products.set([selectedType])
+            coupon.buy_one_get_one_product.set([selectedType])
         if len(buyOneGetOne) > 0:
             buyOneGetOne = json.loads(buyOneGetOne)
         if len(fixedAmount) > 0:
