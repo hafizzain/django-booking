@@ -6526,14 +6526,14 @@ def create_coupon(request):
                     coupon.brands.set([brand])
                     CouponBrand.objects.create(
                         coupon=coupon,
-                        brand=brand,
+                        brand_id=brand,
                         brand_discount=brand_discount
                     )
                 if service_group:
                     coupon.coupon_service_groups.set([service_group])
                     CouponServiceGroup.objects.create(
                         coupon=coupon,
-                        service_group=service_group,
+                        service_group_id=service_group,
                         service_group_discount=service_group_discount
                     )
         if len(service_ids) > 0:
