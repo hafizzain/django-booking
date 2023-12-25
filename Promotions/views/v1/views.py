@@ -6472,7 +6472,7 @@ def create_coupon(request):
     buyOneGetOne = request.data.get('buyOneGetOne', [])
     fixedAmount = request.data.get('fixedAmount', [])
     selectedType = request.data.get('selectedType', None)
-    test_data1 -0
+    test_data1 =0
     test_data2=0
     error = []
     try:
