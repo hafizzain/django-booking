@@ -2282,7 +2282,7 @@ class CouponSerializer(serializers.ModelSerializer):
     coupon_blockdays = CouponBlockDaysresponse(many=True)
     business = Couponbusinessresponse(many=True)
     aval_coupon_brands = CouponBrandresponse(many=True)
-    locations = BusinessAddressresponse(many=True)
+    # locations = BusinessAddressresponse(many=True)
 
     class Meta:
         model = Coupon
