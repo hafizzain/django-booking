@@ -332,6 +332,9 @@ def get_directorflat(request):
     serialized = PromtoionsSerializers.PackagesDiscountSerializers(package, many=True, context={'request': request})
     data.extend(serialized.data)
 
+    coupon = Coupon.objects.all()
+    serializer = CouponSerializer(coupon, context={'request': request})
+    data.extend(serialized.data)
     return Response(
         {
             'status': 200,
