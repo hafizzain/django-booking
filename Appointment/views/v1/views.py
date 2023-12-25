@@ -3326,12 +3326,7 @@ def appointment_service_status_update(request):
 
         # get the price of service from PriceService model
         # and add to the checkout total.
-        price = PriceService.objects.filter(
-                    service=appointment_service.service,
-                    currency=appointment.business_address.currency
-                ).order_by('-created_at').values('price')[:1]
-
-        temp_subtotal = F('total_price') + price + gst_price + gst_price1
+        temp_subtotal = F('total_price') + appointment_service.price + gst_price + gst_price1
 
         checkout, created = AppointmentCheckout.objects.get_or_create(
             appointment=appointment,
