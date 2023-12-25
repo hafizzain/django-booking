@@ -6475,102 +6475,102 @@ def create_coupon(request):
     test_data1 =0
     test_data2=0
     error = []
-    try:
-        if requested_status == 'true':
-            requested_status = True
-        else:
-            requested_status = False
-        code_check = Coupon.objects.filter(code__icontains=code)
-        if code_check:
-            return Response({"msg": "Coupon already exists"}, status=status.HTTP_400_BAD_REQUEST)
-        coupon = Coupon.objects.create(
-            name=name,
-            amount_spent=amount_spent,
-            discounted_percentage=discounted_percentage,
-            coupon_type_value=coupon_type_value,
-            short_description=short_description,
-            buy_one_type=buy_one_type,
-            start_date=start_date,
-            end_date=end_date,
-            coupon_type=coupon_type,
-            block_day=block_day,
-            usage_limit=usage_limit,
-            user_limit=user_limit,
-            code=code,
-            type='Coupons_Discount',
-            requested_status=requested_status
-        )
-        if buy_one_type == 'Service':
-            coupon.buy_one_get_one_service.set([selectedType])
-        if buy_one_type == 'Product':
-            coupon.buy_one_get_one_product.set([selectedType])
-        if len(buyOneGetOne) > 0:
-            buyOneGetOne = json.loads(buyOneGetOne)
-        if len(fixedAmount) > 0:
-            fixedAmount = json.loads(fixedAmount)
-        if len(location) > 0:
-            location = json.loads(location)
-            coupon.business.set(location)
-        if len(service_group_brand) > 0:
-            service_group_brand = json.loads(service_group_brand)
-            for item in service_group_brand:
-                service_group = item.get("service_group", None)
-                test_data1 = service_group
-                service_group_discount = float(item.get("discount", 0))
-                brand = item.get("brand", None)
-                test_data2 = brand
-                brand_discount = float(item.get("brand_discount", 0))
-                if brand:
-                    coupon.brands.set([brand])
-                    CouponBrand.objects.create(
-                        coupon=coupon,
-                        brand_id=brand,
-                        brand_discount=brand_discount
-                    )
-                if service_group:
-                    coupon.coupon_service_groups.set([service_group])
-                    CouponServiceGroup.objects.create(
-                        coupon=coupon,
-                        service_group_id=service_group,
-                        service_group_discount=service_group_discount
-                    )
-        if len(service_ids) > 0:
-            service_ids = json.loads(service_ids)
-            coupon.coupons_services.set(service_ids)
-        if client == 'all':
-            client_ids = list(Client.objects.values_list('id', flat=True).distinct())
-            client_ids_str = [str(client_id) for client_id in client_ids]
-            coupon.clients.set(client_ids_str)
-        if len(client) > 0:
-            client = json.loads(client)
-            coupon.clients.set(client)
-        if len(excluded_products) > 0:
-            excluded_products = json.loads(excluded_products)
-            coupon.excluded_products.set(excluded_products)
-        if len(product_brand) > 0:
-            product_brand = json.loads(product_brand)
-            coupon.brand_id.set(product_brand)
-        if len(days_restriction) > 0:
-            days_restriction = json.loads(days_restriction)
-            for day in days_restriction:
-                day = day.get("day", None)
-                CouponBlockDays.objects.create(day=day, coupon_id=coupon.id)
-        if len(store_restriction) > 0:
-            store_restriction = json.loads(store_restriction)
-            coupon.locations.set(store_restriction)
-    except Exception as ex:
-        error = str(ex)
-        return Response(
-            {
-                'status': False,
-                'status_code': 400,
-                'response': {
-                    'message': 'Something went wrong',
-                    'error_message': error,
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
+    # try:
+    if requested_status == 'true':
+        requested_status = True
+    else:
+        requested_status = False
+    code_check = Coupon.objects.filter(code__icontains=code)
+    if code_check:
+        return Response({"msg": "Coupon already exists"}, status=status.HTTP_400_BAD_REQUEST)
+    coupon = Coupon.objects.create(
+        name=name,
+        amount_spent=amount_spent,
+        discounted_percentage=discounted_percentage,
+        coupon_type_value=coupon_type_value,
+        short_description=short_description,
+        buy_one_type=buy_one_type,
+        start_date=start_date,
+        end_date=end_date,
+        coupon_type=coupon_type,
+        block_day=block_day,
+        usage_limit=usage_limit,
+        user_limit=user_limit,
+        code=code,
+        type='Coupons_Discount',
+        requested_status=requested_status
+    )
+    if buy_one_type == 'Service':
+        coupon.buy_one_get_one_service.set([selectedType])
+    if buy_one_type == 'Product':
+        coupon.buy_one_get_one_product.set([selectedType])
+    if len(buyOneGetOne) > 0:
+        buyOneGetOne = json.loads(buyOneGetOne)
+    if len(fixedAmount) > 0:
+        fixedAmount = json.loads(fixedAmount)
+    if len(location) > 0:
+        location = json.loads(location)
+        coupon.business.set(location)
+    if len(service_group_brand) > 0:
+        service_group_brand = json.loads(service_group_brand)
+        for item in service_group_brand:
+            service_group = item.get("service_group", None)
+            test_data1 = service_group
+            service_group_discount = float(item.get("discount", 0))
+            brand = item.get("brand", None)
+            test_data2 = brand
+            brand_discount = float(item.get("brand_discount", 0))
+            if brand:
+                coupon.brands.set([brand])
+                CouponBrand.objects.create(
+                    coupon=coupon,
+                    brand_id=brand,
+                    brand_discount=brand_discount
+                )
+            if service_group:
+                coupon.coupon_service_groups.set([service_group])
+                CouponServiceGroup.objects.create(
+                    coupon=coupon,
+                    service_group_id=service_group,
+                    service_group_discount=service_group_discount
+                )
+    if len(service_ids) > 0:
+        service_ids = json.loads(service_ids)
+        coupon.coupons_services.set(service_ids)
+    if client == 'all':
+        client_ids = list(Client.objects.values_list('id', flat=True).distinct())
+        client_ids_str = [str(client_id) for client_id in client_ids]
+        coupon.clients.set(client_ids_str)
+    if len(client) > 0:
+        client = json.loads(client)
+        coupon.clients.set(client)
+    if len(excluded_products) > 0:
+        excluded_products = json.loads(excluded_products)
+        coupon.excluded_products.set(excluded_products)
+    if len(product_brand) > 0:
+        product_brand = json.loads(product_brand)
+        coupon.brand_id.set(product_brand)
+    if len(days_restriction) > 0:
+        days_restriction = json.loads(days_restriction)
+        for day in days_restriction:
+            day = day.get("day", None)
+            CouponBlockDays.objects.create(day=day, coupon_id=coupon.id)
+    if len(store_restriction) > 0:
+        store_restriction = json.loads(store_restriction)
+        coupon.locations.set(store_restriction)
+    # except Exception as ex:
+    #     error = str(ex)
+    #     return Response(
+    #         {
+    #             'status': False,
+    #             'status_code': 400,
+    #             'response': {
+    #                 'message': 'Something went wrong',
+    #                 'error_message': error,
+    #             }
+    #         },
+    #         status=status.HTTP_400_BAD_REQUEST
+    #     )
 
     serializer = CouponSerializer(coupon, context={'request': request})
     return Response(
