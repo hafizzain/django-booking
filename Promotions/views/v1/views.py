@@ -6581,7 +6581,8 @@ def create_coupon(request):
                     'message': 'Something went wrong',
                     'error_message': error,
                     'test_data1':test_data1,
-                    'test_data2':test_data2
+                    'test_data2':test_data2,
+                    'service_group_brand':service_group_brand
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
