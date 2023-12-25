@@ -31,12 +31,13 @@ class RefundProduct(models.Model):
     
     refunded_quantity = models.PositiveIntegerField()
     refunded_amount = models.DecimalField(max_digits=10, decimal_places=2)
+
+# Refund Services Model
+# class RefundServices(CommonField):
+#     refund = models.ForeignKey(Refund, on_delete = models.CASCADE, verbose_name = 'Refund id')
+#     services = models.ForeignKey(Service, on_delete= models.CASCADE, verbose_name = 'Service id')
     
-class RefundServices(CommonField):
-    refund = models.ForeignKey(Refund, on_delete = models.CASCADE, verbose_name = 'Refund id')
-    services = models.ForeignKey(Service, on_delete= models.CASCADE, verbose_name = 'Service id')
-    
-    refund_amount = models.DecimalField(max_digits = 10, decimal_places =2)
+#     refund_amount = models.DecimalField(max_digits = 10, decimal_places =2)
 
 class Coupon(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
