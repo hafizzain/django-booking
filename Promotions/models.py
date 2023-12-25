@@ -642,6 +642,8 @@ class Coupon(models.Model):
     type = models.TextField(null=True)
     status = models.TextField(default='active')
     requested_status = models.BooleanField(default=True)
+    buy_one_type = models.TextField(null=True)
+
 
 
 
