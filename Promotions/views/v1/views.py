@@ -6463,12 +6463,12 @@ def create_coupon(request):
     user_limit = request.data.get('userLimit', None)
     coupon_type = request.data.get('couponType', None)
     days_restriction = request.data.get('dayRestrictions', [])
-    amount_spent = request.data.get('amount_spent',None)
-    discounted_percentage = request.data.get('discounted_percentage',None)
+    amount_spent = request.data.get('amount_spent', None)
+    discounted_percentage = request.data.get('discounted_percentage', None)
     client = request.data.get('client', 'all')
     location = request.data.get('location', [])
-    requested_status = request.data.get('status',False)
-    buyOneGetOne = request.data.get('buyOneGetOne',None)
+    requested_status = request.data.get('status', False)
+    buyOneGetOne = request.data.get('buyOneGetOne', None)
 
     error = []
 
@@ -6490,20 +6490,26 @@ def create_coupon(request):
             user_limit=user_limit,
             code=code,
             type='Coupons_Discount',
-            status=requested_status
+            requested_status=requested_status
         )
-        if len(buyOneGetOne) >0:
-            buyOneGetOne=json.loads(buyOneGetOne)
-
-        if len(location)>0:
+        if len(buyOneGetOne) > 0:
+            buyOneGetOne = json.loads(buyOneGetOne)
+            for buy in buyOneGetOne:
+                selectType = buy.get("selectType", None)
+                type = buy.get("type", None)
+                if type =='service':
+                    coupon.coupons_services.set(selectType)
+                if type =='product':
+                    coupon.excluded_products.set(selectType)
+        if len(location) > 0:
             location = json.loads(location)
             coupon.business.set(location)
-        if len(service_group_brand)>0:
+        if len(service_group_brand) > 0:
             service_group_brand = json.loads(service_group_brand)
             for item in service_group_brand:
-                service_group = item.get("service_group",None)
+                service_group = item.get("service_group", None)
                 service_group_discount = float(item.get("discount", 0))
-                brand = item.get("brand",None)
+                brand = item.get("brand", None)
                 brand_discount = float(item.get("brand_discount", 0))
                 if brand:
                     coupon.brand_id.set(brand)
