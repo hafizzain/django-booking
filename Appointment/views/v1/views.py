@@ -3603,7 +3603,7 @@ def get_available_appointments(request):
             start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
             end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
             end_datetime = end_datetime + timezone.timedelta(days=1)  # Adjust for end of day
-            query &= Q(created_at__range=(start_datetime, end_datetime))
+            query &= Q(appointment_services__appointment_date__range=(start_datetime, end_datetime))
         if location_id is not None:
             query &= Q(business_address__id=location_id)
         if appointment_id is not None:
