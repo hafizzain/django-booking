@@ -35,7 +35,7 @@ class AppointmentCheckoutManager(models.QuerySet):
                 output_field=FloatField()
             ),
             just_services_price_inside=Coalesce(
-                Sum('appointment__appointment_services__price', filter=sum_filter),
+                Sum(F('appointment__appointment_services__price'), filter=sum_filter),
                 0.0,
                 output_field=FloatField()
             ),
