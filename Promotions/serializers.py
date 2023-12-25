@@ -2295,14 +2295,8 @@ class CouponSerializer(serializers.ModelSerializer):
         try:
             coupon_brand_queryset = CouponBrand.objects.filter(coupon=obj)
             brand_serializer = CouponBrandresponse(coupon_brand_queryset ,many=True).data
-            # Assuming you want to filter CouponServiceGroup based on obj.id
             coupon_service_group_queryset = CouponServiceGroup.objects.filter(coupon=obj)
             coupon_service = CouponServiceGroupcouponserializerresponse(coupon_service_group_queryset,many=True).data
-            # Replace this with the actual logic you need for CouponServiceGroup
-            # For example, you might want to retrieve values from CouponServiceGroup
-            # and include them in the returned dictionary.
-            # service_group_values = coupon_service_group_queryset.values_list('service_group',
-            #                                                                  'service_group_discount').first()
 
             return {
                 'id': obj.id,
