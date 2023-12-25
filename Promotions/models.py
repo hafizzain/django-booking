@@ -653,6 +653,7 @@ class CouponBrand(models.Model):
     coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, related_name='aval_coupon_brands')
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='aval_coupon_brand')
     brand_discount = models.FloatField(null=True)
+    is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(null=True)
     updated_at = models.DateTimeField(null=True)
 
