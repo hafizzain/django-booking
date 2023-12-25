@@ -15,7 +15,7 @@ from Promotions.models import BundleFixed, ComplimentaryDiscount, DirectOrFlatDi
     MentionedNumberService, PackagesDiscount, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, \
     ServiceDurationForSpecificTime, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, \
     SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount, Service, ServiceGroup, \
-    PromotionExcludedItem, Coupon, CouponBlockDays
+    PromotionExcludedItem, Coupon, CouponBlockDays, CouponBrand
 from Client.models import Vouchers, Client
 
 from Utility.models import Currency, ExceptionRecord
@@ -2221,6 +2221,12 @@ class PromotionExcludedItemSerializer(serializers.ModelSerializer):
         fields = ['id', 'excluded_item']
 
 
+
+
+class CouponBrandresponse(serializers.ModelSerializer):
+    class Meta:
+        model = CouponBrand
+        fields = "__all__"
 class Clientcouponresponse(serializers.ModelSerializer):
     class Meta:
         model = Client

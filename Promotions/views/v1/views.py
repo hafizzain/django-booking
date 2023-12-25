@@ -6463,6 +6463,7 @@ def create_coupon(request):
     amount_spent = request.data.get('amount_spent',None)
     discounted_percentage = request.data.get('discounted_percentage',None)
     client = request.data.get('client', [])
+    location = request.data.get('location', [])
     error = []
 
     try:
@@ -6483,6 +6484,8 @@ def create_coupon(request):
             user_limit=user_limit,
             code=code
         )
+        if len(location)>0:
+            coupon.business.set(business)
         if len(service_group_brand)>0:
             service_group_brand = json.loads(service_group_brand)
             for item in service_group_brand:
