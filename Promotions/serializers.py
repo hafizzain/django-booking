@@ -2286,7 +2286,7 @@ class CouponSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Coupon
-        fields = ['id', 'name', 'code', 'short_description', 'start_date', 'end_date', 'coupon_type',
+        fields = ['id', 'name','status','code', 'short_description', 'start_date', 'end_date', 'coupon_type',
                   'user_limit', 'usage_limit', 'clients', 'brands', 'coupons_services', 'coupon_service_groups',
-                  'locations','business','amount_spent','discounted_percentage','type','aval_coupon_brands',
+                  'locations','business','amount_spent','discounted_percentage','type','aval_coupon_brands','coupon_type_value',
                   'excluded_products', 'coupon_blockdays']
