@@ -2277,6 +2277,7 @@ class CouponSerializer(serializers.ModelSerializer):
     excluded_products = Productcouponresponse(many=True)
     coupon_blockdays = CouponBlockDaysresponse(many=True)
     business = Couponbusinessresponse(many=True)
+    CouponBrandresponse(many=True)
 
     class Meta:
         model = Coupon
