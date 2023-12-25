@@ -32,8 +32,7 @@ from Employee.models import CategoryCommission, CommissionSchemeSetting, Employe
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
-from django.db.models import Q, OuterRef, Subquery, FloatField
-from django.db.models.functions import Coalesce
+from django.db.models import Q, F
 
 from Client.models import Client, ClientPackageValidation, ClientPromotions, LoyaltyPoints, ClientLoyaltyPoint, \
     LoyaltyPointLogs
@@ -3325,28 +3324,14 @@ def appointment_service_status_update(request):
     # If all Void then don't create the checkout.
     if appointment_service_status == choices.AppointmentServiceStatus.STARTED:
 
-        # Calculating service price total and saving it to checkout
-        services_taken_status = [choices.AppointmentServiceStatus.STARTED, choices.AppointmentServiceStatus.FINISHED]
-        appointment_service_query = Q(appointment=appointment, status__in=[services_taken_status])
-        currency = appointment.business_address.currency
-        query_for_price = Q(service=OuterRef('service'), currency=currency)        
-        total_service_price = AppointmentService.objects \
-                                        .filter(appointment_service_query) \
-                                        .annotate(
-                                            service_price=Coalesce(
-                                                PriceService.objects \
-                                                .filter(query_for_price) \
-                                                .order_by('-created_at') \
-                                                .values('price')[:1],
-                                                0.0,
-                                                output_field=FloatField()
-                                            )
-                                            
-                                        ).aggregate(
-                                            final_price=Coalesce(Sum('service_price'), 0.0, output_field=FloatField())
-                                        )
-        temp_subtotal = total_service_price['final_price'] + gst_price + gst_price1
+        # get the price of service from PriceService model
+        # and add to the checkout total.
+        price = PriceService.objects.filter(
+                    service=appointment_service.service,
+                    currency=appointment.business_address.currency
+                ).order_by('-created_at').values('price')[:1]
 
+        temp_subtotal = F('total_price') + price + gst_price + gst_price1
 
         checkout, created = AppointmentCheckout.objects.get_or_create(
             appointment=appointment,
