@@ -5,7 +5,6 @@ from Product.models import Product
 from Business.models import BusinessAddress
 from Client.models import Client
 from Invoices.models import SaleInvoice
-from Service.models import Service
 from .choices import *
 from Utility.models import CommonField
 
@@ -19,7 +18,6 @@ class Refund(CommonField):
     location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, verbose_name = 'location id')
     refund_invoice_id = models.ForeignKey(SaleInvoice, on_delete=models.CASCADE, verbose_name = 'Invoice id')
     refunded_products = models.ManyToManyField(Product, through='RefundProduct')
-    # redunded_services = models.ManyToManyField(Service,through='RefundServices')
     
     refund_type = models.CharField(choices=RefundChoices.choices, max_length=20)
     reason = models.TextField()
@@ -31,13 +29,6 @@ class RefundProduct(models.Model):
     
     refunded_quantity = models.PositiveIntegerField()
     refunded_amount = models.DecimalField(max_digits=10, decimal_places=2)
-
-# Refund Services Model
-# class RefundServices(CommonField):
-#     refund = models.ForeignKey(Refund, on_delete = models.CASCADE, verbose_name = 'Refund id')
-#     services = models.ForeignKey(Service, on_delete= models.CASCADE, verbose_name = 'Service id')
-    
-#     refund_amount = models.DecimalField(max_digits = 10, decimal_places =2)
 
 class Coupon(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
