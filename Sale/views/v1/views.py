@@ -274,7 +274,7 @@ def get_service_optimized(request):
                 errors.append('Employee Location 0')
     services = Service.objects.filter(query).order_by('-created_at').distinct()
     for service in services:
-        service_list.append(service.id)
+        service_list.append(service.name)
         all_groups = ServiceGroup.objects.filter(id=service.id)
         for group in all_groups:
              servicegroup_ids.append(group.id)
