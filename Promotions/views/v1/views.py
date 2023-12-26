@@ -6682,6 +6682,9 @@ def update_coupon(request):
             instance.brand_id.set(product_brand)
         if len(days_restriction) > 0:
             days_restriction = json.loads(days_restriction)
+            deleted_block_days = CouponBlockDays.objects.filter(coupon_id=instance.id)
+            if deleted_block_days:
+                deleted_block_days.delete()
             for day in days_restriction:
                 day = day.get("day", None)
                 CouponBlockDays.objects.create(day=day, coupon_id=instance.id)
