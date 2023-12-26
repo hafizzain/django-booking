@@ -235,6 +235,7 @@ def get_service_optimized(request):
     search_text = request.GET.get('search_text', None)
     no_pagination = request.GET.get('no_pagination', None)
     aval_service_group_id = None
+    servicegroup_ids = []
     query = Q(is_deleted=False)
 
     currency = BusinessAddress.objects.get(id=location_id).currency
@@ -270,12 +271,11 @@ def get_service_optimized(request):
                 query &= Q(location__id=first_location.id)
             else:
                 errors.append('Employee Location 0')
-
     services = Service.objects.filter(query).order_by('-created_at').distinct()
     for service in services:
         all_groups = ServiceGroup.objects.filter(id=service.id)
         for group in all_groups:
-            aval_service_group_id = group.id
+             servicegroup_ids.append(group.id)
 
     # if is_mobile then request.user will be employee
     # so we will filter only those services which are assigned to
@@ -310,7 +310,8 @@ def get_service_optimized(request):
                 'error_message': None,
                 'service': serialized.data,
                 'errors': errors,
-                'service_group': aval_service_group_id
+                'service_group': aval_service_group_id,
+                'servicegroup_ids':servicegroup_ids
             }
         },
         status=status.HTTP_200_OK
