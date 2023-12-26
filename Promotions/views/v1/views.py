@@ -6472,6 +6472,7 @@ def create_coupon(request):
     buyOneGetOne = request.data.get('buyOneGetOne', [])
     fixedAmount = request.data.get('fixedAmount', [])
     selectedType = request.data.get('selectedType', None)
+    client_type= request.data.get('client_type',None)
     test_data1 =0
     test_data2=0
     error = []
@@ -6498,7 +6499,8 @@ def create_coupon(request):
         user_limit=user_limit,
         code=code,
         type='Coupons_Discount',
-        requested_status=requested_status
+        requested_status=requested_status,
+        client_type=client_type
     )
     if buy_one_type == 'Service':
         coupon.buy_one_get_one_service.set([selectedType])
@@ -6628,6 +6630,7 @@ def update_coupon(request):
         instance.buy_one_type = request.data.get('type', instance.buy_one_type)
         instance.amount_spent = request.data.get('amount_spent', instance.amount_spent)
         instance.discounted_percentage = request.data.get('discounted_percentage', instance.discounted_percentage)
+        instance.client_type=request.data.get('client_type',instance.client_type)
         instance.save()
         if buy_one_type == 'Service':
             instance.buy_one_get_one_service.clear()
@@ -6639,29 +6642,37 @@ def update_coupon(request):
             location = json.loads(location)
             instance.business.clear()
             instance.business.set(location)
-        # if len(service_group_brand) > 0:
-        #     service_group_brand = json.loads(service_group_brand)
-        #     for item in service_group_brand:
-        #         service_group = item.get("service_group", None)
-        #         test_data1 = service_group
-        #         service_group_discount = float(item.get("discount", 0))
-        #         brand = item.get("brand", None)
-        #         test_data2 = brand
-        #         brand_discount = float(item.get("brand_discount", 0))
-        #         if brand:
-        #             coupon.brands.set([brand])
-        #             CouponBrand.objects.create(
-        #                 coupon=coupon,
-        #                 brand_id=brand,
-        #                 brand_discount=brand_discount
-        #             )
-        #         if service_group:
-        #             coupon.coupon_service_groups.set([service_group])
-        #             CouponServiceGroup.objects.create(
-        #                 coupon=coupon,
-        #                 service_group_id=service_group,
-        #                 service_group_discount=service_group_discount
-        #             )
+        if len(service_group_brand) > 0:
+            service_group_brand = json.loads(service_group_brand)
+            for item in service_group_brand:
+                service_group = item.get("service_group", None)
+                test_data1 = service_group
+                service_group_discount = float(item.get("discount", 0))
+                brand = item.get("brand", None)
+                test_data2 = brand
+                brand_discount = float(item.get("brand_discount", 0))
+                if brand:
+                    instance.brands.clear()
+                    instance.brands.set([brand])
+                    brand_to_del = CouponBrand.objects.filter(coupon=instance)
+                    if brand_to_del:
+                        brand_to_del.delete()
+                    CouponBrand.objects.create(
+                        coupon=instance,
+                        brand_id=brand,
+                        brand_discount=brand_discount
+                    )
+                if service_group:
+                    instance.coupon_service_groups.clear()
+                    instance.coupon_service_groups.set([service_group])
+                    service_group_del = CouponServiceGroup.objects.filter(coupon=instance)
+                    if service_group_del:
+                        service_group_del.delete()
+                    CouponServiceGroup.objects.create(
+                        coupon=instance,
+                        service_group_id=service_group,
+                        service_group_discount=service_group_discount
+                    )
         if len(service_ids) > 0:
             instance.excluded_services.clear()
             service_ids = json.loads(service_ids)

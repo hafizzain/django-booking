@@ -631,6 +631,7 @@ class Coupon(models.Model):
     amount_spent = models.FloatField(null=True)
     discounted_percentage = models.FloatField(null=True)
     code = models.TextField(null=True)
+    client_type = models.TextField(null=True)
     coupon_type_value = models.TextField(null=True)
     brands = models.ManyToManyField(Brand, related_name='coupons_brand', null=True)
     excluded_services = models.ManyToManyField(Service, related_name='coupons_service', null=True)

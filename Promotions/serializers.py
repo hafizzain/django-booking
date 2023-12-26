@@ -2310,7 +2310,7 @@ class CouponSerializer(serializers.ModelSerializer):
     class Meta:
         model = Coupon
         fields = ['id', 'name','buy_one_type','requested_status','status','code', 'short_description', 'start_date', 'end_date', 'coupon_type',
-                  'user_limit', 'usage_limit', 'clients', 'brands', 'excluded_services', 'coupon_service_groups',
+                  'user_limit', 'usage_limit', 'clients', 'brands', 'excluded_services', 'coupon_service_groups','client_type',
                   'locations','business','amount_spent','discounted_percentage','type','aval_coupon_brands','coupon_type_value',
                   'excluded_products', 'coupon_blockdays','buy_one_get_one_product','buy_one_get_one_service','servicegroup_discount'
                   ]
