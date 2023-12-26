@@ -6755,6 +6755,7 @@ def delete_coupon(request, id=None):
 @permission_classes([AllowAny])
 def get_coupon(request):
     coupon_code = request.query_params.get('coupon_code', None)
+    client_type = request.query_params.get('client_type',None)
     try:
         coupon = Coupon.objects.get(code=coupon_code)
     except:
@@ -6784,6 +6785,20 @@ def get_coupon(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    if coupon.client_type != client_type:
+        return Response(
+            {
+                'status': False,
+                'status_code': 400,
+                'response': {
+                    'message': 'Enter a valid client type',
+                    'error_message': None,
+
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
 
     serializer = CouponSerializer(coupon, context={'request': request})
     return Response(
