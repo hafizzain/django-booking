@@ -547,7 +547,7 @@ class ServiceSerializerOP(serializers.ModelSerializer):
 
     def get_avaliableservicegroup(self, obj):
         try:
-            ser = ServiceGroup.objects.filter(service=obj)
+            ser = ServiceGroup.objects.filter(services=obj)
             return ser.id
         except Exception as err:
             err = str(err)
