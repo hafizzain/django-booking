@@ -3373,7 +3373,7 @@ def paid_unpaid_clients(request):
         query &= Q(appointment__status=choices.AppointmentStatus.DONE)
 
     if is_paid == 'unpaid':
-        query &= ~Q(appointment__status__in=[choices.AppointmentStatus.DONE, choices.AppointmentStatus.FINISHED])
+        query &= ~Q(appointment__status=choices.AppointmentStatus.DONE)
 
     if location_id:
         query &= Q(business_address__id=location_id)
@@ -3388,10 +3388,13 @@ def paid_unpaid_clients(request):
 
     appointment_checkouts = AppointmentCheckout.objects \
         .filter(query) \
-        .with_subtotal() \
         .with_payment_status() \
         .with_client_name() \
         .with_payment_date() \
+        .with_subtotal() \
+        .annotate(
+            just_services_price = Sum(F('appointment__appointment_services__price'))
+        ) \
         .order_by('-created_at')
 
     serialized = list(PaidUnpaidAppointmentCheckoutSerializer(appointment_checkouts, many=True).data)
