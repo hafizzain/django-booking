@@ -6593,7 +6593,7 @@ def create_coupon(request):
 @api_view(['PATCH'])
 @permission_classes([AllowAny])
 def update_coupon(request):
-    id = request.GET.get('id', None)
+    id = request.data.get('id', None)
     if id:
         product_brand = request.data.get('product_brand', [])
         service_ids = request.data.get('excludedServices', [])
