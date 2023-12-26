@@ -4,7 +4,6 @@ from rest_framework import routers
 
 
 router = routers.DefaultRouter()
-router.register('policies', views.BusinessPolicyViewSet)
 router.register('refund_policies', views.RefundSettingViewset)
 
 urlpatterns = [
