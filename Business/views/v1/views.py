@@ -4850,6 +4850,6 @@ class BusinessPolicyViewSet(viewsets.ModelViewSet):
     serializer_class = BusinessPolicySerializer
 
 class RefundSettingViewset(viewsets.ModelViewSet):
-    authentication_classes = [IsAuthenticated]
+    authentication_classes = [AllowAny]
     queryset = RefundSetting.objects.all()
     serializer_class = RefundSettingSerializer
