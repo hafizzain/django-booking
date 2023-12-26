@@ -191,8 +191,8 @@ def get_client_dropdown(request):
     end_date = request.GET.get('end_date', None)
     gender = request.GET.get('gender', None)
     number_visit = request.GET.get('number_visit', None)
-    min_spend_amount = request.GET.get('min_spend_amount', None)
-    max_spend_amount = request.GET.get('max_spend_amount', None)
+    min_spend_amount = request.GET.get('min_spend_amount', 0)
+    max_spend_amount = request.GET.get('max_spend_amount', 1000000000000)
     query = Q(is_deleted=False, is_blocked=False, is_active=True)
     isFiltered = False
     
