@@ -6536,7 +6536,7 @@ def create_coupon(request):
                 )
     if len(service_ids) > 0:
         service_ids = json.loads(service_ids)
-        coupon.coupons_services.set(service_ids)
+        coupon.excluded_services.set(service_ids)
     if client == 'all':
         pass
         # client_ids = list(Client.objects.values_list('id', flat=True).distinct())
@@ -6663,9 +6663,9 @@ def update_coupon(request):
         #                 service_group_discount=service_group_discount
         #             )
         if len(service_ids) > 0:
-            instance.coupons_services.clear()
+            instance.excluded_services.clear()
             service_ids = json.loads(service_ids)
-            instance.coupons_services.set(service_ids)
+            instance.excluded_services.set(service_ids)
         if client == 'all':
             pass
         if client != 'all':
