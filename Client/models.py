@@ -45,18 +45,19 @@ class ClientManager(models.QuerySet):
                                 .values('created_at')[:1]
         
         return self.annotate(
-            last_appointment_date=Coalesce(Subquery(last_appointment_subquery),
+            last_transaction_date=Coalesce(Subquery(last_appointment_subquery),   #last_appointment_date
                                             Value(None)),
             last_sale_date=Coalesce(Subquery(last_sale_subquery),
                                             Value(None))
-        ).annotate(
-            last_transaction_date=Case(
-                When(last_appointment_date__gt=F('last_sale_date'), then=F('last_appointment_date')),
-                When(last_appointment_date__lte=F('last_sale_date'), then=F('last_sale_date')),
-                output_field=DateTimeField(),
-                default=Value(None)
-            )
         )
+        # ).annotate(
+        #     last_transaction_date=Case(
+        #         When(last_appointment_date__gt=F('last_sale_date'), then=F('last_appointment_date')),
+        #         When(last_appointment_date__lte=F('last_sale_date'), then=F('last_sale_date')),
+        #         output_field=DateTimeField(),
+        #         default=Value(None)
+        #     )
+        # )
         
     def count_total_visit(self, start_date=None, end_date=None):
         if start_date and end_date:
