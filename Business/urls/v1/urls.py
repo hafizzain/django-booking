@@ -4,7 +4,6 @@ from rest_framework import routers
 
 
 router = routers.DefaultRouter()
-router.register('policies', views.BusinessPolicyViewSet)
 router.register('refund_policies', views.RefundSettingViewset)
 
 urlpatterns = [
@@ -88,19 +87,19 @@ urlpatterns = [
     # business tax setting
     path('tax_setting/', views.BusinessTaxSettingView.as_view()),
 
-    # privacy
-    path('create_privacy/', views.BusinessPrivacyCreateView.as_view()),
-    path('get_privacies/', views.BusinessPrivacyListView.as_view()),
-    path('get_privacy/<int:id>', views.BusinessPrivacyRetreiveView.as_view()),
-    path('update_privacy/<int:id>', views.BusinessPrivacyUpdateView.as_view()),
-    path('delete/<int:id>', views.BusinessPrivacyDestroyView.as_view()),
+    # # privacy
+    # path('create_privacy/', views.BusinessPrivacyCreateView.as_view()),
+    # path('get_privacies/', views.BusinessPrivacyListView.as_view()),
+    # path('get_privacy/<int:id>', views.BusinessPrivacyRetreiveView.as_view()),
+    # path('update_privacy/<int:id>', views.BusinessPrivacyUpdateView.as_view()),
+    # path('delete/<int:id>', views.BusinessPrivacyDestroyView.as_view()),
 
-    # policy
-    path('create_policy/', views.BusinessPolicyCreateView.as_view()),
-    path('get_policies/', views.BusinessPolicyListView.as_view()),
-    path('get_policy/<int:id>', views.BusinessPolicyRetreiveView.as_view()),
-    path('update_policy/<int:id>', views.BusinessPolicyUpdateView.as_view()),
-    path('delete_policy/<int:id>', views.BusinessPolicyDestroyView.as_view()),
+    # # policy
+    # path('create_policy/', views.BusinessPolicyCreateView.as_view()),
+    # path('get_policies/', views.BusinessPolicyListView.as_view()),
+    # path('get_policy/<int:id>', views.BusinessPolicyRetreiveView.as_view()),
+    # path('update_policy/<int:id>', views.BusinessPolicyUpdateView.as_view()),
+    # path('delete_policy/<int:id>', views.BusinessPolicyDestroyView.as_view()),
 
 
 ]

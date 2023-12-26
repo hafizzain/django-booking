@@ -242,8 +242,8 @@ DEFAULT_RENDERER_CLASSES = [
 ]
 
 if DEBUG:
-    DEFAULT_RENDERER_CLASSES = [
-    'Utility.customizations.renderers.CustomRenderer',
+    DEFAULT_RENDERER_CLASSES = DEFAULT_RENDERER_CLASSES + [
+    'rest_framework.renderers.BrowsableAPIRenderer',
 ]
 
 
@@ -254,7 +254,8 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 
     'DEFAULT_AUTHENTICATION_CLASSES' : [
-        'rest_framework.authentication.TokenAuthentication'
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication'
     ],
 
     'DEFAULT_PERMISSION_CLASSES' : [
