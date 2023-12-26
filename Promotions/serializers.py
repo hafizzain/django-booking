@@ -2285,7 +2285,7 @@ class CouponSerializer(serializers.ModelSerializer):
     brands = Brandcouponresponse(many=True)
     coupons_services = Servicecouponresponse(many=True)
     coupon_service_groups = ServiceGroupcouponresponse(many=True)
-    excluded_products = Productcouponresponse(many=True)
+    # excluded_products = Productcouponresponse(many=True)
     coupon_blockdays = CouponBlockDaysresponse(many=True)
     business = Couponbusinessresponse(many=True)
     aval_coupon_brands = CouponBrandresponse(many=True)
