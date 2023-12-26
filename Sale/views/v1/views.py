@@ -236,6 +236,7 @@ def get_service_optimized(request):
     no_pagination = request.GET.get('no_pagination', None)
     aval_service_group_id = None
     servicegroup_ids = []
+    service_list = []
     query = Q(is_deleted=False)
 
     currency = BusinessAddress.objects.get(id=location_id).currency
@@ -273,6 +274,7 @@ def get_service_optimized(request):
                 errors.append('Employee Location 0')
     services = Service.objects.filter(query).order_by('-created_at').distinct()
     for service in services:
+        service_list.append(service.id)
         all_groups = ServiceGroup.objects.filter(id=service.id)
         for group in all_groups:
              servicegroup_ids.append(group.id)
@@ -311,7 +313,8 @@ def get_service_optimized(request):
                 'service': serialized.data,
                 'errors': errors,
                 'service_group': aval_service_group_id,
-                'servicegroup_ids':servicegroup_ids
+                'servicegroup_ids': servicegroup_ids,
+                'service_list':service_list
             }
         },
         status=status.HTTP_200_OK
