@@ -33,11 +33,11 @@ class ClientManager(models.QuerySet):
         of a particular client and then compare them to find the least one.
         
         """
-        Appointment = apps.get_model(app_label='Appointment', model_name='Appointment')
-        last_appointment_subquery = Appointment.objects \
-                                        .filter(client=OuterRef('pk')) \
+        AppointmentCheckout = apps.get_model(app_label='Appointment', model_name='AppointmentCheckout')
+        last_appointment_subquery = AppointmentCheckout.objects \
+                                        .filter(appointment__client=OuterRef('pk')) \
                                         .order_by('-created_at') \
-                                        .values('created_at')[:1]
+                                        .values('updated_at')[:1]  # why updated_at -> because it can be created but not paid
         Checkout = apps.get_model(app_label='Order', model_name='Checkout')
         last_sale_subquery = Checkout.objects \
                                         .filter(client=OuterRef('pk')) \
