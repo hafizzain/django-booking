@@ -19,7 +19,7 @@ class Refund(CommonField):
     location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, verbose_name = 'location id')
     refund_invoice_id = models.ForeignKey(SaleInvoice, on_delete=models.CASCADE, verbose_name = 'Invoice id')
     refunded_products = models.ManyToManyField(Product, through='RefundProduct')
-    redunded_services = models.ManyToManyField(Service,through='RefundServices')
+    # redunded_services = models.ManyToManyField(Service,through='RefundServices')
     
     refund_type = models.CharField(choices=RefundChoices.choices, max_length=20)
     reason = models.TextField()
