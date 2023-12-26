@@ -11,6 +11,7 @@ urlpatterns = [
     path('create_couponsdiscount/', views.create_coupon),
     path('delete_couponsdiscount/<str:id>/',views.delete_coupon),
     path('delete_couponsdiscount/',views.delete_all_coupon),
+    path('update_couponsdiscount/',views.update_coupon),
     path('get_coupon/<uuid:id>/',views.get_coupon),
 
     
