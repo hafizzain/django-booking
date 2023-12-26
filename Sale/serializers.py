@@ -550,7 +550,8 @@ class ServiceSerializerOP(serializers.ModelSerializer):
             ser = ServiceGroup.objects.filter(service=obj)
             return ser.id
         except Exception as err:
-            return  None
+            err = str(err)
+            return  err
             #print(err)
     
         
