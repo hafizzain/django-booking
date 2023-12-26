@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.timezone import now
 from Authentication.models import User
 from Profile.models import Profile, UserLanguage
-from Utility.models import Country, State, City, Software, Currency, Language
+from Utility.models import Country, State, City, Software, Currency, CommonField
 from Utility.Constants.compressImage import upload_to_bucket
 import uuid
 
@@ -516,3 +516,7 @@ class BusinessPolicy(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+class RefundSetting(CommonField):
+    location = models.OneToOneField(BusinessAddress, on_delete=models.CASCADE)
+    refund_days = models.IntegerField(default=30)
