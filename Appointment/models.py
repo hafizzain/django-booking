@@ -266,6 +266,10 @@ class AppointmentService(models.Model):
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
 
+    client_tag = models.CharField(max_length=50, default='')
+    client_type = models.CharField(max_length=50, default='')
+
+
     def get_final_price(self):
         """
         Only slight changes to reflect the Non None values

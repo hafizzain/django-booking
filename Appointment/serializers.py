@@ -151,58 +151,58 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     client_info = serializers.SerializerMethodField(read_only=True)
 
     def get_client_info(self, obj):
-        try:
-            if not obj.appointment:
-                return {}
-            client = obj.appointment.client
+        return {
+            
+        }
+        # try:
+        #     if not obj.appointment:
+        #         return {}
+        #     client = obj.appointment.client
 
-            client_f_month = int(client.created_at.strftime('%m'))
-            first_appointment = None
-            if client:
-                client_appointments = Appointment.objects.filter(
-                    client = client,
-                    status__in = [choices.AppointmentStatus.DONE, choices.AppointmentStatus.FINISHED]
-                )
+        #     client_f_month = int(client.created_at.strftime('%m'))
+        #     first_appointment = None
+        #     if client:
+        #         client_appointments = Appointment.objects.filter(
+        #             client = client,
+        #             status__in = [choices.AppointmentStatus.DONE, choices.AppointmentStatus.FINISHED]
+        #         )
 
-                if len(client_appointments) > 0:
-                    total_spend = AppointmentCheckout.objects.filter(appointment__client=client)
-                    price = 0
-                    for ck in total_spend:
-                        price = price + ck.total_price
+        #         if len(client_appointments) > 0:
+        #             total_spend = AppointmentCheckout.objects.filter(appointment__client=client)
+        #             price = 0
+        #             for ck in total_spend:
+        #                 price = price + ck.total_price
 
-                    last_app = client_appointments.order_by('created_at').last()
-                    last_month = int(last_app.created_at.strftime('%m'))
+        #             last_app = client_appointments.order_by('created_at').last()
+        #             last_month = int(last_app.created_at.strftime('%m'))
 
-                    # first_appointment = client_appointments[0]
-                    # first_month = int(first_appointment.created_at.strftime('%m'))
+        #             months = max(client_f_month - last_month, 1)
+        #             monthly_spending = 0
+        #             tag = ''
 
-                    months = max(client_f_month - last_month, 1)
-                    monthly_spending = 0
-                    tag = ''
+        #             if client_appointments.count() >= months:
+        #                 tag = 'Most Visitor'
+        #             else:
+        #                 tag = 'Least Visitor'
 
-                    if client_appointments.count() >= months:
-                        tag = 'Most Visitor'
-                    else:
-                        tag = 'Least Visitor'
+        #             client_type = None
+        #             monthly_spending = price / months
+        #             if monthly_spending >= 100:
+        #                 client_type = 'Most Spender'
 
-                    client_type = None
-                    monthly_spending = price / months
-                    if monthly_spending >= 100:
-                        client_type = 'Most Spender'
-
-                    return {
-                        'months': months,
-                        'tag': tag,
-                        'client_type': client_type,
-                    }
-                else:
-                    return {}
-            else:
-                return {}
-        except Exception as err:
-            return {
-                'error': str(err)
-            }
+        #             return {
+        #                 'months': months,
+        #                 'tag': tag,
+        #                 'client_type': client_type,
+        #             }
+        #         else:
+        #             return {}
+        #     else:
+        #         return {}
+        # except Exception as err:
+        #     return {
+        #         'error': str(err)
+        #     }
 
     def get_appointment_status(self, obj):
         if obj.appointment:
