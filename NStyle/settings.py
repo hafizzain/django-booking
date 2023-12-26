@@ -242,8 +242,8 @@ DEFAULT_RENDERER_CLASSES = [
 ]
 
 if DEBUG:
-    DEFAULT_RENDERER_CLASSES = [
-    'Utility.customizations.renderers.CustomRenderer',
+    DEFAULT_RENDERER_CLASSES = DEFAULT_RENDERER_CLASSES + [
+    'rest_framework.renderers.BrowsableAPIRenderer',
 ]
 
 
