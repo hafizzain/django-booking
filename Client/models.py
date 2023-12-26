@@ -33,16 +33,24 @@ class ClientManager(models.QuerySet):
         of a particular client and then compare them to find the least one.
         
         """
-        Appointment = apps.get_model(app_label='Appointment', model_name='Appointment')
-        last_appointment_subquery = Appointment.objects \
-                                        .filter(client=OuterRef('pk')) \
+        AppointmentCheckout = apps.get_model(app_label='Appointment', model_name='AppointmentCheckout')
+        last_appointment_subquery = AppointmentCheckout.objects \
+                                        .filter(appointment__client=OuterRef('pk')) \
                                         .order_by('-created_at') \
-                                        .values('created_at')[:1]
+                                        .values('updated_at')[:1]  # why updated_at -> because it can be created but not paid
         Checkout = apps.get_model(app_label='Order', model_name='Checkout')
         last_sale_subquery = Checkout.objects \
-                                        .filter(client=OuterRef('pk')) \
-                                        .order_by('created_at') \
-                                        .values('created_at')[:1]
+                                .filter(client=OuterRef('pk')) \
+                                .order_by('-created_at') \
+                                .values('created_at')[:1]
+        # some sort of validations
+        appointment_query=Q(last_appointment_date__isnull=False,
+                            last_sale_date__isnull=True) | \
+                            Q(last_appointment_date__gt=F('last_sale_date'))
+        # some sort of validations
+        sale_query=Q(last_appointment_date__isnull=True,
+                    last_sale_date__isnull=False) | \
+                    Q(last_appointment_date__lte=F('last_sale_date'))
         
         return self.annotate(
             last_appointment_date=Coalesce(Subquery(last_appointment_subquery),
@@ -51,8 +59,8 @@ class ClientManager(models.QuerySet):
                                             Value(None))
         ).annotate(
             last_transaction_date=Case(
-                When(last_appointment_date__gt=F('last_sale_date'), then=F('last_appointment_date')),
-                When(last_appointment_date__lte=F('last_sale_date'), then=F('last_sale_date')),
+                When(appointment_query, then=F('last_appointment_date')),
+                When(sale_query, then=F('last_sale_date')),
                 output_field=DateTimeField(),
                 default=Value(None)
             )
