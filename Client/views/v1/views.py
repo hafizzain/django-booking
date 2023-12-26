@@ -198,6 +198,7 @@ def get_client_dropdown(request):
     query = Q(is_deleted=False, is_blocked=False, is_active=True)
     isFiltered = False #for frontend purpose
     
+    
     if start_date and end_date:
         appoint_client_ids = list(AppointmentCheckout.objects\
                     .filter(created_at__range=(start_date, end_date))\
