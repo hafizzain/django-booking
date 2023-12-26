@@ -545,7 +545,7 @@ class ServiceSerializerOP(serializers.ModelSerializer):
         except Exception as err:
             pass
 
-    def get_service_group(self, obj):
+    def get_avaliableservicegroup(self, obj):
         group = obj.servicegroup_services.filter(is_deleted=False)
         return ServiceGroupSerializerOP(group, many=True).data
     
