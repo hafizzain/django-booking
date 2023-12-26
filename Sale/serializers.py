@@ -522,6 +522,7 @@ class ServiceSerializerOP(serializers.ModelSerializer):
     priceservice = serializers.SerializerMethodField(read_only=True)
     price = serializers.SerializerMethodField(read_only=True)
     avaliableservicegroup =  serializers.SerializerMethodField(read_only=True)
+    avaliablesobj = serializers.SerializerMethodField(read_only=True)
     
     def get_price(self, obj):
         try:
