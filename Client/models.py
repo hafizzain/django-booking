@@ -43,21 +43,28 @@ class ClientManager(models.QuerySet):
                                 .filter(client=OuterRef('pk')) \
                                 .order_by('-created_at') \
                                 .values('created_at')[:1]
+        # some sort of validations
+        appointment_query=Q(last_appointment_date__isnull=False,
+                            last_sale_date__isnull=True) | \
+                            Q(last_appointment_date__gt=F('last_sale_date'))
+        # some sort of validations
+        sale_query=Q(last_appointment_date__isnull=True,
+                    last_sale_date__isnull=False) | \
+                    Q(last_appointment_date__lte=F('last_sale_date'))
         
         return self.annotate(
-            last_transaction_date=Coalesce(Subquery(last_appointment_subquery),   #last_appointment_date
+            last_appointment_date=Coalesce(Subquery(last_appointment_subquery),
                                             Value(None)),
             last_sale_date=Coalesce(Subquery(last_sale_subquery),
                                             Value(None))
+        ).annotate(
+            last_transaction_date=Case(
+                When(appointment_query, then=F('last_appointment_date')),
+                When(sale_query, then=F('last_sale_date')),
+                output_field=DateTimeField(),
+                default=Value(None)
+            )
         )
-        # ).annotate(
-        #     last_transaction_date=Case(
-        #         When(last_appointment_date__gt=F('last_sale_date'), then=F('last_appointment_date')),
-        #         When(last_appointment_date__lte=F('last_sale_date'), then=F('last_sale_date')),
-        #         output_field=DateTimeField(),
-        #         default=Value(None)
-        #     )
-        # )
         
     def count_total_visit(self, start_date=None, end_date=None):
         if start_date and end_date:
