@@ -1,7 +1,7 @@
 # serializers.py
 
 from rest_framework import serializers
-from .models import Refund, RefundProduct, Coupon
+from Finance.models import Refund, RefundProduct, Coupon
 
 class RefundProductSerializer(serializers.ModelSerializer):
     class Meta:
