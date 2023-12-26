@@ -186,15 +186,17 @@ def get_client_dropdown(request):
     search_text = request.GET.get('search_text', None)
     # no_pagination = request.GET.get('no_pagination', None)
     page = request.GET.get('page', None)
-    is_searched = False
+    is_searched = False #for frontend purpose
     start_date = request.GET.get('start_date', None)
     end_date = request.GET.get('end_date', None)
     gender = request.GET.get('gender', None)
     number_visit = request.GET.get('number_visit', None)
     min_spend_amount = request.GET.get('min_spend_amount', 0)
     max_spend_amount = request.GET.get('max_spend_amount', 1000000000000)
+    min_check = request.GET.get('min_spend_amount', None) #for frontend purpose
+    max_check = request.GET.get('max_spend_amount', None) #for frontend purpose
     query = Q(is_deleted=False, is_blocked=False, is_active=True)
-    isFiltered = False
+    isFiltered = False #for frontend purpose
     
     if start_date and end_date:
         appoint_client_ids = list(AppointmentCheckout.objects\
@@ -224,7 +226,8 @@ def get_client_dropdown(request):
                     .filter(total_price__range = (min_spend_amount, max_spend_amount)) \
                     .values_list('appointment__client__id', flat=True))
         query &= Q(id__in=total_spend_amount)
-        isFiltered = True
+        if min_check or max_check:
+            isFiltered = True
         
     if search_text:
         query &= Q(full_name__icontains=search_text) | \
