@@ -23,7 +23,7 @@ class RefundSerializer(serializers.ModelSerializer):
         refund = Refund.objects.create(user=self.context['request'].user, **validated_data)
 
         refund_products_instances = [
-            RefundProduct(refund=refund, product=get_object_or_404(Product, pk=refunded_product_data['product']), **refunded_product_data)
+            RefundProduct(refund=refund, product=get_object_or_404(Product, id=refunded_product_data['product']), **refunded_product_data)
             for refunded_product_data in refunded_products_data
         ]
         RefundProduct.objects.bulk_create(refund_products_instances)
