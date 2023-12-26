@@ -5,7 +5,7 @@ from Product.models import Product
 from Business.models import BusinessAddress
 from Client.models import Client
 from Invoices.models import SaleInvoice
-from .choices import *
+from Finance.choices import *
 from Utility.models import CommonField
 
 
