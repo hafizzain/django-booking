@@ -156,7 +156,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                 return {}
             client = obj.appointment.client
 
-            client_f_month = client.created_at.strftime('%m')
+            client_f_month = int(client.created_at.strftime('%m'))
             first_appointment = None
             if client:
                 client_appointments = Appointment.objects.filter(
