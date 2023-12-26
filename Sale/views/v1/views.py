@@ -234,7 +234,7 @@ def get_service_optimized(request):
     is_mobile = request.GET.get('is_mobile', None)
     search_text = request.GET.get('search_text', None)
     no_pagination = request.GET.get('no_pagination', None)
-    aval_service_group_id = 0
+    aval_service_group_id = None
     query = Q(is_deleted=False)
 
     currency = BusinessAddress.objects.get(id=location_id).currency
