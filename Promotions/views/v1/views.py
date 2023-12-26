@@ -6754,40 +6754,51 @@ def delete_coupon(request, id=None):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_coupon(request):
-    if id:
-        coupon_code = request.query_params.get('coupon_code', None)
+    coupon_code = request.query_params.get('coupon_code', None)
+    try:
         coupon = Coupon.objects.get(code=coupon_code)
-        current_date = timezone.now().date()
-        if coupon.end_date < current_date:
-            return Response(
-                {
-                    'status': True,
-                    'status_code': 400,
-                    'response': {
-                        'message': 'Coupon expired',
-                        'error_message': None,
-
-                    }
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        serializer = CouponSerializer(coupon, context={'request': request})
+    except:
         return Response(
             {
-                'status': True,
-                'status_code': 201,
+                'status': False,
+                'status_code': 400,
                 'response': {
-                    'message': 'Coupon get successfully!',
+                    'message': 'Coupon not found',
                     'error_message': None,
-                    'coupon': serializer.data,
 
                 }
             },
-            status=status.HTTP_200_OK
+            status=status.HTTP_400_BAD_REQUEST
         )
-    else:
-        return Response({"msg": "Enter a valid id to get"}, status=status.HTTP_400_BAD_REQUEST)
+    current_date = timezone.now().date()
+    if coupon.end_date < current_date:
+        return Response(
+            {
+                'status': False,
+                'status_code': 400,
+                'response': {
+                    'message': 'Coupon expired',
+                    'error_message': None,
+
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    serializer = CouponSerializer(coupon, context={'request': request})
+    return Response(
+        {
+            'status': True,
+            'status_code': 201,
+            'response': {
+                'message': 'Coupon get successfully!',
+                'error_message': None,
+                'coupon': serializer.data,
+
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
 
 @api_view(['DELETE'])
