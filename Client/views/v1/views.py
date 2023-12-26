@@ -219,7 +219,7 @@ def get_client_dropdown(request):
         query &= Q(total_visit=number_visit)
         isFiltered = True
         
-    if min_spend_amount and max_spend_amount:
+    if min_spend_amount or max_spend_amount:
         total_spend_amount = list(AppointmentCheckout.objects \
                     .filter(total_price__range = (min_spend_amount, max_spend_amount)) \
                     .values_list('appointment__client__id', flat=True))
