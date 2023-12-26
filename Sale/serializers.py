@@ -521,6 +521,7 @@ class ServiceSerializerMainpage(serializers.ModelSerializer):
 class ServiceSerializerOP(serializers.ModelSerializer):    
     priceservice = serializers.SerializerMethodField(read_only=True)
     price = serializers.SerializerMethodField(read_only=True)
+    avaliableservicegroup =  serializers.SerializerMethodField(read_only=True)
     
     def get_price(self, obj):
         try:
@@ -543,11 +544,15 @@ class ServiceSerializerOP(serializers.ModelSerializer):
             return PriceServiceSerializers(ser, many = True).data
         except Exception as err:
             pass
+
+    def get_avaliableservicegroup(self, obj):
+        group = obj.servicegroup_services.filter(is_deleted=False)
+        return ServiceGroupSerializerOP(group, many=True).data
     
         
     class Meta:
         model = Service
-        fields = ['id', 'name', 'price', 'controls_time_slot', 'client_can_book', 'slot_availible_for_online', 'priceservice']
+        fields = ['id', 'name', 'price', 'controls_time_slot', 'client_can_book', 'slot_availible_for_online', 'priceservice' , 'avaliableservicegroup']
                
 
 class ServiceTranlationsSerializer(serializers.ModelSerializer):
