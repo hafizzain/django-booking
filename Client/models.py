@@ -40,9 +40,9 @@ class ClientManager(models.QuerySet):
                                         .values('updated_at')[:1]  # why updated_at -> because it can be created but not paid
         Checkout = apps.get_model(app_label='Order', model_name='Checkout')
         last_sale_subquery = Checkout.objects \
-                                        .filter(client=OuterRef('pk')) \
-                                        .order_by('created_at') \
-                                        .values('created_at')[:1]
+                                .filter(client=OuterRef('pk')) \
+                                .order_by('-created_at') \
+                                .values('created_at')[:1]
         
         return self.annotate(
             last_appointment_date=Coalesce(Subquery(last_appointment_subquery),
