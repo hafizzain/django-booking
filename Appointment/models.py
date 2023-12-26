@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import uuid
 from xml.parsers.expat import model
 from django.db import models
-from django.db.models import Sum, Subquery, OuterRef, FloatField, Case, When, Value, CharField, F, DateTimeField
+from django.db.models import Sum, Subquery, OuterRef, FloatField, Case, When, Value, CharField, F, DateTimeField, Q
 from django.db.models.functions import Coalesce
 
 from Authentication.models import User
@@ -15,31 +15,34 @@ from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Order.models import Checkout
 from . import choices
 from Utility.models import CommonField
+from .choices import AppointmentServiceStatus
 
 
 
 class AppointmentCheckoutManager(models.QuerySet):
 
-    def with_total_service_price(self, currency):
-
-        
-        
-        service_ids = AppointmentService.objects \
-                    .filter(appointment=OuterRef(OuterRef('appointment'))) \
-                    .values_list('service__id', flat=True)
-
+    def with_subtotal(self):
+        """
+        Return the subtotal.
+        subtotal: total_price + gst_price + gst_price1
+        """
+        status_list = [
+            AppointmentServiceStatus.STARTED, 
+            AppointmentServiceStatus.FINISHED,
+            AppointmentServiceStatus.BOOKED
+        ]
+        sum_filter=Q(appointment__appointment_services__status__in=status_list)
         return self.annotate(
             subtotal=Coalesce(
-                Subquery(
-                    PriceService.objects \
-                    .filter(service__id__in=service_ids, currency=currency) \
-                    .annotate(total_price=Sum('price')) \
-                    .order_by('-created_at') \
-                    .values('total_price')[:1]
-                ),
+                Sum('appointment__appointment_services__price', filter=sum_filter) + F('gst_price') + F('gst_price1'),
                 0.0,
                 output_field=FloatField()
-            )
+            ),
+            just_services_price_inside=Coalesce(
+                Sum(F('appointment__appointment_services__price'), filter=sum_filter),
+                0.0,
+                output_field=FloatField()
+            ),
         )
     
     def with_payment_status(self):
@@ -62,6 +65,16 @@ class AppointmentCheckoutManager(models.QuerySet):
                     default=Value(None)
                     ),
         )
+
+    def with_total_tax(self):
+        return self.annotate(
+            total_tax=Coalesce(
+                F('gst_price') + F('gst_price1'),
+                0.0,
+                output_field=FloatField()
+            )
+        )
+
 
 class AppointmentLogs(models.Model):
     LOG_TYPE_CHOICES =[
@@ -402,6 +415,26 @@ class AppointmentCheckout(models.Model):
         if self.gst_price1:
             total += self.gst_price1
         return total
+    
+    def total_service_price(self):
+        currency = self.business_address.currency
+        query_for_price = Q(service=OuterRef('service'), currency=currency)        
+        appointment_service = AppointmentService.objects \
+                                        .filter(appointment=self.appointment) \
+                                        .annotate(
+                                            service_price=Coalesce(
+                                                PriceService.objects \
+                                                .filter(query_for_price) \
+                                                .order_by('-created_at') \
+                                                .values('price')[:1],
+                                                0.0,
+                                                output_field=FloatField()
+                                            )
+                                            
+                                        ).aggregate(
+                                            final_price=Sum('service_price')
+                                        )
+        return appointment_service['final_price']
     
     @property
     def fun():

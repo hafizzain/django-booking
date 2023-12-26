@@ -8,6 +8,11 @@ urlpatterns = [
     path('get_directorflat/', views.get_directorflat),
     path('delete_directorflat/', views.delete_directorflat),
     path('update_directorflat/', views.update_directorflat),
+    path('create_couponsdiscount/', views.create_coupon),
+    path('delete_couponsdiscount/<str:id>/',views.delete_coupon),
+    path('delete_couponsdiscount/',views.delete_all_coupon),
+    path('update_couponsdiscount/',views.update_coupon),
+    path('get_coupon/',views.get_coupon),
 
     
     path('get_discount_and_promotions/', views.get_discount_and_promotions),

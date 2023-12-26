@@ -32,7 +32,8 @@ from Employee.models import CategoryCommission, CommissionSchemeSetting, Employe
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
-from django.db.models import Q
+from django.db.models import Q, F
+
 from Client.models import Client, ClientPackageValidation, ClientPromotions, LoyaltyPoints, ClientLoyaltyPoint, \
     LoyaltyPointLogs
 from datetime import date, timedelta
@@ -1747,15 +1748,15 @@ def create_checkout(request):
     member = request.data.get('member', None)
     business_address = request.data.get('business_address', None)
 
-    tip = request.data.get('tip', [])
+    tax_name = request.data.get('tax_name', '')
+    tax_name1 = request.data.get('tax_name1', '')
     gst = request.data.get('gst', 0)
     gst1 = request.data.get('gst1', 0)
     gst_price = request.data.get('gst_price', 0)
     gst_price1 = request.data.get('gst_price1', 0)
     service_price = request.data.get('service_price', None)
     total_price = request.data.get('total_price', 0)
-    tax_name = request.data.get('tax_name', '')
-    tax_name1 = request.data.get('tax_name1', '')
+    tip = request.data.get('tip', [])
 
     is_promotion_availed = request.data.get('is_promotion_availed', False)
 
@@ -1825,8 +1826,6 @@ def create_checkout(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    appointment.status = 'Done'
-    appointment.save()
     if type(tip) == str:
         tip = json.loads(tip)
     if type(tip) == list:
@@ -1967,24 +1966,28 @@ def create_checkout(request):
     except Exception as err:
         Errors.append(str(err))
 
-    checkout = AppointmentCheckout.objects.create(
-        appointment=appointment,
-        appointment_service=service_appointment,
-        payment_method=payment_method,
-        service=service,
-        member=member,
-        business_address=business_address,
-        gst=gst,
-        gst1=gst1,
-        gst_price=gst_price,
-        gst_price1=gst_price1,
-        tax_name=tax_name,
-        tax_name1=tax_name1,
-        service_price=service_price,
-        total_price=total_price,
-        service_commission=float(service_commission),
-        service_commission_type=service_commission_type,
-    )
+    """
+    Updating the unpaid checkout created in the appointment_service_status_update/
+    api and feeding all the other data here.
+    """
+    checkout = AppointmentCheckout.objects.get(appointment=appointment)
+    checkout.appointment_service=service_appointment
+    checkout.payment_method=payment_method
+    checkout.service=service
+    checkout.member=member
+    checkout.business_address=business_address
+    checkout.gst=gst
+    checkout.gst1=gst1
+    checkout.gst_price=gst_price
+    checkout.gst_price1=gst_price1
+    checkout.tax_name=tax_name
+    checkout.tax_name1=tax_name1
+    checkout.service_price=service_price
+    checkout.total_price=total_price
+    checkout.service_commission=float(service_commission)
+    checkout.service_commission_type=service_commission_type
+    checkout.save()
+    
 
     # change the status of appointment after checkout
     appointment.status = choices.AppointmentStatus.DONE
@@ -2494,7 +2497,7 @@ def get_client_sale(request):
     total_sale += product_total if product_total else 0
     if product_order.count() > 5:
         product_order = product_order[:5]
-    product = POSerializerForClientSale(product_order, many=True, context={'request': request, })
+    product = POSerializerForClientSale(product_order, many=True, context={'request': request,})
 
     # Service Orders----------------------
     service_orders = ServiceOrder.objects \
@@ -2516,7 +2519,7 @@ def get_client_sale(request):
                            .filter(checkout__client=client) \
                            .select_related('membership', 'user', 'member') \
                            .order_by('-created_at')[:5]
-    voucher_total = voucher_order.aggregate(total_sale=Sum('voucher__price'))['total_sale']
+    voucher_total = voucher_order.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += voucher_total if voucher_total else 0
     if voucher_order.count() > 5:
         voucher_order = voucher_order[:5]
@@ -2545,9 +2548,11 @@ def get_client_sale(request):
     total_sale += appointment_total if appointment_total else 0
     if appointment_checkout_all.count() > 5:
         appointment_checkout_5 = appointment_checkout_all[:5]
-    print("i am printing the product data", product)
+
     appointment = ServiceClientSaleSerializer(appointment_checkout_5[:5], many=True)
     quick_sale_count = len(product.data) + len(services_data.data)
+    # for item in product:
+    #     print("i am printing item",item)
     price_values = sum(item.get('price', 0) for item in product.data)
     voucher_total_price = 0
     voucher_total_price = sum(item.get('price', 0) for item in voucher.data)
@@ -3278,6 +3283,14 @@ def appointment_service_status_update(request):
     appointment_id = request.data.get('appointment_id', None)
     appointment_service_id = request.data.get('appointment_service_id', None)
     appointment_service_status = request.data.get('status', None)
+    gst = request.data.get('gst', None)
+    gst1 = request.data.get('gst1', None)
+    gst_price = float(request.data.get('gst_price', None))
+    gst_price1 = float(request.data.get('gst_price1', None))
+    tax_name = request.data.get('tax_name', None)
+    tax_name1 = request.data.get('tax_name1', None)
+
+    status_list = [choices.AppointmentServiceStatus.STARTED, choices.AppointmentServiceStatus.FINISHED]
 
     # changing the status
     appointment = Appointment.objects.get(id=appointment_id)
@@ -3293,12 +3306,9 @@ def appointment_service_status_update(request):
     appoint_service_statuses = list(
         AppointmentService.objects.filter(appointment=appointment).values_list('status', flat=True))
 
-    is_all_finished = all(
-        [True if status == choices.AppointmentServiceStatus.FINISHED else False for status in appoint_service_statuses])
-    is_all_void = all(
-        [True if status == choices.AppointmentServiceStatus.VOID else False for status in appoint_service_statuses])
-    is_all_started = all(
-        [True if status == choices.AppointmentServiceStatus.STARTED else False for status in appoint_service_statuses])
+    is_all_finished = all([True if status == choices.AppointmentServiceStatus.FINISHED else False for status in appoint_service_statuses])
+    is_all_void = all([True if status == choices.AppointmentServiceStatus.VOID else False for status in appoint_service_statuses])
+    is_all_started = all([True if status == choices.AppointmentServiceStatus.STARTED else False for status in appoint_service_statuses])
 
     if (is_all_finished or is_all_void) or (not is_all_started):
         appointment.status = choices.AppointmentStatus.FINISHED
@@ -3306,6 +3316,31 @@ def appointment_service_status_update(request):
     else:
         appointment.status = choices.AppointmentStatus.STARTED
         appointment.save()
+
+
+    # When there is any appointment started make the appointment checkout here, 
+    # so that we can calculate the tax and the service prices using query
+    # to monitor paid and unpaid appointment checkouts.
+    # If all Void then don't create the checkout.
+    any_service_started_or_funished = AppointmentService.objects.filter(
+                                        appointment=appointment,
+                                        status__in=status_list
+                                    ).exists()
+    status_started_finished = appointment_service_status in status_list
+
+    if any_service_started_or_funished or status_started_finished:
+        checkout, created = AppointmentCheckout.objects.get_or_create(
+            appointment=appointment,
+            business_address=appointment.business_address
+        )
+        checkout.gst=gst
+        checkout.gst1=gst1
+        checkout.gst_price=gst_price
+        checkout.gst_price1=gst_price1
+        checkout.tax_name=tax_name
+        checkout.tax_name1=tax_name1
+        checkout.save()
+        
 
     serialized = AppointmentServiceSerializerBasic(appointment_service)
 
@@ -3316,7 +3351,7 @@ def appointment_service_status_update(request):
             'response': {
                 'message': 'Appointment Service',
                 'error_message': None,
-                'appointment_service': serialized.data
+                'appointment_service': serialized.data,
             }
         },
         status=status.HTTP_200_OK
@@ -3330,8 +3365,7 @@ def paid_unpaid_clients(request):
     is_paid = request.GET.get('is_paid', None)
     start_date = request.GET.get('start_date', None)
     end_date = request.GET.get('end_date', None)
-
-    currency = BusinessAddress.objects.get(id=location_id).currency
+    search_text = request.GET.get('search_text', None)
 
     query = Q()
 
@@ -3344,15 +3378,23 @@ def paid_unpaid_clients(request):
     if location_id:
         query &= Q(business_address__id=location_id)
 
+    if search_text:
+        search_text = search_text.replace('#', '')
+        query &= Q(appointment__client__full_name__icontains=search_text) | \
+                Q(appointment__id__icontains=search_text)
+
     if start_date and end_date:
-        query &= Q(created_at__range=(start_date, end_date))
+        query &= Q(created_at__date__range=get_date_range_tuple(start_date, end_date))
 
     appointment_checkouts = AppointmentCheckout.objects \
         .filter(query) \
-        .with_total_service_price(currency) \
         .with_payment_status() \
         .with_client_name() \
         .with_payment_date() \
+        .with_subtotal() \
+        .annotate(
+            just_services_price = Sum(F('appointment__appointment_services__price'))
+        ) \
         .order_by('-created_at')
 
     serialized = list(PaidUnpaidAppointmentCheckoutSerializer(appointment_checkouts, many=True).data)
@@ -3557,7 +3599,7 @@ def get_available_appointments(request):
             start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
             end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
             end_datetime = end_datetime + timezone.timedelta(days=1)  # Adjust for end of day
-            query &= Q(created_at__range=(start_datetime, end_datetime))
+            query &= Q(appointment_services__appointment_date__range=(start_datetime, end_datetime))
         if location_id is not None:
             query &= Q(business_address__id=location_id)
         if appointment_id is not None:
@@ -3565,9 +3607,8 @@ def get_available_appointments(request):
         if booking_id is not None:
             query &= Q(appointment_services__id=booking_id)
 
-        appointment = Appointment.objects.filter(query)
-        if appointment:
-            appointment = appointment.order_by('-created_at')
+        appointment = Appointment.objects.filter(query).distinct('id')
+
     except Exception as err:
         return Response(
             {
