@@ -77,8 +77,7 @@ NSTYLE_APPS = [
     'MultiLanguage.apps.MultilanguageConfig',
     'SuperInsight.apps.SuperinsightConfig',
     'Notification.apps.NotificationConfig',
-    'Analytics.apps.AnalyticsConfig',
-    'Finance.apps.FinanceConfig', # Add a new App Finance by Asad
+    'Analytics.apps.AnalyticsConfig'
 ]
 
 
