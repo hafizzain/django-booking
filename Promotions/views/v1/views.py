@@ -6695,7 +6695,7 @@ def update_coupon(request):
                 'status': True,
                 'status_code': 200,
                 'response': {
-                    'message': 'Coupon created successfully!',
+                    'message': 'Coupon updated successfully!',
                     'error_message': None,
                     'errors': error,
                     'coupon': serializer.data,
