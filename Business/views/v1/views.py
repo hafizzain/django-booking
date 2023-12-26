@@ -15,7 +15,7 @@ from rest_framework.generics import (ListAPIView, CreateAPIView, UpdateAPIView, 
 from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Authentication.serializers import UserTenantLoginSerializer
 
-from Business.models import BusinessAddressMedia, BusinessType, BusinessPrivacy, BusinessPolicy
+from Business.models import BusinessAddressMedia, BusinessType, BusinessPrivacy, BusinessPolicy, RefundSetting
 from Business.serializers.v1_serializers import (BusinessAddress_CustomerSerializer,
                                                  EmployeAppointmentServiceSerializer,
                                                  EmployeTenatSerializer, OpeningHoursSerializer,
@@ -28,7 +28,7 @@ from Business.serializers.v1_serializers import (BusinessAddress_CustomerSeriali
                                                  StaffNotificationSettingSerializer, StockNotificationSettingSerializer,
                                                  BusinessTaxSerializer, PaymentMethodSerializer,
                                                  BusinessTaxSettingSerializer, BusinessPrivacySerializer,
-                                                 BusinessPolicySerializer, BusinessVendorSerializerDropdown)
+                                                 BusinessPolicySerializer, BusinessVendorSerializerDropdown, RefundSettingSerializer)
 from Client.models import Client
 from Employee.models import EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeeSelectedService
 from Employee.Constants.Add_Employe import add_employee
@@ -4848,3 +4848,8 @@ class BusinessPolicyViewSet(viewsets.ModelViewSet):
     authentication_classes = [AllowAny]
     queryset = BusinessPolicy.objects.all()
     serializer_class = BusinessPolicySerializer
+
+class RefundSettingViewset(viewsets.ModelViewSet):
+    authentication_classes = [IsAuthenticated]
+    queryset = RefundSetting.objects.all()
+    serializer_class = RefundSettingSerializer
