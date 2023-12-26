@@ -6763,7 +6763,7 @@ def get_coupon(request):
                 'status': False,
                 'status_code': 400,
                 'response': {
-                    'message': 'Coupon not found',
+                    'message': 'Enter a valid coupon',
                     'error_message': None,
 
                 }
