@@ -3324,11 +3324,10 @@ def appointment_service_status_update(request):
     # If all Void then don't create the checkout.
     any_service_started_or_funished = AppointmentService.objects.filter(
                                         appointment=appointment,
-                                        status__in=status_list
-                                    )
+                                    ).exclude(status=choices.AppointmentServiceStatus.VOID)
     status_started_finished = appointment_service_status in status_list
 
-    if any_service_started_or_funished.exists() or status_started_finished:
+    if any_service_started_or_funished.exists() and status_started_finished:
         """
         Creating the checkout and Calculating the Tax
         """
