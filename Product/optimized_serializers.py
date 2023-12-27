@@ -138,36 +138,12 @@ class OptimizedProductStockSerializer(serializers.ModelSerializer):
         ]
 
 class OtpimizedProductSerializer(serializers.ModelSerializer):
-    brand=OptimizedBrandSerializer(read_only=True)
-    category= OptimizedCategorySerializer(read_only=True)
-    total_orders = serializers.IntegerField(read_only=True)
-    # vendor= VendorSerializer(read_only=True)
-    
-    # media = serializers.SerializerMethodField()
-    # stocks = serializers.SerializerMethodField(read_only=True)
+    brand = OptimizedBrandSerializer(read_only=True)
+    category = OptimizedCategorySerializer(read_only=True)
+    total_order_quantity = serializers.FloatField(read_only=True)
     location_quantities = serializers.SerializerMethodField(read_only=True)
     cover_image = serializers.SerializerMethodField()
-    # consumed = serializers.SerializerMethodField()
-    # stocktransfer = serializers.SerializerMethodField()
     currency_retail_price = serializers.SerializerMethodField()
-    stock_health = serializers.CharField()
-    
-    # location = serializers.SerializerMethodField()
-    # location = serializers.SerializerMethodField(read_only=True)
-    # size = serializers.SerializerMethodField(read_only=True)
-
-    # short_id = serializers.SerializerMethodField(read_only=True)
-    # invoices = serializers.SerializerMethodField(read_only=True)
-
-    
-    # def get_short_id(self,obj):
-    #     return obj.short_id
-
-    # def get_size(self,obj):
-    #     try:
-    #         return obj.product_size
-    #     except:
-    #         return None
     
     def get_currency_retail_price(self, obj):
         location_currency_id = self.context.get('location_currency', None)
@@ -177,26 +153,6 @@ class OtpimizedProductSerializer(serializers.ModelSerializer):
             currency__id = location_currency_id
         )
         return OptimizedCurrencyRetailPriceSerializer( currency_retail, many = True).data
-        
-    # def get_stocktransfer(self, obj):
-        
-    #         stocktransfer = ProductStockTransfer.objects.filter(product = obj)
-    #         return ProductStockTransferlocationSerializer( stocktransfer, many = True).data
-        
-    # def get_consumed(self, obj):
-        
-    #         comsumption = ProductConsumption.objects.filter(product = obj)
-    #         return ProductConsumptionSerializer( comsumption, many = True).data
-
-    
-    # def get_location(self, obj):
-    #     try:
-    #         all_location = obj.location.all()
-    #         return LocationSerializer(all_location, many = True).data
-    #     except Exception as err:
-    #         print(err)
-    #         None
-
     
     def get_cover_image(self, obj):
         cvr_img = ProductMedia.objects.filter(product=obj, is_cover=True, is_deleted=False).order_by('-created_at')
@@ -208,24 +164,6 @@ class OtpimizedProductSerializer(serializers.ModelSerializer):
                 return f'{url}{cvr_img.image}'
         except:
             return None
-
-
-    # def get_media(self, obj):
-    #     try:
-    #         context = self.context
-    #     except:
-    #         context = {}
-    #     all_medias = ProductMedia.objects.filter(product=obj, is_deleted=False).order_by('-created_at')
-    #     return ProductMediaSerializer(all_medias, many=True, context=context).data
-
-    # def get_stocks(self, obj):
-    #     location = self.context['location']
-    #     if location is not None:
-    #         all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False, location__id = location ).order_by('-created_at')
-    #         return ProductStockSerializer(all_stocks, many=True).data
-    #     else:
-    #         all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False,).order_by('-created_at')
-    #         return ProductStockSerializer(all_stocks, many=True).data
 
     def get_location_quantities(self, obj):
         location = self.context['location']
@@ -239,14 +177,6 @@ class OtpimizedProductSerializer(serializers.ModelSerializer):
                                                      location__is_closed=False,
                                                      location__is_active=True).order_by('-created_at')
             return OptimizedProductStockSerializer(all_stocks, many=True).data
-        
-    # def get_invoices(self, obj):
-    #     try:
-    #         invoice = ProductTranslations.objects.filter(product = obj) 
-    #         return ProductTranlationsSerializer(invoice, many=True).data
-    #     except:
-    #         return []
-
 
     class Meta:
         model = Product
@@ -262,25 +192,7 @@ class OtpimizedProductSerializer(serializers.ModelSerializer):
             'category',
             'brand', 
             'short_description',
-            'total_orders',
-            'stock_health',
-            # 'is_active',
-            # 'short_id', 
-            # 'arabic_name', 
-            # 'size',
-            # 'cost_price',
-            # 'tax_rate',
-            # 'barcode_id',
-            # 'sku',
-            # 'slug',
-            # 'media',
-            # 'stocks',
-            # 'vendor',
-            # 'created_at',
-            # 'consumed',
-            # 'stocktransfer',
-            # 'location',
-            # 'invoices'
+            'total_order_quantity',
         ]
         read_only_fields = [
             # 'slug', 

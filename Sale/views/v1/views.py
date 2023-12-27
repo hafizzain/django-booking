@@ -2,6 +2,8 @@ from datetime import timedelta
 import datetime
 from threading import Thread
 from django.shortcuts import render
+
+from Promotions.models import Coupon
 from Sale.Constants.StaffEmail import StaffSaleEmail
 from Sale.Constants.stock_lowest import stock_lowest
 from Sale.Constants.tunrover import ProductTurnover
@@ -2218,6 +2220,7 @@ def new_create_sale_order(request):
     loyalty_points_redeemed_id = request.data.get('redeemed_id', None)
     loyalty_points_redeemed = request.data.get('redeemed_points', None)
     total_discount_value = request.data.get('discount_value', None)
+    coupon_discounted_price = request.data.get('coupon_discounted_price', None)
     tip = request.data.get('tip', [])
     total_price = request.data.get('total_price', None)
     minus_price = 0
@@ -2287,7 +2290,8 @@ def new_create_sale_order(request):
         tax_applied1=tax_applied1,
         tax_name=tax_name,
         tax_name1=tax_name1,
-        total_discount=total_discount_value
+        total_discount=total_discount_value,
+        coupon_discounted_price=coupon_discounted_price
     )
 
     checkout.save()
@@ -2335,7 +2339,13 @@ def new_create_sale_order(request):
         is_voucher_redeemed = id.get('is_voucher_redeemed', None)
         is_coupon_redeemed = id.get('is_coupon_redeemed', None)
         redeemed_price = id.get('redeemed_price', None)
+        redeemed_coupon_id = id.get('redeemed_coupon_id', None)
 
+        if redeemed_coupon_id:
+            coupon = Coupon.objects.get(id=redeemed_coupon_id)
+            coupon.usage_limit -= 1
+            coupon.user_limit -= 1
+            coupon.save()
         if redeemed_price is None:
             redeemed_price = 0
 

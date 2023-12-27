@@ -1496,9 +1496,8 @@ def get_products_optimized(request):
         'product_stock',
     ) \
     .filter(query) \
-    .with_total_orders(location) \
-    .with_stock_health(location) \
-    .order_by('-total_orders')
+    .with_total_orders_quantity(location) \
+    .order_by('-total_order_quantity')
 
     
     all_products_count = all_products.count()

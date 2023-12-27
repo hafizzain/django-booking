@@ -6773,6 +6773,34 @@ def get_coupon(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    if coupon.usage_limit <=0:
+        return Response(
+            {
+                'status': False,
+                'status_code': 400,
+                'response': {
+                    'message': 'Coupon usage limit exceed',
+                    'error_message': None,
+                    # 'current_day': current_day
+
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    if coupon.user_limit <= 0:
+        return Response(
+            {
+                'status': False,
+                'status_code': 400,
+                'response': {
+                    'message': 'Coupon user limit exceed',
+                    'error_message': None,
+                    # 'current_day': current_day
+
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
     if total_price is not None:
         if coupon.coupon_type_value == '3':
             total_price = float(total_price)
@@ -6948,7 +6976,7 @@ def create_refund(request):
 
             }
         },
-        status=status.HTTP_201_CREATED
+        status=status.HTTP_200_OK
     )
 
 
@@ -6956,8 +6984,8 @@ def create_refund(request):
 @permission_classes([AllowAny])
 def update_refund(request):
     number_of_days = request.data.get('number_of_days', None)
-    location = request.data.get('location', None)
-    refundsetting = RefundSetting.objects.filter(location_id=location)
+    id = request.query_params.get('id', None)
+    refundsetting = RefundSetting.objects.get(id=id)
     if refundsetting:
         refundsetting.update(number_of_days=number_of_days)
     else:
@@ -6973,13 +7001,14 @@ def update_refund(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request}, many=True)
+
+    serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request}, many=False)
     return Response(
         {
             'status': True,
             'status_code': 201,
             'response': {
-                'message': 'Refund created successfully!',
+                'message': 'Refund updated successfully!',
                 'error_message': None,
                 'errors': [],
                 'data': serializer.data,
@@ -6993,8 +7022,8 @@ def update_refund(request):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def delete_refund(request):
-    location = request.data.get('location', None)
-    refundsetting = RefundSetting.objects.filter(location_id=location)
+    id = request.query_params.get('id', None)
+    refundsetting = RefundSetting.objects.filter(id=id)
     if refundsetting:
         refundsetting.delete()
         return Response(
