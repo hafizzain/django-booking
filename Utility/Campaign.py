@@ -14,6 +14,7 @@ def run_campaign(message=None, subject=None, client_email_list=None, campaign_ty
                 [client_email], # Send email to each recipient individually
                 fail_silently=False,
             )
+            
     elif  campaign_type == "AppNotification" or campaign_type == "Both":
         pass
     
