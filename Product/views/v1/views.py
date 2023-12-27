@@ -1497,7 +1497,6 @@ def get_products_optimized(request):
     ) \
     .filter(query) \
     .with_total_orders(location) \
-    .with_stock_health(location) \
     .order_by('-total_orders')
 
     
