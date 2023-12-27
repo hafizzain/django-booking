@@ -47,8 +47,9 @@ class RefundAPIView(APIView):
     '''
     def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
         try:
-            request.data['user'] = request.user.id
-            serializer = RefundSerializer(data=request.data)
+            user = request.user
+            request.data['user'] = user.id
+            serializer = RefundSerializer(data=request.data, context={'request': request})
             if serializer.is_valid():
                 refund_instance = serializer.save()
                 
