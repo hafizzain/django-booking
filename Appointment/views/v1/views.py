@@ -3284,12 +3284,8 @@ def appointment_service_status_update(request):
     appointment_id = request.data.get('appointment_id', None)
     appointment_service_id = request.data.get('appointment_service_id', None)
     appointment_service_status = request.data.get('status', None)
-    gst = request.data.get('gst', None)
-    gst1 = request.data.get('gst1', None)
-    gst_price = float(request.data.get('gst_price', None))
-    gst_price1 = float(request.data.get('gst_price1', None))
-    tax_name = request.data.get('tax_name', None)
-    tax_name1 = request.data.get('tax_name1', None)
+    gst_price = None
+    gst_price1 = None
 
     status_list = [choices.AppointmentServiceStatus.STARTED, choices.AppointmentServiceStatus.FINISHED]
 
@@ -3344,18 +3340,21 @@ def appointment_service_status_update(request):
 
         if tax_setting.is_combined():
             gst_price = round((parent_taxes[0].tax_rate * total_price / 100), 2)
-            gst_price1 = round((parent_taxes[1].tax_rate * total_price / 100), 2)
+            if parent_tax.is_group():
+                gst_price1 = round((parent_taxes[1].tax_rate * total_price / 100), 2)
+        elif tax_setting.is_seperately():
+            gst_price = round((parent_taxes[0].tax_rate * total_price / 100), 2)
+            if parent_tax.is_group():
+                total_price += gst_price
+                gst_price1 = round((parent_taxes[1].tax_rate * total_price / 100), 2)
 
         checkout, created = AppointmentCheckout.objects.get_or_create(
             appointment=appointment,
             business_address=appointment.business_address
         )
-        checkout.gst=gst
-        checkout.gst1=gst1
-        checkout.gst_price=gst_price
-        checkout.gst_price1=gst_price1
-        checkout.tax_name=tax_name
-        checkout.tax_name1=tax_name1
+
+        checkout.gst_price = gst_price
+        checkout.gst_price1 = gst_price1
         checkout.save()
         
 
