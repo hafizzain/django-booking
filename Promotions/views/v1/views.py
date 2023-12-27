@@ -6775,7 +6775,7 @@ def get_coupon(request):
         )
     if total_price is not None:
         total_price = float(total_price)
-        if total_price >= float(coupon.amount_spent):
+        if total_price <= float(coupon.amount_spent):
             return Response(
                 {
                     'status': False,
