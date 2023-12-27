@@ -3327,7 +3327,7 @@ def appointment_service_status_update(request):
                                     ).exclude(status=choices.AppointmentServiceStatus.VOID)
     status_started_finished = appointment_service_status in status_list
 
-    if any_service_started_or_funished.exists() and status_started_finished:
+    if any_service_started_or_funished.exists() or status_started_finished:
         """
         Creating the checkout and Calculating the Tax
         """
@@ -3373,7 +3373,8 @@ def appointment_service_status_update(request):
                 'error_message': None,
                 'appointment_service': serialized.data,
                 'seperate_or_combined':seperate_or_combined,
-                'group_or_individual':group_or_individual
+                'group_or_individual':group_or_individual,
+                'total_price':total_price
             }
         },
         status=status.HTTP_200_OK
