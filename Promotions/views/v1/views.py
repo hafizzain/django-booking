@@ -6826,6 +6826,7 @@ def get_coupon(request):
                     'response': {
                         'message': 'Coupon does not valid for selected client',
                         'error_message': None,
+                        'current_day':current_day
 
                     }
                 },
