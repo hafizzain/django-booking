@@ -6956,7 +6956,7 @@ def delete_refund(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_refund(request):
-    location = request.query_params.get('location', None)
+    location = request.data.get('location', None)
     if location :
         refundsetting = RefundSetting.objects.filter(location_id=location)
         if refundsetting:
