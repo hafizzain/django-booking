@@ -1497,7 +1497,7 @@ def get_products_optimized(request):
     ) \
     .filter(query) \
     .with_total_orders_quantity(location) \
-    .order_by('-total_orders')
+    .order_by('-total_order_quantity')
 
     
     all_products_count = all_products.count()
