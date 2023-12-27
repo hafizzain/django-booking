@@ -993,6 +993,7 @@ class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
     #     return list(checkout.appointment.appointment_services.all().values('status', 'total_price'))
 
     subtotal = serializers.FloatField()
+    total_tax = serializers.FloatField()
     client_name = serializers.CharField()
     payment_status = serializers.CharField()
     payment_date = serializers.DateTimeField()
@@ -1008,7 +1009,7 @@ class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentCheckout
         fields = ['id', 'booking_id', 'client_name', 'booking_date', 'subtotal', 'payment_status',
-                  'payment_date', 'gst_price', 'gst_price1', 'total_price']
+                  'payment_date', 'gst_price', 'gst_price1', 'total_price', 'total_tax']
 
 
 
