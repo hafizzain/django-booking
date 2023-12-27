@@ -3398,6 +3398,7 @@ def paid_unpaid_clients(request):
         .with_client_name() \
         .with_payment_date() \
         .with_subtotal() \
+        .with_total_tax() \
         .order_by('-created_at')
 
     serialized = list(PaidUnpaidAppointmentCheckoutSerializer(appointment_checkouts, many=True).data)
