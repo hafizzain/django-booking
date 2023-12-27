@@ -19,7 +19,7 @@ from Business.models import BusinessAddress
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
 from Client.serializers import ClientAppointmentSerializer, ClientSerializerOP
 from Employee.models import Employee, EmployeeProfessionalInfo, EmployeeSelectedService, EmployeDailySchedule
-from Service.models import PriceService, Service
+from Service.models import PriceService, Service, ServiceGroup
 from datetime import datetime, timedelta
 from Product.Constants.index import tenant_media_base_url
 from django.db.models import Q, F
@@ -680,7 +680,7 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
 
 class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
-    # price = serializers.SerializerMethodField(read_only=True)
+    avaliable_service_group = serializers.SerializerMethodField(read_only=True)
     booked_by = serializers.SerializerMethodField(read_only=True)
     booking_id = serializers.SerializerMethodField(read_only=True)
     appointment_type = serializers.SerializerMethodField(read_only=True)
@@ -732,6 +732,15 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
             return obj.service.name
         except Exception as err:
             return None
+
+    def get_avaliable_service_group(self , obj):
+        try:
+            service_group_ids = ServiceGroup.objects.filter(id=obj.service.id, is_delete=False).values_list('id', flat=True)
+            return service_group_ids
+        except Exception as ex:
+            ex = str(ex)
+            return ex
+
 
     def get_location(self, obj):
         try:
