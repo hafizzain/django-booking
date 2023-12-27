@@ -21,6 +21,7 @@ class RefundServiceSerializer(serializers.ModelSerializer):
         
 class RefundSerializer(serializers.ModelSerializer):
     refunded_products = RefundProductSerializer(many=True)
+    refunded_services = RefundServiceSerializer(many=True)
 
     class Meta:
         model = Refund
