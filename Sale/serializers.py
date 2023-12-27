@@ -1817,6 +1817,7 @@ class ProductTranslationSerializer(serializers.ModelSerializer):
 
 
 class SaleOrder_ProductSerializer(serializers.ModelSerializer):
+    product_id = serializers.SerializerMethodField(read_only=True) # Method field to get the product id
     product_name  = serializers.SerializerMethodField(read_only=True)
     product_arabic_name  = serializers.SerializerMethodField(read_only=True)
     product_price  = serializers.SerializerMethodField(read_only=True)
@@ -1842,8 +1843,10 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
             return ProductTranlationsSerializerNew(secondary_product_translations).data
         else:
             return None
-        
-
+    
+    # Added Field method to get the product_id By M Asad
+    def get_product_id(self, obj):
+        return obj.product.id
 
     def get_selection_type(self, obj):
         return 'PRODUCT'
@@ -1883,7 +1886,8 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'product_name', 'product_arabic_name', 'product_original_price', 
             'quantity', 'product_price', 'price', 'selection_type', 'discount_percentage',
-            'redeemed_type', 'primary_product_translation', 'secondary_product_translation']
+            'redeemed_type', 'primary_product_translation', 'secondary_product_translation',
+            'product_id']
 
 
 class SaleOrder_ProductSerializerOP(serializers.ModelSerializer):
@@ -2309,6 +2313,7 @@ class SaleInvoiceSerializerOP(serializers.ModelSerializer):
 
 
 class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
+    service_id = serializers.SerializerMethodField(read_only = True) # added the appointment field to get appointment id
     location = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
@@ -2342,6 +2347,11 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
             
     def get_order_type(self, obj):
         return 'Appointment'
+    
+    # Getting services ids
+    def get_service_id(self, obj):
+        return self.obj.id
+        
     
     def get_client(self, obj):
         if obj.appointment and obj.appointment.client:
@@ -2392,7 +2402,7 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
                  'membership', 'rewards', 'tip', 'gst', 'gst1', 'gst_price', 'gst_price1', 'service_price',
                  'total_price', 'service_commission', 'service_commission_type', 'voucher_discount_percentage',
                  'created_at', 'order_type', 'client', 'location', 'price', 'promotion_name', 'invoice',
-                 'tax_name', 'tax_name1', 'total_tip', 'client_loyalty_points']
+                 'tax_name', 'tax_name1', 'total_tip', 'client_loyalty_points','service_id']
 
 
 
