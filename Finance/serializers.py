@@ -20,7 +20,7 @@ class RefundSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         refunded_products_data = validated_data.pop('refunded_products')
-        refund = Refund.objects.create(user=self.context['request'].user, **validated_data)
+        refund = Refund.objects.create(**validated_data)
 
         refund_products_instances = [
             RefundProduct(refund=refund, product=get_object_or_404(Product, id=refunded_product_data['product']), **refunded_product_data)
