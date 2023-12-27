@@ -2333,12 +2333,13 @@ def new_create_sale_order(request):
         discount_percentage = id.get('discount_percentage', None)
         is_membership_redeemed = id.get('is_membership_redeemed', None)
         is_voucher_redeemed = id.get('is_voucher_redeemed', None)
+        is_coupon_redeemed = id.get('is_coupon_redeemed', None)
         redeemed_price = id.get('redeemed_price', None)
 
         if redeemed_price is None:
             redeemed_price = 0
 
-        is_redeemed = is_membership_redeemed or is_voucher_redeemed
+        is_redeemed = is_membership_redeemed or is_voucher_redeemed or is_coupon_redeemed
 
         item_name = ''
         item_id = service_id
@@ -2632,7 +2633,8 @@ def new_create_sale_order(request):
 
         if order_instance is not None and is_redeemed:
             order_instance.is_redeemed = True
-            order_instance.redeemed_type = 'Membership' if is_membership_redeemed else 'Voucher' if is_voucher_redeemed else ''
+
+            order_instance.redeemed_type = 'Membership' if is_membership_redeemed else 'Voucher' if is_voucher_redeemed else 'Coupon'
             order_instance.redeemed_price = float(redeemed_price)
             order_instance.redeemed_instance_id = redeemed_membership_id
             order_instance.total_discount = float(total_discount_value) if total_discount_value else None
