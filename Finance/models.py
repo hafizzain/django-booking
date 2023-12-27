@@ -2,6 +2,8 @@ from django.db import models
 from Authentication.models import User
 from Business.models import Business
 from Product.models import Product
+from Service.models import Service
+
 from Business.models import BusinessAddress
 from Client.models import Client
 from Invoices.models import SaleInvoice
@@ -18,6 +20,7 @@ class Refund(CommonField):
     location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, verbose_name = 'location id')
     refund_invoice_id = models.ForeignKey(SaleInvoice, on_delete=models.CASCADE, verbose_name = 'Invoice id')
     refunded_products = models.ManyToManyField(Product, through='RefundProduct')
+    refunded_services = models.ManyToManyField(Service, through='RefundServices')
     
     refund_type = models.CharField(choices=RefundChoices.choices, max_length=20)
     # reason = models.TextField()
@@ -28,6 +31,12 @@ class RefundProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Product id')
     
     refunded_quantity = models.PositiveIntegerField()
+    refunded_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    
+class RefundServices(models.Model):
+    refund = models.ForeignKey(Refund, on_delete=models.CASCADE, verbose_name = 'Refund id')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, verbose_name='Service id')
+    
     refunded_amount = models.DecimalField(max_digits=10, decimal_places=2)
 
 class Coupon(models.Model):
