@@ -140,7 +140,7 @@ class OptimizedProductStockSerializer(serializers.ModelSerializer):
 class OtpimizedProductSerializer(serializers.ModelSerializer):
     brand = OptimizedBrandSerializer(read_only=True)
     category = OptimizedCategorySerializer(read_only=True)
-    total_orders = serializers.IntegerField(read_only=True)
+    total_order_quantity = serializers.FloatField(read_only=True)
     location_quantities = serializers.SerializerMethodField(read_only=True)
     cover_image = serializers.SerializerMethodField()
     currency_retail_price = serializers.SerializerMethodField()
@@ -192,7 +192,7 @@ class OtpimizedProductSerializer(serializers.ModelSerializer):
             'category',
             'brand', 
             'short_description',
-            'total_orders',
+            'total_order_quantity',
         ]
         read_only_fields = [
             # 'slug', 
