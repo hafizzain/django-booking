@@ -191,8 +191,8 @@ def get_client_dropdown(request):
     end_date = request.GET.get('end_date', None)
     gender = request.GET.get('gender', None)
     number_visit = request.GET.get('number_visit', None)
-    min_spend_amount = request.GET.get('min_spend_amount', 0)
-    max_spend_amount = request.GET.get('max_spend_amount', 1000000000000)
+    min_spend_amount = request.GET.get('min_spend_amount', None)
+    max_spend_amount = request.GET.get('max_spend_amount', None)
     min_check = request.GET.get('min_spend_amount', None) #for frontend purpose
     max_check = request.GET.get('max_spend_amount', None) #for frontend purpose
     query = Q(is_deleted=False, is_blocked=False, is_active=True)
@@ -223,6 +223,11 @@ def get_client_dropdown(request):
         isFiltered = True
         
     if min_spend_amount or max_spend_amount:
+        if min_spend_amount is None:
+            min_spend_amount = 0
+        if max_spend_amount is None:
+            max_spend_amount = 10000000
+            
         total_spend_amount = list(AppointmentCheckout.objects \
                     .filter(total_price__range = (min_spend_amount, max_spend_amount)) \
                     .values_list('appointment__client__id', flat=True))
