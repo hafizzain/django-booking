@@ -2221,12 +2221,12 @@ class PromotionExcludedItemSerializer(serializers.ModelSerializer):
         fields = ['id', 'excluded_item']
 
 
-
-
 class CouponBrandresponse(serializers.ModelSerializer):
     class Meta:
         model = CouponBrand
         fields = "__all__"
+
+
 class Clientcouponresponse(serializers.ModelSerializer):
     class Meta:
         model = Client
@@ -2251,11 +2251,11 @@ class ServiceGroupcouponresponse(serializers.ModelSerializer):
         fields = "__all__"
 
 
-
 class CouponServiceGroupcouponserializerresponse(serializers.ModelSerializer):
     class Meta:
         model = CouponServiceGroup
         fields = "__all__"
+
 
 class Productcouponresponse(serializers.ModelSerializer):
     class Meta:
@@ -2274,10 +2274,12 @@ class Couponbusinessresponse(serializers.ModelSerializer):
         model = Business
         fields = "__all__"
 
+
 class BusinessAddressresponse(serializers.ModelSerializer):
     class Meta:
         model = BusinessAddress
         fields = "__all__"
+
 
 class CouponSerializer(serializers.ModelSerializer):
     # clients = Clientcouponresponse(many=True)
@@ -2289,14 +2291,15 @@ class CouponSerializer(serializers.ModelSerializer):
     coupon_blockdays = CouponBlockDaysresponse(many=True)
     business = Couponbusinessresponse(many=True)
     aval_coupon_brands = CouponBrandresponse(many=True)
+
     # locations = BusinessAddressresponse(many=True)
 
     def get_servicegroup_discount(self, obj):
         try:
             coupon_brand_queryset = CouponBrand.objects.filter(coupon=obj)
-            brand_serializer = CouponBrandresponse(coupon_brand_queryset ,many=True).data
+            brand_serializer = CouponBrandresponse(coupon_brand_queryset, many=True).data
             coupon_service_group_queryset = CouponServiceGroup.objects.filter(coupon=obj)
-            coupon_service = CouponServiceGroupcouponserializerresponse(coupon_service_group_queryset,many=True).data
+            coupon_service = CouponServiceGroupcouponserializerresponse(coupon_service_group_queryset, many=True).data
 
             return [{
                 'id': obj.id,
@@ -2304,20 +2307,31 @@ class CouponSerializer(serializers.ModelSerializer):
                 'service_group': coupon_service,
             }]
         except Exception as err:
-            err=str(err)
+            err = str(err)
             return {err}
 
     class Meta:
         model = Coupon
-        fields = ['id', 'name','buy_one_type','requested_status','status','code', 'short_description', 'start_date', 'end_date', 'coupon_type',
-                  'user_limit', 'usage_limit', 'clients', 'brands', 'excluded_services', 'coupon_service_groups','client_type',
-                  'locations','business','amount_spent','discounted_percentage','type','aval_coupon_brands','coupon_type_value',
-                  'excluded_products', 'coupon_blockdays','buy_one_get_one_product','buy_one_get_one_service','servicegroup_discount'
+        fields = ['id', 'name', 'buy_one_type', 'requested_status', 'status', 'code', 'short_description', 'start_date',
+                  'end_date', 'coupon_type',
+                  'user_limit', 'usage_limit', 'clients', 'brands', 'excluded_services', 'coupon_service_groups',
+                  'client_type',
+                  'locations', 'business', 'amount_spent', 'discounted_percentage', 'type', 'aval_coupon_brands',
+                  'coupon_type_value',
+                  'excluded_products', 'coupon_blockdays', 'buy_one_get_one_product', 'buy_one_get_one_service',
+                  'servicegroup_discount'
                   ]
 
 
+class Locationserializerresponse(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessAddress
+        fields = ['id', 'address_name']
+
+
 class RefundSettingSerializer(serializers.ModelSerializer):
+    location = Locationserializerresponse()
 
     class Meta:
         model = RefundSetting
-        fields ="__all__"
+        fields = ['id', 'number_of_days', 'location']
