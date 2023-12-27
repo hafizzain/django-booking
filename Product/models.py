@@ -20,7 +20,7 @@ class ProductManager(models.QuerySet):
         or quantity * discount_price.
         """
 
-        order_filter = Q(location=location)
+        order_filter = Q(product_orders__location=location)
         return self.annotate(
             total_order_quantity = Coalesce(
                 Sum('product_orders__quantity', filter=order_filter),
