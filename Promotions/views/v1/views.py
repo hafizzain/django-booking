@@ -6879,3 +6879,129 @@ def create_refund(request):
         },
         status=status.HTTP_201_CREATED
     )
+
+@api_view(['PATCH'])
+@permission_classes([AllowAny])
+def update_refund(request):
+    number_of_days = request.data.get('number_of_days', None)
+    location = request.data.get('location', None)
+    refundsetting = RefundSetting.objects.filter(location_id=location)
+    if refundsetting:
+                  refundsetting =refundsetting.update(number_of_days=number_of_days)
+    else:
+        return Response(
+            {
+                'status': False,
+                'status_code': 400,
+                'response': {
+                    'message': 'Refund already exists',
+                    'error_message': None,
+
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request})
+    return Response(
+        {
+            'status': True,
+            'status_code': 201,
+            'response': {
+                'message': 'Refund created successfully!',
+                'error_message': None,
+                'errors': [],
+                'data': serializer.data,
+
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+
+@api_view(['DELETE'])
+@permission_classes([AllowAny])
+def delete_refund(request):
+    location = request.data.get('location', None)
+    refundsetting = RefundSetting.objects.filter(location_id=location)
+    if refundsetting:
+          refundsetting.delete()
+          return Response(
+              {
+                  'status': True,
+                  'status_code': 200,
+                  'response': {
+                      'message': 'Refund deleted successfully!',
+                      'error_message': None,
+                      'errors': [],
+                  }
+              },
+              status=status.HTTP_200_OK
+          )
+    else:
+        return Response(
+            {
+                'status': False,
+                'status_code': 400,
+                'response': {
+                    'message': 'Refund doesnot exists',
+                    'error_message': None,
+
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_refund(request):
+    location = request.query_params.get('location', None)
+    if location :
+        refundsetting = RefundSetting.objects.filter(location_id=location)
+        if refundsetting:
+            serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request})
+            return Response(
+                {
+                    'status': True,
+                    'status_code': 200,
+                    'response': {
+                        'message': 'Refund get successfully!',
+                        'error_message': None,
+                        'errors': [],
+                        'data': serializer.data,
+
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                {
+                    'status': False,
+                    'status_code': 400,
+                    'response': {
+                        'message': 'Refund doesnot exists',
+                        'error_message': None,
+
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    else:
+        refundsetting = RefundSetting.objects.all()
+        serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request},many=True)
+        return Response(
+            {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Refund get successfully!',
+                    'error_message': None,
+                    'errors': [],
+                    'data': serializer.data,
+
+                }
+            },
+            status=status.HTTP_200_OK
+        )
