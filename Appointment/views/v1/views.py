@@ -3287,6 +3287,9 @@ def appointment_service_status_update(request):
     gst_price = None
     gst_price1 = None
 
+    seperate_or_combined = None
+    group_or_individual = None
+
     status_list = [choices.AppointmentServiceStatus.STARTED, choices.AppointmentServiceStatus.FINISHED]
 
     # changing the status
@@ -3339,12 +3342,17 @@ def appointment_service_status_update(request):
         tax_serializer = BusinessTaxSerializerNew(business_tax)
 
         if tax_setting.is_combined():
+            seperate_or_combined = 'Combined'
             gst_price = round((parent_taxes[0].tax_rate * total_price / 100), 2)
             if parent_tax.is_group():
+                group_or_individual = 'Group'
                 gst_price1 = round((parent_taxes[1].tax_rate * total_price / 100), 2)
+
         elif tax_setting.is_seperately():
+            seperate_or_combined = 'Seperately'
             gst_price = round((parent_taxes[0].tax_rate * total_price / 100), 2)
             if parent_tax.is_group():
+                group_or_individual = 'Group'
                 total_price += gst_price
                 gst_price1 = round((parent_taxes[1].tax_rate * total_price / 100), 2)
 
@@ -3368,7 +3376,9 @@ def appointment_service_status_update(request):
                 'message': 'Appointment Service',
                 'error_message': None,
                 'appointment_service': serialized.data,
-                'tax_data':tax_serializer.data
+                'tax_data':tax_serializer.data,
+                'seperate_or_combined':seperate_or_combined,
+                'group_or_individual':group_or_individual
             }
         },
         status=status.HTTP_200_OK
