@@ -6985,7 +6985,7 @@ def create_refund(request):
 def update_refund(request):
     number_of_days = request.data.get('number_of_days', None)
     id = request.query_params.get('id', None)
-    refundsetting = RefundSetting.objects.filter(id=id)
+    refundsetting = RefundSetting.objects.get(id=id)
     if refundsetting:
         refundsetting.update(number_of_days=number_of_days)
     else:
@@ -7001,7 +7001,7 @@ def update_refund(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request}, many=True)
+    serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request}, many=False)
     return Response(
         {
             'status': True,

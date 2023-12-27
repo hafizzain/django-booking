@@ -6,7 +6,7 @@ from Appointment.Constants.Reschedule import reschedule_appointment
 from Appointment.Constants.AddAppointment import Add_appointment
 from Appointment.Constants.cancelappointment import cancel_appointment
 from Appointment.Constants.comisionCalculate import calculate_commission
-from Promotions.models import ComplimentaryDiscount, PackagesDiscount, ServiceDurationForSpecificTime
+from Promotions.models import ComplimentaryDiscount, PackagesDiscount, ServiceDurationForSpecificTime, Coupon
 from Sale.Constants.Custom_pag import CustomPagination
 
 from rest_framework.decorators import api_view, permission_classes
@@ -1752,7 +1752,7 @@ def create_checkout(request):
     appointment = request.data.get('appointment', None)
     appointment_service_obj = request.data.get('appointment_service_obj', None)
     appointment_service = request.data.get('appointment_service', None)
-
+    coupon_discounted_price =0
     payment_method = request.data.get('payment_method', None)
     service = request.data.get('service', None)
     member = request.data.get('member', None)
@@ -1868,6 +1868,13 @@ def create_checkout(request):
     empl_commissions_instances = []
     for app in appointment_service_obj:
         client_name = app.get('client', None)
+        coupon_discounted_price = app.get('coupon_discounted_price', None)
+        redeemed_coupon_id = app.get('redeemed_coupon_id',None)
+        if redeemed_coupon_id:
+            coupon = Coupon.objects.get(id=redeemed_coupon_id)
+            coupon.usage_limit -= 1
+            coupon.user_limit -= 1
+            coupon.save()
         active_user_staff = None
         try:
             active_user_staff = Employee.objects.get(
@@ -1878,7 +1885,6 @@ def create_checkout(request):
             )
         except:
             pass
-
         id = app.get('id', None)
         redeemed_price = app.get('redeemed_price', 0.00)
 
@@ -1996,6 +2002,7 @@ def create_checkout(request):
     checkout.total_price=total_price
     checkout.service_commission=float(service_commission)
     checkout.service_commission_type=service_commission_type
+    checkout.coupon_discounted_price = coupon_discounted_price
     checkout.save()
     
 
