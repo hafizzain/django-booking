@@ -595,6 +595,14 @@ class BusinessTaxSerializer(serializers.ModelSerializer):
         model = BusinessTax
         fields = ['id', 'name', 'parent_tax',
                   'tax_rate', 'location', 'tax_type', 'is_active']
+
+class BusinessTaxSerializerNew(serializers.ModelSerializer):
+    parent_tax = ParentBusinessTaxSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = BusinessTax
+        exclude = ('created_at','user')
+
 class BusinessVendorSerializer(serializers.ModelSerializer):
 
     country = CountrySerializer(read_only=True)

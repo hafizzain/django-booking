@@ -484,6 +484,13 @@ class BusinessTaxSetting(models.Model):
 
     def __str__(self) -> str:
         return str(self.id)
+    
+
+    def is_combined(self):
+        return self.tax_setting == BusinessTaxSetting.SETTING_TYPE[0][0]
+    
+    def is_seperately(self):
+        return self.tax_setting == BusinessTaxSetting.SETTING_TYPE[1][0]
 
 
 class BusinessPrivacy(models.Model):

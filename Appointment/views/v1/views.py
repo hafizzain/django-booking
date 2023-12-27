@@ -17,8 +17,8 @@ from rest_framework.pagination import PageNumberPagination
 
 from rest_framework import status
 from Appointment.Constants.durationchoice import DURATION_CHOICES
-from Business.models import Business, BusinessAddress, BusinessTax
-from Business.serializers.v1_serializers import BusinessTaxSerializer
+from Business.models import Business, BusinessAddress, BusinessTax, BusinessTaxSetting
+from Business.serializers.v1_serializers import BusinessTaxSerializerNew
 from datetime import datetime
 from Order.models import MemberShipOrder, ProductOrder, VoucherOrder, ServiceOrder
 from Sale.Constants.Custom_pag import AppointmentsPagination
@@ -3326,16 +3326,20 @@ def appointment_service_status_update(request):
     any_service_started_or_funished = AppointmentService.objects.filter(
                                         appointment=appointment,
                                         status__in=status_list
-                                    ).exists()
+                                    )
     status_started_finished = appointment_service_status in status_list
 
-    if any_service_started_or_funished or status_started_finished:
+    if any_service_started_or_funished.exists() or status_started_finished:
         """
         Creating the checkout and Calculating the Tax
         """
 
-        # location_taxes = BusinessTax.objects.filter(location=appointment.business_address)
-        # tax_data = dict(BusinessTaxSerializer(location_taxes, many=True).data)
+        tax_setting = BusinessTaxSetting.objects.get(business=appointment.business)
+        total_price = any_service_started_or_funished.aggregate(total_price=Sum('price'))['total_price']
+        business_tax = BusinessTax.objects.filter(location=appointment.business_address)
+        tax_serializer = BusinessTaxSerializerNew(business_tax, many=True)
+        # if tax_setting.is_combined():
+
 
         checkout, created = AppointmentCheckout.objects.get_or_create(
             appointment=appointment,
@@ -3360,7 +3364,7 @@ def appointment_service_status_update(request):
                 'message': 'Appointment Service',
                 'error_message': None,
                 'appointment_service': serialized.data,
-                # 'tax_data':tax_data
+                'tax_data':tax_serializer.data
             }
         },
         status=status.HTTP_200_OK
