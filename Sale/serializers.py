@@ -2313,6 +2313,7 @@ class SaleInvoiceSerializerOP(serializers.ModelSerializer):
 
 
 class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
+    
     location = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
