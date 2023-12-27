@@ -23,7 +23,7 @@ class ProductManager(models.QuerySet):
         order_filter = Q(location=location)
         return self.annotate(
             total_orders = Coalesce(
-                Count('product_orders', filter=order_filter),
+                Count('product_orders'),
                 0,
                 output_field=IntegerField()
             )
