@@ -6773,22 +6773,51 @@ def get_coupon(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    if total_price is not None:
-        total_price = float(total_price)
-        if total_price <= float(coupon.amount_spent):
-            return Response(
-                {
-                    'status': False,
-                    'status_code': 400,
-                    'response': {
-                        'message': 'Coupon can not be implement',
-                        'error_message': None,
-                        # 'current_day': current_day
+    if coupon.usage_limit <=0:
+        return Response(
+            {
+                'status': False,
+                'status_code': 400,
+                'response': {
+                    'message': 'Coupon usage limit exceed',
+                    'error_message': None,
+                    # 'current_day': current_day
 
-                    }
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    if coupon.user_limit <= 0:
+        return Response(
+            {
+                'status': False,
+                'status_code': 400,
+                'response': {
+                    'message': 'Coupon user limit exceed',
+                    'error_message': None,
+                    # 'current_day': current_day
+
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    if total_price is not None:
+        if coupon.coupon_type_value == '3':
+            total_price = float(total_price)
+            if total_price <= float(coupon.amount_spent):
+                return Response(
+                    {
+                        'status': False,
+                        'status_code': 400,
+                        'response': {
+                            'message': 'Coupon can not be implement',
+                            'error_message': None,
+                            # 'current_day': current_day
+
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
     current_date = timezone.now().date()
     current_day = timezone.now()
     current_day = current_day.strftime('%A')
@@ -6806,21 +6835,21 @@ def get_coupon(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    if total_price is not None:
-        if float(total_price) >= float(coupon.amount_spent):
-            return Response(
-                {
-                    'status': False,
-                    'status_code': 400,
-                    'response': {
-                        'message': 'Coupon can not be implement',
-                        'error_message': None,
-                        'current_day': current_day
-
-                    }
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+    # if total_price is not None:
+    #     if float(total_price) >= float(coupon.amount_spent):
+    #         return Response(
+    #             {
+    #                 'status': False,
+    #                 'status_code': 400,
+    #                 'response': {
+    #                     'message': 'Coupon can not be implement',
+    #                     'error_message': None,
+    #                     'current_day': current_day
+    #
+    #                 }
+    #             },
+    #             status=status.HTTP_400_BAD_REQUEST
+    #         )
 
     if coupon.end_date < current_date:
         return Response(

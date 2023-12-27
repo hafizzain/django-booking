@@ -2,6 +2,8 @@ from datetime import timedelta
 import datetime
 from threading import Thread
 from django.shortcuts import render
+
+from Promotions.models import Coupon
 from Sale.Constants.StaffEmail import StaffSaleEmail
 from Sale.Constants.stock_lowest import stock_lowest
 from Sale.Constants.tunrover import ProductTurnover
@@ -2335,7 +2337,13 @@ def new_create_sale_order(request):
         is_voucher_redeemed = id.get('is_voucher_redeemed', None)
         is_coupon_redeemed = id.get('is_coupon_redeemed', None)
         redeemed_price = id.get('redeemed_price', None)
+        redeemed_coupon_id = id.get('redeemed_coupon_id', None)
 
+        if redeemed_coupon_id:
+            coupon = Coupon.objects.get(id=redeemed_coupon_id)
+            coupon.usage_limit -= 1
+            coupon.user_limit -= 1
+            coupon.save()
         if redeemed_price is None:
             redeemed_price = 0
 
