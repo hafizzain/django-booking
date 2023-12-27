@@ -78,7 +78,8 @@ NSTYLE_APPS = [
     'SuperInsight.apps.SuperinsightConfig',
     'Notification.apps.NotificationConfig',
     'Analytics.apps.AnalyticsConfig',
-    'Finance.apps.FinanceConfig'
+    'Finance.apps.FinanceConfig',
+    'HRM.apps.HrmConfig',
 ]
 
 
