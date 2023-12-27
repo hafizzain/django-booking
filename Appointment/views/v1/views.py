@@ -1258,6 +1258,7 @@ def update_appointment_service(request):
             price = app.get('price', None)
             member = app.get('member', None)
             is_deleted = app.get('is_deleted', None)
+            is_favourite = app.get('is_favourite', False)
             id = app.get('id', None)
             try:
                 service_id = Service.objects.get(id=service)
@@ -1291,6 +1292,7 @@ def update_appointment_service(request):
                 service_appointment.duration = duration
                 service_appointment.price = price
                 service_appointment.member = member_id
+                service_appointment.is_favourite = is_favourite
                 service_appointment.save()
 
                 # If a new service is added change the status of 
