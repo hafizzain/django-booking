@@ -3392,6 +3392,7 @@ def paid_unpaid_clients(request):
         query &= Q(created_at__date__range=get_date_range_tuple(start_date, end_date))
 
     appointment_checkouts = AppointmentCheckout.objects \
+        .select_related('appointment') \
         .filter(query) \
         .with_payment_status() \
         .with_client_name() \
