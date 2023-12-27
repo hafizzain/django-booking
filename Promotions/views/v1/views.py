@@ -6901,7 +6901,7 @@ def update_refund(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request})
+    serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request},many=True)
     return Response(
         {
             'status': True,
