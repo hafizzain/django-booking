@@ -3334,8 +3334,8 @@ def appointment_service_status_update(request):
         Creating the checkout and Calculating the Tax
         """
 
-        location_taxes = BusinessTax.objects.filter(location=appointment.business_address)
-        tax_data = dict(BusinessTaxSerializer(location_taxes, many=True).data)
+        # location_taxes = BusinessTax.objects.filter(location=appointment.business_address)
+        # tax_data = dict(BusinessTaxSerializer(location_taxes, many=True).data)
 
         checkout, created = AppointmentCheckout.objects.get_or_create(
             appointment=appointment,
@@ -3360,7 +3360,7 @@ def appointment_service_status_update(request):
                 'message': 'Appointment Service',
                 'error_message': None,
                 'appointment_service': serialized.data,
-                'tax_data':tax_data
+                # 'tax_data':tax_data
             }
         },
         status=status.HTTP_200_OK
