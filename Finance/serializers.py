@@ -29,7 +29,7 @@ class RefundSerializer(serializers.ModelSerializer):
         ]
 
         refund_products = RefundProduct.objects.bulk_create(refund_products_instances)
-        refund.refunded_products.set(refund_products)
+        refund.refundproduct_set.set(refund_products)
 
         return refund
 
