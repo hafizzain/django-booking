@@ -6862,6 +6862,7 @@ def get_coupon(request):
                 'error_message': None,
                 'coupon': serializer.data,
                 'coupon.amount_spent':coupon.amount_spent,
+                'total_price':total_price
 
             }
         },
