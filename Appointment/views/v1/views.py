@@ -1868,13 +1868,6 @@ def create_checkout(request):
     empl_commissions_instances = []
     for app in appointment_service_obj:
         client_name = app.get('client', None)
-        coupon_discounted_price = app.get('coupon_discounted_price', None)
-        redeemed_coupon_id = app.get('redeemed_coupon_id',None)
-        if redeemed_coupon_id:
-            coupon = Coupon.objects.get(id=redeemed_coupon_id)
-            coupon.usage_limit -= 1
-            coupon.user_limit -= 1
-            coupon.save()
         active_user_staff = None
         try:
             active_user_staff = Employee.objects.get(
@@ -1986,6 +1979,13 @@ def create_checkout(request):
     Updating the unpaid checkout created in the appointment_service_status_update/
     api and feeding all the other data here.
     """
+    coupon_discounted_price = request.data.get('coupon_discounted_price', None)
+    redeemed_coupon_id = request.data.get('redeemed_coupon_id', None)
+    if redeemed_coupon_id:
+        coupon = Coupon.objects.get(id=redeemed_coupon_id)
+        coupon.usage_limit -= 1
+        coupon.user_limit -= 1
+        coupon.save()
     checkout = AppointmentCheckout.objects.get(appointment=appointment)
     checkout.appointment_service=service_appointment
     checkout.payment_method=payment_method
