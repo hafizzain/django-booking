@@ -3374,7 +3374,9 @@ def appointment_service_status_update(request):
                 'appointment_service': serialized.data,
                 'seperate_or_combined':seperate_or_combined,
                 'group_or_individual':group_or_individual,
-                'total_price':total_price
+                'total_price':total_price,
+                'gst_price': gst_price,
+                'gst_price1': gst_price1
             }
         },
         status=status.HTTP_200_OK
