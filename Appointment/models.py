@@ -450,6 +450,7 @@ class AppointmentCheckout(models.Model):
         parent_tax = business_tax.parent_tax.all()[0]
         parent_taxes = parent_tax.parent_tax.all()
 
+        # workaround here
         if parent_tax.is_individual():
             parent_taxes = [parent_tax]
 
