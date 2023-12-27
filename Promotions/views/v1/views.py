@@ -6816,23 +6816,25 @@ def get_coupon(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     if client_id is not None:
-        check_coupon = Coupon.objects.filter(clients__id=client_id)
-        if check_coupon.exists():
-            pass
-        else:
-            return Response(
-                {
-                    'status': False,
-                    'status_code': 400,
-                    'response': {
-                        'message': 'Coupon does not valid for selected client',
-                        'error_message': None,
-                        'current_day':current_day
+        check_coupon = Coupon.objects.get(code=coupon_code)
+        if check_coupon.clients.exists():
+            check_coupon = Coupon.objects.filter(clients__id=client_id)
+            if check_coupon:
+                pass
+            else:
+                return Response(
+                    {
+                        'status': False,
+                        'status_code': 400,
+                        'response': {
+                            'message': 'Coupon does not valid for selected client',
+                            'error_message': None,
+                            'current_day':current_day
 
-                    }
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
     serializer = CouponSerializer(coupon, context={'request': request})
     return Response(
         {
