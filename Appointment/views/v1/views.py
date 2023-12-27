@@ -3331,14 +3331,11 @@ def appointment_service_status_update(request):
         """
         Creating the checkout and Calculating the Tax
         """
-
         tax_setting = BusinessTaxSetting.objects.get(business=appointment.business)
         total_price = any_service_started_or_funished.aggregate(total_price=Sum('price'))['total_price']
         business_tax = BusinessTax.objects.filter(location=appointment.business_address).first()
         parent_tax = business_tax.parent_tax.all()[0]
         parent_taxes = parent_tax.parent_tax.all()
-
-        tax_serializer = BusinessTaxSerializerNew(business_tax)
 
         if tax_setting.is_combined():
             seperate_or_combined = 'Combined'
@@ -3375,7 +3372,6 @@ def appointment_service_status_update(request):
                 'message': 'Appointment Service',
                 'error_message': None,
                 'appointment_service': serialized.data,
-                'tax_data':tax_serializer.data,
                 'seperate_or_combined':seperate_or_combined,
                 'group_or_individual':group_or_individual
             }
