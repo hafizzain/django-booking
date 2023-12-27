@@ -985,12 +985,12 @@ class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
 
 
 class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
-    just_services_price_inside = serializers.FloatField()
-    just_services_price = serializers.FloatField()
-    statuses = serializers.SerializerMethodField()
+    # just_services_price_inside = serializers.FloatField()
+    # just_services_price = serializers.FloatField()
+    # statuses = serializers.SerializerMethodField()
 
-    def get_statuses(self, checkout):
-        return list(checkout.appointment.appointment_services.all().values('status', 'total_price'))
+    # def get_statuses(self, checkout):
+    #     return list(checkout.appointment.appointment_services.all().values('status', 'total_price'))
 
     subtotal = serializers.FloatField()
     client_name = serializers.CharField()
@@ -1007,7 +1007,7 @@ class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AppointmentCheckout
-        fields = ['id', 'booking_id', 'client_name', 'booking_date', 'subtotal', 'payment_status', 'payment_date', 'gst_price', 'gst_price1', 'total_price', 'just_services_price_inside', 'just_services_price', 'statuses']
+        fields = ['id', 'booking_id', 'client_name', 'booking_date', 'subtotal', 'payment_status', 'payment_date', 'gst_price', 'gst_price1', 'total_price']
 
 
 
