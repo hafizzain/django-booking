@@ -446,8 +446,8 @@ class AppointmentCheckout(models.Model):
         """
 
         # default values if either is not calculated
-        gst_price = None
-        gst_price1 = None
+        gst_price = 0
+        gst_price1 = 0
 
         total_price = self.void_excluded_services_price()
         tax_setting = BusinessTaxSetting.objects.get(business=self.appointment.business)
