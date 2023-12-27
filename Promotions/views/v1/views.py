@@ -6757,6 +6757,7 @@ def get_coupon(request):
     coupon_code = request.query_params.get('coupon_code', None)
     client_type = request.query_params.get('client_type', None)
     client_id = request.query_params.get('client_id', None)
+    total_price = request.query_params.get('totalPriceWithoutTax',None)
     try:
         coupon = Coupon.objects.get(code=coupon_code)
     except:
@@ -6789,6 +6790,21 @@ def get_coupon(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    if total_price >= coupon.amount_spent:
+        return Response(
+            {
+                'status': False,
+                'status_code': 400,
+                'response': {
+                    'message': 'Coupon can not be implement',
+                    'error_message': None,
+                    'current_day': current_day
+
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
     if coupon.end_date < current_date:
         return Response(
             {
