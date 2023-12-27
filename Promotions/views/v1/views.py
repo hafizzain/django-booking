@@ -6773,6 +6773,34 @@ def get_coupon(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    if coupon.usage_limit <=0:
+        return Response(
+            {
+                'status': False,
+                'status_code': 400,
+                'response': {
+                    'message': 'Coupon usage limit exceed',
+                    'error_message': None,
+                    # 'current_day': current_day
+
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    if coupon.user_limit <= 0:
+        return Response(
+            {
+                'status': False,
+                'status_code': 400,
+                'response': {
+                    'message': 'Coupon user limit exceed',
+                    'error_message': None,
+                    # 'current_day': current_day
+
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
     if total_price is not None:
         if coupon.coupon_type_value == '3':
             total_price = float(total_price)
