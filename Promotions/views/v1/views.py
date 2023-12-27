@@ -6790,20 +6790,21 @@ def get_coupon(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    if total_price >= coupon.amount_spent:
-        return Response(
-            {
-                'status': False,
-                'status_code': 400,
-                'response': {
-                    'message': 'Coupon can not be implement',
-                    'error_message': None,
-                    'current_day': current_day
+    if total_price is not None:
+        if float(total_price) >= float(coupon.amount_spent):
+            return Response(
+                {
+                    'status': False,
+                    'status_code': 400,
+                    'response': {
+                        'message': 'Coupon can not be implement',
+                        'error_message': None,
+                        'current_day': current_day
 
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
     if coupon.end_date < current_date:
         return Response(
@@ -6860,6 +6861,7 @@ def get_coupon(request):
                 'message': 'Coupon redeemed successfully!',
                 'error_message': None,
                 'coupon': serializer.data,
+                'coupon.amount_spent':coupon.amount_spent,
 
             }
         },
