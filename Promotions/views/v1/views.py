@@ -6685,7 +6685,7 @@ def update_coupon(request):
             service_ids = json.loads(service_ids)
             instance.excluded_services.set(service_ids)
         if client == 'all':
-            pass
+            instance.clients.clear()
         if client != 'all':
             client = json.loads(client)
             instance.clients.clear()
