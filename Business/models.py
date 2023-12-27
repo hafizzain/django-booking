@@ -525,5 +525,5 @@ class BusinessPolicy(models.Model):
         return self.title
 
 class RefundSetting(CommonField):
-    location = models.OneToOneField(BusinessAddress, on_delete=models.CASCADE)
-    refund_days = models.IntegerField(default=30)
+    location = models.OneToOneField(BusinessAddress, on_delete=models.CASCADE,related_name='refund_location')
+    number_of_days = models.IntegerField(default=30)
