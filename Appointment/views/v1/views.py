@@ -3340,10 +3340,11 @@ def appointment_service_status_update(request):
         parent_tax = business_tax.parent_tax.all()[0]
         parent_taxes = parent_tax.parent_tax.all()
 
-        tax_serializer = BusinessTaxSerializerNew(parent_taxes, many=True)
+        tax_serializer = BusinessTaxSerializerNew(business_tax)
 
-        # if tax_setting.is_combined():
-
+        if tax_setting.is_combined():
+            gst_price = round((parent_taxes[0].tax_rate * total_price / 100), 2)
+            gst_price1 = round((parent_taxes[1].tax_rate * total_price / 100), 2)
 
         checkout, created = AppointmentCheckout.objects.get_or_create(
             appointment=appointment,
