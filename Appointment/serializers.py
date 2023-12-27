@@ -735,7 +735,7 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
 
     def get_avaliable_service_group(self , obj):
         try:
-            service_group_ids = ServiceGroup.objects.filter(id=obj.service.id, is_delete=False).values_list('id', flat=True)
+            service_group_ids = ServiceGroup.objects.filter(id=obj.service.id).values_list('id', flat=True)
             return service_group_ids
         except Exception as ex:
             ex = str(ex)
