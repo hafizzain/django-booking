@@ -10,6 +10,7 @@ class RefundProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = RefundProduct
         fields = '__all__'
+        read_only_fields = ['refund']
 
 class RefundSerializer(serializers.ModelSerializer):
     refunded_products = RefundProductSerializer(many=True)
@@ -22,7 +23,6 @@ class RefundSerializer(serializers.ModelSerializer):
         refunded_products_data = validated_data.pop('refunded_products')
         refund = Refund.objects.create(**validated_data)
 
-        # Create RefundProduct instances without setting the refund field
         refund_products_instances = [
             RefundProduct(product=get_object_or_404(Product, id=refunded_product_data['product']), **refunded_product_data)
             for refunded_product_data in refunded_products_data
