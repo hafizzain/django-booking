@@ -1283,11 +1283,6 @@ def update_appointment_service(request):
                     service_appointment.business_address = appointment.business_address
                     service_appointment.status = choices.AppointmentServiceStatus.BOOKED
 
-                    # If a new service is added change the status of 
-                    # appointment to started
-                    appointment.status = choices.AppointmentStatus.BOOKED
-                    appointment.save()
-
                 service_appointment.appointment_date = appointment_date
                 service_appointment.appointment_time = date_time
                 service_appointment.service = service_id
@@ -1296,8 +1291,20 @@ def update_appointment_service(request):
                 service_appointment.duration = duration
                 service_appointment.price = price
                 service_appointment.member = member_id
-
                 service_appointment.save()
+
+                # If a new service is added change the status of 
+                # appointment to started
+                appointment.status = choices.AppointmentStatus.BOOKED
+                appointment.save()
+
+                appointment_checkout, created = AppointmentCheckout.objects.get_or_create(
+                    appointment=appointment,
+                    business_address=appointment.business_address
+                )
+                
+                # save method is being called in apply_texes method.
+                appointment_checkout.apply_taxes()
             except Exception as err:
                 errors.append(str(err))
             else:
@@ -3328,38 +3335,14 @@ def appointment_service_status_update(request):
     status_started_finished = appointment_service_status in status_list
 
     if any_service_started_or_funished.exists() or status_started_finished:
-        """
-        Creating the checkout and Calculating the Tax
-        """
-        tax_setting = BusinessTaxSetting.objects.get(business=appointment.business)
-        total_price = any_service_started_or_funished.aggregate(total_price=Sum('price'))['total_price']
-        business_tax = BusinessTax.objects.filter(location=appointment.business_address).first()
-        parent_tax = business_tax.parent_tax.all()[0]
-        parent_taxes = parent_tax.parent_tax.all()
 
-        if tax_setting.is_combined():
-            seperate_or_combined = 'Combined'
-            gst_price = round((parent_taxes[0].tax_rate * total_price / 100), 2)
-            if parent_tax.is_group():
-                group_or_individual = 'Group'
-                gst_price1 = round((parent_taxes[1].tax_rate * total_price / 100), 2)
-
-        elif tax_setting.is_seperately():
-            seperate_or_combined = 'Seperately'
-            gst_price = round((parent_taxes[0].tax_rate * total_price / 100), 2)
-            if parent_tax.is_group():
-                group_or_individual = 'Group'
-                total_price += gst_price
-                gst_price1 = round((parent_taxes[1].tax_rate * total_price / 100), 2)
-
-        checkout, created = AppointmentCheckout.objects.get_or_create(
+        appointment_checkout, created = AppointmentCheckout.objects.get_or_create(
             appointment=appointment,
             business_address=appointment.business_address
         )
-
-        checkout.gst_price = gst_price
-        checkout.gst_price1 = gst_price1
-        checkout.save()
+        
+        # save method is being called in apply_texes method.
+        appointment_checkout.apply_taxes()
         
 
     serialized = AppointmentServiceSerializerBasic(appointment_service)
@@ -3374,9 +3357,6 @@ def appointment_service_status_update(request):
                 'appointment_service': serialized.data,
                 'seperate_or_combined':seperate_or_combined,
                 'group_or_individual':group_or_individual,
-                'total_price':total_price,
-                'gst_price': gst_price,
-                'gst_price1': gst_price1
             }
         },
         status=status.HTTP_200_OK
@@ -3412,14 +3392,12 @@ def paid_unpaid_clients(request):
         query &= Q(created_at__date__range=get_date_range_tuple(start_date, end_date))
 
     appointment_checkouts = AppointmentCheckout.objects \
+        .select_related('appointment') \
         .filter(query) \
         .with_payment_status() \
         .with_client_name() \
         .with_payment_date() \
         .with_subtotal() \
-        .annotate(
-            just_services_price = Sum(F('appointment__appointment_services__price'))
-        ) \
         .order_by('-created_at')
 
     serialized = list(PaidUnpaidAppointmentCheckoutSerializer(appointment_checkouts, many=True).data)
