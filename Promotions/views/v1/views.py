@@ -6773,8 +6773,9 @@ def get_coupon(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     current_date = timezone.now().date()
-    current_day = timezone.now().day
-    day_check = CouponBlockDays.objects.filter(day=current_day, coupon_id=coupon.id)
+    current_day = timezone.now()
+    current_day = current_day.strftime('%A')
+    day_check = CouponBlockDays.objects.filter(day__icontains=current_day, coupon_id=coupon.id)
     if day_check:
         return Response(
             {
