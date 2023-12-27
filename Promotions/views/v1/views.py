@@ -6809,7 +6809,7 @@ def get_coupon(request):
                     'status': False,
                     'status_code': 400,
                     'response': {
-                        'message': 'Couponed does not valid for selected client',
+                        'message': 'Coupon does not valid for selected client',
                         'error_message': None,
 
                     }
@@ -6822,7 +6822,7 @@ def get_coupon(request):
             'status': True,
             'status_code': 201,
             'response': {
-                'message': 'Coupon get successfully!',
+                'message': 'Coupon redeemed successfully!',
                 'error_message': None,
                 'coupon': serializer.data,
 
