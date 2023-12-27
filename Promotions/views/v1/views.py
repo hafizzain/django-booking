@@ -6809,7 +6809,7 @@ def get_coupon(request):
                     'status': False,
                     'status_code': 400,
                     'response': {
-                        'message': 'Client does not attach',
+                        'message': 'Couponed does not valid for selected client',
                         'error_message': None,
 
                     }
