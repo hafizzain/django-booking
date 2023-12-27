@@ -5,14 +5,16 @@ from django.conf import settings
     
 def run_campaign(message=None, subject=None, client_email_list=None, campaign_type=None):
     
-    if campaign_type == "email" or campaign_type == "Both": 
-        send_mail(
+    if campaign_type == "email" or campaign_type == "Both":
+        for client_email in client_email_list:
+            send_mail(
                 subject,
                 message,
                 settings.EMAIL_HOST_USER,
-                client_email_list,
+                [client_email], # Send email to each recipient individually
                 fail_silently=False,
             )
+            
     elif  campaign_type == "AppNotification" or campaign_type == "Both":
         pass
     
