@@ -6,7 +6,7 @@ from django.db.models import Sum, Subquery, OuterRef, FloatField, Case, When, Va
 from django.db.models.functions import Coalesce
 
 from Authentication.models import User
-from Business.models import Business, BusinessAddress
+from Business.models import Business, BusinessAddress, BusinessTaxSetting, BusinessTax
 from django.utils.timezone import now
 from Service.models import Service, PriceService
 from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs
@@ -439,6 +439,41 @@ class AppointmentCheckout(models.Model):
                                             final_price=Sum('service_price')
                                         )
         return appointment_service['final_price']
+    
+    def apply_taxes(self):
+        """
+        Calculating the Tax and Total Price
+        """
+        total_price = self.void_excluded_services_price()
+        tax_setting = BusinessTaxSetting.objects.get(business=self.appointment.business)
+        business_tax = BusinessTax.objects.filter(location=self.appointment.business_address).first()
+        parent_tax = business_tax.parent_tax.all()[0]
+        parent_taxes = parent_tax.parent_tax.all()
+
+        if tax_setting.is_combined():
+            gst_price = round((parent_taxes[0].tax_rate * total_price / 100), 2)
+            if parent_tax.is_group():
+                gst_price1 = round((parent_taxes[1].tax_rate * total_price / 100), 2)
+
+        elif tax_setting.is_seperately():
+            gst_price = round((parent_taxes[0].tax_rate * total_price / 100), 2)
+            if parent_tax.is_group():
+                total_price += gst_price
+                gst_price1 = round((parent_taxes[1].tax_rate * total_price / 100), 2)
+
+        self.gst_price = gst_price
+        self.gst_price1 = gst_price1
+        self.save()
+
+
+    def void_excluded_services_price(self):
+        """
+        Calculate the appointment services price (VOID excluded)
+        """
+        return AppointmentService.objects \
+            .filter(appointment=self.appointment) \
+            .exclude(status=choices.AppointmentServiceStatus.VOID) \
+            .aggregate(total_price=Sum('price'))['total_price']
     
     @property
     def fun():
