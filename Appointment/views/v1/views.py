@@ -17,7 +17,8 @@ from rest_framework.pagination import PageNumberPagination
 
 from rest_framework import status
 from Appointment.Constants.durationchoice import DURATION_CHOICES
-from Business.models import Business, BusinessAddress
+from Business.models import Business, BusinessAddress, BusinessTax
+from Business.serializers.v1_serializers import BusinessTaxSerializer
 from datetime import datetime
 from Order.models import MemberShipOrder, ProductOrder, VoucherOrder, ServiceOrder
 from Sale.Constants.Custom_pag import AppointmentsPagination
@@ -3329,6 +3330,13 @@ def appointment_service_status_update(request):
     status_started_finished = appointment_service_status in status_list
 
     if any_service_started_or_funished or status_started_finished:
+        """
+        Creating the checkout and Calculating the Tax
+        """
+
+        location_taxes = BusinessTax.objects.filter(location=appointment.business_address)
+        tax_data = BusinessTaxSerializer(location_taxes, many=True).data
+
         checkout, created = AppointmentCheckout.objects.get_or_create(
             appointment=appointment,
             business_address=appointment.business_address
@@ -3352,6 +3360,7 @@ def appointment_service_status_update(request):
                 'message': 'Appointment Service',
                 'error_message': None,
                 'appointment_service': serialized.data,
+                'tax_data':tax_data
             }
         },
         status=status.HTTP_200_OK
