@@ -428,6 +428,15 @@ class BusinessTax(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=now)
 
+    def is_individual(self):
+        return self.tax_type == BusinessTax.TAX_TYPES[0][0]
+    
+    def is_group(self):
+        return self.tax_type == BusinessTax.TAX_TYPES[1][0]
+    
+    def is_location(self):
+        return self.tax_type == BusinessTax.TAX_TYPES[2][0]
+
     def __str__(self):
         return str(self.id)
 
