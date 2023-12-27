@@ -45,6 +45,12 @@ class MemberSaleSerializer(serializers.ModelSerializer):
         fields = ['id', 'full_name']
 
 
+class ServiceGroupSerializerOP(serializers.ModelSerializer):
+    class Meta:
+        model = ServiceGroup
+        fields = ['id', 'name']
+
+
 class ServiceSaleSerializer(serializers.ModelSerializer):
     price_service = serializers.SerializerMethodField(read_only=True)
 
@@ -152,7 +158,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
 
     def get_client_info(self, obj):
         return {
-            
+
         }
         # try:
         #     if not obj.appointment:
@@ -733,14 +739,17 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
         except Exception as err:
             return None
 
-    def get_avaliable_service_group(self , obj):
-        try:
-            service_group_ids = ServiceGroup.objects.filter(id=obj.service.id, is_delete=False).values_list('id', flat=True)
-            return service_group_ids
-        except Exception as ex:
-            ex = str(ex)
-            return ex
+    # def get_avaliable_service_group(self, obj):
+    #     try:
+    #         service_group_ids = ServiceGroup.objects.filter(id=obj.service.id).values_list('id', flat=True)
+    #         return service_group_ids
+    #     except Exception as ex:
+    #         ex = str(ex)
+    #         return ex
 
+    def get_avaliable_service_group(self, obj):
+        group = obj.service.servicegroup_services.filter(is_deleted=False)
+        return ServiceGroupSerializerOP(group, many=True).data
 
     def get_location(self, obj):
         try:
@@ -821,7 +830,7 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AppointmentService
-        fields = ('id', 'service','avaliable_service_group', 'member', 'price', 'client', 'designation',
+        fields = ('id', 'service', 'avaliable_service_group', 'member', 'price', 'client', 'designation',
                   'appointment_date', 'appointment_time', 'duration', 'srv_name', 'status',
                   'booked_by', 'booking_id', 'appointment_type', 'client_can_book', 'slot_availible_for_online',
                   'appointment_status', 'location', 'employee_list', 'created_at', 'is_deleted',
@@ -907,6 +916,7 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
                   'duration', 'notes', 'is_favourite'
                   )
 
+
 # Not Using below Serializer
 class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
     client_name = serializers.SerializerMethodField(read_only=True)
@@ -966,7 +976,7 @@ class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
             services_prices = Service.objects \
                 .filter(id__in=service_ids) \
                 .annotate(
-                    currency_price=Coalesce(
+                currency_price=Coalesce(
                     Subquery(
                         PriceService.objects \
                             .filter(query_for_price)
@@ -1014,15 +1024,11 @@ class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
 
     def get_booking_date(self, obj):
         return obj.appointment.created_at
-    
+
     class Meta:
         model = AppointmentCheckout
         fields = ['id', 'booking_id', 'client_name', 'booking_date', 'subtotal', 'payment_status',
                   'payment_date', 'gst_price', 'gst_price1', 'total_price', 'total_tax']
-
-
-
-
 
 
 class NoteSerializer(serializers.ModelSerializer):
@@ -1124,7 +1130,8 @@ class SingleNoteResponseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Appointment
-        fields = ['id', 'client', 'created_at', 'client_type', 'status', 'appointment_services','cancel_reason','cancel_note']
+        fields = ['id', 'client', 'created_at', 'client_type', 'status', 'appointment_services', 'cancel_reason',
+                  'cancel_note']
 
 
 class AppointmentServiceSeriailzer(serializers.ModelSerializer):
