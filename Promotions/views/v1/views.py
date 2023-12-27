@@ -6984,8 +6984,8 @@ def create_refund(request):
 @permission_classes([AllowAny])
 def update_refund(request):
     number_of_days = request.data.get('number_of_days', None)
-    location = request.query_params.get('location', None)
-    refundsetting = RefundSetting.objects.filter(location_id=location)
+    id = request.query_params.get('id', None)
+    refundsetting = RefundSetting.objects.filter(id=id)
     if refundsetting:
         refundsetting.update(number_of_days=number_of_days)
     else:
@@ -7021,8 +7021,8 @@ def update_refund(request):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def delete_refund(request):
-    location = request.query_params.get('location', None)
-    refundsetting = RefundSetting.objects.filter(location_id=location)
+    id = request.query_params.get('id', None)
+    refundsetting = RefundSetting.objects.filter(id=id)
     if refundsetting:
         refundsetting.delete()
         return Response(
