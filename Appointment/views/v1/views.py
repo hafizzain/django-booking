@@ -3335,7 +3335,7 @@ def appointment_service_status_update(request):
         """
 
         location_taxes = BusinessTax.objects.filter(location=appointment.business_address)
-        tax_data = BusinessTaxSerializer(location_taxes, many=True).data
+        tax_data = dict(BusinessTaxSerializer(location_taxes, many=True).data)
 
         checkout, created = AppointmentCheckout.objects.get_or_create(
             appointment=appointment,
