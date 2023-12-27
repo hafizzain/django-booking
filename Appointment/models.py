@@ -444,11 +444,20 @@ class AppointmentCheckout(models.Model):
         """
         Calculating the Tax and Total Price
         """
+
+        # default values if either is not calculated
+        gst_price = None
+        gst_price1 = None
+
         total_price = self.void_excluded_services_price()
         tax_setting = BusinessTaxSetting.objects.get(business=self.appointment.business)
         business_tax = BusinessTax.objects.filter(location=self.appointment.business_address).first()
         parent_tax = business_tax.parent_tax.all()[0]
         parent_taxes = parent_tax.parent_tax.all()
+
+        # workaround here
+        if parent_tax.is_individual():
+            parent_taxes = [parent_tax]
 
         if tax_setting.is_combined():
             gst_price = round((parent_taxes[0].tax_rate * total_price / 100), 2)
