@@ -6960,7 +6960,7 @@ def get_refund(request):
     if location :
         refundsetting = RefundSetting.objects.filter(location_id=location)
         if refundsetting:
-            serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request})
+            serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request},many=True)
             return Response(
                 {
                     'status': True,
