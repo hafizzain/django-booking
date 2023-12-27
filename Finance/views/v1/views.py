@@ -47,6 +47,7 @@ class RefundAPIView(APIView):
     '''
     def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
         try:
+            request.data['user'] = request.user.id
             serializer = RefundSerializer(data=request.data)
             if serializer.is_valid():
                 refund_instance = serializer.save()
@@ -55,7 +56,7 @@ class RefundAPIView(APIView):
                 client = get_object_or_404(Client, pk=client_id)
 
                 coupon_data = {
-                    'user': request.user,  
+                    'user': request.user.id,  
                     'client': client,
                     'refund_coupon_code': f"REFUND_{short_uuid(refund_instance.id)}",  
                     'amount': refund_instance.total_refund_amount,
