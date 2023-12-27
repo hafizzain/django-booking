@@ -22,14 +22,14 @@ class RefundSerializer(serializers.ModelSerializer):
         refunded_products_data = validated_data.pop('refunded_products')
         refund = Refund.objects.create(**validated_data)
 
-        refund_products_instances = []
-        for refunded_product_data in refunded_products_data:
-            refunded_product_data['refund'] = refund 
-            product_instance = get_object_or_404(Product, id=refunded_product_data['product'])
-            refund_products_instances.append(RefundProduct(product=product_instance, **refunded_product_data))
+        # Create RefundProduct instances without setting the refund field
+        refund_products_instances = [
+            RefundProduct(product=get_object_or_404(Product, id=refunded_product_data['product']), **refunded_product_data)
+            for refunded_product_data in refunded_products_data
+        ]
 
-        # Bulk create RefundProduct instances
-        RefundProduct.objects.bulk_create(refund_products_instances)
+        refund_products = RefundProduct.objects.bulk_create(refund_products_instances)
+        refund.refunded_products.set(refund_products)
 
         return refund
 
