@@ -1283,19 +1283,6 @@ def update_appointment_service(request):
                     service_appointment.business_address = appointment.business_address
                     service_appointment.status = choices.AppointmentServiceStatus.BOOKED
 
-                    # If a new service is added change the status of 
-                    # appointment to started
-                    appointment.status = choices.AppointmentStatus.BOOKED
-                    appointment.save()
-
-                    appointment_checkout, created = AppointmentCheckout.objects.get_or_create(
-                        appointment=appointment,
-                        business_address=appointment.business_address
-                    )
-                    
-                    # save method is being called in apply_texes method.
-                    appointment_checkout.apply_taxes()
-
                 service_appointment.appointment_date = appointment_date
                 service_appointment.appointment_time = date_time
                 service_appointment.service = service_id
@@ -1304,8 +1291,20 @@ def update_appointment_service(request):
                 service_appointment.duration = duration
                 service_appointment.price = price
                 service_appointment.member = member_id
-
                 service_appointment.save()
+
+                # If a new service is added change the status of 
+                # appointment to started
+                appointment.status = choices.AppointmentStatus.BOOKED
+                appointment.save()
+
+                appointment_checkout, created = AppointmentCheckout.objects.get_or_create(
+                    appointment=appointment,
+                    business_address=appointment.business_address
+                )
+                
+                # save method is being called in apply_texes method.
+                appointment_checkout.apply_taxes()
             except Exception as err:
                 errors.append(str(err))
             else:
