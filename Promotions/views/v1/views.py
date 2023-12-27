@@ -6611,7 +6611,7 @@ def update_coupon(request):
         fixedAmount = request.data.get('fixedAmount', [])
         selectedType = request.data.get('selectedType', None)
         buy_one_type = request.data.get('type', None)
-        coupon_to_filter = request.data.get('coupon_code',None)
+        coupon_to_filter = request.data.get('coupon_code', None)
         error = []
         # try:
         if requested_status == 'true':
@@ -6755,7 +6755,8 @@ def delete_coupon(request, id=None):
 @permission_classes([AllowAny])
 def get_coupon(request):
     coupon_code = request.query_params.get('coupon_code', None)
-    client_type = request.query_params.get('client_type',None)
+    client_type = request.query_params.get('client_type', None)
+    client_id = request.query_params.get('client_id', None)
     try:
         coupon = Coupon.objects.get(code=coupon_code)
     except:
@@ -6798,8 +6799,23 @@ def get_coupon(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    if client_id is not None:
+        check_coupon = Coupon.objects.filter(clients__id=client_id)
+        if check_coupon.exists():
+            pass
+        else:
+            return Response(
+                {
+                    'status': False,
+                    'status_code': 400,
+                    'response': {
+                        'message': 'Client does not attach',
+                        'error_message': None,
 
-
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
     serializer = CouponSerializer(coupon, context={'request': request})
     return Response(
         {
@@ -6880,6 +6896,7 @@ def create_refund(request):
         status=status.HTTP_201_CREATED
     )
 
+
 @api_view(['PATCH'])
 @permission_classes([AllowAny])
 def update_refund(request):
@@ -6887,7 +6904,7 @@ def update_refund(request):
     location = request.data.get('location', None)
     refundsetting = RefundSetting.objects.filter(location_id=location)
     if refundsetting:
-                  refundsetting.update(number_of_days=number_of_days)
+        refundsetting.update(number_of_days=number_of_days)
     else:
         return Response(
             {
@@ -6901,7 +6918,7 @@ def update_refund(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request},many=True)
+    serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request}, many=True)
     return Response(
         {
             'status': True,
@@ -6918,26 +6935,25 @@ def update_refund(request):
     )
 
 
-
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def delete_refund(request):
     location = request.data.get('location', None)
     refundsetting = RefundSetting.objects.filter(location_id=location)
     if refundsetting:
-          refundsetting.delete()
-          return Response(
-              {
-                  'status': True,
-                  'status_code': 200,
-                  'response': {
-                      'message': 'Refund deleted successfully!',
-                      'error_message': None,
-                      'errors': [],
-                  }
-              },
-              status=status.HTTP_200_OK
-          )
+        refundsetting.delete()
+        return Response(
+            {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Refund deleted successfully!',
+                    'error_message': None,
+                    'errors': [],
+                }
+            },
+            status=status.HTTP_200_OK
+        )
     else:
         return Response(
             {
@@ -6957,10 +6973,11 @@ def delete_refund(request):
 @permission_classes([AllowAny])
 def get_refund(request):
     location = request.data.get('location', None)
-    if location :
+    if location:
         refundsetting = RefundSetting.objects.filter(location_id=location)
         if refundsetting:
-            serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request},many=True)
+            serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request},
+                                                                       many=True)
             return Response(
                 {
                     'status': True,
@@ -6990,7 +7007,8 @@ def get_refund(request):
             )
     else:
         refundsetting = RefundSetting.objects.all()
-        serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request},many=True)
+        serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request},
+                                                                   many=True)
         return Response(
             {
                 'status': True,
