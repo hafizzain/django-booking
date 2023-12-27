@@ -6887,7 +6887,7 @@ def update_refund(request):
     location = request.data.get('location', None)
     refundsetting = RefundSetting.objects.filter(location_id=location)
     if refundsetting:
-                  refundsetting =refundsetting.update(number_of_days=number_of_days)
+                  refundsetting.update(number_of_days=number_of_days)
     else:
         return Response(
             {
