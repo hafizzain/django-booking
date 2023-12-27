@@ -5,7 +5,7 @@ from Sale.serializers import AvailPriceServiceSerializers, PriceServiceSerialize
 from Service.models import PriceService
 from rest_framework import serializers
 
-from Business.models import BusinessAddress, BusinessTax, Business
+from Business.models import BusinessAddress, BusinessTax, Business, RefundSetting
 from Product.Constants.index import tenant_media_base_url
 from django_tenants.utils import tenant_context
 from Product.models import Product, Brand
@@ -2314,3 +2314,10 @@ class CouponSerializer(serializers.ModelSerializer):
                   'locations','business','amount_spent','discounted_percentage','type','aval_coupon_brands','coupon_type_value',
                   'excluded_products', 'coupon_blockdays','buy_one_get_one_product','buy_one_get_one_service','servicegroup_discount'
                   ]
+
+
+class RefundSettingSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = RefundSetting
+        fields ="__all__"

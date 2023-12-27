@@ -11,7 +11,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from Authentication.serializers import UserTenantLoginSerializer
-from Business.models import BusinessAddressMedia, BusinessType
+from Business.models import BusinessAddressMedia, BusinessType, RefundSetting
 from Business.serializers.v1_serializers import EmployeTenatSerializer, OpeningHoursSerializer, \
     AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, \
     Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, \
@@ -6834,4 +6834,48 @@ def delete_all_coupon(request):
             }
         },
         status=status.HTTP_200_OK
+    )
+
+
+@transaction.atomic
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def create_refund(request):
+    detail = None
+    number_of_days = request.data.get('number_of_days', None)
+    location = request.data.get('location', None)
+    refundcheck = RefundSetting.objects.filter(
+        location_id=location
+    )
+    if refundcheck:
+        return Response(
+            {
+                'status': False,
+                'status_code': 400,
+                'response': {
+                    'message': 'Refund already exists',
+                    'error_message': None,
+
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    refundsetting = RefundSetting.objects.create(
+        number_of_days=number_of_days,
+        location_id=location
+    )
+    serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request})
+    return Response(
+        {
+            'status': True,
+            'status_code': 201,
+            'response': {
+                'message': 'Refund created successfully!',
+                'error_message': None,
+                'errors': [],
+                'data': serializer.data,
+
+            }
+        },
+        status=status.HTTP_201_CREATED
     )
