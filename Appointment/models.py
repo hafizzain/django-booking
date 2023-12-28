@@ -316,50 +316,53 @@ class AppointmentService(models.Model):
         
         if self.status == choices.AppointmentServiceStatus.FINISHED and self.appointment and self.appointment.client and self.appointment.status in [choices.AppointmentStatus.DONE, choices.AppointmentStatus.FINISHED]:
             client = self.appointment.client
+
+            if not self.client_tag:
+                self.client_tag = client.client_tag
+
+            if not self.client_type:
+                self.client_type = client.client_type
+
+
+
             # client_f_month = int(client.created_at.strftime('%m'))
             client_f_month = 10
+
+            apps_services = AppointmentService.objects.filter(
+                appointment__client = self.appointment.client,
+                status = choices.AppointmentServiceStatus.FINISHED,
+            )
             
             client_appointments = Appointment.objects.filter(
                 client = client,
                 status__in = [choices.AppointmentStatus.DONE, choices.AppointmentStatus.FINISHED]
             )
-            if len(client_appointments) > 0:
-                total_spend = AppointmentCheckout.objects.filter(appointment__client=client, appointment=self.appointment)
-                price = 0
-                for ck in total_spend:
-                    price = price + ck.total_service_price()
+            # total_spend = AppointmentCheckout.objects.filter(appointment__client=client, appointment=self.appointment)
+            price = 0
+            for ck in apps_services:
+                price = price + ck.get_final_price()
 
-                # last_app = client_appointments.order_by('created_at').last()
-                # last_month = int(self.appointment.created_at.strftime('%m'))
-                last_appointment = AppointmentService.objects.filter(
-                    appointment__client = self.appointment.client,
-                    status = choices.AppointmentServiceStatus.FINISHED,
-                ).exclude(appointment = self.appointment).order_by('created_at').last()
-                
-                if last_appointment:
-                    last_month = int(last_appointment.created_at.strftime('%m'))
-                    months = max(last_month - client_f_month , 1)
-                    monthly_spending = 0
-                    tag = ''
+            # last_app = client_appointments.order_by('created_at').last()
+            # last_month = int(self.appointment.created_at.strftime('%m'))
+            # last_appointment = apps_services.exclude(appointment = self.appointment).order_by('created_at').last()
+            
+            last_month = int(datetime.now().strftime('%m'))
+            months = max(last_month - client_f_month , 1)
+            
+            if client_appointments.count() >= months:
+                tag = 'Most Visitor'
+            else:
+                tag = 'Least Visitor'
 
-                    if client_appointments.count() >= months:
-                        tag = 'Most Visitor'
-                    else:
-                        tag = 'Least Visitor'
+            monthly_spending = price / months
+            if monthly_spending >= 100:
+                client_type = 'Most Spender'
+            else:
+                client_type = f'{price}/{months}/{monthly_spending}'
 
-                    client_type = ''
-                    monthly_spending = price / months
-                    if monthly_spending >= 100:
-                        client_type = 'Most Spender'
-                    else:
-                        client_type = f'price : {price} - months : {months}, monthly_spending : {monthly_spending}'
-
-                    if not self.client_tag:
-                        self.client_tag = tag
-
-                    if not self.client_type:
-                        self.client_type = client_type
-        
+            client.client_tag = tag
+            client.client_type = client_type
+    
         super(AppointmentService, self).save(*args, **kwargs)
     
 
