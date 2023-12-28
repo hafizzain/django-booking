@@ -350,7 +350,7 @@ class DiscountPromotionSalesReport(models.Model):
 
 
 class CouponReport(models.Model):
-    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, null=True , related_name='coupon_report')
+    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, null=True , related_name='coupon_reports')
     id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, primary_key=True)
     checkout_id = models.TextField(null=True)
     checkout_type = models.TextField(null=True)
