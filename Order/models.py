@@ -6,7 +6,8 @@ from django.db.models.functions import Coalesce
 from Authentication.models import User
 from Business.models import BusinessAddress
 from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs
-from Promotions.models import PurchaseDiscount, SpendSomeAmount, FixedPriceService, MentionedNumberService, BundleFixed, RetailAndGetService
+from Promotions.models import PurchaseDiscount, SpendSomeAmount, FixedPriceService, MentionedNumberService, BundleFixed, \
+    RetailAndGetService, Coupon
 from django.utils.timezone import now
 from Employee.models import Employee
 from Product.models import Product, CurrencyRetailPrice
@@ -104,6 +105,7 @@ class Checkout(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_checkout_order', null=True, blank=True)
     coupon_discounted_price = models.FloatField(null=True)
+    coupon = models.ForeignKey(Coupon , on_delete=models.CASCADE , related_name='coupon_checkout')
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_checkout_orders', null=True, blank=True)
     location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, related_name='location_checkout_orders', null=True, blank=True)
     member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='member_checkout_orders', null=True)
