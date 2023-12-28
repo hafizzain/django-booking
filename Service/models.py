@@ -37,7 +37,7 @@ class ServiceManager(models.QuerySet):
 
         return self.annotate(
             appointment_count=Coalesce(
-                Count('serivce_appointments', filter=query),
+                Count('serivce_appointments', filter=query, distinct=True),
                 0,
                 output_field=IntegerField()
             )
@@ -55,7 +55,7 @@ class ServiceManager(models.QuerySet):
 
         return self.annotate(
             total_orders_quantity = Coalesce(
-                Sum('service_orders__quantity', filter=query),
+                Sum('service_orders__quantity', filter=query, distinct=True),
                 0,
                 output_field=IntegerField()
             )
