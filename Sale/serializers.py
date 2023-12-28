@@ -7,6 +7,7 @@ from Employee.models import Employee, EmployeeProfessionalInfo, EmployeeSelected
 from Business.models import BusinessAddress, BusinessTax
 from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
+from Promotions.models import Coupon
 from Utility.models import Currency, ExceptionRecord
 from Sale.Constants.Promotion import get_promotions
 
@@ -2064,6 +2065,12 @@ class AppointmentTipsSerializer(serializers.ModelSerializer):
         fields = ['id', 'member', 'tip', 'member_name']
 
 
+
+class CouponServiceGroupcouponserializersaleresponse(serializers.ModelSerializer):
+    class Meta:
+        model = Coupon
+        fields = "__all__"
+
 class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     product = serializers.SerializerMethodField(read_only=True)  # ProductOrderSerializer(read_only = True)
     service = serializers.SerializerMethodField(read_only=True)  # serviceOrderSerializer(read_only = True)
@@ -2087,6 +2094,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     tip = serializers.SerializerMethodField(read_only=True)
     total_tip = serializers.SerializerMethodField(read_only=True)
     client_loyalty_points = serializers.SerializerMethodField(read_only=True)
+    coupon = CouponServiceGroupcouponserializersaleresponse()
 
     def get_client_loyalty_points(self, obj):
         return obj.get_client_loyalty_points()
