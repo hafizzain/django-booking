@@ -104,12 +104,15 @@ class RefundAPIView(APIView):
                 'expiry_date': request.data.get('expiry_date'),
                 'related_refund': refund_instance.id,
             }
-            try:
-                coupon_serializer = CouponSerializer(data=coupon_data)
-                coupon_serializer.is_valid(raise_exception=True)
+            coupon_serializer = CouponSerializer(data=coupon_data)
+            if coupon_serializer.is_valid():
+                # coupon_serializer.is_valid(raise_exception=True)
                 coupon_serializer.save()
-            except Exception as e:
-                return Response({'Error':'Error occured while Creating Coupon'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                return Response({
+                    'errors' : coupon_serializer.errors,
+                    'error_message' : coupon_serializer.error_messages,
+                }, status=status.HTTP_400_BAD_REQUEST)
             
             response_data = {
                 'message': 'Record created successfully',
