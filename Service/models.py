@@ -25,8 +25,15 @@ class ServiceManager(models.QuerySet):
         )
 
     def with_total_appointment_count(self, location=None, duration=None):
+
         query = Q(serivce_appointments__status=choices.AppointmentServiceStatus.FINISHED)
-        query &= self.get_common_query(location=location, duration=duration)
+        if location:
+            query &= Q(serivce_appointments__business_address=location)
+        if duration:
+            today = datetime.today()
+            date = today - timedelta(days=duration)
+            query &= Q(serivce_appointments__created_at__gte=date)
+
 
         return self.annotate(
             appointment_count=Coalesce(
@@ -37,7 +44,15 @@ class ServiceManager(models.QuerySet):
         )
 
     def with_total_orders_quantity(self, location=None, duration=None):
-        query = self.get_common_query(location=location, duration=duration)
+
+        query = Q()
+        if location:
+            query &= Q(service_orders__business_address=location)
+        if duration:
+            today = datetime.today()
+            date = today - timedelta(days=duration)
+            query &= Q(service_orders__created_at__gte=date)
+
         return self.annotate(
             total_orders_quantity = Coalesce(
                 Count('service_orders__quantity', filter=query),
@@ -45,16 +60,6 @@ class ServiceManager(models.QuerySet):
                 output_field=IntegerField()
             )
         )
-    
-    def get_common_query(self, location=None, duration=None):
-        query = Q()
-        if location:
-            query &= Q(serivce_appointments__business_address=location)
-        if duration:
-            today = datetime.today()
-            date = today - timedelta(days=duration)
-            query &= Q(serivce_appointments__created_at__gte=date)
-        return query
 
 class Service(models.Model):
     SERVICE_CHOICE = [
