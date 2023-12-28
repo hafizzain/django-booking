@@ -26,7 +26,7 @@ class HolidayApiView(APIView):
     
     def get(self, request, pk=None):
         no_pagination = request.GET.get('no_pagination', None)
-        location = request.GET.get('location', None)
+        location = request.GET.get('location', None)  #data deal with location
         if pk is not None:
             holiday = get_object_or_404(Holiday, id=pk)
             serializer = HolidaySerializer(holiday)
