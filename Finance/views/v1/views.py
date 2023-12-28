@@ -46,54 +46,17 @@ class RefundAPIView(APIView):
         }
     
     '''
-    # def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
-    #     try:
-    #         user = request.user
-    #         request.data['user'] = user.id
-    #         serializer = RefundSerializer(data=request.data, context={'request': request})
-    #         if serializer.is_valid():
-    #             refund_instance = serializer.save()
-                
-    #             client_id = request.data.get('client')
-    #             client = get_object_or_404(Client, pk=client_id)
-
-    #             coupon_data = {
-    #                 'user': request.user.id,  
-    #                 'client': client_id,
-    #                 'refund_coupon_code': f"REFUND_{short_uuid(refund_instance.id)}",  
-    #                 'amount': refund_instance.total_refund_amount,
-    #                 'expiry_date': request.data.get('expiry_date'),
-    #                 'related_refund': refund_instance.id,
-    #             }
-    #             try:
-    #                 coupon_serializer = CouponSerializer(data=coupon_data)
-    #                 coupon_serializer.is_valid(raise_exception=True)
-    #                 coupon_serializer.save()
-    #             except Exception as e:
-    #                 return Response({'Error':'Error occured while Creating Coupon'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-                
-    #             response_data = {
-    #                 'message': 'Record created successfully',
-    #                 'refund': RefundSerializer(refund_instance).data,
-    #                 'coupon': CouponSerializer(coupon_serializer.instance).data,
-    #             }
-
-    #             return Response(response_data, status=status.HTTP_201_CREATED)
-    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    #         # return Response({'data': request.data} , status=status.HTTP_200_OK)
-    #     except Exception as e:
-    #         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-    def post(self, request, *args, **kewargs):
+    def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
+        try:
             user = request.user
             request.data['user'] = user.id
             serializer = RefundSerializer(data=request.data, context={'request': request})
-            # return Response({"initial Data": serializer.initial_data})
-            
             if serializer.is_valid():
-                # refundded_products = serializer.data.pop("refunded_products")
                 refund_instance = serializer.save()
+                
                 client_id = request.data.get('client')
+                client = get_object_or_404(Client, pk=client_id)
+
                 coupon_data = {
                     'user': request.user.id,  
                     'client': client_id,
@@ -111,61 +74,12 @@ class RefundAPIView(APIView):
                 
                 response_data = {
                     'message': 'Record created successfully',
-                    'refund':   serializer.data,
-                    'coupon':   coupon_serializer.data,
+                    'refund': RefundSerializer(refund_instance).data,
+                    'coupon': CouponSerializer(coupon_serializer.instance).data,
                 }
-                return Response(response_data)
-            else:
-                return Response({'msg':"error occured", 'error':serializer.errors})
 
-
-
-    # def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
-    #     user = request.user
-    #     request.data['user'] = user.id
-    #     # serializer = RefundSerializer(data=request.data, context={'request': request})
-
-    #     product = Product.objects.get(id = request.data['refunded_products'][0]['product'])
-    #     return Response({
-    #         'name' : product.name
-    #     })
-        # if serializer.is_valid():
-        #     refund_instance = serializer.save()
-            
-        #     client_id = request.data.get('client')
-        #     # client = get_object_or_404(Client, pk=client_id)
-
-        #     coupon_data = {
-        #         'user': request.user.id,  
-        #         # 'client': client.id,
-        #         'client': client_id,
-        #         'refund_coupon_code': f"REFUND_{short_uuid(refund_instance.id)}",  
-        #         'amount': refund_instance.total_refund_amount,
-        #         # 'expiry_date': refund_instance.expiry,
-        #         'expiry_date': request.data.get('expiry_date'),
-        #         'related_refund': refund_instance.id,
-        #     }
-        #     coupon_serializer = CouponSerializer(data=coupon_data)
-        #     if coupon_serializer.is_valid():
-        #         # coupon_serializer.is_valid(raise_exception=True)
-        #         coupon_serializer.save()
-        #     else:
-        #         return Response({
-        #             'errors' : coupon_serializer.errors,
-        #             'error_message' : coupon_serializer.error_messages,
-        #         }, status=status.HTTP_400_BAD_REQUEST)
-            
-        #     response_data = {
-        #         'message': 'Record created successfully',
-        #         'refund': RefundSerializer(refund_instance).data,
-        #         'coupon': CouponSerializer(coupon_serializer.instance).data,
-        #     }
-
-        #     return Response(response_data, status=status.HTTP_201_CREATED)
-        
-        # return Response({
-        #     'errors' : serializer.errors,
-        #     'error_message' : serializer.error_messages,
-        # }, status=status.HTTP_400_BAD_REQUEST)
-        # # return Response({'data': request.data} , status=status.HTTP_200_OK)
-        
+                return Response(response_data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            # return Response({'data': request.data} , status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
