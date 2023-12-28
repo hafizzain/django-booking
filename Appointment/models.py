@@ -8,6 +8,8 @@ from django.db.models.functions import Coalesce
 from Authentication.models import User
 from Business.models import Business, BusinessAddress, BusinessTaxSetting, BusinessTax
 from django.utils.timezone import now
+
+from Promotions.models import Coupon
 from Service.models import Service, PriceService
 from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs
 from Employee.models import Employee
@@ -371,11 +373,12 @@ class AppointmentCheckout(models.Model):
     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True, blank=True , related_name='appointment_checkout')
     appointment_service = models.ForeignKey(AppointmentService, on_delete=models.CASCADE, null=True, blank=True ,related_name='appointment_service_checkout')
     coupon_discounted_price = models.FloatField(null=True)
+    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, related_name='coupon_appointment_checkout', null=True)
     payment_method = models.CharField(max_length=100, choices= PAYMENT_CHOICES, default='', null=True, blank=True)  
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='checkout_service_appointments', null=True, blank=True)
     member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='checkout_member_appointments', null=True, blank=True)
     business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='appointment_address_checkout')
-
+    is_coupon_redeemed = models.TextField(null=True)
     voucher =models.ForeignKey(Vouchers, on_delete=models.CASCADE, related_name='checkout_voucher_appointments', null=True, blank=True) 
     promotion =models.ForeignKey(Promotion, on_delete=models.CASCADE, related_name='checkout_promotion_appointments', null=True, blank=True) 
     membership =models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='checkout_membership_appointments', null=True, blank=True) 
