@@ -2415,7 +2415,7 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AppointmentCheckout
-        fields = ['id', 'appointment', 'coupon','coupon_discounted_price','appointment_service', 'payment_method', 'service',
+        fields = ['id', 'appointment', 'is_coupon_redeemed','coupon','coupon_discounted_price','appointment_service', 'payment_method', 'service',
                   'business_address', 'voucher', 'promotion',
                   'membership', 'rewards', 'tip', 'gst', 'gst1', 'gst_price', 'gst_price1', 'service_price',
                   'total_price', 'service_commission', 'service_commission_type', 'voucher_discount_percentage',
