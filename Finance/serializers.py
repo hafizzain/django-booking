@@ -28,8 +28,8 @@ class RefundSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        refunded_products_data = validated_data.pop('refunded_products')
-        refund_services_data = validated_data.pop('refunded_services')
+        # refunded_products_data = validated_data.pop('refunded_products')
+        # refund_services_data = validated_data.pop('refunded_services')
         refund = Refund.objects.create(**validated_data)
         
         # if refunded_products_data:
