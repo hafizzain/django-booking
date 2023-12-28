@@ -130,7 +130,7 @@ class HolidayApiView(APIView):
     def patch(self, request, pk):
         holiday = get_object_or_404(Holiday, id=pk)
         # Ensure 'user' is not included in the update
-        request.data.pop('user', None)
+        request.data.get('user', None)
         serializer = HolidaySerializer(holiday, data=request.data,
                                        partial=True)
         if serializer.is_valid():
