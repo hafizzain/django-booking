@@ -2224,6 +2224,7 @@ def new_create_sale_order(request):
     redeemed_coupon_id = request.data.get('redeemed_coupon_id',None)
     tip = request.data.get('tip', [])
     total_price = request.data.get('total_price', None)
+    is_coupon_redeemed = request.data.get('is_coupon_redeemed', None)
     minus_price = 0
 
     errors = []
@@ -2293,7 +2294,8 @@ def new_create_sale_order(request):
         tax_name1=tax_name1,
         total_discount=total_discount_value,
         coupon_discounted_price=coupon_discounted_price,
-        coupon_id = redeemed_coupon_id
+        coupon_id = redeemed_coupon_id,
+        is_coupon_redeemed=is_coupon_redeemed
     )
 
     checkout.save()

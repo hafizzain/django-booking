@@ -2064,11 +2064,12 @@ class AppointmentTipsSerializer(serializers.ModelSerializer):
         model = AppointmentEmployeeTip
         fields = ['id', 'member', 'tip', 'member_name']
 
-class Couponresponse(serializers.ModelSerializer):
+
+
+class CouponServiceGroupcouponserializersaleresponse(serializers.ModelSerializer):
     class Meta:
         model = Coupon
         fields = "__all__"
-
 
 class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     product = serializers.SerializerMethodField(read_only=True)  # ProductOrderSerializer(read_only = True)
@@ -2093,7 +2094,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     tip = serializers.SerializerMethodField(read_only=True)
     total_tip = serializers.SerializerMethodField(read_only=True)
     client_loyalty_points = serializers.SerializerMethodField(read_only=True)
-    coupon = Couponresponse()
+    coupon = CouponServiceGroupcouponserializersaleresponse()
 
     def get_client_loyalty_points(self, obj):
         return obj.get_client_loyalty_points()
@@ -2217,11 +2218,12 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Checkout
         fields = [
-            'id','coupon',
+            'id','is_coupon_redeemed','coupon','coupon_discounted_price',
             'product', 'service', 'membership', 'voucher', 'client', 'location', 'gst', 'gst1', 'gst_price',
-            'gst_price1','coupon_discounted_price',
+            'gst_price1',
             'created_at', 'payment_type', 'tip', 'service_commission', 'voucher_commission', 'product_commission',
             'service_commission_type', 'product_commission_type', 'voucher_commission_type', 'ids',
+            'membership_product',
             'membership_service', 'membership_type', 'invoice', 'tax_name', 'tax_name1', 'total_discount',
             'voucher_redeem_percentage', 'redeem_option', 'total_tip', 'client_loyalty_points'
         ]
@@ -2288,7 +2290,7 @@ class SaleOrders_CheckoutSerializerOP(serializers.ModelSerializer):
 
     class Meta:
         model = Checkout
-        fields = ['id', 'payment_type', 'client', 'invoice', 'created_at','coupon_discounted_price',
+        fields = ['id', 'payment_type', 'client', 'invoice', 'created_at',
                   'subtotal', 'total_tax', 'total_tip']
 
 
@@ -2328,6 +2330,11 @@ class SaleInvoiceSerializerOP(serializers.ModelSerializer):
         fields = ['id', 'file']
 
 
+class Couponresponseappointment(serializers.ModelSerializer):
+
+    class Meta:
+        model = Coupon
+        fields = "__all__"
 class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
@@ -2343,6 +2350,7 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
     total_tip = serializers.SerializerMethodField(read_only=True)
 
     client_loyalty_points = serializers.SerializerMethodField(read_only=True)
+    coupon = Couponresponseappointment()
 
     def get_client_loyalty_points(self, obj):
         return obj.get_client_loyalty_points()
@@ -2407,7 +2415,7 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AppointmentCheckout
-        fields = ['id', 'appointment', 'appointment_service', 'payment_method', 'service',
+        fields = ['id', 'appointment', 'is_coupon_redeemed','coupon','coupon_discounted_price','appointment_service', 'payment_method', 'service',
                   'business_address', 'voucher', 'promotion',
                   'membership', 'rewards', 'tip', 'gst', 'gst1', 'gst_price', 'gst_price1', 'service_price',
                   'total_price', 'service_commission', 'service_commission_type', 'voucher_discount_percentage',
@@ -2420,7 +2428,7 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
     order_type = serializers.SerializerMethodField(read_only=True)
     invoice = serializers.SerializerMethodField(read_only=True)
     total_tip = serializers.SerializerMethodField(read_only=True)
-    subtotal = serializers.FloatField()
+    subtotal = serializers.SerializerMethodField(read_only=True)
     total_tax = serializers.FloatField()
 
     def get_order_type(self, obj):
@@ -2446,6 +2454,16 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
             return serializer.data
         except Exception as e:
             return str(e)
+
+    def get_subtotal(self, obj):
+        try:
+            total = obj.subtotal
+            if obj.coupon_discounted_price:
+                return total - obj.coupon_discounted_price
+            else:
+                return total
+        except:
+            return 0
 
     class Meta:
         model = AppointmentCheckout

@@ -1982,6 +1982,7 @@ def create_checkout(request):
     """
     coupon_discounted_price = request.data.get('coupon_discounted_price', None)
     redeemed_coupon_id = request.data.get('redeemed_coupon_id', None)
+    is_coupon_redeemed = request.data.get('is_coupon_redeemed', None)
     if redeemed_coupon_id:
         coupon = Coupon.objects.get(id=redeemed_coupon_id)
         coupon.usage_limit -= 1
@@ -2004,6 +2005,8 @@ def create_checkout(request):
     checkout.service_commission = float(service_commission)
     checkout.service_commission_type = service_commission_type
     checkout.coupon_discounted_price = coupon_discounted_price
+    checkout.coupon_id = redeemed_coupon_id
+    checkout.is_coupon_redeemed = is_coupon_redeemed
     checkout.save()
 
     # change the status of appointment after checkout

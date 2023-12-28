@@ -8,6 +8,8 @@ from django.db.models.functions import Coalesce
 from Authentication.models import User
 from Business.models import Business, BusinessAddress, BusinessTaxSetting, BusinessTax
 from django.utils.timezone import now
+
+from Promotions.models import Coupon
 from Service.models import Service, PriceService
 from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs
 from Employee.models import Employee
@@ -311,6 +313,43 @@ class AppointmentService(models.Model):
     def save(self, *args, **kwargs):
         if not self.total_price:
             self.total_price = self.price
+        
+        if self.status == choices.AppointmentServiceStatus.FINISHED and self.appointment and self.appointment.client:
+            client = self.appointment.client
+            client_f_month = int(client.created_at.strftime('%m'))
+            
+            client_appointments = Appointment.objects.filter(
+                client = client,
+                status__in = [choices.AppointmentStatus.DONE, choices.AppointmentStatus.FINISHED]
+            )
+            if len(client_appointments) > 0:
+                total_spend = AppointmentCheckout.objects.filter(appointment__client=client)
+                price = 0
+                for ck in total_spend:
+                    price = price + ck.total_price
+
+                last_app = client_appointments.order_by('created_at').last()
+                last_month = int(last_app.created_at.strftime('%m'))
+
+                months = max(client_f_month - last_month, 1)
+                monthly_spending = 0
+                tag = ''
+
+                if client_appointments.count() >= months:
+                    tag = 'Most Visitor'
+                else:
+                    tag = 'Least Visitor'
+
+                client_type = ''
+                monthly_spending = price / months
+                if monthly_spending >= 100:
+                    client_type = 'Most Spender'
+
+                if not self.client_tag:
+                    self.client_tag = tag
+
+                if not self.client_type:
+                    self.client_type = client_type
         super(AppointmentService, self).save(*args, **kwargs)
     
 
@@ -334,11 +373,12 @@ class AppointmentCheckout(models.Model):
     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True, blank=True , related_name='appointment_checkout')
     appointment_service = models.ForeignKey(AppointmentService, on_delete=models.CASCADE, null=True, blank=True ,related_name='appointment_service_checkout')
     coupon_discounted_price = models.FloatField(null=True)
+    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, related_name='coupon_appointment_checkout', null=True)
     payment_method = models.CharField(max_length=100, choices= PAYMENT_CHOICES, default='', null=True, blank=True)  
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='checkout_service_appointments', null=True, blank=True)
     member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='checkout_member_appointments', null=True, blank=True)
     business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='appointment_address_checkout')
-
+    is_coupon_redeemed = models.TextField(null=True)
     voucher =models.ForeignKey(Vouchers, on_delete=models.CASCADE, related_name='checkout_voucher_appointments', null=True, blank=True) 
     promotion =models.ForeignKey(Promotion, on_delete=models.CASCADE, related_name='checkout_promotion_appointments', null=True, blank=True) 
     membership =models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='checkout_membership_appointments', null=True, blank=True) 

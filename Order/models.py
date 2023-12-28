@@ -111,7 +111,7 @@ class Checkout(models.Model):
     member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='member_checkout_orders', null=True)
     client_type = models.CharField(choices = CLIENT_TYPE, max_length=50 , default = '' )
     payment_type = models.CharField(choices = PAYMENT_TYPE, max_length=50 , default = '' )
-    
+    is_coupon_redeemed = models.TextField(null=True)
     tip = models.FloatField(default = 0) # Not in Use
 
     tax_applied = models.FloatField(default=0, verbose_name='Tax Applied in Percentage')
