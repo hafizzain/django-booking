@@ -29,7 +29,7 @@ class RefundSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         # refunded_products_data = validated_data.pop('refunded_products')
-        return validated_data.pop('refunded_products')
+        return validated_data
         # refund_services_data = validated_data.pop('refunded_services')
         # refund = Refund.objects.create(**validated_data)
         
