@@ -108,10 +108,8 @@ class ServiceManager(models.QuerySet):
                 output_field=IntegerField()
             )
         ).annotate(
-            total_count=Sum(
-                ExpressionWrapper(F('appointment_count') + F('total_orders_quantity'),
-                                  output_field=IntegerField())
-            )
+            total_count=ExpressionWrapper(F('appointment_count') + F('total_orders_quantity'),
+                                        output_field=IntegerField())
         )
 
 class Service(models.Model):
