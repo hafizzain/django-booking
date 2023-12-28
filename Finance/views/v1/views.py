@@ -90,8 +90,8 @@ class RefundAPIView(APIView):
         serializer = RefundSerializer(data=request.data, context={'request': request})
         # return Response({"initial Data": serializer.initial_data})
         if serializer.is_valid():
-            refundded_products = serializer.data.pop("refunded_products")
-            return Response(refundded_products)
+            # refundded_products = serializer.data.pop("refunded_products")
+            return Response(serializer.data)
 
 
 
