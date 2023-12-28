@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render 
 from django.db import transaction
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -99,6 +99,9 @@ class HolidayApiView(APIView):
         user = request.user
         holiday_data = request.data.copy()
         holiday_data['user'] = user.id
+        
+        if 'is_active' not in holiday_data:     #due to unknown clash 
+            holiday_data['is_active'] = True
         # request.data['user'] = user.id
         serializer = HolidaySerializer(data=holiday_data,
                                        context={'request': request})
