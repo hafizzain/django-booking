@@ -8,7 +8,7 @@ from Client.models import Client
 class ClientSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
-    def get_image(self, obj):   #get client image url for AWS 
+    def get_image(self, obj):   # get client image url from AWS 
         if obj.image:
             try:
                 request = self.context["request"]
