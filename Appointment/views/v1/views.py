@@ -71,6 +71,7 @@ from Utility.date_range_utils import get_date_range_tuple
 from rest_framework.pagination import PageNumberPagination
 
 from ... import choices
+from Service.serializers import BasicServiceSerializer
 
 
 @api_view(['GET'])
@@ -2342,7 +2343,12 @@ def service_appointment_count(request):
         service_ids = list(PriceService.objects.filter(currency=currency).values_list('service__id', flat=True))
         query &= Q(id__in=service_ids)
 
-    services = Service.objects.filter(query)
+    services = Service.objects \
+                .filter(query) \
+                .with_total_appointment_count(location=location, duration=duration) \
+                .with_total_orders_quantity(location=location, duration=duration)
+
+    serializer = BasicServiceSerializer(services, many=True)
 
     return_data = []
     for ser in services:
@@ -2383,6 +2389,7 @@ def service_appointment_count(request):
                 'message': 'Appointment Checkout Create!',
                 'error_message': None,
                 'data': sorted_data,
+                'serializer_data': serializer.data
 
             }
         },
