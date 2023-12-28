@@ -31,7 +31,9 @@ class RefundSerializer(serializers.ModelSerializer):
         # return validated_data.pop('refunded_products')
         # return f" validated data: {validated_data} validated data RP: {validated_data.pop('refunded_products')}"
         refunded_products_data = validated_data.pop('refunded_products')
-        return refunded_products_data
+        refund_services_data = validated_data.pop('refunded_services')
+        
+        return refund_services_data
         
         # refund_services_data = validated_data.pop('refunded_services')
         # refund = Refund.objects.create(**validated_data)
