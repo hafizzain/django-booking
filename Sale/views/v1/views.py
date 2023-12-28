@@ -2836,6 +2836,8 @@ def new_create_sale_order(request):
                 'message': 'Product Order Sale Created!',
                 'error_message': errors,
                 'sale': serialized.data,
+                'total_price':total_price,
+                'coupon_discounted_price':coupon_discounted_price
             }
         },
         status=status.HTTP_201_CREATED
