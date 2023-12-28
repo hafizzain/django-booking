@@ -85,7 +85,6 @@ class RefundAPIView(APIView):
     #         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     def post(self, request, *args, **kewargs):
-        try:
             user = request.user
             request.data['user'] = user.id
             serializer = RefundSerializer(data=request.data, context={'request': request})
@@ -95,31 +94,29 @@ class RefundAPIView(APIView):
                 # refundded_products = serializer.data.pop("refunded_products")
                 refund_instance = serializer.save()
                 client_id = request.data.get('client')
-                coupon_data = {
-                    'user': request.user.id,  
-                    'client': client_id,
-                    'refund_coupon_code': f"REFUND_{short_uuid(refund_instance.id)}",  
-                    'amount': refund_instance.total_refund_amount,
-                    'expiry_date': request.data.get('expiry_date'),
-                    'related_refund': refund_instance.id,
-                }
-                try:
-                    coupon_serializer = CouponSerializer(data=coupon_data)
-                    coupon_serializer.is_valid(raise_exception=True)
-                    coupon_serializer.save()
-                except Exception as e:
-                    return Response({'Error':'Error occured while Creating Coupon'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                # coupon_data = {
+                #     'user': request.user.id,  
+                #     'client': client_id,
+                #     'refund_coupon_code': f"REFUND_{short_uuid(refund_instance.id)}",  
+                #     'amount': refund_instance.total_refund_amount,
+                #     'expiry_date': request.data.get('expiry_date'),
+                #     'related_refund': refund_instance.id,
+                # }
+                # try:
+                #     coupon_serializer = CouponSerializer(data=coupon_data)
+                #     coupon_serializer.is_valid(raise_exception=True)
+                #     coupon_serializer.save()
+                # except Exception as e:
+                #     return Response({'Error':'Error occured while Creating Coupon'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
                 response_data = {
                     'message': 'Record created successfully',
                     'refund': RefundSerializer(refund_instance).data,
-                    'coupon': CouponSerializer(coupon_serializer.instance).data,
+                    # 'coupon': CouponSerializer(coupon_serializer.instance).data,
                 }
                 return Response(response_data)
             else:
                 return Response({'msg':"error occured", 'error':serializer.errors})
-        except Exception as e:
-            return Response({'internal error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
