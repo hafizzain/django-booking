@@ -2457,7 +2457,7 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
 
     def get_subtotal(self, obj):
         # try:
-        return [str(obj.coupon) ,str(obj.coupon_discounted_price) ,str(obj.obj.subtotal)]
+        return [str(obj.coupon) ,str(obj.coupon_discounted_price) ,str(obj.subtotal)]
         #     total = obj.subtotal
         #     if obj.coupon:
         #         # return total - obj.coupon_discounted_price
