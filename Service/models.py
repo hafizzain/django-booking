@@ -47,7 +47,7 @@ class ServiceManager(models.QuerySet):
 
         query = Q()
         if location:
-            query &= Q(service_orders__business_address=location)
+            query &= Q(service_orders__location=location)
         if duration:
             today = datetime.today()
             date = today - timedelta(days=duration)
