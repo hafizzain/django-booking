@@ -327,7 +327,7 @@ class AppointmentService(models.Model):
                 total_spend = AppointmentCheckout.objects.filter(appointment__client=client, appointment=self.appointment)
                 price = 0
                 for ck in total_spend:
-                    price = price + ck.total_service_price
+                    price = price + ck.total_service_price()
 
                 # last_app = client_appointments.order_by('created_at').last()
                 # last_month = int(self.appointment.created_at.strftime('%m'))
