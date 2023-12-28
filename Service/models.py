@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from django.db import models
 from django.utils.timezone import now
 from django.db.models.functions import Coalesce
-from django.db.models import Count, IntegerField, Q, Sum, F
+from django.db.models import Count, IntegerField, Q, Sum, F, ExpressionWrapper
 
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
@@ -108,7 +108,10 @@ class ServiceManager(models.QuerySet):
                 output_field=IntegerField()
             )
         ).annotate(
-            total_count=Sum(F('appointment_count') + F('total_orders_quantity'))
+            total_count=Sum(
+                ExpressionWrapper(F('appointment_count') + F('total_orders_quantity'),
+                                  output_field=IntegerField())
+            )
         )
 
 class Service(models.Model):
