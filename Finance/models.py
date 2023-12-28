@@ -48,3 +48,5 @@ class Coupon(models.Model):
     expiry_date = models.DateField()
     is_used = models.BooleanField(default=False)
     related_refund = models.ForeignKey(Refund, on_delete=models.CASCADE, null=True, blank=True)
+
+
