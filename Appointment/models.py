@@ -334,34 +334,31 @@ class AppointmentService(models.Model):
                 last_appointment = AppointmentService.objects.filter(
                     appointment__client = self.appointment.client,
                     status = choices.AppointmentServiceStatus.FINISHED,
-                ).order_by('created_at').last()
+                ).exclude(appointment = self.appointment).order_by('created_at').last()
                 
                 if last_appointment:
                     last_month = int(last_appointment.created_at.strftime('%m'))
-                else:
-                    last_month = int(datetime.now().strftime('%m'))
+                    months = max(last_month - client_f_month , 1)
+                    monthly_spending = 0
+                    tag = ''
 
-                months = max(last_month - client_f_month , 1)
-                monthly_spending = 0
-                tag = ''
+                    if client_appointments.count() >= months:
+                        tag = 'Most Visitor'
+                    else:
+                        tag = 'Least Visitor'
 
-                if client_appointments.count() >= months:
-                    tag = 'Most Visitor'
-                else:
-                    tag = 'Least Visitor'
+                    client_type = ''
+                    monthly_spending = price / months
+                    if monthly_spending >= 100:
+                        client_type = 'Most Spender'
+                    else:
+                        client_type = f'price : {price} - months : {months}, monthly_spending : {monthly_spending}'
 
-                client_type = ''
-                monthly_spending = price / months
-                if monthly_spending >= 100:
-                    client_type = 'Most Spender'
-                else:
-                    client_type = f'price : {price} - months : {months}, monthly_spending : {monthly_spending}'
+                    if not self.client_tag:
+                        self.client_tag = tag
 
-                if not self.client_tag:
-                    self.client_tag = tag
-
-                if not self.client_type:
-                    self.client_type = client_type
+                    if not self.client_type:
+                        self.client_type = client_type
         
         super(AppointmentService, self).save(*args, **kwargs)
     

@@ -163,22 +163,22 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
         if obj.appointment.status in [choices.AppointmentStatus.DONE, choices.AppointmentStatus.FINISHED]:
             tag = obj.client_tag
             client_type = obj.client_type
-        else:
-            if obj.appointment.client:
-                last_appointment = AppointmentService.objects.filter(
-                    appointment__client = obj.appointment.client,
-                    status = choices.AppointmentServiceStatus.FINISHED,
-                ).order_by('created_at').last()
+        # else:
+        #     if obj.appointment.client:
+        #         last_appointment = AppointmentService.objects.filter(
+        #             appointment__client = obj.appointment.client,
+        #             status = choices.AppointmentServiceStatus.FINISHED,
+        #         ).order_by('created_at').last()
                 
-                if last_appointment:
-                    tag = last_appointment.client_tag
-                    client_type = last_appointment.client_type
-                else:
-                    tag = 'No last appointment'
-                    client_type = 'No last appointment'
-            else:
-                tag = 'No Client'
-                client_type = 'No Client'
+        #         if last_appointment:
+        #             tag = last_appointment.client_tag
+        #             client_type = last_appointment.client_type
+        #         else:
+        #             tag = 'No last appointment'
+        #             client_type = 'No last appointment'
+        #     else:
+        #         tag = 'No Client'
+        #         client_type = 'No Client'
 
         return {
             'tag' : tag,
