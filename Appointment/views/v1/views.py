@@ -2004,7 +2004,7 @@ def create_checkout(request):
     checkout.service_commission = float(service_commission)
     checkout.service_commission_type = service_commission_type
     checkout.coupon_discounted_price = coupon_discounted_price
-    checkout.coupon = redeemed_coupon_id
+    checkout.coupon_id = redeemed_coupon_id
     checkout.save()
 
     # change the status of appointment after checkout
