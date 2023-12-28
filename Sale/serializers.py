@@ -2218,7 +2218,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Checkout
         fields = [
-            'id','coupon',
+            'id','coupon','coupon_discounted_price',
             'product', 'service', 'membership', 'voucher', 'client', 'location', 'gst', 'gst1', 'gst_price',
             'gst_price1',
             'created_at', 'payment_type', 'tip', 'service_commission', 'voucher_commission', 'product_commission',
