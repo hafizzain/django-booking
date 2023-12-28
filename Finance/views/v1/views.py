@@ -88,8 +88,11 @@ class RefundAPIView(APIView):
         user = request.user
         request.data['user'] = user.id
         serializer = RefundSerializer(data=request.data, context={'request': request})
+        serialized_data = serializer.data
+        
         if serializer.is_valid():
             return Response(serializer.data)
+
 
     # def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
     #     user = request.user
