@@ -97,10 +97,10 @@ class HolidayApiView(APIView):
     @transaction.atomic
     def post(self, request):
         user = request.user
-        mutable_data = request.data.copy()
-        mutable_data['user'] = user.id
+        holiday_data = request.data.copy()
+        holiday_data['user'] = user.id
         # request.data['user'] = user.id
-        serializer = HolidaySerializer(data=mutable_data,
+        serializer = HolidaySerializer(data=holiday_data,
                                        context={'request': request})
         if serializer.is_valid():
             serializer.save()
