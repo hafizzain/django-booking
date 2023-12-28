@@ -28,7 +28,8 @@ class Meta:
     fields = '__all__'
 
 def create(self, validated_data):
-    return validated_data
+    return f" validated data: {validated_data} validated data RP: {validated_data.pop('refunded_services')}"
+    # refunded_products_data = validated_data.pop('refunded_services')
     # refund_services_data = validated_data.pop('refunded_services')
     # refund = Refund.objects.create(**validated_data)
     # refund.save()
