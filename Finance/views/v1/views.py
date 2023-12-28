@@ -88,7 +88,7 @@ class RefundAPIView(APIView):
     def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
         user = request.user
         request.data['user'] = user.id
-        serializer = RefundSerializer(data=request.data, context={'request': request})
+        # serializer = RefundSerializer(data=request.data, context={'request': request})
 
         product = Product.objects.get(id = request.data['refunded_products'][0]['product'])
         return Response({
