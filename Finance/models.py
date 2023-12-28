@@ -41,7 +41,7 @@ class RefundServices(models.Model):
 
 class Coupon(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)  
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, blank= True, null= True)  
     
     refund_coupon_code = models.CharField(max_length=50, unique=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
