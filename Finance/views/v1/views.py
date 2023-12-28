@@ -95,7 +95,7 @@ class RefundAPIView(APIView):
                 # refundded_products = serializer.data.pop("refunded_products")
                 return Response(serializer.data)
             else:
-                return Response({'msg':"error occured"})
+                return Response({'msg':"error occured", 'error':serializer.errors})
         except Exception as e:
             return Response({'internal error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
