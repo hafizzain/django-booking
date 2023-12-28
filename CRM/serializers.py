@@ -8,7 +8,7 @@ from Client.models import Client
 class ClientSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
-    def get_image(self, obj):
+    def get_image(self, obj):   # get client image url from AWS 
         if obj.image:
             try:
                 request = self.context["request"]
@@ -25,7 +25,7 @@ class ClientSerializer(serializers.ModelSerializer):
         
 class SegmentSerializer(serializers.ModelSerializer):
     client_data = serializers.SerializerMethodField(read_only=True)
-    def get_client_data(self, obj):
+    def get_client_data(self, obj):     # get extra client data from client model related to segment
         request = self.context.get('request')
         clients = obj.client.all()
         serializer = ClientSerializer(clients, many=True, context={'request': request})
@@ -49,6 +49,6 @@ class CampaignsSerializer(serializers.ModelSerializer):
         model =  Campaign
         fields = '__all__'
     
-    def get_segment_data(self, obj):
+    def get_segment_data(self, obj): # get segment extra data from segment model related to campaign
         segment = obj.segment
         return {'id': segment.id, 'name': segment.name}

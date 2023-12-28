@@ -2428,7 +2428,7 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
     order_type = serializers.SerializerMethodField(read_only=True)
     invoice = serializers.SerializerMethodField(read_only=True)
     total_tip = serializers.SerializerMethodField(read_only=True)
-    subtotal = serializers.FloatField()
+    subtotal = serializers.SerializerMethodField(read_only=True)
     total_tax = serializers.FloatField()
 
     def get_order_type(self, obj):
@@ -2454,6 +2454,23 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
             return serializer.data
         except Exception as e:
             return str(e)
+
+    def get_subtotal(self, obj):
+        try:
+            if obj.coupon:
+                total = float(obj.subtotal) - float(obj.coupon_discounted_price)
+                return total
+        except:
+            return 0
+
+        #     total = obj.subtotal
+        #     if obj.coupon:
+        #         # return total - obj.coupon_discounted_price
+        #          [obj.coupon_discounted_price, obj.coupon]
+        #     else:
+        #         return total
+        # except:
+        #     return 0
 
     class Meta:
         model = AppointmentCheckout
