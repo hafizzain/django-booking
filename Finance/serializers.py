@@ -27,10 +27,10 @@ class RefundSerializer(serializers.ModelSerializer):
         model = Refund
         fields = '__all__'
 
-    def create(self, validated_data):
+    # def create(self, validated_data):
         # refunded_products_data = validated_data.pop('refunded_products')
         # refund_services_data = validated_data.pop('refunded_services')
-        refund = Refund.objects.create(**validated_data)
+        # refund = Refund.objects.create(**validated_data)
         
         # if refunded_products_data:
         #     refund_products_instances = [
@@ -48,7 +48,7 @@ class RefundSerializer(serializers.ModelSerializer):
         # refund.refundproduct_set.set(refund_products)
         # refund.refundedservices_set.set(refund_service)
 
-        return refund
+        # return refund
 
 
 class CouponSerializer(serializers.ModelSerializer):

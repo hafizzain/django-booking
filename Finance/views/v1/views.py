@@ -116,6 +116,10 @@ class RefundAPIView(APIView):
             }
 
             return Response(response_data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response({
+            'errors' : serializer.errors,
+            'error_message' : serializer.error_messages,
+        }, status=status.HTTP_400_BAD_REQUEST)
         # return Response({'data': request.data} , status=status.HTTP_200_OK)
         
