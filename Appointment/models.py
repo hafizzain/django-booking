@@ -334,7 +334,7 @@ class AppointmentService(models.Model):
                 last_appointment = AppointmentService.objects.filter(
                     appointment__client = self.appointment.client,
                     status = choices.AppointmentServiceStatus.FINISHED,
-                ).order_by('created_at').last()
+                ).exclude(appointment = self.appointment).order_by('created_at').last()
                 
                 if last_appointment:
                     last_month = int(last_appointment.created_at.strftime('%m'))
