@@ -92,11 +92,12 @@ class RefundAPIView(APIView):
             refund_instance = serializer.save()
             
             client_id = request.data.get('client')
-            client = get_object_or_404(Client, pk=client_id)
+            # client = get_object_or_404(Client, pk=client_id)
 
             coupon_data = {
                 'user': request.user.id,  
-                'client': client.id,
+                # 'client': client.id,
+                'client': client_id,
                 'refund_coupon_code': f"REFUND_{short_uuid(refund_instance.id)}",  
                 'amount': refund_instance.total_refund_amount,
                 'expiry_date': refund_instance.expiry,
