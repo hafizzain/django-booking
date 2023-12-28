@@ -2212,10 +2212,9 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'product', 'service', 'membership', 'voucher', 'client', 'location', 'gst', 'gst1', 'gst_price',
-            'gst_price1',
+            'gst_price1','coupon_discounted_price',
             'created_at', 'payment_type', 'tip', 'service_commission', 'voucher_commission', 'product_commission',
             'service_commission_type', 'product_commission_type', 'voucher_commission_type', 'ids',
-            'membership_product',
             'membership_service', 'membership_type', 'invoice', 'tax_name', 'tax_name1', 'total_discount',
             'voucher_redeem_percentage', 'redeem_option', 'total_tip', 'client_loyalty_points'
         ]
