@@ -28,8 +28,8 @@ class Refund(CommonField):
 
 class RefundProduct(models.Model):
     refund = models.ForeignKey(Refund, on_delete=models.CASCADE, verbose_name = 'Refund id')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Product id')
     
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Product id')
     refunded_quantity = models.PositiveIntegerField()
     refunded_amount = models.DecimalField(max_digits=10, decimal_places=2)
     
