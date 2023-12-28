@@ -127,7 +127,7 @@ class HolidayApiView(APIView):
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
         
     @transaction.atomic
-    def put(self, request, pk):
+    def patch(self, request, pk):
         holiday = get_object_or_404(Holiday, id=pk)
         serializer = HolidaySerializer(holiday, data=request.data)
         
