@@ -23,35 +23,35 @@ class RefundSerializer(serializers.ModelSerializer):
     refunded_products = RefundProductSerializer(many=True)
     refunded_services = RefundServiceSerializer(many=True)
 
-class Meta:
-    model = Refund
-    fields = '__all__'
+    class Meta:
+        model = Refund
+        fields = '__all__'
 
-def create(self, validated_data):
-    return f" validated data: {validated_data} validated data RP: {validated_data.pop('refunded_products')}"
-    # refunded_products_data = validated_data.pop('refunded_products')
-    # refund_services_data = validated_data.pop('refunded_services')
-    # refund = Refund.objects.create(**validated_data)
-    # refund.save()
-    
-    # if refunded_products_data:
-    #     refund_products_instances = [
-    #         RefundProduct(refund= refund,product=Product.objects.get(id=refunded_product_data['product']))
-    #         for refunded_product_data in refunded_products_data
-    #     ]
-    #     # refund_service = RefundServices.objects.bulk_create(refunded_services_instances)
-    #     # refund.refundproduct_set.set(refund_products)
-    #     return RefundProduct
+    def create(self, validated_data):
+        return f" validated data: {validated_data} validated data RP: {validated_data.pop('refunded_products')}"
+        # refunded_products_data = validated_data.pop('refunded_products')
+        # refund_services_data = validated_data.pop('refunded_services')
+        # refund = Refund.objects.create(**validated_data)
+        # refund.save()
         
-    # if refund_services_data : 
-    #     refunded_services_instances = [
-    #         RefundServices(refund= refund,service = get_object_or_404(Service, id = refunded_service_data['service']))
-    #         for refunded_service_data in refund_services_data
-    #     ]
-    #     # refund_products = RefundProduct.objects.bulk_create(refund_products_instances)
-    #     # refund.refundedservices_set.set(refund_service)
+        # if refunded_products_data:
+        #     refund_products_instances = [
+        #         RefundProduct(refund= refund,product=Product.objects.get(id=refunded_product_data['product']))
+        #         for refunded_product_data in refunded_products_data
+        #     ]
+        #     # refund_service = RefundServices.objects.bulk_create(refunded_services_instances)
+        #     # refund.refundproduct_set.set(refund_products)
+        #     return RefundProduct
+            
+        # if refund_services_data : 
+        #     refunded_services_instances = [
+        #         RefundServices(refund= refund,service = get_object_or_404(Service, id = refunded_service_data['service']))
+        #         for refunded_service_data in refund_services_data
+        #     ]
+        #     # refund_products = RefundProduct.objects.bulk_create(refund_products_instances)
+        #     # refund.refundedservices_set.set(refund_service)
 
-    # return refund
+        # return refund
 
 
 class CouponSerializer(serializers.ModelSerializer):
