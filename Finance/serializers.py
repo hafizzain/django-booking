@@ -31,6 +31,7 @@ class RefundSerializer(serializers.ModelSerializer):
         refunded_products_data = validated_data.pop('refunded_products')
         refund_services_data = validated_data.pop('refunded_services')
         refund = Refund.objects.create(**validated_data)
+        
         if refunded_products_data:
             refund_products_instances = [
                 RefundProduct(product=get_object_or_404(Product, id=refunded_product_data['product']), **refunded_product_data)
