@@ -6987,7 +6987,8 @@ def update_refund(request):
     id = request.query_params.get('id', None)
     refundsetting = RefundSetting.objects.get(id=id)
     if refundsetting:
-        refundsetting.update(number_of_days=number_of_days)
+        refundsetting.number_of_days=number_of_days
+        refundsetting.save()
     else:
         return Response(
             {

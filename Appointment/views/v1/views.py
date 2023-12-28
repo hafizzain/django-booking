@@ -1304,7 +1304,7 @@ def update_appointment_service(request):
                     appointment=appointment,
                     business_address=appointment.business_address
                 )
-                
+
                 # save method is being called in apply_texes method.
                 appointment_checkout.apply_taxes()
             except Exception as err:
@@ -1752,7 +1752,7 @@ def create_checkout(request):
     appointment = request.data.get('appointment', None)
     appointment_service_obj = request.data.get('appointment_service_obj', None)
     appointment_service = request.data.get('appointment_service', None)
-    coupon_discounted_price =0
+    coupon_discounted_price = 0
     payment_method = request.data.get('payment_method', None)
     service = request.data.get('service', None)
     member = request.data.get('member', None)
@@ -1987,24 +1987,23 @@ def create_checkout(request):
         coupon.user_limit -= 1
         coupon.save()
     checkout = AppointmentCheckout.objects.get(appointment=appointment)
-    checkout.appointment_service=service_appointment
-    checkout.payment_method=payment_method
-    checkout.service=service
-    checkout.member=member
-    checkout.business_address=business_address
-    checkout.gst=gst
-    checkout.gst1=gst1
-    checkout.gst_price=gst_price
-    checkout.gst_price1=gst_price1
-    checkout.tax_name=tax_name
-    checkout.tax_name1=tax_name1
-    checkout.service_price=service_price
-    checkout.total_price=total_price
-    checkout.service_commission=float(service_commission)
-    checkout.service_commission_type=service_commission_type
+    checkout.appointment_service = service_appointment
+    checkout.payment_method = payment_method
+    checkout.service = service
+    checkout.member = member
+    checkout.business_address = business_address
+    checkout.gst = gst
+    checkout.gst1 = gst1
+    checkout.gst_price = gst_price
+    checkout.gst_price1 = gst_price1
+    checkout.tax_name = tax_name
+    checkout.tax_name1 = tax_name1
+    checkout.service_price = service_price
+    checkout.total_price = total_price
+    checkout.service_commission = float(service_commission)
+    checkout.service_commission_type = service_commission_type
     checkout.coupon_discounted_price = coupon_discounted_price
     checkout.save()
-    
 
     # change the status of appointment after checkout
     appointment.status = choices.AppointmentStatus.DONE
@@ -2514,7 +2513,7 @@ def get_client_sale(request):
     total_sale += product_total if product_total else 0
     if product_order.count() > 5:
         product_order = product_order[:5]
-    product = POSerializerForClientSale(product_order, many=True, context={'request': request,})
+    product = POSerializerForClientSale(product_order, many=True, context={'request': request, })
 
     # Service Orders----------------------
     service_orders = ServiceOrder.objects \
@@ -3322,9 +3321,12 @@ def appointment_service_status_update(request):
     appoint_service_statuses = list(
         AppointmentService.objects.filter(appointment=appointment).values_list('status', flat=True))
 
-    is_all_finished = all([True if status == choices.AppointmentServiceStatus.FINISHED else False for status in appoint_service_statuses])
-    is_all_void = all([True if status == choices.AppointmentServiceStatus.VOID else False for status in appoint_service_statuses])
-    is_all_started = all([True if status == choices.AppointmentServiceStatus.STARTED else False for status in appoint_service_statuses])
+    is_all_finished = all(
+        [True if status == choices.AppointmentServiceStatus.FINISHED else False for status in appoint_service_statuses])
+    is_all_void = all(
+        [True if status == choices.AppointmentServiceStatus.VOID else False for status in appoint_service_statuses])
+    is_all_started = all(
+        [True if status == choices.AppointmentServiceStatus.STARTED else False for status in appoint_service_statuses])
 
     if (is_all_finished or is_all_void) or (not is_all_started):
         appointment.status = choices.AppointmentStatus.FINISHED
@@ -3333,26 +3335,23 @@ def appointment_service_status_update(request):
         appointment.status = choices.AppointmentStatus.STARTED
         appointment.save()
 
-
-    # When there is any appointment started make the appointment checkout here, 
+    # When there is any appointment started make the appointment checkout here,
     # so that we can calculate the tax and the service prices using query
     # to monitor paid and unpaid appointment checkouts.
     # If all Void then don't create the checkout.
     any_service_started_or_funished = AppointmentService.objects.filter(
-                                        appointment=appointment,
-                                    ).exclude(status=choices.AppointmentServiceStatus.VOID)
+        appointment=appointment,
+    ).exclude(status=choices.AppointmentServiceStatus.VOID)
     status_started_finished = appointment_service_status in status_list
 
     if any_service_started_or_funished.exists() or status_started_finished:
-
         appointment_checkout, created = AppointmentCheckout.objects.get_or_create(
             appointment=appointment,
             business_address=appointment.business_address
         )
-        
+
         # save method is being called in apply_texes method.
         appointment_checkout.apply_taxes()
-        
 
     serialized = AppointmentServiceSerializerBasic(appointment_service)
 
@@ -3364,8 +3363,8 @@ def appointment_service_status_update(request):
                 'message': 'Appointment Service',
                 'error_message': None,
                 'appointment_service': serialized.data,
-                'seperate_or_combined':seperate_or_combined,
-                'group_or_individual':group_or_individual,
+                'seperate_or_combined': seperate_or_combined,
+                'group_or_individual': group_or_individual,
             }
         },
         status=status.HTTP_200_OK
@@ -3395,7 +3394,7 @@ def paid_unpaid_clients(request):
     if search_text:
         search_text = search_text.replace('#', '')
         query &= Q(appointment__client__full_name__icontains=search_text) | \
-                Q(appointment__id__icontains=search_text)
+                 Q(appointment__id__icontains=search_text)
 
     if start_date and end_date:
         query &= Q(created_at__date__range=get_date_range_tuple(start_date, end_date))
