@@ -85,7 +85,6 @@ class RefundAPIView(APIView):
     #         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     def post(self, request, *args, **kewargs):
-        try:
             user = request.user
             request.data['user'] = user.id
             serializer = RefundSerializer(data=request.data, context={'request': request})
@@ -112,14 +111,12 @@ class RefundAPIView(APIView):
                 
                 response_data = {
                     'message': 'Record created successfully',
-                    'refund': RefundSerializer(refund_instance).data,
-                    'coupon': CouponSerializer(coupon_serializer.instance).data,
+                    'refund':   serializer.data,
+                    'coupon':   coupon_serializer.data,
                 }
                 return Response(response_data)
             else:
                 return Response({'msg':"error occured", 'error':serializer.errors})
-        except Exception as e:
-            return Response({'internal error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
