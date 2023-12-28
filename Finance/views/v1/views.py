@@ -49,33 +49,34 @@ class RefundAPIView(APIView):
         try:
             user = request.user
             request.data['user'] = user.id
-            serializer = RefundSerializer(data=request.data, context={'request': request})
-            if serializer.is_valid():
-                refund_instance = serializer.save()
+            # serializer = RefundSerializer(data=request.data, context={'request': request})
+            # if serializer.is_valid():
+            #     refund_instance = serializer.save()
                 
-                client_id = request.data.get('client')
-                client = get_object_or_404(Client, pk=client_id)
+            #     client_id = request.data.get('client')
+            #     client = get_object_or_404(Client, pk=client_id)
 
-                coupon_data = {
-                    'user': request.user.id,  
-                    'client': client,
-                    'refund_coupon_code': f"REFUND_{short_uuid(refund_instance.id)}",  
-                    'amount': refund_instance.total_refund_amount,
-                    'expiry_date': refund_instance.expiry,
-                    'related_refund': refund_instance,
-                }
+            #     coupon_data = {
+            #         'user': request.user.id,  
+            #         'client': client,
+            #         'refund_coupon_code': f"REFUND_{short_uuid(refund_instance.id)}",  
+            #         'amount': refund_instance.total_refund_amount,
+            #         'expiry_date': refund_instance.expiry,
+            #         'related_refund': refund_instance,
+            #     }
                 
-                coupon_serializer = CouponSerializer(data=coupon_data)
-                coupon_serializer.is_valid(raise_exception=True)
-                coupon_serializer.save()
+            #     coupon_serializer = CouponSerializer(data=coupon_data)
+            #     coupon_serializer.is_valid(raise_exception=True)
+            #     coupon_serializer.save()
  
-                response_data = {
-                    'message': 'Record created successfully',
-                    'refund': RefundSerializer(refund_instance).data,
-                    'coupon': CouponSerializer(coupon_serializer.instance).data,
-                }
+            #     response_data = {
+            #         'message': 'Record created successfully',
+            #         'refund': RefundSerializer(refund_instance).data,
+            #         'coupon': CouponSerializer(coupon_serializer.instance).data,
+            #     }
 
-                return Response(response_data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            #     return Response(response_data, status=status.HTTP_201_CREATED)
+            # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'data': request.data})
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
