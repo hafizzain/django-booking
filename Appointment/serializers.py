@@ -158,7 +158,8 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
 
     def get_client_info(self, obj):
         return {
-
+            'client_tag' : obj.client_tag,
+            'client_type' : obj.client_type,
         }
         # try:
         #     if not obj.appointment:
