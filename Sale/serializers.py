@@ -7,7 +7,6 @@ from Employee.models import Employee, EmployeeProfessionalInfo, EmployeeSelected
 from Business.models import BusinessAddress, BusinessTax
 from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
-from Promotions.models import Coupon
 from Utility.models import Currency, ExceptionRecord
 from Sale.Constants.Promotion import get_promotions
 
@@ -2064,10 +2063,6 @@ class AppointmentTipsSerializer(serializers.ModelSerializer):
         model = AppointmentEmployeeTip
         fields = ['id', 'member', 'tip', 'member_name']
 
-class Couponresponse(serializers.ModelSerializer):
-    class Meta:
-        model = Coupon
-        fields = "__all__"
 
 class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     product = serializers.SerializerMethodField(read_only=True)  # ProductOrderSerializer(read_only = True)
@@ -2215,11 +2210,12 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Checkout
         fields = [
-            'id','coupon',
+            'id',
             'product', 'service', 'membership', 'voucher', 'client', 'location', 'gst', 'gst1', 'gst_price',
-            'gst_price1','coupon_discounted_price',
+            'gst_price1',
             'created_at', 'payment_type', 'tip', 'service_commission', 'voucher_commission', 'product_commission',
             'service_commission_type', 'product_commission_type', 'voucher_commission_type', 'ids',
+            'membership_product',
             'membership_service', 'membership_type', 'invoice', 'tax_name', 'tax_name1', 'total_discount',
             'voucher_redeem_percentage', 'redeem_option', 'total_tip', 'client_loyalty_points'
         ]
@@ -2286,7 +2282,7 @@ class SaleOrders_CheckoutSerializerOP(serializers.ModelSerializer):
 
     class Meta:
         model = Checkout
-        fields = ['id', 'payment_type', 'client', 'invoice', 'created_at','coupon_discounted_price',
+        fields = ['id', 'payment_type', 'client', 'invoice', 'created_at',
                   'subtotal', 'total_tax', 'total_tip']
 
 
