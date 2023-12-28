@@ -362,6 +362,7 @@ class AppointmentService(models.Model):
 
             client.client_tag = tag
             client.client_type = client_type
+            client.save()
         else:
             if self.appointment.client:
                 if not self.client_tag:
