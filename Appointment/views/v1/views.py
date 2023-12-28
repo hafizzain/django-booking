@@ -2365,13 +2365,12 @@ def service_appointment_count(request):
 
             app_service = AppointmentService.objects.filter(service=ser,
                                                             business_address=location,
-                                                            appointment_status__in=['Paid', 'Done'],
                                                             created_at__gte=day)
             sale_services = ServiceOrder.objects.filter(service=ser, created_at__gte=day, location=location)
         else:
             app_service = AppointmentService.objects.filter(service=ser,
                                                             business_address=location,
-                                                            appointment_status__in=['Paid', 'Done'], )
+                                                            )
             sale_services = ServiceOrder.objects.filter(service=ser, location=location)
 
         count += app_service.count()
