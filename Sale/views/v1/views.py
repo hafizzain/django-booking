@@ -1361,17 +1361,17 @@ def get_all_sale_orders_optimized(request):
     if range_start:
         query &= Q(created_at__range=(range_start, range_end))
 
-    # if client_id:
-    #     sale_queries &= Q(client__id=client_id) & query
-    #     app_queries &= Q(appointment__client__id=client_id) & query
+    if client_id:
+        sale_queries &= Q(client__id=client_id) & query
+        app_queries &= Q(appointment__client__id=client_id) & query
 
-    # if service_id:
-    #     service_orders = ServiceOrder.objects.filter(
-    #         service__id = service_id
-    #     ).values_list('checkout' , flat=True)
+    if service_id:
+        service_orders = ServiceOrder.objects.filter(
+            service__id = service_id
+        ).values_list('checkout' , flat=True)
 
-    # sale_queries &= Q(id__in=list(service_orders))
-    # app_queries &= Q(appointment__appointment_services__service__id=service_id)
+        sale_queries &= Q(id__in=list(service_orders))
+        app_queries &= Q(appointment__appointment_services__service__id=service_id)
 
     if search_text:
         # removing # for better search

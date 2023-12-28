@@ -36,7 +36,7 @@ class SegmentAPIView(APIView):
     search_fields = ['name', 'segment_type', 'is_active']
     
     def get(self, request , pk=None):
-        no_pagination = request.GET.get('no_pagination', None)
+        no_pagination = request.GET.get('no_pagination', None) # for frontend 
         
         if pk is not None:
             segment = get_object_or_404(Segment, id=pk)
@@ -68,7 +68,9 @@ class SegmentAPIView(APIView):
                 filtered_queryset = filtered_queryset.filter(is_active=is_active)
               
             if no_pagination:
-                serializer = SegmentSerializer(filtered_queryset, many=True,context={'request': request})
+                serializer = SegmentSerializer(filtered_queryset,
+                                               many=True,
+                                               context={'request': request})
                 data = {
                         "success": True,
                         "status_code" : 200,
@@ -82,7 +84,9 @@ class SegmentAPIView(APIView):
             else:
                 paginator = self.pagination_class()
                 result_page = paginator.paginate_queryset(filtered_queryset, request)
-                serializer = SegmentSerializer(result_page, many=True, context={'request': request})
+                serializer = SegmentSerializer(result_page,
+                                               many=True,
+                                               context={'request': request})
                 data = {
                         'count': paginator.page.paginator.count,
                         'next': paginator.get_next_link(),
@@ -147,8 +151,11 @@ class SegmentAPIView(APIView):
     @transaction.atomic
     def put(self, request, pk):
         segment = get_object_or_404(Segment, id=pk)
-        serializer = SegmentSerializer(segment, data=request.data, context={'request': request})
+        serializer = SegmentSerializer(segment,
+                                       data=request.data,
+                                       context={'request': request})
         name = request.data.get('name')
+        # check if segment with this name already exist
         existing_segment = Segment.objects.filter(name=name) \
                             .exclude(id=pk).first()
         if existing_segment:
@@ -162,7 +169,7 @@ class SegmentAPIView(APIView):
             }
             return Response(data, status=status.HTTP_200_OK)
         
-        if not segment.is_static():
+        if not segment.is_static():     # check if segment type is static user can't update it
             if serializer.is_valid():
                 serializer.save()
                 data = {
@@ -228,7 +235,7 @@ class SegmentDropdownAPIView(APIView):
     search_fields = ['name']
     
     def get(self, request):
-        is_search = False
+        is_search = False   # for frontend
         filtered_queryset = Segment.objects.filter(is_deleted=False)\
                             .order_by('-created_at')
                             
@@ -291,7 +298,7 @@ class CampaignsAPIView(APIView):
                 }
             return Response(data, status=status.HTTP_200_OK)
         else:
-            query = Q()
+            query = Q()     # empty query for filter
             
             title = self.request.query_params.get('search_text', None)
             if title:
@@ -344,8 +351,9 @@ class CampaignsAPIView(APIView):
     def post(self, request):
         user = request.user
         request.data['user'] = user.id
-        
         title = request.data.get('title', None)
+        
+        # check if campaign with this title already exist
         if Campaign.objects.filter(title=title, is_deleted=False).exists():
             data = {
                 "success": False,

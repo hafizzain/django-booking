@@ -2359,38 +2359,6 @@ def service_appointment_count(request):
 
     serializer = BasicServiceSerializer(services, many=True)
 
-    return_data = []
-    for ser in services:
-        count = 0
-        if duration is not None:
-            today = datetime.today()
-            day = today - timedelta(days=int(duration))
-
-            app_service = AppointmentService.objects.filter(service=ser,
-                                                            business_address=location,
-                                                            appointment_status__in=['Paid', 'Done'],
-                                                            created_at__gte=day)
-            sale_services = ServiceOrder.objects.filter(service=ser, created_at__gte=day, location=location)
-        else:
-            app_service = AppointmentService.objects.filter(service=ser,
-                                                            business_address=location,
-                                                            appointment_status__in=['Paid', 'Done']
-                                                            )
-            sale_services = ServiceOrder.objects.filter(service=ser, location=location)
-
-        count += app_service.count()
-
-        for service_order in sale_services:
-            count += service_order.quantity
-
-        data = {
-            'name': str(ser.name),
-            'count': count
-        }
-        return_data.append(data)
-
-    sorted_data = sorted(return_data, key=lambda x: x['count'], reverse=True)[:10]
-
     return Response(
         {
             'status': True,
@@ -2398,7 +2366,6 @@ def service_appointment_count(request):
             'response': {
                 'message': 'Appointment Checkout Create!',
                 'error_message': None,
-                'data': sorted_data,
                 'serializer_data': serializer.data
 
             }
