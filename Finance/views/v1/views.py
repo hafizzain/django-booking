@@ -48,7 +48,7 @@ class RefundAPIView(APIView):
     def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
         try:
             user = request.user
-            request.data['user'] = user
+            request.data['user'] = user.id
             serializer = RefundSerializer(data=request.data, context={'request': request})
             if serializer.is_valid():
                 refund_instance = serializer.save()
@@ -58,17 +58,19 @@ class RefundAPIView(APIView):
 
                 coupon_data = {
                     'user': request.user.id,  
-                    'client': client,
+                    'client': client.id,
                     'refund_coupon_code': f"REFUND_{short_uuid(refund_instance.id)}",  
                     'amount': refund_instance.total_refund_amount,
                     'expiry_date': refund_instance.expiry,
-                    'related_refund': refund_instance,
+                    'related_refund': refund_instance.id,
                 }
+                try:
+                    coupon_serializer = CouponSerializer(data=coupon_data)
+                    coupon_serializer.is_valid(raise_exception=True)
+                    coupon_serializer.save()
+                except Exception as e:
+                    return Response({'Error':'Error occured while Creating Coupon'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
-                coupon_serializer = CouponSerializer(data=coupon_data)
-                coupon_serializer.is_valid(raise_exception=True)
-                coupon_serializer.save()
- 
                 response_data = {
                     'message': 'Record created successfully',
                     'refund': RefundSerializer(refund_instance).data,
