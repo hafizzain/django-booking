@@ -311,6 +311,16 @@ class AppointmentService(models.Model):
     def save(self, *args, **kwargs):
         if not self.total_price:
             self.total_price = self.price
+        
+        if self.status == choices.AppointmentServiceStatus.FINISHED and self.appointment and self.appointment.client:
+            client_appointments = Appointment.objects.filter(
+                client = self.appointment.client,
+                status__in = [choices.AppointmentStatus.DONE, choices.AppointmentStatus.FINISHED]
+            )
+            if not self.client_tag:
+                self.client_tag = ''
+            if not self.client_type:
+                self.client_type = ''
         super(AppointmentService, self).save(*args, **kwargs)
     
 
