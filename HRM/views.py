@@ -129,11 +129,10 @@ class HolidayApiView(APIView):
     @transaction.atomic
     def patch(self, request, pk):
         holiday = get_object_or_404(Holiday, id=pk)
-        user = request.user
-        request.data['user'] = user.id
+        # Ensure 'user' is not included in the update
+        request.data.pop('user', None)
         serializer = HolidaySerializer(holiday, data=request.data,
-                                       context={'request': request})
-        
+                                       partial=True)
         if serializer.is_valid():
             serializer.save()
             data = {
