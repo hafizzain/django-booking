@@ -26,20 +26,20 @@ class Refund(CommonField):
     # reason = models.TextField()
     total_refund_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)  
 
-class RefundProduct(models.Model):
+class RefundProduct(CommonField):
     refund = models.ForeignKey(Refund, on_delete=models.CASCADE, verbose_name = 'Refund id')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Product id')
     
     refunded_quantity = models.PositiveIntegerField()
     refunded_amount = models.DecimalField(max_digits=10, decimal_places=2)
     
-class RefundServices(models.Model):
+class RefundServices(CommonField):
     refund = models.ForeignKey(Refund, on_delete=models.CASCADE, verbose_name = 'Refund id')
     service = models.ForeignKey(Service, on_delete=models.CASCADE, verbose_name='Service id')
     
     refunded_amount = models.DecimalField(max_digits=10, decimal_places=2)
 
-class Coupon(models.Model):
+class Coupon(CommonField):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)  
     
