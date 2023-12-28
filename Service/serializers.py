@@ -13,9 +13,8 @@ class ServiceTranslationsSerializer(serializers.ModelSerializer):
         fields = ['id', 'service', 'service_name', 'language']
 
 class BasicServiceSerializer(serializers.ModelSerializer):
-    appointment_count = serializers.IntegerField()
-    total_orders_quantity = serializers.IntegerField()
+    total_count = serializers.IntegerField()
 
     class Meta:
         model = Service
-        fields = ['id', 'name', 'appointment_count', 'total_orders_quantity']
+        fields = ['id', 'name', 'total_count']
