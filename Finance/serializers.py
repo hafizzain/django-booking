@@ -20,8 +20,8 @@ class RefundServiceSerializer(serializers.ModelSerializer):
         read_only_fields = ['refund']
         
 class RefundSerializer(serializers.ModelSerializer):
-    refunded_products = RefundProductSerializer(many=True)
-    refunded_services = RefundServiceSerializer(many=True)
+    # refunded_products = RefundProductSerializer(many=True)
+    # refunded_services = RefundServiceSerializer(many=True)
 
     class Meta:
         model = Refund
