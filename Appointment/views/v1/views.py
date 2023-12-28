@@ -6,7 +6,7 @@ from Appointment.Constants.Reschedule import reschedule_appointment
 from Appointment.Constants.AddAppointment import Add_appointment
 from Appointment.Constants.cancelappointment import cancel_appointment
 from Appointment.Constants.comisionCalculate import calculate_commission
-from Promotions.models import ComplimentaryDiscount, PackagesDiscount, ServiceDurationForSpecificTime
+from Promotions.models import ComplimentaryDiscount, PackagesDiscount, ServiceDurationForSpecificTime, Coupon
 from Sale.Constants.Custom_pag import CustomPagination
 
 from rest_framework.decorators import api_view, permission_classes
@@ -71,6 +71,7 @@ from Utility.date_range_utils import get_date_range_tuple
 from rest_framework.pagination import PageNumberPagination
 
 from ... import choices
+from Service.serializers import BasicServiceSerializer
 
 
 @api_view(['GET'])
@@ -1258,6 +1259,7 @@ def update_appointment_service(request):
             price = app.get('price', None)
             member = app.get('member', None)
             is_deleted = app.get('is_deleted', None)
+            is_favourite = app.get('is_favourite', False)
             id = app.get('id', None)
             try:
                 service_id = Service.objects.get(id=service)
@@ -1283,11 +1285,6 @@ def update_appointment_service(request):
                     service_appointment.business_address = appointment.business_address
                     service_appointment.status = choices.AppointmentServiceStatus.BOOKED
 
-                    # If a new service is added change the status of 
-                    # appointment to started
-                    appointment.status = choices.AppointmentStatus.BOOKED
-                    appointment.save()
-
                 service_appointment.appointment_date = appointment_date
                 service_appointment.appointment_time = date_time
                 service_appointment.service = service_id
@@ -1296,8 +1293,21 @@ def update_appointment_service(request):
                 service_appointment.duration = duration
                 service_appointment.price = price
                 service_appointment.member = member_id
-
+                service_appointment.is_favourite = is_favourite
                 service_appointment.save()
+
+                # If a new service is added change the status of 
+                # appointment to started
+                appointment.status = choices.AppointmentStatus.BOOKED
+                appointment.save()
+
+                appointment_checkout, created = AppointmentCheckout.objects.get_or_create(
+                    appointment=appointment,
+                    business_address=appointment.business_address
+                )
+
+                # save method is being called in apply_texes method.
+                appointment_checkout.apply_taxes()
             except Exception as err:
                 errors.append(str(err))
             else:
@@ -1743,7 +1753,7 @@ def create_checkout(request):
     appointment = request.data.get('appointment', None)
     appointment_service_obj = request.data.get('appointment_service_obj', None)
     appointment_service = request.data.get('appointment_service', None)
-
+    coupon_discounted_price = 0
     payment_method = request.data.get('payment_method', None)
     service = request.data.get('service', None)
     member = request.data.get('member', None)
@@ -1869,7 +1879,6 @@ def create_checkout(request):
             )
         except:
             pass
-
         id = app.get('id', None)
         redeemed_price = app.get('redeemed_price', 0.00)
 
@@ -1971,24 +1980,31 @@ def create_checkout(request):
     Updating the unpaid checkout created in the appointment_service_status_update/
     api and feeding all the other data here.
     """
+    coupon_discounted_price = request.data.get('coupon_discounted_price', None)
+    redeemed_coupon_id = request.data.get('redeemed_coupon_id', None)
+    if redeemed_coupon_id:
+        coupon = Coupon.objects.get(id=redeemed_coupon_id)
+        coupon.usage_limit -= 1
+        coupon.user_limit -= 1
+        coupon.save()
     checkout = AppointmentCheckout.objects.get(appointment=appointment)
-    checkout.appointment_service=service_appointment
-    checkout.payment_method=payment_method
-    checkout.service=service
-    checkout.member=member
-    checkout.business_address=business_address
-    checkout.gst=gst
-    checkout.gst1=gst1
-    checkout.gst_price=gst_price
-    checkout.gst_price1=gst_price1
-    checkout.tax_name=tax_name
-    checkout.tax_name1=tax_name1
-    checkout.service_price=service_price
-    checkout.total_price=total_price
-    checkout.service_commission=float(service_commission)
-    checkout.service_commission_type=service_commission_type
+    checkout.appointment_service = service_appointment
+    checkout.payment_method = payment_method
+    checkout.service = service
+    checkout.member = member
+    checkout.business_address = business_address
+    checkout.gst = gst
+    checkout.gst1 = gst1
+    checkout.gst_price = gst_price
+    checkout.gst_price1 = gst_price1
+    checkout.tax_name = tax_name
+    checkout.tax_name1 = tax_name1
+    checkout.service_price = service_price
+    checkout.total_price = total_price
+    checkout.service_commission = float(service_commission)
+    checkout.service_commission_type = service_commission_type
+    checkout.coupon_discounted_price = coupon_discounted_price
     checkout.save()
-    
 
     # change the status of appointment after checkout
     appointment.status = choices.AppointmentStatus.DONE
@@ -2333,7 +2349,12 @@ def service_appointment_count(request):
         service_ids = list(PriceService.objects.filter(currency=currency).values_list('service__id', flat=True))
         query &= Q(id__in=service_ids)
 
-    services = Service.objects.filter(query)
+    services = Service.objects \
+                .filter(query) \
+                .with_total_appointment_count(location=location, duration=duration) \
+                .with_total_orders_quantity(location=location, duration=duration)
+
+    serializer = BasicServiceSerializer(services, many=True)
 
     return_data = []
     for ser in services:
@@ -2344,13 +2365,12 @@ def service_appointment_count(request):
 
             app_service = AppointmentService.objects.filter(service=ser,
                                                             business_address=location,
-                                                            appointment_status__in=['Paid', 'Done'],
                                                             created_at__gte=day)
             sale_services = ServiceOrder.objects.filter(service=ser, created_at__gte=day, location=location)
         else:
             app_service = AppointmentService.objects.filter(service=ser,
                                                             business_address=location,
-                                                            appointment_status__in=['Paid', 'Done'], )
+                                                            )
             sale_services = ServiceOrder.objects.filter(service=ser, location=location)
 
         count += app_service.count()
@@ -2374,6 +2394,7 @@ def service_appointment_count(request):
                 'message': 'Appointment Checkout Create!',
                 'error_message': None,
                 'data': sorted_data,
+                'serializer_data': serializer.data
 
             }
         },
@@ -2498,7 +2519,7 @@ def get_client_sale(request):
     total_sale += product_total if product_total else 0
     if product_order.count() > 5:
         product_order = product_order[:5]
-    product = POSerializerForClientSale(product_order, many=True, context={'request': request,})
+    product = POSerializerForClientSale(product_order, many=True, context={'request': request, })
 
     # Service Orders----------------------
     service_orders = ServiceOrder.objects \
@@ -3306,9 +3327,12 @@ def appointment_service_status_update(request):
     appoint_service_statuses = list(
         AppointmentService.objects.filter(appointment=appointment).values_list('status', flat=True))
 
-    is_all_finished = all([True if status == choices.AppointmentServiceStatus.FINISHED else False for status in appoint_service_statuses])
-    is_all_void = all([True if status == choices.AppointmentServiceStatus.VOID else False for status in appoint_service_statuses])
-    is_all_started = all([True if status == choices.AppointmentServiceStatus.STARTED else False for status in appoint_service_statuses])
+    is_all_finished = all(
+        [True if status == choices.AppointmentServiceStatus.FINISHED else False for status in appoint_service_statuses])
+    is_all_void = all(
+        [True if status == choices.AppointmentServiceStatus.VOID else False for status in appoint_service_statuses])
+    is_all_started = all(
+        [True if status == choices.AppointmentServiceStatus.STARTED else False for status in appoint_service_statuses])
 
     if (is_all_finished or is_all_void) or (not is_all_started):
         appointment.status = choices.AppointmentStatus.FINISHED
@@ -3317,54 +3341,23 @@ def appointment_service_status_update(request):
         appointment.status = choices.AppointmentStatus.STARTED
         appointment.save()
 
-
-    # When there is any appointment started make the appointment checkout here, 
+    # When there is any appointment started make the appointment checkout here,
     # so that we can calculate the tax and the service prices using query
     # to monitor paid and unpaid appointment checkouts.
     # If all Void then don't create the checkout.
     any_service_started_or_funished = AppointmentService.objects.filter(
-                                        appointment=appointment,
-                                        status__in=status_list
-                                    )
+        appointment=appointment,
+    ).exclude(status=choices.AppointmentServiceStatus.VOID)
     status_started_finished = appointment_service_status in status_list
 
     if any_service_started_or_funished.exists() or status_started_finished:
-        """
-        Creating the checkout and Calculating the Tax
-        """
-
-        tax_setting = BusinessTaxSetting.objects.get(business=appointment.business)
-        total_price = any_service_started_or_funished.aggregate(total_price=Sum('price'))['total_price']
-        business_tax = BusinessTax.objects.filter(location=appointment.business_address).first()
-        parent_tax = business_tax.parent_tax.all()[0]
-        parent_taxes = parent_tax.parent_tax.all()
-
-        tax_serializer = BusinessTaxSerializerNew(business_tax)
-
-        if tax_setting.is_combined():
-            seperate_or_combined = 'Combined'
-            gst_price = round((parent_taxes[0].tax_rate * total_price / 100), 2)
-            if parent_tax.is_group():
-                group_or_individual = 'Group'
-                gst_price1 = round((parent_taxes[1].tax_rate * total_price / 100), 2)
-
-        elif tax_setting.is_seperately():
-            seperate_or_combined = 'Seperately'
-            gst_price = round((parent_taxes[0].tax_rate * total_price / 100), 2)
-            if parent_tax.is_group():
-                group_or_individual = 'Group'
-                total_price += gst_price
-                gst_price1 = round((parent_taxes[1].tax_rate * total_price / 100), 2)
-
-        checkout, created = AppointmentCheckout.objects.get_or_create(
+        appointment_checkout, created = AppointmentCheckout.objects.get_or_create(
             appointment=appointment,
             business_address=appointment.business_address
         )
 
-        checkout.gst_price = gst_price
-        checkout.gst_price1 = gst_price1
-        checkout.save()
-        
+        # save method is being called in apply_texes method.
+        appointment_checkout.apply_taxes()
 
     serialized = AppointmentServiceSerializerBasic(appointment_service)
 
@@ -3376,9 +3369,8 @@ def appointment_service_status_update(request):
                 'message': 'Appointment Service',
                 'error_message': None,
                 'appointment_service': serialized.data,
-                'tax_data':tax_serializer.data,
-                'seperate_or_combined':seperate_or_combined,
-                'group_or_individual':group_or_individual
+                'seperate_or_combined': seperate_or_combined,
+                'group_or_individual': group_or_individual,
             }
         },
         status=status.HTTP_200_OK
@@ -3408,20 +3400,19 @@ def paid_unpaid_clients(request):
     if search_text:
         search_text = search_text.replace('#', '')
         query &= Q(appointment__client__full_name__icontains=search_text) | \
-                Q(appointment__id__icontains=search_text)
+                 Q(appointment__id__icontains=search_text)
 
     if start_date and end_date:
         query &= Q(created_at__date__range=get_date_range_tuple(start_date, end_date))
 
     appointment_checkouts = AppointmentCheckout.objects \
+        .select_related('appointment') \
         .filter(query) \
         .with_payment_status() \
         .with_client_name() \
         .with_payment_date() \
         .with_subtotal() \
-        .annotate(
-            just_services_price = Sum(F('appointment__appointment_services__price'))
-        ) \
+        .with_total_tax() \
         .order_by('-created_at')
 
     serialized = list(PaidUnpaidAppointmentCheckoutSerializer(appointment_checkouts, many=True).data)

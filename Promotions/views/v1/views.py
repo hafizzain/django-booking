@@ -6611,7 +6611,7 @@ def update_coupon(request):
         fixedAmount = request.data.get('fixedAmount', [])
         selectedType = request.data.get('selectedType', None)
         buy_one_type = request.data.get('type', None)
-        coupon_to_filter = request.data.get('coupon_code',None)
+        coupon_to_filter = request.data.get('coupon_code', None)
         error = []
         # try:
         if requested_status == 'true':
@@ -6685,7 +6685,7 @@ def update_coupon(request):
             service_ids = json.loads(service_ids)
             instance.excluded_services.set(service_ids)
         if client == 'all':
-            pass
+            instance.clients.clear()
         if client != 'all':
             client = json.loads(client)
             instance.clients.clear()
@@ -6755,7 +6755,9 @@ def delete_coupon(request, id=None):
 @permission_classes([AllowAny])
 def get_coupon(request):
     coupon_code = request.query_params.get('coupon_code', None)
-    client_type = request.query_params.get('client_type',None)
+    client_type = request.query_params.get('client_type', None)
+    client_id = request.query_params.get('client_id', None)
+    total_price = request.query_params.get('totalPriceWithoutTax',None)
     try:
         coupon = Coupon.objects.get(code=coupon_code)
     except:
@@ -6771,7 +6773,84 @@ def get_coupon(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    if coupon.usage_limit <=0:
+        return Response(
+            {
+                'status': False,
+                'status_code': 400,
+                'response': {
+                    'message': 'Coupon usage limit exceed',
+                    'error_message': None,
+                    # 'current_day': current_day
+
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    if coupon.user_limit <= 0:
+        return Response(
+            {
+                'status': False,
+                'status_code': 400,
+                'response': {
+                    'message': 'Coupon user limit exceed',
+                    'error_message': None,
+                    # 'current_day': current_day
+
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    if total_price is not None:
+        if coupon.coupon_type_value == '3':
+            total_price = float(total_price)
+            if total_price < float(coupon.amount_spent):
+                return Response(
+                    {
+                        'status': False,
+                        'status_code': 400,
+                        'response': {
+                            'message': 'Coupon can not be implement',
+                            'error_message': None,
+                            # 'current_day': current_day
+
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
     current_date = timezone.now().date()
+    current_day = timezone.now()
+    current_day = current_day.strftime('%A')
+    day_check = CouponBlockDays.objects.filter(day__icontains=current_day, coupon_id=coupon.id)
+    if day_check:
+        return Response(
+            {
+                'status': False,
+                'status_code': 400,
+                'response': {
+                    'message': 'Coupon can not be added on {current_day}'.format(current_day=current_day),
+                    'error_message': None,
+
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    # if total_price is not None:
+    #     if float(total_price) >= float(coupon.amount_spent):
+    #         return Response(
+    #             {
+    #                 'status': False,
+    #                 'status_code': 400,
+    #                 'response': {
+    #                     'message': 'Coupon can not be implement',
+    #                     'error_message': None,
+    #                     'current_day': current_day
+    #
+    #                 }
+    #             },
+    #             status=status.HTTP_400_BAD_REQUEST
+    #         )
+
     if coupon.end_date < current_date:
         return Response(
             {
@@ -6798,17 +6877,37 @@ def get_coupon(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    if client_id is not None:
+        check_coupon = Coupon.objects.get(code=coupon_code)
+        if check_coupon.clients.exists():
+            check_coupon = Coupon.objects.filter(clients__id=client_id)
+            if check_coupon:
+                pass
+            else:
+                return Response(
+                    {
+                        'status': False,
+                        'status_code': 400,
+                        'response': {
+                            'message': 'Coupon does not valid for selected client',
+                            'error_message': None,
+                            'current_day':current_day
 
-
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
     serializer = CouponSerializer(coupon, context={'request': request})
     return Response(
         {
             'status': True,
             'status_code': 201,
             'response': {
-                'message': 'Coupon get successfully!',
+                'message': 'Coupon redeemed successfully!',
                 'error_message': None,
                 'coupon': serializer.data,
+                'coupon.amount_spent':coupon.amount_spent,
+                'total_price':total_price
 
             }
         },
@@ -6877,17 +6976,19 @@ def create_refund(request):
 
             }
         },
-        status=status.HTTP_201_CREATED
+        status=status.HTTP_200_OK
     )
+
 
 @api_view(['PATCH'])
 @permission_classes([AllowAny])
 def update_refund(request):
     number_of_days = request.data.get('number_of_days', None)
-    location = request.data.get('location', None)
-    refundsetting = RefundSetting.objects.filter(location_id=location)
+    id = request.query_params.get('id', None)
+    refundsetting = RefundSetting.objects.get(id=id)
     if refundsetting:
-                  refundsetting.update(number_of_days=number_of_days)
+        refundsetting.number_of_days=number_of_days
+        refundsetting.save()
     else:
         return Response(
             {
@@ -6901,13 +7002,14 @@ def update_refund(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request},many=True)
+
+    serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request}, many=False)
     return Response(
         {
             'status': True,
             'status_code': 201,
             'response': {
-                'message': 'Refund created successfully!',
+                'message': 'Refund updated successfully!',
                 'error_message': None,
                 'errors': [],
                 'data': serializer.data,
@@ -6918,26 +7020,25 @@ def update_refund(request):
     )
 
 
-
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def delete_refund(request):
-    location = request.data.get('location', None)
-    refundsetting = RefundSetting.objects.filter(location_id=location)
+    id = request.query_params.get('id', None)
+    refundsetting = RefundSetting.objects.filter(id=id)
     if refundsetting:
-          refundsetting.delete()
-          return Response(
-              {
-                  'status': True,
-                  'status_code': 200,
-                  'response': {
-                      'message': 'Refund deleted successfully!',
-                      'error_message': None,
-                      'errors': [],
-                  }
-              },
-              status=status.HTTP_200_OK
-          )
+        refundsetting.delete()
+        return Response(
+            {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Refund deleted successfully!',
+                    'error_message': None,
+                    'errors': [],
+                }
+            },
+            status=status.HTTP_200_OK
+        )
     else:
         return Response(
             {
@@ -6957,10 +7058,11 @@ def delete_refund(request):
 @permission_classes([AllowAny])
 def get_refund(request):
     location = request.data.get('location', None)
-    if location :
+    if location:
         refundsetting = RefundSetting.objects.filter(location_id=location)
         if refundsetting:
-            serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request},many=True)
+            serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request},
+                                                                       many=True)
             return Response(
                 {
                     'status': True,
@@ -6990,7 +7092,8 @@ def get_refund(request):
             )
     else:
         refundsetting = RefundSetting.objects.all()
-        serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request},many=True)
+        serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request},
+                                                                   many=True)
         return Response(
             {
                 'status': True,

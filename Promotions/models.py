@@ -617,7 +617,6 @@ class PromotionExcludedItem(models.Model):
     def __str__(self):
         return str(self.id)
 
-
 class Coupon(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     name = models.TextField(null=True, blank=True)
@@ -626,8 +625,8 @@ class Coupon(models.Model):
     end_date = models.DateField(null=True)
     coupon_type = models.TextField(null=True)
     block_day = models.TextField(null=True)
-    usage_limit = models.TextField(null=True)
-    user_limit = models.TextField(null=True)
+    usage_limit = models.FloatField(null=True)
+    user_limit = models.FloatField(null=True)
     amount_spent = models.FloatField(null=True)
     discounted_percentage = models.FloatField(null=True)
     code = models.TextField(null=True)

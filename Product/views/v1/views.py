@@ -863,6 +863,8 @@ def add_product(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+        
+    ''' Products are being created here '''
     location_ids = []
     product = Product.objects.create(
         user = user,
@@ -883,7 +885,7 @@ def add_product(request):
         is_active = is_active,
         published = True,
     )
-
+    '''Images are being creating here saperately. This needs to be Optimized'''
     for img in medias:
         ProductMedia.objects.create(
             user=user,
@@ -892,6 +894,7 @@ def add_product(request):
             image=img,
             is_cover = True
         )
+    '''Currency is being creating here saperately for every single object'''
     if currency_retail_price is not None:
         if type(currency_retail_price) == str:
             currency_retail_price = currency_retail_price.replace("'" , '"')
@@ -946,7 +949,7 @@ def add_product(request):
                     alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
                     is_active = stock_status,
                 )
-
+        ''' Product Stock is being maintaining from here for Every Location '''
         try:
             location_remaing = BusinessAddress.objects.filter(is_deleted=False).exclude(id__in=location_ids)
             for i, location_id in enumerate(location_remaing):
@@ -967,6 +970,8 @@ def add_product(request):
 
     else:
         ExceptionRecord.objects.create(text='No Location Quantities Find')
+    
+    ''' Product which are being Used on the invoices are being store Saperately '''
     
     if invoices is not None:
         if type(invoices) == str:
@@ -1014,6 +1019,7 @@ def add_product(request):
         status=status.HTTP_201_CREATED
     )
 
+# ------------------------------------------------------ Product Adding Feature Ending here -------------------------------
 
 @transaction.atomic
 @api_view(['PUT'])
@@ -1496,9 +1502,8 @@ def get_products_optimized(request):
         'product_stock',
     ) \
     .filter(query) \
-    .with_total_orders(location) \
-    .with_stock_health(location) \
-    .order_by('-total_orders')
+    .with_total_orders_quantity(location) \
+    .order_by('-total_order_quantity')
 
     
     all_products_count = all_products.count()

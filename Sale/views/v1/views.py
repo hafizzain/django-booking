@@ -2,6 +2,8 @@ from datetime import timedelta
 import datetime
 from threading import Thread
 from django.shortcuts import render
+
+from Promotions.models import Coupon
 from Sale.Constants.StaffEmail import StaffSaleEmail
 from Sale.Constants.stock_lowest import stock_lowest
 from Sale.Constants.tunrover import ProductTurnover
@@ -2218,6 +2220,8 @@ def new_create_sale_order(request):
     loyalty_points_redeemed_id = request.data.get('redeemed_id', None)
     loyalty_points_redeemed = request.data.get('redeemed_points', None)
     total_discount_value = request.data.get('discount_value', None)
+    coupon_discounted_price = request.data.get('coupon_discounted_price', None)
+    redeemed_coupon_id = request.data.get('redeemed_coupon_id',None)
     tip = request.data.get('tip', [])
     total_price = request.data.get('total_price', None)
     minus_price = 0
@@ -2287,7 +2291,9 @@ def new_create_sale_order(request):
         tax_applied1=tax_applied1,
         tax_name=tax_name,
         tax_name1=tax_name1,
-        total_discount=total_discount_value
+        total_discount=total_discount_value,
+        coupon_discounted_price=coupon_discounted_price,
+        coupon_id = redeemed_coupon_id
     )
 
     checkout.save()
@@ -2333,12 +2339,19 @@ def new_create_sale_order(request):
         discount_percentage = id.get('discount_percentage', None)
         is_membership_redeemed = id.get('is_membership_redeemed', None)
         is_voucher_redeemed = id.get('is_voucher_redeemed', None)
+        is_coupon_redeemed = id.get('is_coupon_redeemed', None)
         redeemed_price = id.get('redeemed_price', None)
+        redeemed_coupon_id = id.get('redeemed_coupon_id', None)
 
+        if redeemed_coupon_id:
+            coupon = Coupon.objects.get(id=redeemed_coupon_id)
+            coupon.usage_limit -= 1
+            coupon.user_limit -= 1
+            coupon.save()
         if redeemed_price is None:
             redeemed_price = 0
 
-        is_redeemed = is_membership_redeemed or is_voucher_redeemed
+        is_redeemed = is_membership_redeemed or is_voucher_redeemed or is_coupon_redeemed
 
         item_name = ''
         item_id = service_id
@@ -2632,7 +2645,8 @@ def new_create_sale_order(request):
 
         if order_instance is not None and is_redeemed:
             order_instance.is_redeemed = True
-            order_instance.redeemed_type = 'Membership' if is_membership_redeemed else 'Voucher' if is_voucher_redeemed else ''
+
+            order_instance.redeemed_type = 'Membership' if is_membership_redeemed else 'Voucher' if is_voucher_redeemed else 'Coupon'
             order_instance.redeemed_price = float(redeemed_price)
             order_instance.redeemed_instance_id = redeemed_membership_id
             order_instance.total_discount = float(total_discount_value) if total_discount_value else None
@@ -2824,6 +2838,8 @@ def new_create_sale_order(request):
                 'message': 'Product Order Sale Created!',
                 'error_message': errors,
                 'sale': serialized.data,
+                'total_price':total_price,
+                'coupon_discounted_price':coupon_discounted_price
             }
         },
         status=status.HTTP_201_CREATED
