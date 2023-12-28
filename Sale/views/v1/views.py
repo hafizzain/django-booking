@@ -1370,8 +1370,8 @@ def get_all_sale_orders_optimized(request):
             service__id = service_id
         ).values_list('checkout' , flat=True)
 
-    sale_queries &= Q(id__in=list(service_orders))
-    app_queries &= Q(appointment__appointment_services__service__id=service_id)
+        sale_queries &= Q(id__in=list(service_orders))
+        app_queries &= Q(appointment__appointment_services__service__id=service_id)
 
     if search_text:
         # removing # for better search
