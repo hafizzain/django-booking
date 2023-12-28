@@ -13,6 +13,6 @@ class Holiday(CommonField):
     name = models.CharField(max_length=200)
     note = models.TextField(null=True, blank=True, max_length=200)
     start_date = models.DateTimeField()
-    end_date = models.DateTimeField(blank=True)
+    end_date = models.DateTimeField(blank=True, null=True)
     
     REQUIRED_FIELDS = ['name', 'start_date']
