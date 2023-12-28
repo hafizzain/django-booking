@@ -176,9 +176,9 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                 else:
                     tag = 'No last appointment'
                     client_type = 'No last appointment'
-
-            tag = 'No Client'
-            client_type = 'No Client'
+            else:
+                tag = 'No Client'
+                client_type = 'No Client'
 
         return {
             'tag' : tag,
