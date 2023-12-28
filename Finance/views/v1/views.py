@@ -7,6 +7,7 @@ from Finance.models import Refund, Client
 from Finance.serializers import RefundSerializer, CouponSerializer
 from Finance.helpers import short_uuid
 
+from Product.models import Product
 class RefundAPIView(APIView):
     
     def get(self, request, *args, **kwargs):
@@ -87,9 +88,11 @@ class RefundAPIView(APIView):
     def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
         user = request.user
         request.data['user'] = user.id
-        # serializer = RefundSerializer(data=request.data, context={'request': request})
+        serializer = RefundSerializer(data=request.data, context={'request': request})
+
+        product = Product.objects.get(id = request.data['refunded_products'][0]['product'])
         return Response({
-            'id' : request.data['refunded_products'][0]['product']
+            'name' : product.name
         })
         if serializer.is_valid():
             refund_instance = serializer.save()
