@@ -101,6 +101,7 @@ class RefundAPIView(APIView):
                 'refund_coupon_code': f"REFUND_{short_uuid(refund_instance.id)}",  
                 'amount': refund_instance.total_refund_amount,
                 # 'expiry_date': refund_instance.expiry,
+                'expiry_date': request.data.get('expiry_date'),
                 'related_refund': refund_instance.id,
             }
             try:
