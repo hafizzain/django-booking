@@ -37,7 +37,7 @@ class RefundSerializer(serializers.ModelSerializer):
         
         if refunded_products_data:
             refund_products_instances = [
-                RefundProduct(refund= refund,product=Product.objects.get(id=refunded_product_data['product']))
+                RefundProduct(refund= refund,product=Product.objects.get(id=refunded_product_data['refunded_products']["product"]))
                 for refunded_product_data in refunded_products_data
             ]
             refund_products = RefundProduct.objects.bulk_create(refund_products_instances)
