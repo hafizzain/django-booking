@@ -34,7 +34,7 @@ class RefundSerializer(serializers.ModelSerializer):
         
         if refunded_products_data:
             refund_products_instances = [
-                RefundProduct(product=get_object_or_404(Product, id=refunded_product_data['product']), **refunded_product_data)
+                RefundProduct(product=Product.objects.get(id=refunded_product_data['product']), **refunded_product_data)
                 for refunded_product_data in refunded_products_data
             ]
         if refund_services_data : 
