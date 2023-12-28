@@ -87,7 +87,7 @@ class RefundAPIView(APIView):
     def post(self, request, *args, **kewargs):
         try:
             user = request.user
-            request.data['user'] = user
+            request.data['user'] = user.id
             serializer = RefundSerializer(data=request.data, context={'request': request})
             # return Response({"initial Data": serializer.initial_data})
             
