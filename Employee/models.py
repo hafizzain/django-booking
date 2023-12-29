@@ -639,8 +639,19 @@ class EmployeeCommission(models.Model):
 
 
 class LeaveManagement(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True,related_name='employee_leaves')
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, related_name='employee_leaves')
     casual_leave = models.IntegerField(null=True, default=0, help_text='Number of casual leaves allowed')
     annual_leave = models.IntegerField(null=True, default=0, help_text='Number of annual leaves allowed')
     medical_leave = models.IntegerField(null=True, default=0, help_text='Number of medical leaves allowed')
     number_of_months = models.TextField(null=True)
+
+
+class WeekendManagement(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, related_name='employee_weekdays')
+    monday = models.BooleanField(default=False)
+    tuesday = models.BooleanField(default=False)
+    wednesday = models.BooleanField(default=False)
+    thursday = models.BooleanField(default=False)
+    friday = models.BooleanField(default=False)
+    saturday = models.BooleanField(default=False)
+    sunday = models.BooleanField(default=False)

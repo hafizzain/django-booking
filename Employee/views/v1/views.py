@@ -7,7 +7,7 @@ from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee,
                              EmployeePermissionSetting, EmployeeModulePermission
 , EmployeeMarketingPermission, EmployeeSelectedService, SallarySlipPayrol, StaffGroup
 , StaffGroupModulePermission, Attendance
-, Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation, LeaveManagement
+, Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation, LeaveManagement, WeekendManagement
                              )
 from Tenants.models import EmployeeTenantDetail, Tenant
 from django_tenants.utils import tenant_context
@@ -25,7 +25,8 @@ from Employee.serializers import (EmployeSerializer, EmployeInformationsSerializ
                                   singleEmployeeSerializer,
                                   CommissionSerializer, AssetSerializer, WorkingScheduleSerializer,
                                   NewVacationSerializer,
-                                  NewAbsenceSerializer, singleEmployeeSerializerOP, Payroll_WorkingScheduleSerializerOP
+                                  NewAbsenceSerializer, singleEmployeeSerializerOP, Payroll_WorkingScheduleSerializerOP,
+                                  WeekendManagementSerializer
                                   )
 from Employee.optimized_serializers import OptimizedEmployeeSerializerDashboard
 from django.db import connection, transaction
@@ -5629,3 +5630,46 @@ def check_employee_existance(request):
         },
         status=status.HTTP_404_NOT_FOUND
     )
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def create_weekend_management(request):
+    if request.method == 'POST':
+        try:
+            employee = Employee.objects.get(id=request.data.get('employee_id'))
+            weekend_management = WeekendManagement.objects.create(
+                employee=employee,
+                monday=request.data.get('monday', False),
+                tuesday=request.data.get('tuesday', False),
+                wednesday=request.data.get('wednesday', False),
+                thursday=request.data.get('thursday', False),
+                friday=request.data.get('friday', False),
+                saturday=request.data.get('saturday', False),
+                sunday=request.data.get('sunday', False),
+            )
+            weekend = WeekendManagementSerializer(weekend_management)
+            return Response(
+                {
+                    'status': 200,
+                    'status_code': '200',
+                    'response': {
+                        'message': 'Week end created across employee!',
+                        'error_message': None,
+                        'weekend':weekend
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+        except:
+            return Response(
+                {
+                    'status': 404,
+                    'status_code': '404',
+                    'response': {
+                        'message': 'Employee does not exists!',
+                        'error_message': None,
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
