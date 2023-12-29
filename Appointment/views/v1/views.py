@@ -775,6 +775,11 @@ def create_appointment(request):
             client_can_book=client_can_book,
             status=choices.AppointmentServiceStatus.BOOKED
         )
+        if appointment.client:
+            appointment_service.client_tag = appointment.client.client_tag
+            appointment_service.client_type = appointment.client.client_type
+            appointment_service.save()
+            
         price_com = 0
         try:
             if extra_price is not None and price == 0:
