@@ -42,18 +42,6 @@ class RefundSerializer(serializers.ModelSerializer):
         RefundServices.objects.bulk_create(refunded_services_instances)
 
         return refund
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation['refunded_products'] = RefundProductSerializer(
-            instance.refunded_products.select_related('product').all(),
-            many=True
-        ).data
-        representation['refunded_services'] = RefundServiceSerializer(
-            instance.refunded_services.select_related('service').all(),
-            many=True
-        ).data
-        return representation
-
 
 
 class CouponSerializer(serializers.ModelSerializer):
