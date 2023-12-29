@@ -7,7 +7,7 @@ from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee,
                              EmployeePermissionSetting, EmployeeModulePermission
 , EmployeeMarketingPermission, EmployeeSelectedService, SallarySlipPayrol, StaffGroup
 , StaffGroupModulePermission, Attendance
-, Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation, LeaveManagement
+, Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation, LeaveManagement, WeekendManagement
                              )
 from Tenants.models import EmployeeTenantDetail, Tenant
 from django_tenants.utils import tenant_context
@@ -25,7 +25,8 @@ from Employee.serializers import (EmployeSerializer, EmployeInformationsSerializ
                                   singleEmployeeSerializer,
                                   CommissionSerializer, AssetSerializer, WorkingScheduleSerializer,
                                   NewVacationSerializer,
-                                  NewAbsenceSerializer, singleEmployeeSerializerOP, Payroll_WorkingScheduleSerializerOP
+                                  NewAbsenceSerializer, singleEmployeeSerializerOP, Payroll_WorkingScheduleSerializerOP,
+                                  WeekendManagementSerializer
                                   )
 from Employee.optimized_serializers import OptimizedEmployeeSerializerDashboard
 from django.db import connection, transaction
@@ -918,6 +919,7 @@ def create_employee(request):
     state_unique_id = request.data.get('state', None)
     city_name = request.data.get('city', None)
     leave_data = request.data.get('leave_data', [])
+    lev_id=0
 
     if not all([
         business_id, full_name, employee_id, country_unique_id, gender, address, designation, income_type,
@@ -1093,11 +1095,12 @@ def create_employee(request):
             pass
     if len(leave_data) > 0:
         leave_data = json.loads(leave_data)
-        LeaveManagement.objects.create(
+        lev_id = LeaveManagement.objects.create(
             employee_id=employee.id,
             casual_leave=leave_data.get('casual_leave', 0),
             annual_leave=leave_data.get('annual_leave', 0),
-            medical_leave=leave_data.get('medical_leave', 0)
+            medical_leave=leave_data.get('medical_leave', 0),
+            number_of_months=leave_data.get('number_of_months', 0)
         )
 
     employee_p_info = EmployeeProfessionalInfo.objects.create(
@@ -1217,7 +1220,8 @@ def create_employee(request):
                 'message': 'Employee Added Successfully!',
                 'error_message': None,
                 'employee_error': employees_error,
-                'employees': data
+                'employees': data,
+                'lev_id':lev_id
             }
         },
         status=status.HTTP_201_CREATED
@@ -1304,9 +1308,8 @@ def update_employee(request):
     email_changed = False
     old_email = None
     emp_email = request.data.get('email')
-    leave_data = request.data.get('leave_data',[])
-
-
+    leave_data = request.data.get('leave_data', [])
+    lev_id = 0
 
     # emp = Employee.objects.get(id=id)
 
@@ -1351,11 +1354,13 @@ def update_employee(request):
         )
     if len(leave_data) > 0:
         leave_data = json.loads(leave_data)
-        LeaveManagement.objects.filter(employee_id=id).update(
+        lev_id  = LeaveManagement.objects.filter(employee_id=id).update(
             casual_leave=leave_data.get('casual_leave', 0),
             annual_leave=leave_data.get('annual_leave', 0),
-            medical_leave=leave_data.get('medical_leave', 0)
+            medical_leave=leave_data.get('medical_leave', 0),
+            number_of_months=leave_data.get('number_of_months', 0)
         )
+
     try:
         staff = StaffGroup.objects.get(employees=id)
         staff.employees.remove(employee)
@@ -1543,7 +1548,8 @@ def update_employee(request):
                 'response': {
                     'message': ' Employee updated successfully',
                     'error_message': 'Error in saving Employee',
-                    'Employee': data
+                    'Employee': data,
+                    'lev_id': lev_id
                 }
             },
             status=status.HTTP_200_OK
@@ -5628,3 +5634,171 @@ def check_employee_existance(request):
         },
         status=status.HTTP_404_NOT_FOUND
     )
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def create_weekend_management(request):
+        try:
+            employee = Employee.objects.get(id=request.data.get('employee_id'))
+            weekend_management = WeekendManagement.objects.create(
+                employee=employee,
+                monday=request.data.get('monday', False),
+                tuesday=request.data.get('tuesday', False),
+                wednesday=request.data.get('wednesday', False),
+                thursday=request.data.get('thursday', False),
+                friday=request.data.get('friday', False),
+                saturday=request.data.get('saturday', False),
+                sunday=request.data.get('sunday', False),
+            )
+            weekend = WeekendManagementSerializer(weekend_management)
+            return Response(
+                {
+                    'status': 200,
+                    'status_code': '200',
+                    'response': {
+                        'message': 'Week end created across employee!',
+                        'error_message': None,
+                        'weekend':weekend.data
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+        except:
+            return Response(
+                {
+                    'status': 404,
+                    'status_code': '404',
+                    'response': {
+                        'message': 'Employee does not exists!',
+                        'error_message': None,
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+
+@api_view(['PATCH'])
+@permission_classes([AllowAny])
+def update_weekend_management(request):
+        try:
+            employee = request.data.get('employee_id',None)
+            if employee:
+                WeekendManagement.objects.filter(employee_id=employee).update(
+                    monday=request.data.get('monday', False),
+                    tuesday=request.data.get('tuesday', False),
+                    wednesday=request.data.get('wednesday', False),
+                    thursday=request.data.get('thursday', False),
+                    friday=request.data.get('friday', False),
+                    saturday=request.data.get('saturday', False),
+                    sunday=request.data.get('sunday', False),
+                )
+                # weekend = WeekendManagementSerializer(weekend_management)
+                return Response(
+                    {
+                        'status': 200,
+                        'status_code': '200',
+                        'response': {
+                            'message': 'Week end updated across employee!',
+                            'error_message': None,
+                            # 'weekend':weekend
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+        except:
+            return Response(
+                {
+                    'status': 400,
+                    'status_code': '400',
+                    'response': {
+                        'message': 'Employee does not exists!',
+                        'error_message': None,
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_weekend_management(request):
+        try:
+            employee = request.data.get('employee_id',None)
+            if employee:
+                weekend = WeekendManagement.objects.filter(employee_id=employee)
+                weekend = WeekendManagementSerializer(weekend)
+                return Response(
+                    {
+                        'status': 200,
+                        'status_code': '200',
+                        'response': {
+                            'message': 'Week end updated across employee!',
+                            'error_message': None,
+                            'weekend':weekend.data
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+            else:
+                weekend = WeekendManagement.objects.all()
+                weekend = WeekendManagementSerializer(weekend ,many=True)
+                return Response(
+                    {
+                        'status': 200,
+                        'status_code': '200',
+                        'response': {
+                            'message': 'Week end updated across employee!',
+                            'error_message': None,
+                            'weekend': weekend.data
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+        except:
+            return Response(
+                {
+                    'status': 400,
+                    'status_code': '400',
+                    'response': {
+                        'message': 'Employee does not exists!',
+                        'error_message': None,
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+@api_view(['DELETE'])
+@permission_classes([AllowAny])
+def delete_weekend_management(request):
+        try:
+            id = request.data.get('id',None)
+            if id:
+                weekend = WeekendManagement.objects.filter(id=id)
+                if weekend:
+                    weekend.delete()
+                    return Response(
+                        {
+                            'status': 200,
+                            'status_code': '200',
+                            'response': {
+                                'message': 'Week end deleted across employee!',
+                                'error_message': None,
+                                # 'weekend':weekend
+                            }
+                        },
+                        status=status.HTTP_200_OK
+                    )
+        except:
+            return Response(
+                {
+                    'status': 400,
+                    'status_code': '400',
+                    'response': {
+                        'message': 'Weekend does not exists!',
+                        'error_message': None,
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
