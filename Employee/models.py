@@ -128,7 +128,7 @@ class Employee(models.Model):
     to_present = models.BooleanField(default=False)
     ending_date = models.DateField(null=True, blank=True)
     can_refunds = models.BooleanField(default=True,null=True)
-    can_refund = models.BooleanField(default=True, null=True)
+    can_refund = models.BooleanField(default=True)
 
     is_default = models.BooleanField(default=False)
 
