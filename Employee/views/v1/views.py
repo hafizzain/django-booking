@@ -5657,7 +5657,7 @@ def create_weekend_management(request):
 @permission_classes([AllowAny])
 def update_weekend_management(request):
     try:
-        employee_id = request.query_params.get('employee_id', None)
+        id = request.query_params.get('id', None)
         if not employee_id:
             return Response(
                 {
@@ -5672,7 +5672,7 @@ def update_weekend_management(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        weekend_instance = WeekendManagement.objects.get(employee_id=employee_id)
+        weekend_instance = WeekendManagement.objects.get(id=id)
         # Update fields
         weekend_instance.monday = request.data.get('monday', False)
         weekend_instance.tuesday = request.data.get('tuesday', False)
@@ -5738,6 +5738,7 @@ def get_weekend_management(request):
             weekend = WeekendManagementSerializer(weekend)
             return Response(
                 {
+                    'success':True,
                     'status': 200,
                     'status_code': '200',
                     'response': {
@@ -5753,6 +5754,7 @@ def get_weekend_management(request):
             weekend = WeekendManagementSerializer(weekend, many=True)
             return Response(
                 {
+                    'success': True,
                     'status': 200,
                     'status_code': '200',
                     'response': {
@@ -5766,6 +5768,7 @@ def get_weekend_management(request):
     except:
         return Response(
             {
+                'success': False,
                 'status': 400,
                 'status_code': '400',
                 'response': {
