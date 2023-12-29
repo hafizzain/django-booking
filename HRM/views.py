@@ -25,6 +25,9 @@ class HolidayApiView(APIView):
     search_fields = ['name', 'start_date', 'end_date']
     
     def get(self, request, pk=None):
+        name = self.request.query_params.get('search_text', None)
+        start_date = self.request.query_params.get('start_date', None)
+        end_date = self.request.query_params.get('end_date', None)
         no_pagination = request.GET.get('no_pagination', None)
         location = request.GET.get('location', None)  #data deal with location
         if pk is not None:
@@ -41,18 +44,13 @@ class HolidayApiView(APIView):
                 }
             return Response(data, status=status.HTTP_200_OK)
         else:
-            filtered_queryset = Holiday.objects.filter(location=location) \
-                                .order_by('-created_at')
-            query = Q()
-            name = self.request.query_params.get('search_text', None)
+            query = Q(location=location)
             if name:
                 query &= Q(name__icontains=name)
             
-            start_date = self.request.query_params.get('start_date', None)
             if start_date:
                 query &= Q(start_date__gte=start_date)
             
-            end_date = self.request.query_params.get('end_date', None)
             if end_date:
                 query &= Q(end_date__lte=end_date)
             
