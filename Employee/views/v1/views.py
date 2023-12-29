@@ -1309,6 +1309,7 @@ def update_employee(request):
     old_email = None
     emp_email = request.data.get('email')
     leave_data = request.data.get('leave_data', [])
+    lev_id = 0
 
     # emp = Employee.objects.get(id=id)
 
@@ -1353,12 +1354,13 @@ def update_employee(request):
         )
     if len(leave_data) > 0:
         leave_data = json.loads(leave_data)
-        LeaveManagement.objects.filter(employee_id=id).update(
+        lev_id  = LeaveManagement.objects.filter(employee_id=id).update(
             casual_leave=leave_data.get('casual_leave', 0),
             annual_leave=leave_data.get('annual_leave', 0),
             medical_leave=leave_data.get('medical_leave', 0),
             number_of_months=leave_data.get('number_of_months', 0)
         )
+
     try:
         staff = StaffGroup.objects.get(employees=id)
         staff.employees.remove(employee)
@@ -1546,7 +1548,8 @@ def update_employee(request):
                 'response': {
                     'message': ' Employee updated successfully',
                     'error_message': 'Error in saving Employee',
-                    'Employee': data
+                    'Employee': data,
+                    'lev_id': lev_id
                 }
             },
             status=status.HTTP_200_OK
