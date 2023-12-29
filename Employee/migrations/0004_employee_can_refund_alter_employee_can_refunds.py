@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
+        migrations.AddField(
             model_name='employee',
             name='can_refund',
             field=models.BooleanField(default=True, null=True),
