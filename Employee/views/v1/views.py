@@ -5639,7 +5639,6 @@ def check_employee_existance(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def create_weekend_management(request):
-    if request.method == 'POST':
         try:
             employee = Employee.objects.get(id=request.data.get('employee_id'))
             weekend_management = WeekendManagement.objects.create(
