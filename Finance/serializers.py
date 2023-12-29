@@ -1,9 +1,9 @@
 from rest_framework import serializers
-from Finance.models import Refund, RefundProduct, RefundServices ,RefundCoupon
+from Finance.models import Refund, RefundProducts, RefundServices ,RefundCoupon
 
 class RefundProductSerializer(serializers.ModelSerializer):
     class Meta:
-        model = RefundProduct
+        model = RefundProducts
         fields = '__all__'
         read_only_fields = ['refund']
 
@@ -29,10 +29,10 @@ class RefundSerializer(serializers.ModelSerializer):
 
         # Create refunded products
         refunded_products_instances = [
-            RefundProduct(refund=refund, **product_data)
+            RefundProducts(refund=refund, **product_data)
             for product_data in refunded_products_data
         ]
-        RefundProduct.objects.bulk_create(refunded_products_instances)
+        RefundProducts.objects.bulk_create(refunded_products_instances)
 
         # Create refunded services
         refunded_services_instances = [
