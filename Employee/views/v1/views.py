@@ -5732,9 +5732,9 @@ def update_weekend_management(request):
 @permission_classes([AllowAny])
 def get_weekend_management(request):
     try:
-        employee = request.data.get('employee_id', False)
-        if employee:
-            weekend = WeekendManagement.objects.filter(employee_id=employee)
+        id = request.query_params.get('id', False)
+        if id:
+            weekend = WeekendManagement.objects.filter(id=id)
             weekend = WeekendManagementSerializer(weekend)
             return Response(
                 {
