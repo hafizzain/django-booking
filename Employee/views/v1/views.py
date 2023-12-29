@@ -5677,3 +5677,96 @@ def create_weekend_management(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
+
+
+
+@api_view(['PATCH'])
+@permission_classes([AllowAny])
+def update_weekend_management(request):
+        try:
+            employee = request.data.get('employee_id',None)
+            if employee:
+                WeekendManagement.objects.filter(employee_id=employee).update(
+                    monday=request.data.get('monday', False),
+                    tuesday=request.data.get('tuesday', False),
+                    wednesday=request.data.get('wednesday', False),
+                    thursday=request.data.get('thursday', False),
+                    friday=request.data.get('friday', False),
+                    saturday=request.data.get('saturday', False),
+                    sunday=request.data.get('sunday', False),
+                )
+                # weekend = WeekendManagementSerializer(weekend_management)
+                return Response(
+                    {
+                        'status': 200,
+                        'status_code': '200',
+                        'response': {
+                            'message': 'Week end updated across employee!',
+                            'error_message': None,
+                            # 'weekend':weekend
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+        except:
+            return Response(
+                {
+                    'status': 400,
+                    'status_code': '400',
+                    'response': {
+                        'message': 'Employee does not exists!',
+                        'error_message': None,
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_weekend_management(request):
+        try:
+            employee = request.data.get('employee_id',None)
+            if employee:
+                weekend = WeekendManagement.objects.filter(employee_id=employee)
+                weekend = WeekendManagementSerializer(weekend)
+                return Response(
+                    {
+                        'status': 200,
+                        'status_code': '200',
+                        'response': {
+                            'message': 'Week end updated across employee!',
+                            'error_message': None,
+                            'weekend':weekend.data
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+            else:
+                weekend = WeekendManagement.objects.all()
+                weekend = WeekendManagementSerializer(weekend ,many=True)
+                return Response(
+                    {
+                        'status': 200,
+                        'status_code': '200',
+                        'response': {
+                            'message': 'Week end updated across employee!',
+                            'error_message': None,
+                            'weekend': weekend.data
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+        except:
+            return Response(
+                {
+                    'status': 400,
+                    'status_code': '400',
+                    'response': {
+                        'message': 'Employee does not exists!',
+                        'error_message': None,
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
