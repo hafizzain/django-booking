@@ -1,4 +1,4 @@
-from uuid import uuid4
+
 from django.db import models
 from Authentication.models import User
 from Business.models import Business
@@ -26,16 +26,11 @@ class Refund(CommonField):
     
     total_refund_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)  
 
-class RefundProducts(models.Model):
-    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-    is_active = models.BooleanField(default=True,null=True)
-    is_blocked = models.BooleanField(default=False)
-    is_deleted = models.BooleanField(default=False)
-    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+class RefundProducts(CommonField):
+    
     refund = models.ForeignKey(Refund, on_delete=models.CASCADE, verbose_name = 'Refund id')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Product id')
-    is_active = models.BooleanField(default=True)
+    
     
     refunded_quantity = models.PositiveIntegerField()
     refunded_amount = models.DecimalField(max_digits=10, decimal_places=2)
