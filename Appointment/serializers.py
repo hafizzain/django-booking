@@ -335,172 +335,169 @@ class BlockSerializer(serializers.ModelSerializer):
 class EmployeeAppointmentSerializer(serializers.ModelSerializer):
     employee = serializers.SerializerMethodField()
     appointments = serializers.SerializerMethodField()
-    unavailable_time = serializers.SerializerMethodField()
+    # unavailable_time = serializers.SerializerMethodField()
 
-    def get_appointment_id(self, obj):
-        return None
+    # def get_unavailable_time(self, employee_instance):
+    #     return self.retreive_unavailable_time(employee_instance)
 
-    def get_unavailable_time(self, employee_instance):
-        return self.retreive_unavailable_time(employee_instance)
+    # def retreive_unavailable_time(self, employee_instance):
+    #     errors = []
+    #     selected_date = self.context.get('selected_date', None)
+    #     if not selected_date:
+    #         return []
 
-    def retreive_unavailable_time(self, employee_instance):
-        errors = []
-        selected_date = self.context.get('selected_date', None)
-        if not selected_date:
-            return []
+    #     data = []
 
-        data = []
+    #     exluded_times = []
+    #     try:
+    #         employee_working_schedule = EmployeDailySchedule.objects.get(
+    #             employee=employee_instance,
+    #             date=selected_date,
+    #         )
+    #         if employee_working_schedule.is_leave:
+    #             raise Exception('Employee on Leave')
 
-        exluded_times = []
-        try:
-            employee_working_schedule = EmployeDailySchedule.objects.get(
-                employee=employee_instance,
-                date=selected_date,
-            )
-            if employee_working_schedule.is_leave:
-                raise Exception('Employee on Leave')
+    #         if employee_working_schedule.is_vacation:
+    #             raise Exception('Employee on Vacation')
 
-            if employee_working_schedule.is_vacation:
-                raise Exception('Employee on Vacation')
+    #     except Exception as err:
+    #         errors.append(str(err))
+    #         exluded_times.append({
+    #             'start_time': "00:00:00",
+    #             'end_time': "00:00:00",
+    #         })
+    #     else:
+    #         first_shift = [employee_working_schedule.start_time, employee_working_schedule.end_time]
+    #         second_shift = [employee_working_schedule.start_time_shift,
+    #                         employee_working_schedule.end_time_shift] if employee_working_schedule.start_time_shift else None
 
-        except Exception as err:
-            errors.append(str(err))
-            exluded_times.append({
-                'start_time': "00:00:00",
-                'end_time': "00:00:00",
-            })
-        else:
-            first_shift = [employee_working_schedule.start_time, employee_working_schedule.end_time]
-            second_shift = [employee_working_schedule.start_time_shift,
-                            employee_working_schedule.end_time_shift] if employee_working_schedule.start_time_shift else None
+    #         if not first_shift[0] or not first_shift[1]:
+    #             return []
 
-            if not first_shift[0] or not first_shift[1]:
-                return []
+    #         if employee_working_schedule.start_time.strftime('%H:%M:%S') == "00:00:00":
+    #             if employee_working_schedule.end_time.strftime('%H:%M:%S') == '00:00:00':
+    #                 pass
+    #             else:
+    #                 start_time = employee_working_schedule.end_time.strftime('%H:%M:%S')
+    #                 end_time = "00:00:00"
+    #                 if employee_working_schedule.start_time_shift:
+    #                     end_time = None
 
-            if employee_working_schedule.start_time.strftime('%H:%M:%S') == "00:00:00":
-                if employee_working_schedule.end_time.strftime('%H:%M:%S') == '00:00:00':
-                    pass
-                else:
-                    start_time = employee_working_schedule.end_time.strftime('%H:%M:%S')
-                    end_time = "00:00:00"
-                    if employee_working_schedule.start_time_shift:
-                        end_time = None
+    #                     if employee_working_schedule.end_time.strftime(
+    #                             '%H:%M:%S') == employee_working_schedule.start_time_shift.strftime('%H:%M:%S'):
+    #                         if employee_working_schedule.end_time_shift.strftime('%H:%M:%S') == "00:00:00":
+    #                             start_time = None
+    #                             end_time = None
+    #                         else:
+    #                             start_time = employee_working_schedule.end_time_shift.strftime('%H:%M:%S')
+    #                             end_time = '00:00:00'
 
-                        if employee_working_schedule.end_time.strftime(
-                                '%H:%M:%S') == employee_working_schedule.start_time_shift.strftime('%H:%M:%S'):
-                            if employee_working_schedule.end_time_shift.strftime('%H:%M:%S') == "00:00:00":
-                                start_time = None
-                                end_time = None
-                            else:
-                                start_time = employee_working_schedule.end_time_shift.strftime('%H:%M:%S')
-                                end_time = '00:00:00'
+    #                 if start_time and end_time:
+    #                     exluded_times.append({
+    #                         'start_time': start_time,
+    #                         'end_time': end_time,
+    #                     })
+    #         else:
+    #             start_time = "00:00:00"
+    #             end_time = employee_working_schedule.start_time.strftime('%H:%M:%S')
+    #             exluded_times.append({
+    #                 'start_time': start_time,
+    #                 'end_time': end_time,
+    #             })
 
-                    if start_time and end_time:
-                        exluded_times.append({
-                            'start_time': start_time,
-                            'end_time': end_time,
-                        })
-            else:
-                start_time = "00:00:00"
-                end_time = employee_working_schedule.start_time.strftime('%H:%M:%S')
-                exluded_times.append({
-                    'start_time': start_time,
-                    'end_time': end_time,
-                })
+    #             start_time = employee_working_schedule.end_time.strftime('%H:%M:%S')
+    #             end_time = None
 
-                start_time = employee_working_schedule.end_time.strftime('%H:%M:%S')
-                end_time = None
+    #             if employee_working_schedule.end_time_shift:
+    #                 if employee_working_schedule.end_time.strftime(
+    #                         '%H:%M:%S') == employee_working_schedule.start_time_shift.strftime('%H:%M:%S'):
+    #                     start_time = None
+    #                     end_time = None
+    #                     if employee_working_schedule.end_time_shift.strftime('%H:%M:%S') == "00:00:00":
+    #                         pass
+    #                     else:
+    #                         start_time = employee_working_schedule.end_time_shift.strftime('%H:%M:%S')
+    #                         end_time = "00:00:00"
+    #                         exluded_times.append({
+    #                             'start_time': start_time,
+    #                             'end_time': end_time,
+    #                         })
+    #                 else:
+    #                     end_time = employee_working_schedule.start_time_shift.strftime('%H:%M:%S')
+    #                     exluded_times.append({
+    #                         'start_time': start_time,
+    #                         'end_time': end_time,
+    #                     })
+    #                     start_time = None
+    #                     end_time = None
 
-                if employee_working_schedule.end_time_shift:
-                    if employee_working_schedule.end_time.strftime(
-                            '%H:%M:%S') == employee_working_schedule.start_time_shift.strftime('%H:%M:%S'):
-                        start_time = None
-                        end_time = None
-                        if employee_working_schedule.end_time_shift.strftime('%H:%M:%S') == "00:00:00":
-                            pass
-                        else:
-                            start_time = employee_working_schedule.end_time_shift.strftime('%H:%M:%S')
-                            end_time = "00:00:00"
-                            exluded_times.append({
-                                'start_time': start_time,
-                                'end_time': end_time,
-                            })
-                    else:
-                        end_time = employee_working_schedule.start_time_shift.strftime('%H:%M:%S')
-                        exluded_times.append({
-                            'start_time': start_time,
-                            'end_time': end_time,
-                        })
-                        start_time = None
-                        end_time = None
+    #                     if employee_working_schedule.end_time_shift.strftime('%H:%M:%S') == "00:00:00":
+    #                         pass
+    #                     else:
+    #                         start_time = employee_working_schedule.end_time_shift.strftime('%H:%M:%S')
+    #                         end_time = "00:00:00"
+    #                         exluded_times.append({
+    #                             'start_time': start_time,
+    #                             'end_time': end_time,
+    #                         })
+    #             else:
+    #                 end_time = "00:00:00"
+    #                 exluded_times.append({
+    #                     'start_time': start_time,
+    #                     'end_time': end_time,
+    #                 })
 
-                        if employee_working_schedule.end_time_shift.strftime('%H:%M:%S') == "00:00:00":
-                            pass
-                        else:
-                            start_time = employee_working_schedule.end_time_shift.strftime('%H:%M:%S')
-                            end_time = "00:00:00"
-                            exluded_times.append({
-                                'start_time': start_time,
-                                'end_time': end_time,
-                            })
-                else:
-                    end_time = "00:00:00"
-                    exluded_times.append({
-                        'start_time': start_time,
-                        'end_time': end_time,
-                    })
+    #     for exl_time in exluded_times:
+    #         start_time = exl_time['start_time']
+    #         end_time = exl_time['end_time']
+    #         if start_time and end_time:
+    #             start_time_f = datetime.strptime(start_time, '%H:%M:%S')
+    #             end_time_f = datetime.strptime('23:59:59' if end_time == '00:00:00' else end_time, '%H:%M:%S')
 
-        for exl_time in exluded_times:
-            start_time = exl_time['start_time']
-            end_time = exl_time['end_time']
-            if start_time and end_time:
-                start_time_f = datetime.strptime(start_time, '%H:%M:%S')
-                end_time_f = datetime.strptime('23:59:59' if end_time == '00:00:00' else end_time, '%H:%M:%S')
+    #             difference = end_time_f - start_time_f
+    #             seconds = difference.seconds
+    #             minutes = seconds // 60
+    #             hours = minutes // 60
+    #             remaining_minutes = minutes % 60
 
-                difference = end_time_f - start_time_f
-                seconds = difference.seconds
-                minutes = seconds // 60
-                hours = minutes // 60
-                remaining_minutes = minutes % 60
+    #             remaining_time = remaining_minutes // 5
+    #             remaining_time = remaining_time * 5
 
-                remaining_time = remaining_minutes // 5
-                remaining_time = remaining_time * 5
+    #             # remianing_time_less_than_five = remaining_minutes % 5
+    #             # if remianing_time_less_than_five > 2:
+    #             #     remianing_time = remianing_time + 5
 
-                # remianing_time_less_than_five = remaining_minutes % 5
-                # if remianing_time_less_than_five > 2:
-                #     remianing_time = remianing_time + 5
+    #             data.append([
+    #                 {
+    #                     "appointment_id": "51479f52-7943-44d1-b3b5-12e0125ca307",
+    #                     "appointment_date": selected_date,
+    #                     "appointment_time": start_time,
+    #                     "end_time": end_time,
+    #                     # 'difference' : f'{difference}min',
+    #                     # "duration": "35min",
+    #                     "duration": f'{hours}h {remaining_time}min',
+    #                     "created_at": "2023-05-29T06:45:38.035196Z",
+    #                     "is_blocked": True,
+    #                     "is_unavailable": True,
+    #                     'errors': errors,
+    #                     'exluded_times': exluded_times
+    #                 }
+    #             ])
+    #     return data
 
-                data.append([
-                    {
-                        "appointment_id": "51479f52-7943-44d1-b3b5-12e0125ca307",
-                        "appointment_date": selected_date,
-                        "appointment_time": start_time,
-                        "end_time": end_time,
-                        # 'difference' : f'{difference}min',
-                        # "duration": "35min",
-                        "duration": f'{hours}h {remaining_time}min',
-                        "created_at": "2023-05-29T06:45:38.035196Z",
-                        "is_blocked": True,
-                        "is_unavailable": True,
-                        'errors': errors,
-                        'exluded_times': exluded_times
-                    }
-                ])
-        return data
+    #     # single_data = {
+    #     #     "id": "51479f52-7943-44d1-b3b5-12e0125ca307",
+    #     #     "appointment_id": "51479f52-7943-44d1-b3b5-12e0125ca307",
+    #     #     "appointment_date": "2023-05-29",
+    #     #     "appointment_time": "00:00:00",
+    #     #     "end_time": "00:00:00",
+    #     #     "duration": "35min",
+    #     #     "created_at": "2023-05-29T06:45:38.035196Z",
+    #     #     "is_blocked": True,
+    #     # }
 
-        # single_data = {
-        #     "id": "51479f52-7943-44d1-b3b5-12e0125ca307",
-        #     "appointment_id": "51479f52-7943-44d1-b3b5-12e0125ca307",
-        #     "appointment_date": "2023-05-29",
-        #     "appointment_time": "00:00:00",
-        #     "end_time": "00:00:00",
-        #     "duration": "35min",
-        #     "created_at": "2023-05-29T06:45:38.035196Z",
-        #     "is_blocked": True,
-        # }
-
-        # data.append(single_data)
-        return data
+    #     # data.append(single_data)
+    #     return data
 
     def get_appointments(self, obj):
         selected_date = self.context.get('selected_date', None)
@@ -579,7 +576,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
         model = Employee
         fields = [
             'employee',
-            'unavailable_time',
+            # 'unavailable_time',
             'appointments',
         ]
 

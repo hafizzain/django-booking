@@ -113,6 +113,7 @@ class ProductManager(models.QuerySet):
         )
 
     def with_stock_health(self, location):
+        #Deprecated method
         query = Q(product=OuterRef('pk'), is_deleted=False)
         if location:
             query &= Q(location=location)
