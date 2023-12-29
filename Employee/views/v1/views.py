@@ -5638,7 +5638,7 @@ def create_weekend_management(request):
             },
             status=status.HTTP_200_OK
         )
-    except:
+    except Exception as ex:
         return Response(
             {
                 'success': False,
