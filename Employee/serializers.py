@@ -146,7 +146,14 @@ class EmployeeGlobelPermission(serializers.ModelSerializer):
     class Meta:
         model = EmployePermission
         fields = ['permissions']
-        
+
+
+class LeaveManagementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeaveManagement
+        fields = "__all__"
+
+
 class EmployeSerializer(serializers.ModelSerializer):
     employee_info = serializers.SerializerMethodField(read_only=True)   
     image = serializers.SerializerMethodField()
@@ -168,6 +175,7 @@ class EmployeSerializer(serializers.ModelSerializer):
     staff_group = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
     schedule = serializers.SerializerMethodField(read_only=True)
+    employee_leaves =  LeaveManagementSerializer()
 
     def get_schedule(self, obj):
         try:
@@ -345,6 +353,7 @@ class EmployeSerializer(serializers.ModelSerializer):
                 'staff_group',
                 'location',
                 'schedule',
+                'employee_leaves',
                 # 'globel_permission',
                 'permissions' , 'monday','tuesday','wednesday','thursday','friday','saturday','sunday'    
                 #'module_permissions',
