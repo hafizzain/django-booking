@@ -356,8 +356,12 @@ class CouponReport(models.Model):
     checkout_type = models.TextField(null=True)
     invoice = models.ForeignKey(SaleInvoice, on_delete=models.SET_NULL, related_name='invoice_coupon_sale',
                                 null=True, blank=True)
-    coupon_type = models.TextField(null=True)
+    client_type = models.TextField(null=True, blank=True)
+    coupon_type_value = models.TextField(null=True)
     coupon_name = models.TextField(null=True)
+    coupon_type = models.TextField(null=True)
+    amount_spent = models.FloatField(null=True)
+    discounted_percentage = models.FloatField(null=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='user_coupon', null=True, blank=True)
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, related_name='client_coupon', null=True,
                                blank=True)
