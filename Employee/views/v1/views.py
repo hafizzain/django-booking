@@ -5758,7 +5758,7 @@ def get_weekend_management(request):
                     'status': 200,
                     'status_code': '200',
                     'response': {
-                        'message': 'Week end updated across employee!',
+                        'message': 'Weekend get across employee successfully!',
                         'error_message': None,
                         'weekend': weekend.data
                     }
