@@ -5628,6 +5628,7 @@ def create_weekend_management(request):
         return Response(
             {
                 'status': 200,
+                'success':True,
                 'status_code': '200',
                 'response': {
                     'message': 'Week end created across employee!',
@@ -5640,6 +5641,7 @@ def create_weekend_management(request):
     except:
         return Response(
             {
+                'success': False,
                 'status': 404,
                 'status_code': '404',
                 'response': {
@@ -5659,6 +5661,7 @@ def update_weekend_management(request):
         if not employee_id:
             return Response(
                 {
+                    'success': False,
                     'status': 400,
                     'status_code': '400',
                     'response': {
@@ -5687,6 +5690,7 @@ def update_weekend_management(request):
 
         return Response(
             {
+                'success': True,
                 'status': 200,
                 'status_code': '200',
                 'response': {
@@ -5700,6 +5704,7 @@ def update_weekend_management(request):
     except WeekendManagement.DoesNotExist:
         return Response(
             {
+                'success': False,
                 'status': 404,
                 'status_code': '404',
                 'response': {
@@ -5712,8 +5717,8 @@ def update_weekend_management(request):
     except Exception as e:
         return Response(
             {
-                'status': 500,
-                'status_code': '500',
+                'status': 400,
+                'status_code': '400',
                 'response': {
                     'message': 'Internal Server Error',
                     'error_message': str(e),
@@ -5727,7 +5732,7 @@ def update_weekend_management(request):
 @permission_classes([AllowAny])
 def get_weekend_management(request):
     try:
-        employee = request.data.get('employee_id', None)
+        employee = request.data.get('employee_id', False)
         if employee:
             weekend = WeekendManagement.objects.filter(employee_id=employee)
             weekend = WeekendManagementSerializer(weekend)
@@ -5783,6 +5788,7 @@ def delete_weekend_management(request):
                 weekend.delete()
                 return Response(
                     {
+                        'success':True,
                         'status': 200,
                         'status_code': '200',
                         'response': {
@@ -5796,6 +5802,7 @@ def delete_weekend_management(request):
     except:
         return Response(
             {
+                'success': False,
                 'status': 400,
                 'status_code': '400',
                 'response': {
