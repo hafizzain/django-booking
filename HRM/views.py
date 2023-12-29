@@ -1,5 +1,7 @@
 from django.shortcuts import render 
 from django.db import transaction
+from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
@@ -7,8 +9,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import filters
-from django.shortcuts import get_object_or_404
-from django.db.models import Q
 from HRM.models import *
 from HRM.serializers import *
 
@@ -25,6 +25,9 @@ class HolidayApiView(APIView):
     search_fields = ['name', 'start_date', 'end_date']
     
     def get(self, request, pk=None):
+        name = self.request.query_params.get('search_text', None)
+        start_date = self.request.query_params.get('start_date', None)
+        end_date = self.request.query_params.get('end_date', None)
         no_pagination = request.GET.get('no_pagination', None)
         location = request.GET.get('location', None)  #data deal with location
         if pk is not None:
@@ -41,23 +44,18 @@ class HolidayApiView(APIView):
                 }
             return Response(data, status=status.HTTP_200_OK)
         else:
-            filtered_queryset = Holiday.objects.filter(location=location) \
-                                .order_by('-created_at')
-            query = Q()
-            name = self.request.query_params.get('search_text', None)
+            query = Q(location=location)
             if name:
                 query &= Q(name__icontains=name)
             
-            start_date = self.request.query_params.get('start_date', None)
             if start_date:
                 query &= Q(start_date__gte=start_date)
             
-            end_date = self.request.query_params.get('end_date', None)
             if end_date:
                 query &= Q(end_date__lte=end_date)
             
             filtered_queryset = Holiday.objects.filter(query) \
-                            .order_by('-created_at')
+                                .order_by('-created_at')
             serializer = HolidaySerializer(filtered_queryset, many=True)
 
             if no_pagination:

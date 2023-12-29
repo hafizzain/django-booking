@@ -157,12 +157,8 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     client_info = serializers.SerializerMethodField(read_only=True)
 
     def get_client_info(self, obj):
-        tag = ''
-        client_type = ''
-
-        if obj.appointment.status in [choices.AppointmentStatus.DONE, choices.AppointmentStatus.FINISHED]:
-            tag = obj.client_tag
-            client_type = obj.client_type
+        tag = obj.client_tag
+        client_type = obj.client_type
         # else:
         #     if obj.appointment.client:
         #         last_appointment = AppointmentService.objects.filter(
