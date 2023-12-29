@@ -5660,7 +5660,7 @@ def create_weekend_management(request):
                     'response': {
                         'message': 'Week end created across employee!',
                         'error_message': None,
-                        'weekend':weekend
+                        'weekend':weekend.data
                     }
                 },
                 status=status.HTTP_200_OK
