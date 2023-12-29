@@ -91,31 +91,6 @@ class EmployeeManager(models.QuerySet):
             evening_count=Count('employee_daily_insights', filter=evening_filter),
         )
 
-    """
-    TODO: Do Not Remove Below Commented Code
-    
-    """
-
-    # def with_total_sale(self):
-    #     appointment_filter = Q(appointment_status='Done')
-    #     order_filter = Q(checkout__is_deleted=False)
-
-    #     return self.annotate(
-    #          appointment_sale=Coalesce(
-    #              Sum('member_appointments__total_price', filter=appointment_filter),
-    #              0
-    #          ),
-    #          price=Case(
-    #              When(member_orders__discount_price__isnull=True, then="member_orders__total_price", filter=order_filter),
-    #              When(member_orders__discount_price__isnull=False, then="member_orders__discount_price", filter=order_filter),
-    #             output_field=FloatField(),
-    #             default=Value(0.00)
-    #          ),
-    #          quantity = F('member_orders__quantity', filter=order_filter)
-    #     ).annotate(
-    #         order_sale = F('price') * F('quantity')
-    #     )
-
 
 class Employee(models.Model):
     GENDER_CHOICES = [
@@ -152,7 +127,8 @@ class Employee(models.Model):
     joining_date = models.DateField(null=True, blank=True)
     to_present = models.BooleanField(default=False)
     ending_date = models.DateField(null=True, blank=True)
-
+    can_refund = models.BooleanField(default=True)
+        
     is_default = models.BooleanField(default=False)
 
     is_deleted = models.BooleanField(default=False)
