@@ -11,3 +11,4 @@ def onNotificationSaveSend_FirebaseNotification(sender, instance, created, **kwa
     if created and instance.appointment and instance.appointment.client:
         instance.client_tag = instance.appointment.client.client_tag
         instance.client_type = instance.appointment.client.client_type
+        instance.save()
