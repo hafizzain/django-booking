@@ -5658,7 +5658,7 @@ def create_weekend_management(request):
 def update_weekend_management(request):
     try:
         id = request.query_params.get('id', None)
-        if not employee_id:
+        if not id:
             return Response(
                 {
                     'success': False,
