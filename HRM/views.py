@@ -41,7 +41,9 @@ class HolidayApiView(APIView):
                 }
             return Response(data, status=status.HTTP_200_OK)
         else:
-            query = Q(location=location)
+            filtered_queryset = Holiday.objects.filter(location=location) \
+                                .order_by('-created_at')
+            query = Q()
             name = self.request.query_params.get('search_text', None)
             if name:
                 query &= Q(name__icontains=name)
