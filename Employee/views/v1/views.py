@@ -5735,14 +5735,14 @@ def get_weekend_management(request):
         id = request.query_params.get('id', False)
         if id:
             weekend = WeekendManagements.objects.filter(id=id)
-            weekend = WeekendManagementSerializer(weekend)
+            weekend = WeekendManagementSerializer(weekend ,many=True)
             return Response(
                 {
                     'success':True,
                     'status': 200,
                     'status_code': '200',
                     'response': {
-                        'message': 'Week end updated across employee!',
+                        'message': 'Weekend get across employee!',
                         'error_message': None,
                         'weekend': weekend.data
                     }
