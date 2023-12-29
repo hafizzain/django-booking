@@ -1,5 +1,7 @@
 from django.shortcuts import render 
 from django.db import transaction
+from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
@@ -7,8 +9,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import filters
-from django.shortcuts import get_object_or_404
-from django.db.models import Q
 from HRM.models import *
 from HRM.serializers import *
 
@@ -41,9 +41,7 @@ class HolidayApiView(APIView):
                 }
             return Response(data, status=status.HTTP_200_OK)
         else:
-            filtered_queryset = Holiday.objects.filter(location=location) \
-                                .order_by('-created_at')
-            query = Q()
+            query = Q(location=location)
             name = self.request.query_params.get('search_text', None)
             if name:
                 query &= Q(name__icontains=name)
@@ -57,7 +55,7 @@ class HolidayApiView(APIView):
                 query &= Q(end_date__lte=end_date)
             
             filtered_queryset = Holiday.objects.filter(query) \
-                            .order_by('-created_at')
+                                .order_by('-created_at')
             serializer = HolidaySerializer(filtered_queryset, many=True)
 
             if no_pagination:
