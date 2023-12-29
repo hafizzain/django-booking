@@ -316,14 +316,6 @@ class AppointmentService(models.Model):
         
         if self.status == choices.AppointmentServiceStatus.FINISHED and self.appointment and self.appointment.client and self.appointment.status in [choices.AppointmentStatus.DONE, choices.AppointmentStatus.FINISHED]:
             client = self.appointment.client
-
-            # if not self.client_tag:
-            #     self.client_tag = client.client_tag
-
-            # if not self.client_type:
-            #     self.client_type = client.client_type
-
-            # client_f_month = int(client.created_at.strftime('%m'))
             client_f_month = 10
 
             apps_services = AppointmentService.objects.filter(
@@ -339,10 +331,6 @@ class AppointmentService(models.Model):
             price = 0
             for ck in apps_services:
                 price = price + ck.get_final_price()
-
-            # last_app = client_appointments.order_by('created_at').last()
-            # last_month = int(self.appointment.created_at.strftime('%m'))
-            # last_appointment = apps_services.exclude(appointment = self.appointment).order_by('created_at').last()
             
             last_month = int(datetime.now().strftime('%m'))
             months = max(last_month - client_f_month , 1)
