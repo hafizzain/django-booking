@@ -5655,7 +5655,7 @@ def create_weekend_management(request):
 @permission_classes([AllowAny])
 def update_weekend_management(request):
     try:
-        employee = request.GET.get('employee_id', None)
+        employee = request.query_params.get('employee_id', None)
         monday = request.data.get('monday', False)
         tuesday = request.data.get('tuesday', False),
         wednesday = request.data.get('wednesday', False)
@@ -5672,7 +5672,7 @@ def update_weekend_management(request):
         sunday = sunday.lower() == 'true' if isinstance(sunday, str) else sunday
 
         if employee:
-            WeekendManagement.objects.filter(id=id).update(monday=monday,tuesday=tuesday,wednesday=wednesday,thursday=thursday,friday=friday,saturday=saturday,sunday=sunday)
+            WeekendManagement.objects.filter(employee_id=employee).update(monday=monday,tuesday=tuesday,wednesday=wednesday,thursday=thursday,friday=friday,saturday=saturday,sunday=sunday)
             # weekend = WeekendManagementSerializer(weekend_management)
             return Response(
                 {
