@@ -1039,7 +1039,7 @@ def create_employee(request):
         address=address,
         joining_date=joining_date,
         ending_date=ending_date,
-        can_refund=can_refund
+        can_refunds=can_refund
     )
     if not to_present:
         pass
@@ -1386,7 +1386,7 @@ def update_employee(request):
         employee.is_active = True
     else:
         employee.is_active = False
-    employee.can_refund = can_refund
+    employee.can_refunds = can_refund
     employee.save()
 
     if country_unique_id is not None:
