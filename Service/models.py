@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from django.db import models
 from django.utils.timezone import now
 from django.db.models.functions import Coalesce
-from django.db.models import Count, IntegerField, Q, Sum
+from django.db.models import Count, IntegerField, Q, Sum, F, ExpressionWrapper
 
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
@@ -25,7 +25,14 @@ class ServiceManager(models.QuerySet):
         )
 
     def with_total_appointment_count(self, location=None, duration=None):
+        """
+        This function returns the Count of appointments (AppointmentService)
+        related to a particular service
 
+        Parameters:
+        - location (BusinessAddress)
+        - duration (int)
+        """
         query = Q(serivce_appointments__status=choices.AppointmentServiceStatus.FINISHED)
         if location:
             query &= Q(serivce_appointments__business_address=location)
@@ -44,7 +51,14 @@ class ServiceManager(models.QuerySet):
         )
 
     def with_total_orders_quantity(self, location=None, duration=None):
+        """
+        This function returns the sum of sales quantity (ServiceOrder)
+        related to a particular service
 
+        Parameters:
+        - location (BusinessAddress)
+        - duration (int)
+        """
         query = Q()
         if location:
             query &= Q(service_orders__location=location)
@@ -59,6 +73,43 @@ class ServiceManager(models.QuerySet):
                 0,
                 output_field=IntegerField()
             )
+        )
+
+    def with_total_sale_count(self, location=None, duration=None):
+        """
+        This function returns the sum of appointments count (AppointmentService) and 
+        sales quantity (ServiceOrder) related to a particular service
+
+        Parameters:
+        - location (BusinessAddress)
+        - duration (int)
+        """
+        service_orders_filter = Q()
+        appointment_service_filter = Q(serivce_appointments__status=choices.AppointmentServiceStatus.FINISHED)
+        if location:
+            service_orders_filter &= Q(service_orders__location=location)
+            appointment_service_filter &= Q(serivce_appointments__business_address=location)
+        if duration:
+            today = datetime.today()
+            date = today - timedelta(days=duration)
+            service_orders_filter &= Q(service_orders__created_at__gte=date)
+            appointment_service_filter &= Q(serivce_appointments__created_at__gte=date)
+
+
+        return self.annotate(
+            appointment_count=Coalesce(
+                Count('serivce_appointments', filter=appointment_service_filter, distinct=True),
+                0,
+                output_field=IntegerField()
+            ),
+            total_orders_quantity = Coalesce(
+                Sum('service_orders__quantity', filter=service_orders_filter, distinct=True),
+                0,
+                output_field=IntegerField()
+            )
+        ).annotate(
+            total_count=ExpressionWrapper(F('appointment_count') + F('total_orders_quantity'),
+                                        output_field=IntegerField())
         )
 
 class Service(models.Model):

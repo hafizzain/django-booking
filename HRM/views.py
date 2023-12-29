@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render 
 from django.db import transaction
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -26,6 +26,7 @@ class HolidayApiView(APIView):
     
     def get(self, request, pk=None):
         no_pagination = request.GET.get('no_pagination', None)
+        location = request.GET.get('location', None)  #data deal with location
         if pk is not None:
             holiday = get_object_or_404(Holiday, id=pk)
             serializer = HolidaySerializer(holiday)
@@ -40,8 +41,8 @@ class HolidayApiView(APIView):
                 }
             return Response(data, status=status.HTTP_200_OK)
         else:
-            filtered_queryset = Holiday.objects.all() \
-                            .order_by('-created_at')
+            filtered_queryset = Holiday.objects.filter(location=location) \
+                                .order_by('-created_at')
             query = Q()
             name = self.request.query_params.get('search_text', None)
             if name:
@@ -97,10 +98,13 @@ class HolidayApiView(APIView):
     @transaction.atomic
     def post(self, request):
         user = request.user
-        mutable_data = request.data.copy()
-        mutable_data['user'] = user.id
+        holiday_data = request.data.copy()
+        holiday_data['user'] = user.id
+        
+        if 'is_active' not in holiday_data:     #due to unknown clash 
+            holiday_data['is_active'] = True
         # request.data['user'] = user.id
-        serializer = HolidaySerializer(data=mutable_data,
+        serializer = HolidaySerializer(data=holiday_data,
                                        context={'request': request})
         if serializer.is_valid():
             serializer.save()

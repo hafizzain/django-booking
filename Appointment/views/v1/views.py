@@ -2354,8 +2354,8 @@ def service_appointment_count(request):
 
     services = Service.objects \
                 .filter(query) \
-                .with_total_appointment_count(location=location, duration=duration) \
-                .with_total_orders_quantity(location=location, duration=duration)
+                .with_total_sale_count(location=location, duration=duration) \
+                .order_by('-total_count')
 
     serializer = BasicServiceSerializer(services, many=True)
 

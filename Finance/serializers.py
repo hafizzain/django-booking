@@ -1,11 +1,5 @@
-
-from django.db import transaction
 from rest_framework import serializers
 from Finance.models import Refund, RefundProduct, RefundServices ,Coupon
-from Product.models import Product
-from Service.models import Service
-from Client.models import Client
-from django.shortcuts import get_object_or_404
 
 class RefundProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,30 +22,38 @@ class RefundSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        # return validated_data.pop('refunded_products')
-        # return f" validated data: {validated_data} validated data RP: {validated_data.pop('refunded_products')}"
-        refunded_products_data = validated_data.pop('refunded_products')
-        refund_services_data = validated_data.pop('refunded_services')
+        refunded_products_data = validated_data.pop('refunded_products', [])
+        refunded_services_data = validated_data.pop('refunded_services', [])
+
         refund = Refund.objects.create(**validated_data)
-        refund.save()
-        
-        if refunded_products_data:
-            refund_products_instances = [
-                RefundProduct(refund= refund,product=Product.objects.get(id=refunded_product_data['refunded_products']["product"]))
-                for refunded_product_data in refunded_products_data
-            ]
-            refund_products = RefundProduct.objects.bulk_create(refund_products_instances)
-            refund.refundproduct_set.set(refund_products)
-            
-        if refund_services_data : 
-            refunded_services_instances = [
-                RefundServices(refund= refund,service = get_object_or_404(Service, id = refunded_service_data['service']))
-                for refunded_service_data in refund_services_data
-            ]
-            refund_service = RefundServices.objects.bulk_create(refunded_services_instances)
-            refund.refundedservices_set.set(refund_service)
+
+        # Create refunded products
+        refunded_products_instances = [
+            RefundProduct(refund=refund, **product_data)
+            for product_data in refunded_products_data
+        ]
+        RefundProduct.objects.bulk_create(refunded_products_instances)
+
+        # Create refunded services
+        refunded_services_instances = [
+            RefundServices(refund=refund, **service_data)
+            for service_data in refunded_services_data
+        ]
+        RefundServices.objects.bulk_create(refunded_services_instances)
 
         return refund
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['refunded_products'] = RefundProductSerializer(
+            instance.refunded_products.select_related('product').all(),
+            many=True
+        ).data
+        representation['refunded_services'] = RefundServiceSerializer(
+            instance.refunded_services.select_related('service').all(),
+            many=True
+        ).data
+        return representation
+
 
 
 class CouponSerializer(serializers.ModelSerializer):

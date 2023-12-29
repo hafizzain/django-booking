@@ -157,10 +157,32 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     client_info = serializers.SerializerMethodField(read_only=True)
 
     def get_client_info(self, obj):
+        tag = ''
+        client_type = ''
+
+        if obj.appointment.status in [choices.AppointmentStatus.DONE, choices.AppointmentStatus.FINISHED]:
+            tag = obj.client_tag
+            client_type = obj.client_type
+        # else:
+        #     if obj.appointment.client:
+        #         last_appointment = AppointmentService.objects.filter(
+        #             appointment__client = obj.appointment.client,
+        #             status = choices.AppointmentServiceStatus.FINISHED,
+        #         ).order_by('created_at').last()
+                
+        #         if last_appointment:
+        #             tag = last_appointment.client_tag
+        #             client_type = last_appointment.client_type
+        #         else:
+        #             tag = 'No last appointment'
+        #             client_type = 'No last appointment'
+        #     else:
+        #         tag = 'No Client'
+        #         client_type = 'No Client'
+
         return {
-            'client_tag' : obj.client_tag,
-            'tag' : obj.client_tag,
-            'client_type' : obj.client_type,
+            'tag' : tag,
+            'client_type' : client_type,
         }
         # try:
         #     if not obj.appointment:
@@ -313,13 +335,13 @@ class BlockSerializer(serializers.ModelSerializer):
 class EmployeeAppointmentSerializer(serializers.ModelSerializer):
     employee = serializers.SerializerMethodField()
     appointments = serializers.SerializerMethodField()
-    unavailable_time = serializers.SerializerMethodField()
+    # unavailable_time = serializers.SerializerMethodField()
 
     def get_appointment_id(self, obj):
         return None
 
-    def get_unavailable_time(self, employee_instance):
-        return self.retreive_unavailable_time(employee_instance)
+    # def get_unavailable_time(self, employee_instance):
+    #     return self.retreive_unavailable_time(employee_instance)
 
     def retreive_unavailable_time(self, employee_instance):
         errors = []
@@ -557,7 +579,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
         model = Employee
         fields = [
             'employee',
-            'unavailable_time',
+            # 'unavailable_time',
             'appointments',
         ]
 
