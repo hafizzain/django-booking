@@ -773,8 +773,17 @@ def create_appointment(request):
             total_price=price,
             slot_availible_for_online=slot_availible_for_online,
             client_can_book=client_can_book,
-            status=choices.AppointmentServiceStatus.BOOKED
+            status=choices.AppointmentServiceStatus.BOOKED,
         )
+        if appointment.client:
+            appointment_service.client_tag = appointment.client.client_tag
+            appointment_service.client_type = appointment.client.client_type
+            appointment_service.save()
+        else:
+            appointment_service.client_tag = 'No Client'
+            appointment_service.client_type = 'No Client'
+            appointment_service.save()
+
         price_com = 0
         try:
             if extra_price is not None and price == 0:

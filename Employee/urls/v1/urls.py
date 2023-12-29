@@ -17,6 +17,12 @@ urlpatterns = [
     path('search_employee/', views.search_employee),
     path('import_employee/', views.import_employee),
 
+
+    path('create_weekend/', views.create_weekend_management),
+    path('update_weekend/', views.update_weekend_management),
+    path('get_weekend/', views.get_weekend_management),
+    path('delete_weekend/', views.delete_weekend_management),
+
     path('delete_all_employees/', views.delete_all_employees),
     path('check_email_employees/', views.check_email_employees),
     
@@ -29,6 +35,7 @@ urlpatterns = [
     
     #Attendence
     path('get_attendence/', views.get_attendence),
+
     path('get_attendence_device/', views.get_attendence_device),
     path('create_attendence/', views.create_attendence),
     path('update_attendence/', views.update_attendence),

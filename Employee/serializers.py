@@ -15,13 +15,13 @@ from datetime import datetime, timedelta
 import calendar
 
 from rest_framework import serializers
-from .models import( EmployeDailySchedule, Employee, EmployeeProfessionalInfo ,
-               EmployeePermissionSetting, EmployeeModulePermission 
-               , EmployeeMarketingPermission, SallarySlipPayrol,
-               StaffGroup, StaffGroupModulePermission, Attendance
-               ,Payroll , CommissionSchemeSetting , Asset ,AssetDocument,
-               EmployeeSelectedService, Vacation ,CategoryCommission
-)
+from .models import (EmployeDailySchedule, Employee, EmployeeProfessionalInfo,
+                     EmployeePermissionSetting, EmployeeModulePermission
+, EmployeeMarketingPermission, SallarySlipPayrol,
+                     StaffGroup, StaffGroupModulePermission, Attendance
+, Payroll, CommissionSchemeSetting, Asset, AssetDocument,
+                     EmployeeSelectedService, Vacation, CategoryCommission, LeaveManagement, WeekendManagement
+                     )
 from Authentication.models import AccountType, User
 from django_tenants.utils import tenant_context
 
@@ -146,7 +146,21 @@ class EmployeeGlobelPermission(serializers.ModelSerializer):
     class Meta:
         model = EmployePermission
         fields = ['permissions']
-        
+
+
+class LeaveManagementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeaveManagement
+        fields = "__all__"
+
+
+class WeekendManagementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WeekendManagement
+        fields = "__all__"
+
+
+
 class EmployeSerializer(serializers.ModelSerializer):
     employee_info = serializers.SerializerMethodField(read_only=True)   
     image = serializers.SerializerMethodField()
@@ -168,6 +182,7 @@ class EmployeSerializer(serializers.ModelSerializer):
     staff_group = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
     schedule = serializers.SerializerMethodField(read_only=True)
+    employee_leaves =  LeaveManagementSerializer()
 
     def get_schedule(self, obj):
         try:
@@ -345,6 +360,7 @@ class EmployeSerializer(serializers.ModelSerializer):
                 'staff_group',
                 'location',
                 'schedule',
+                'employee_leaves',
                 # 'globel_permission',
                 'permissions' , 'monday','tuesday','wednesday','thursday','friday','saturday','sunday'    
                 #'module_permissions',
@@ -635,6 +651,12 @@ class EmployeeDropdownSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ['id', 'full_name', 'mobile_number', 'email', 'employee_id', 'image', 'designation']
 
+class LeaveManagementSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = LeaveManagement
+        fields = "__all__"
+
 class singleEmployeeSerializer(serializers.ModelSerializer):
     total_sale = serializers.FloatField(read_only=True)
     salary = serializers.SerializerMethodField(read_only=True)
@@ -651,6 +673,8 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
         
     location = serializers.SerializerMethodField()
     total_sale_s = serializers.SerializerMethodField()
+    employee_leaves = LeaveManagementSerializer()
+
     
     def get_total_sale_s(self,obj):
         return total_sale_employee(obj)
@@ -736,6 +760,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
         model =Employee
         fields = [
             'id',
+            'employee_leaves',
             'total_sale_s',
             'image',
             'salary',
