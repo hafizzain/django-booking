@@ -335,7 +335,7 @@ class BlockSerializer(serializers.ModelSerializer):
 class EmployeeAppointmentSerializer(serializers.ModelSerializer):
     employee = serializers.SerializerMethodField()
     appointments = serializers.SerializerMethodField()
-    unavailable_time = serializers.SerializerMethodField()
+    # unavailable_time = serializers.SerializerMethodField()
 
     def get_appointment_id(self, obj):
         return None
