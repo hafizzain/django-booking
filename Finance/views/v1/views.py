@@ -93,7 +93,7 @@ class RefundAPIView(APIView):
                     coupon_serializer.is_valid(raise_exception=True)
                     coupon_serializer.save()
                 except Exception as e:
-                    return Response({'Error':'Error occured while Creating Coupon', 'Errors': coupon_serializer.errors}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    return Response({'Error':'Error occured while Creating Coupon', 'Errors': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
                 response_data = {
                     'success': True,
