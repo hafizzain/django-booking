@@ -624,12 +624,13 @@ class LeaveManagement(CommonField):
 
 
 class WeekendManagement(CommonField):
-    # id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, related_name='employee_weekdays')
-    monday = models.TextField(default=False)
-    tuesday = models.TextField(default=False)
-    wednesday = models.TextField(default=False)
-    thursday = models.TextField(default=False)
-    friday = models.TextField(default=False)
-    saturday = models.TextField(default=False)
-    sunday = models.TextField(default=False)
+    pass
+    # # id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    # employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, related_name='employee_weekdays')
+    # monday = models.TextField(default=False)
+    # tuesday = models.TextField(default=False)
+    # wednesday = models.TextField(default=False)
+    # thursday = models.TextField(default=False)
+    # friday = models.TextField(default=False)
+    # saturday = models.TextField(default=False)
+    # sunday = models.TextField(default=False)
