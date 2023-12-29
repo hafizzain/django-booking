@@ -100,6 +100,7 @@ SHARED_APPS = [
     'debug_toolbar',
     'fcm_django',
     'django_filters',
+    'django.db.migrations'
     
 
     'Tenants.apps.TenantsConfig',
