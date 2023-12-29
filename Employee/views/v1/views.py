@@ -919,6 +919,7 @@ def create_employee(request):
     state_unique_id = request.data.get('state', None)
     city_name = request.data.get('city', None)
     leave_data = request.data.get('leave_data', [])
+    lev_id=0
 
     if not all([
         business_id, full_name, employee_id, country_unique_id, gender, address, designation, income_type,
@@ -1094,13 +1095,12 @@ def create_employee(request):
             pass
     if len(leave_data) > 0:
         leave_data = json.loads(leave_data)
-        LeaveManagement.objects.create(
+        lev_id = LeaveManagement.objects.create(
             employee_id=employee.id,
             casual_leave=leave_data.get('casual_leave', 0),
             annual_leave=leave_data.get('annual_leave', 0),
             medical_leave=leave_data.get('medical_leave', 0),
             number_of_months=leave_data.get('number_of_months', 0)
-
         )
 
     employee_p_info = EmployeeProfessionalInfo.objects.create(
@@ -1220,7 +1220,8 @@ def create_employee(request):
                 'message': 'Employee Added Successfully!',
                 'error_message': None,
                 'employee_error': employees_error,
-                'employees': data
+                'employees': data,
+                'lev_id':lev_id
             }
         },
         status=status.HTTP_201_CREATED
