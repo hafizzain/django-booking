@@ -5776,7 +5776,7 @@ def get_weekend_management(request):
 @permission_classes([AllowAny])
 def delete_weekend_management(request):
     try:
-        id = request.data.get('id', None)
+        id = request.query_params.get('id', None)
         if id:
             weekend = WeekendManagement.objects.filter(id=id)
             if weekend:
@@ -5786,7 +5786,7 @@ def delete_weekend_management(request):
                         'status': 200,
                         'status_code': '200',
                         'response': {
-                            'message': 'Week end deleted across employee!',
+                            'message': 'Weekend deleted across employee!',
                             'error_message': None,
                             # 'weekend':weekend
                         }
