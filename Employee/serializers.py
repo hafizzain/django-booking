@@ -15,13 +15,13 @@ from datetime import datetime, timedelta
 import calendar
 
 from rest_framework import serializers
-from .models import( EmployeDailySchedule, Employee, EmployeeProfessionalInfo ,
-               EmployeePermissionSetting, EmployeeModulePermission 
-               , EmployeeMarketingPermission, SallarySlipPayrol,
-               StaffGroup, StaffGroupModulePermission, Attendance
-               ,Payroll , CommissionSchemeSetting , Asset ,AssetDocument,
-               EmployeeSelectedService, Vacation ,CategoryCommission
-)
+from .models import (EmployeDailySchedule, Employee, EmployeeProfessionalInfo,
+                     EmployeePermissionSetting, EmployeeModulePermission
+, EmployeeMarketingPermission, SallarySlipPayrol,
+                     StaffGroup, StaffGroupModulePermission, Attendance
+, Payroll, CommissionSchemeSetting, Asset, AssetDocument,
+                     EmployeeSelectedService, Vacation, CategoryCommission, LeaveManagement
+                     )
 from Authentication.models import AccountType, User
 from django_tenants.utils import tenant_context
 
@@ -635,6 +635,12 @@ class EmployeeDropdownSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ['id', 'full_name', 'mobile_number', 'email', 'employee_id', 'image', 'designation']
 
+class LeaveManagementSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = LeaveManagement
+        fields = "__all__"
+
 class singleEmployeeSerializer(serializers.ModelSerializer):
     total_sale = serializers.FloatField(read_only=True)
     salary = serializers.SerializerMethodField(read_only=True)
@@ -651,6 +657,8 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
         
     location = serializers.SerializerMethodField()
     total_sale_s = serializers.SerializerMethodField()
+    employee_leaves = LeaveManagementSerializer()
+
     
     def get_total_sale_s(self,obj):
         return total_sale_employee(obj)
@@ -736,6 +744,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
         model =Employee
         fields = [
             'id',
+            'employee_leaves',
             'total_sale_s',
             'image',
             'salary',

@@ -1356,7 +1356,6 @@ def update_employee(request):
             annual_leave=leave_data.get('annual_leave', 0),
             medical_leave=leave_data.get('medical_leave', 0)
         )
-
     try:
         staff = StaffGroup.objects.get(employees=id)
         staff.employees.remove(employee)
