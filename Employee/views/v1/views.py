@@ -5655,48 +5655,71 @@ def create_weekend_management(request):
 @permission_classes([AllowAny])
 def update_weekend_management(request):
     try:
-        employee = request.query_params.get('employee_id', None)
-        monday = request.data.get('monday', False)
-        tuesday = request.data.get('tuesday', False),
-        wednesday = request.data.get('wednesday', False)
-        thursday = request.data.get('thursday', False),
-        friday = request.data.get('friday', False)
-        saturday = request.data.get('saturday', False)
-        sunday = request.data.get('sunday', False)
-        monday = monday.lower() == 'true' if isinstance(monday, str) else monday
-        tuesday = tuesday.lower() == 'true' if isinstance(tuesday, str) else tuesday
-        wednesday = wednesday.lower() == 'true' if isinstance(wednesday, str) else wednesday
-        thursday = thursday.lower() == 'true' if isinstance(thursday, str) else thursday
-        friday = friday.lower() == 'true' if isinstance(friday, str) else friday
-        saturday = saturday.lower() == 'true' if isinstance(saturday, str) else saturday
-        sunday = sunday.lower() == 'true' if isinstance(sunday, str) else sunday
-
-        if employee:
-            WeekendManagement.objects.filter(employee_id=employee).update(monday=monday,tuesday=tuesday,wednesday=wednesday,thursday=thursday,friday=friday,saturday=saturday,sunday=sunday)
-            # weekend = WeekendManagementSerializer(weekend_management)
+        employee_id = request.query_params.get('employee_id', None)
+        if not employee_id:
             return Response(
                 {
-                    'status': 200,
-                    'status_code': '200',
+                    'status': 400,
+                    'status_code': '400',
                     'response': {
-                        'message': 'Week end updated across employee!',
+                        'message': 'Employee ID is required!',
                         'error_message': None,
-                        # 'weekend':weekend
                     }
                 },
-                status=status.HTTP_200_OK
+                status=status.HTTP_400_BAD_REQUEST
             )
-    except:
+
+        weekend_instance = WeekendManagement.objects.get(employee_id=employee_id)
+        # Update fields
+        weekend_instance.monday = request.data.get('monday', False)
+        weekend_instance.tuesday = request.data.get('tuesday', False)
+        weekend_instance.wednesday = request.data.get('wednesday', False)
+        weekend_instance.thursday = request.data.get('thursday', False)
+        weekend_instance.friday = request.data.get('friday', False)
+        weekend_instance.saturday = request.data.get('saturday', False)
+        weekend_instance.sunday = request.data.get('sunday', False)
+
+        # Save the updated instance
+        weekend_instance.save()
+
+        # Serialize the updated instance if needed
+        # weekend_serializer = WeekendManagementSerializer(weekend_instance)
+
         return Response(
             {
-                'status': 400,
-                'status_code': '400',
+                'status': 200,
+                'status_code': '200',
                 'response': {
-                    'message': 'Employee does not exists!',
+                    'message': 'Weekend updated for the employee!',
+                    'error_message': None,
+                    # 'weekend': weekend_serializer.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    except WeekendManagement.DoesNotExist:
+        return Response(
+            {
+                'status': 404,
+                'status_code': '404',
+                'response': {
+                    'message': 'Employee does not exist!',
                     'error_message': None,
                 }
             },
-            status=status.HTTP_400_BAD_REQUEST
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        return Response(
+            {
+                'status': 500,
+                'status_code': '500',
+                'response': {
+                    'message': 'Internal Server Error',
+                    'error_message': str(e),
+                }
+            },
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
 
