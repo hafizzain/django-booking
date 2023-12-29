@@ -361,16 +361,6 @@ class AppointmentService(models.Model):
             client.client_tag = tag
             client.client_type = client_type
             client.save()
-        else:
-            if self.appointment.client:
-                if not self.client_tag:
-                    self.client_tag = self.appointment.client.client_tag
-
-                if not self.client_type:
-                    self.client_type = self.appointment.client.client_type
-            else:
-                self.client_tag = 'No Client'
-                self.client_type = 'No Client'
 
     
         super(AppointmentService, self).save(*args, **kwargs)
