@@ -6,7 +6,7 @@ from django.utils.timezone import now
 
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
-from Utility.models import Country, State, City
+from Utility.models import Country, State, City, CommonField
 from Service.models import Service
 from NStyle.choices import EmployeeDailyInsightChoices
 
@@ -614,8 +614,8 @@ class EmployeeCommission(models.Model):
         return str(self.id)
 
 
-class LeaveManagement(models.Model):
-    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+class LeaveManagement(CommonField):
+    # id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, related_name='employee_leaves')
     casual_leave = models.IntegerField(null=True, default=0, help_text='Number of casual leaves allowed')
     annual_leave = models.IntegerField(null=True, default=0, help_text='Number of annual leaves allowed')
@@ -623,8 +623,8 @@ class LeaveManagement(models.Model):
     number_of_months = models.TextField(null=True)
 
 
-class WeekendManagement(models.Model):
-    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+class WeekendManagement(CommonField):
+    # id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, related_name='employee_weekdays')
     monday = models.TextField(default=False)
     tuesday = models.TextField(default=False)
