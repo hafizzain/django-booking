@@ -317,13 +317,11 @@ class AppointmentService(models.Model):
         if self.status == choices.AppointmentServiceStatus.FINISHED and self.appointment and self.appointment.client and self.appointment.status in [choices.AppointmentStatus.DONE, choices.AppointmentStatus.FINISHED]:
             client = self.appointment.client
 
-            if not self.client_tag:
-                self.client_tag = client.client_tag
+            # if not self.client_tag:
+            #     self.client_tag = client.client_tag
 
-            if not self.client_type:
-                self.client_type = client.client_type
-
-
+            # if not self.client_type:
+            #     self.client_type = client.client_type
 
             # client_f_month = int(client.created_at.strftime('%m'))
             client_f_month = 10
