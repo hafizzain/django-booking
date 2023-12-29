@@ -190,5 +190,5 @@ class CategoryCommissionAdmin(admin.ModelAdmin):
         
         return '-------'
 
-# from django.db.migrations.recorder import MigrationRecorder
-# admin.site.register(MigrationRecorder.Migration)
+from django.db.migrations.recorder import MigrationRecorder
+admin.site.register(MigrationRecorder.Migration)

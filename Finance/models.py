@@ -26,7 +26,7 @@ class Refund(CommonField):
     
     total_refund_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)  
 
-class RefundProducts(CommonField):
+class RefundProduct(CommonField):
     
     refund = models.ForeignKey(Refund, on_delete=models.CASCADE, verbose_name = 'Refund id')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Product id')
