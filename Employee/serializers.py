@@ -20,7 +20,8 @@ from .models import (EmployeDailySchedule, Employee, EmployeeProfessionalInfo,
 , EmployeeMarketingPermission, SallarySlipPayrol,
                      StaffGroup, StaffGroupModulePermission, Attendance
 , Payroll, CommissionSchemeSetting, Asset, AssetDocument,
-                     EmployeeSelectedService, Vacation, CategoryCommission, LeaveManagement, WeekendManagement
+                     EmployeeSelectedService, Vacation, CategoryCommission, LeaveManagements,
+                     WeekendManagements
                      )
 from Authentication.models import AccountType, User
 from django_tenants.utils import tenant_context
@@ -150,13 +151,13 @@ class EmployeeGlobelPermission(serializers.ModelSerializer):
 
 class LeaveManagementSerializer(serializers.ModelSerializer):
     class Meta:
-        model = LeaveManagement
+        model = LeaveManagements
         fields = "__all__"
 
 
 class WeekendManagementSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WeekendManagement
+        model = WeekendManagements
         fields = "__all__"
 
 
@@ -654,7 +655,7 @@ class EmployeeDropdownSerializer(serializers.ModelSerializer):
 class LeaveManagementSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = LeaveManagement
+        model = LeaveManagements
         fields = "__all__"
 
 class singleEmployeeSerializer(serializers.ModelSerializer):

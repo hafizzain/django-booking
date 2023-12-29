@@ -614,7 +614,7 @@ class EmployeeCommission(models.Model):
         return str(self.id)
 
 
-class LeaveManagement(CommonField):
+class LeaveManagements(CommonField):
     # id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, related_name='employee_leaves')
     casual_leave = models.IntegerField(null=True, default=0, help_text='Number of casual leaves allowed')
@@ -623,14 +623,13 @@ class LeaveManagement(CommonField):
     number_of_months = models.TextField(null=True)
 
 
-class WeekendManagement(CommonField):
-    pass
-    # # id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-    # employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, related_name='employee_weekdays')
-    # monday = models.TextField(default=False)
-    # tuesday = models.TextField(default=False)
-    # wednesday = models.TextField(default=False)
-    # thursday = models.TextField(default=False)
-    # friday = models.TextField(default=False)
-    # saturday = models.TextField(default=False)
-    # sunday = models.TextField(default=False)
+class WeekendManagements(CommonField):
+    # id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, related_name='employee_weekdays')
+    monday = models.TextField(default=False)
+    tuesday = models.TextField(default=False)
+    wednesday = models.TextField(default=False)
+    thursday = models.TextField(default=False)
+    friday = models.TextField(default=False)
+    saturday = models.TextField(default=False)
+    sunday = models.TextField(default=False)
