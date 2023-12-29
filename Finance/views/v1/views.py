@@ -3,11 +3,11 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from Invoices.models import SaleInvoice
-from Finance.models import Refund, Coupon
+from Finance.models import Refund, RefundCoupon
 from Finance.serializers import RefundSerializer, CouponSerializer
 from Finance.helpers import short_uuid
-
 from Product.models import Product
+
 class RefundAPIView(APIView):
     
     def get(self, request, *args, **kwargs):
@@ -126,7 +126,7 @@ class RefundAPIView(APIView):
 class RefundedCoupons(APIView):
     '''Getting coupons with the refund Data'''
     def get(self, request, *args, **kwargs):
-        coupons = Coupon.objects.select_related('related_refund__business', 'related_refund__location').all()
+        coupons = RefundCoupon.objects.select_related('related_refund__business', 'related_refund__location').all()
         serializer = CouponSerializer(coupons, many=True)
         if not coupons:
             response_data = {
