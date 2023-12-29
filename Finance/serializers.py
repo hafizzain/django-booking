@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from Finance.models import Refund, RefundProduct, RefundServices ,Coupon
+from Finance.models import Refund, RefundProduct, RefundServices ,RefundCoupon
 
 class RefundProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -59,5 +59,5 @@ class RefundSerializer(serializers.ModelSerializer):
 class CouponSerializer(serializers.ModelSerializer):
     related_refund = RefundSerializer(read_only = True)
     class Meta:
-        model = Coupon
+        model = RefundCoupon
         fields = '__all__'
