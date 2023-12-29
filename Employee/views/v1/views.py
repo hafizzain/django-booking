@@ -7,7 +7,7 @@ from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee,
                              EmployeePermissionSetting, EmployeeModulePermission
 , EmployeeMarketingPermission, EmployeeSelectedService, SallarySlipPayrol, StaffGroup
 , StaffGroupModulePermission, Attendance
-, Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation
+, Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation, LeaveManagement
                              )
 from Tenants.models import EmployeeTenantDetail, Tenant
 from django_tenants.utils import tenant_context
@@ -917,6 +917,7 @@ def create_employee(request):
     country_unique_id = request.data.get('country', None)
     state_unique_id = request.data.get('state', None)
     city_name = request.data.get('city', None)
+    leave_data = request.data.get('leave_data', [])
 
     if not all([
         business_id, full_name, employee_id, country_unique_id, gender, address, designation, income_type,
@@ -1090,6 +1091,14 @@ def create_employee(request):
             # data.update(staff)
         except:
             pass
+    if len(leave_data) > 0:
+        leave_data = json.loads(leave_data)
+        LeaveManagement.objects.create(
+            employee_id=employee.id,
+            casual_leave=leave_data.get('casual_leave', 0),
+            annual_leave=leave_data.get('annual_leave', 0),
+            medical_leave=leave_data.get('medical_leave', 0)
+        )
 
     employee_p_info = EmployeeProfessionalInfo.objects.create(
         employee=employee,
@@ -1295,6 +1304,9 @@ def update_employee(request):
     email_changed = False
     old_email = None
     emp_email = request.data.get('email')
+    leave_data = request.data.get('leave_data',[])
+
+
 
     # emp = Employee.objects.get(id=id)
 
@@ -1337,7 +1349,13 @@ def update_employee(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-
+    if len(leave_data) > 0:
+        leave_data = json.loads(leave_data)
+        LeaveManagement.objects.filter(employee_id=id).update(
+            casual_leave=leave_data.get('casual_leave', 0),
+            annual_leave=leave_data.get('annual_leave', 0),
+            medical_leave=leave_data.get('medical_leave', 0)
+        )
     try:
         staff = StaffGroup.objects.get(employees=id)
         staff.employees.remove(employee)
@@ -5610,4 +5628,3 @@ def check_employee_existance(request):
         },
         status=status.HTTP_404_NOT_FOUND
     )
-            
