@@ -651,6 +651,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
         
     location = serializers.SerializerMethodField()
     total_sale_s = serializers.SerializerMethodField()
+
     
     def get_total_sale_s(self,obj):
         return total_sale_employee(obj)

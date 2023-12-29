@@ -639,7 +639,7 @@ class EmployeeCommission(models.Model):
 
 
 class LeaveManagement(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True,related_name='employee_leaves')
     casual_leave = models.IntegerField(null=True, default=0, help_text='Number of casual leaves allowed')
     annual_leave = models.IntegerField(null=True, default=0, help_text='Number of annual leaves allowed')
     medical_leave = models.IntegerField(null=True, default=0, help_text='Number of medical leaves allowed')
