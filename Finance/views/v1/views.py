@@ -42,29 +42,36 @@ class RefundAPIView(APIView):
     '''
     POST REQUEST FOR THE REFUND
     Payload formate:
-        {
-                "user": 1,  # ID of the staff member who generates the bills
-                "client": 1,  # ID of the client
-                "business": 1,  # ID of the business
-                "location": 1,  # ID of the location
-                "refunded_products": [
-                    {
-                    "product": 1,  # ID of the refunded product
-                    "refunded_quantity": 2,
-                    "refunded_amount": 20.00
-                    },
-                    {
-                    "product": 2,  # ID of another refunded product
-                    "refunded_quantity": 1,
-                    "refunded_amount": 15.00
-                    }
-                ],
-                "refund_type": "credit_refund",
-                "reason": "Product was damaged",
-                "total_refund_amount": 35.00  # This field might be calculated on the client side based on the refunded products
-        }
-    
-    '''
+            {
+            "business": "fb06734e-5f9b-4bab-bc43-c803d3c5a5db",
+            "user": 2,
+            "location": "d956e922-089f-4d61-8079-fe9ed76ec053",
+            "refunded_products": [
+            {
+            "product": "6c7ffa6a-278a-4973-a609-7b7f0d86ac21",
+            "refunded_quantity": 1,
+            "refunded_amount": 100.00,
+            "in_stock": true
+            },
+            {
+            "product": "1f67cf1f-c63b-42f3-bb38-4226da4a20fa",
+            "refunded_quantity": 1,
+            "refunded_amount": 100.00
+            }
+            ],
+            "refunded_services": [
+            {
+            "service": "d47cdbda-5965-4e06-9168-b3284d38c25f",
+            "refunded_amount": 100.00
+            }
+            ],
+            "refund_type": "credit_refund",
+            "expiry_date": "2023-12-30",
+            "total_refund_amount": 100
+            }
+
+
+            '''
     def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
         try:
             user = request.user
