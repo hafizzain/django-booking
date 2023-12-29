@@ -71,6 +71,8 @@ class ClientAdmin(admin.ModelAdmin):
         'full_name', 
         'mobile_number',
         'email',
+        'client_tag',
+        'client_type',
     ]
     
 @admin.register(ClientGroup)

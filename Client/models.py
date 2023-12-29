@@ -146,6 +146,10 @@ class Client(models.Model):
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(null=True, blank=True)
 
+    
+    client_tag = models.CharField(max_length=50, default='')
+    client_type = models.CharField(max_length=50, default='')
+
     objects = ClientManager.as_manager()
 
     def __str__(self):
