@@ -127,8 +127,8 @@ class Employee(models.Model):
     joining_date = models.DateField(null=True, blank=True)
     to_present = models.BooleanField(default=False)
     ending_date = models.DateField(null=True, blank=True)
-    can_refunds = models.BooleanField(default=True)
-        
+    can_refunds = models.BooleanField(default=True,null=True)
+
     is_default = models.BooleanField(default=False)
 
     is_deleted = models.BooleanField(default=False)
