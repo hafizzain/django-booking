@@ -6,10 +6,7 @@ from Tenants.models import Tenant
 
 
 class GlobalPermissionChoices(models.Model):
-    id = models.UUIDField(default=uuid4, editable=False, unique=True, primary_key=True)
-    
-    #employee = models.ForeignKey('Employee.Employee', on_delete=models.CASCADE, related_name='employee_global_permission')
-        
+    id = models.UUIDField(default=uuid4, editable=False, unique=True, primary_key=True)        
     text = models.CharField(max_length=1000, default='')
     slug = models.CharField(max_length=1000, default='')
     

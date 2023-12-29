@@ -917,6 +917,8 @@ def create_employee(request):
     country_unique_id = request.data.get('country', None)
     state_unique_id = request.data.get('state', None)
     city_name = request.data.get('city', None)
+    # Either employee can refund the order or not
+    can_refund = request.data.get('can_refund', False)
 
     if not all([
         business_id, full_name, employee_id, country_unique_id, gender, address, designation, income_type,
@@ -945,39 +947,6 @@ def create_employee(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-
-    # existing_employees = Employee.objects.filter(mobile_number=mobile_number)
-    # if existing_employees:
-    #     return Response(
-    #                 {
-    #                     'status' : False,
-    #                     'status_code' : 404,
-    #                     'status_code_text' : '404',
-    #                     'response' : {
-    #                         'message' : f'Employee already exist with this phonne number.',
-    #                         'error_message' : None,
-    #                     }
-    #                 },
-    #                 status=status.HTTP_404_NOT_FOUND
-    #             )
-    # if email is not None:
-    #     with tenant_context(Tenant.objects.get(schema_name = 'public')):
-    #         try:
-    #             employe = User.objects.get(email__icontains = email)
-    #             return Response(
-    #                 {
-    #                     'status' : False,
-    #                     'status_code' : 404,
-    #                     'status_code_text' : '404',
-    #                     'response' : {
-    #                         'message' : f'User Already exist with this {email}!',
-    #                         'error_message' : None,
-    #                     }
-    #                 },
-    #                 status=status.HTTP_404_NOT_FOUND
-    #             )
-    #         except Exception as err:
-    #             pass
 
     if len(salary) > 7:
         return Response(
@@ -1067,6 +1036,7 @@ def create_employee(request):
         address=address,
         joining_date=joining_date,
         ending_date=ending_date,
+        can_refund=can_refund
     )
     if not to_present:
         pass
@@ -1295,6 +1265,8 @@ def update_employee(request):
     email_changed = False
     old_email = None
     emp_email = request.data.get('email')
+    can_refund = request.data.get('can_refund', False)
+
 
     # emp = Employee.objects.get(id=id)
 
@@ -1391,6 +1363,7 @@ def update_employee(request):
         employee.is_active = True
     else:
         employee.is_active = False
+    employee.can_refund = can_refund
     employee.save()
 
     if country_unique_id is not None:
