@@ -17,6 +17,12 @@ urlpatterns = [
     path('search_employee/', views.search_employee),
     path('import_employee/', views.import_employee),
 
+
+    path('create_weekend_management/', views.create_weekend_management),
+    path('update_weekend_management/', views.update_weekend_management),
+    path('get_weekend_management/', views.get_weekend_management),
+    path('delete_weekend_management/', views.delete_weekend_management),
+
     path('delete_all_employees/', views.delete_all_employees),
     path('check_email_employees/', views.check_email_employees),
     

@@ -5721,8 +5721,6 @@ def update_weekend_management(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_weekend_management(request):
@@ -5765,6 +5763,41 @@ def get_weekend_management(request):
                     'status_code': '400',
                     'response': {
                         'message': 'Employee does not exists!',
+                        'error_message': None,
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+@api_view(['DELETE'])
+@permission_classes([AllowAny])
+def delete_weekend_management(request):
+        try:
+            id = request.data.get('id',None)
+            if id:
+                weekend = WeekendManagement.objects.filter(id=id)
+                if weekend:
+                    weekend.delete()
+                    return Response(
+                        {
+                            'status': 200,
+                            'status_code': '200',
+                            'response': {
+                                'message': 'Week end deleted across employee!',
+                                'error_message': None,
+                                # 'weekend':weekend
+                            }
+                        },
+                        status=status.HTTP_200_OK
+                    )
+        except:
+            return Response(
+                {
+                    'status': 400,
+                    'status_code': '400',
+                    'response': {
+                        'message': 'Weekend does not exists!',
                         'error_message': None,
                     }
                 },
