@@ -5683,7 +5683,7 @@ def create_weekend_management(request):
 @permission_classes([AllowAny])
 def update_weekend_management(request):
         try:
-            employee = request.data.get('employee_id',None)
+            employee = request.GET.get('employee_id',None)
             if employee:
                 WeekendManagement.objects.filter(employee_id=employee).update(
                     monday=request.data.get('monday', False),
