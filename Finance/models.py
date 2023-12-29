@@ -22,6 +22,7 @@ class Refund(CommonField):
 
     refund_type = models.CharField(choices=RefundChoices.choices, max_length=20)
     # reason = models.TextField()
+    
     total_refund_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)  
 
 class RefundProduct(CommonField):
