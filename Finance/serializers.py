@@ -58,7 +58,6 @@ class RefundSerializer(serializers.ModelSerializer):
 
 class CouponSerializer(serializers.ModelSerializer):
     related_refund = RefundSerializer(read_only = True)
-    read_only_fields = ['related_refund']
     class Meta:
         model = RefundCoupon
         fields = '__all__'
