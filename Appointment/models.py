@@ -316,7 +316,8 @@ class AppointmentService(models.Model):
         
         if self.status == choices.AppointmentServiceStatus.FINISHED and self.appointment and self.appointment.client and self.appointment.status in [choices.AppointmentStatus.DONE, choices.AppointmentStatus.FINISHED]:
             client = self.appointment.client
-            client_f_month = 10
+            client_f_month = int(client.created_at.strftime('%m'))
+            # client_f_month = 10
 
             apps_services = AppointmentService.objects.filter(
                 appointment__client = self.appointment.client,
