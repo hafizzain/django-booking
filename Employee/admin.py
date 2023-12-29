@@ -191,4 +191,9 @@ class CategoryCommissionAdmin(admin.ModelAdmin):
         return '-------'
 
 from django.db.migrations.recorder import MigrationRecorder
-admin.site.register(MigrationRecorder.Migration)
+@admin.register(MigrationRecorder.Migration)
+class MigrationRecorderAdmin(admin.ModelAdmin):
+
+    list_filter = [
+        'name'
+    ]
