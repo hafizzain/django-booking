@@ -27,7 +27,7 @@ from Employee.serializers import (EmployeSerializer, EmployeInformationsSerializ
                                   CommissionSerializer, AssetSerializer, WorkingScheduleSerializer,
                                   NewVacationSerializer,
                                   NewAbsenceSerializer, singleEmployeeSerializerOP, Payroll_WorkingScheduleSerializerOP,
-                                  WeekendManagementSerializer
+                                  WeekendManagementSerializer ,LeaveManagementSerializer
                                   )
 from Employee.optimized_serializers import OptimizedEmployeeSerializerDashboard
 from django.db import connection, transaction
@@ -922,7 +922,7 @@ def create_employee(request):
     # Either employee can refund the order or not
     can_refund = request.data.get('can_refund', False)
     leave_data = request.data.get('leave_data', [])
-    lev_id = 0
+    leave_management = None
 
     if not all([
         business_id, full_name, employee_id, country_unique_id, gender, address, designation, income_type,
@@ -1066,13 +1066,14 @@ def create_employee(request):
             pass
     if len(leave_data) > 0:
         leave_data = json.loads(leave_data)
-        lev_id = LeaveManagements.objects.create(
+        leave_management = LeaveManagements.objects.create(
             employee_id=employee.id,
             casual_leave=leave_data.get('casual_leave', 0),
             annual_leave=leave_data.get('annual_leave', 0),
             medical_leave=leave_data.get('medical_leave', 0),
             number_of_months=leave_data.get('number_of_months', 0)
         )
+        leave_data = LeaveManagementSerializer(leave_management ,many=False)
 
     employee_p_info = EmployeeProfessionalInfo.objects.create(
         employee=employee,
@@ -1192,7 +1193,7 @@ def create_employee(request):
                 'error_message': None,
                 'employee_error': employees_error,
                 'employees': data,
-                'lev_id': str(lev_id)
+                'leave_data': leave_data
             }
         },
         status=status.HTTP_201_CREATED
