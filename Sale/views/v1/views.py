@@ -443,7 +443,9 @@ def create_service(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-
+    '''
+    Services are being Creating over here
+    '''
     service_obj = Service.objects.create(
         user=user,
         business=business_id,
