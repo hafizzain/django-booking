@@ -4350,7 +4350,7 @@ def create_workingschedule(request):
     to_date = request.data.get('to_date', None)
     date = request.data.get('date', None)
     note = request.data.get('note', None)
-
+    max_records = 2
     is_vacation = request.data.get('is_vacation', None)
 
     is_leave = request.data.get('is_leave', None)
@@ -4402,6 +4402,27 @@ def create_workingschedule(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    check_working_schedule = EmployeDailySchedule.objects.filter(
+        # user=user,
+        business=business,
+        employee=employee_id,
+        is_weekend=True
+        # date=date,
+        
+    )
+    record_count = check_working_schedule.count()
+    if record_count > max_records:
+        return Response(
+            {
+                'status': True,
+                'message':'more than weekends working not allowed',
+                'status_code': 400,
+                'response': {
+                    'message': 'more than weekends working not allowed',
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     working_schedule, created = EmployeDailySchedule.objects.get_or_create(
         user=user,
@@ -4409,7 +4430,6 @@ def create_workingschedule(request):
         employee=employee_id,
         date=date,
     )
-
     working_schedule.day = day
     working_schedule.start_time = start_time
     working_schedule.end_time = end_time
