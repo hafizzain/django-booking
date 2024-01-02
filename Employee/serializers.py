@@ -21,7 +21,7 @@ from .models import (EmployeDailySchedule, Employee, EmployeeProfessionalInfo,
                      StaffGroup, StaffGroupModulePermission, Attendance
 , Payroll, CommissionSchemeSetting, Asset, AssetDocument,
                      EmployeeSelectedService, Vacation, CategoryCommission, LeaveManagements,
-                     WeekendManagement, VacationDetails
+                     WeekManagement, VacationDetails
                      )
 from Authentication.models import AccountType, User
 from django_tenants.utils import tenant_context
@@ -169,7 +169,7 @@ class LeaveManagementSerializer(serializers.ModelSerializer):
 
 class WeekendManagementSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WeekendManagement
+        model = WeekManagement
         fields = "__all__"
 
 

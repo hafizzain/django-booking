@@ -7,7 +7,7 @@ from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee,
                              EmployeePermissionSetting, EmployeeModulePermission
 , EmployeeMarketingPermission, EmployeeSelectedService, SallarySlipPayrol, StaffGroup
 , StaffGroupModulePermission, Attendance
-, Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation, LeaveManagements, WeekendManagement,
+, Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation, LeaveManagements, WeekManagement,
                              VacationDetails
                              )
 from Tenants.models import EmployeeTenantDetail, Tenant
@@ -5821,7 +5821,7 @@ def create_weekend_management(request):
         if sunday == 'true':
             sunday = True
         employee = Employee.objects.get(id=request.data.get('employee_id'))
-        weekend_management = WeekendManagement.objects.create(
+        weekend_management = WeekManagement.objects.create(
             employee=employee,
             monday=monday,
             tuesday=tuesday,
@@ -5899,7 +5899,7 @@ def update_weekend_management(request):
             saturday = True
         if sunday == 'true':
             sunday = True
-        weekend_instance = WeekendManagement.objects.get(id=id)
+        weekend_instance = WeekManagement.objects.get(id=id)
         # Update fields
         weekend_instance.monday = monday
         weekend_instance.tuesday = tuesday
@@ -5928,7 +5928,7 @@ def update_weekend_management(request):
             },
             status=status.HTTP_200_OK
         )
-    except WeekendManagement.DoesNotExist:
+    except WeekManagement.DoesNotExist:
         return Response(
             {
                 'success': False,
@@ -5961,7 +5961,7 @@ def get_weekend_management(request):
     try:
         id = request.query_params.get('id', False)
         if id:
-            weekend = WeekendManagement.objects.filter(id=id)
+            weekend = WeekManagement.objects.filter(id=id)
             weekend = WeekendManagementSerializer(weekend, many=True)
             return Response(
                 {
@@ -5977,7 +5977,7 @@ def get_weekend_management(request):
                 status=status.HTTP_200_OK
             )
         else:
-            weekend = WeekendManagement.objects.all()
+            weekend = WeekManagement.objects.all()
             weekend = WeekendManagementSerializer(weekend, many=True)
             return Response(
                 {
@@ -6013,7 +6013,7 @@ def delete_weekend_management(request):
     try:
         id = request.query_params.get('id', None)
         if id:
-            weekend = WeekendManagement.objects.filter(id=id)
+            weekend = WeekManagement.objects.filter(id=id)
             if weekend:
                 weekend.delete()
                 return Response(
