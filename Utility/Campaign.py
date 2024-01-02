@@ -35,9 +35,9 @@ def send_campaign_email(new_campaign=None):
     if new_campaign.is_both():
         campaign_type = "Both"
     
-    th = Thread(target=run_campaign, args=[], kwargs={'message' : message,
+    thread = Thread(target=run_campaign, args=[], kwargs={'message' : message,
                                                       'subject' : subject,
                                                       'client_email_list' : client_email_list,
                                                       'campaign_type' : campaign_type})
-    th.start()
+    thread.start()
     
