@@ -317,6 +317,7 @@ class ProductStock(models.Model):
     product_unit = models.CharField(max_length=50, null=True, blank=True, verbose_name='Product Unit') 
 
     alert_when_stock_becomes_lowest = models.BooleanField(default=None, null=True, blank=True)
+    is_refunded = models.BooleanField(default = False)
     
     #turnover = models.CharField(default='Highest', choices=TURN_CHOICES, max_length=40)
 

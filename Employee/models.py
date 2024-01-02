@@ -642,3 +642,18 @@ class WeekendManagements(CommonField):
     friday = models.TextField(default=False)
     saturday = models.TextField(default=False)
     sunday = models.TextField(default=False)
+
+
+class WeekManagement(CommonField):
+    # id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, related_name='employee_weekday')
+    monday = models.BooleanField(default=False ,null=True)
+    tuesday = models.BooleanField(default=False ,null=True)
+    wednesday = models.BooleanField(default=False , null=True)
+    thursday = models.BooleanField(default=False, null=True)
+    friday = models.BooleanField(default=False, null=True)
+    saturday = models.BooleanField(default=False, null=True)
+    sunday = models.BooleanField(default=False, null=True)
+
+
+
