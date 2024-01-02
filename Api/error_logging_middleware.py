@@ -26,8 +26,9 @@ class ServerErrorLoggingMiddleware:
 
             tenant = connection.get_tenant()
             tenant_id = None
-            if tenant and hasattr(tenant, 'id'):
-                tenant_id = str(tenant.id)
+            if tenant:
+                if hasattr(tenant, 'id'):
+                    tenant_id = str(tenant.id)
 
             try:
                 pub_tenant = Tenant.objects.get(schema_name = 'public')
