@@ -107,7 +107,7 @@ class RefundAPIView(APIView):
                         }
                     }
                 }
-                return Response(response_data, status=status.HTTP_201_CREATED)
+                return Response(response_data, status=status.HTTP_200_OK)
             response_data = {
                     'success': False,
                     'status_code': 400,
