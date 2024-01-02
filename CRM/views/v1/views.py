@@ -52,7 +52,8 @@ class SegmentAPIView(APIView):
                 }
             return Response(data, status=status.HTTP_200_OK)
         else:
-            filtered_queryset = Segment.objects.all() \
+            filtered_queryset = Segment.objects.prefetch_related('client') \
+                            .select_related('user', 'business') \
                             .order_by('-created_at')
                             
             name = self.request.query_params.get('search_text', None)
