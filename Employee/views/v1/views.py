@@ -4419,6 +4419,9 @@ def create_workingschedule(request):
     working_schedule.to_date = to_date
     working_schedule.note = note
 
+    if is_vacation == 'false':
+        working_schedule.is_vacation = False
+
     if is_vacation is not None:
         working_schedule.is_vacation = True
     else:
