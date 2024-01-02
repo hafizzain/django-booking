@@ -4160,6 +4160,7 @@ def update_vacation_status(request):
                 status=status.HTTP_200_OK
             )
         if vacation_status == 'declined':
+            aval_vacations = Vacation.objects.filter(id=vacation_id)
             vacations = Vacation.objects.filter(id=vacation_id)
             vacations.update(vacation_status=vacation_status)
             return Response(
