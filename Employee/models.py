@@ -479,6 +479,7 @@ class EmployeDailySchedule(models.Model):
     is_leave = models.BooleanField(default=False)
     is_off = models.BooleanField(default=False)
     is_vacation = models.BooleanField(default=False)
+    is_weekend = models.BooleanField(default=False)
 
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=now)
