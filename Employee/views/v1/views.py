@@ -7,7 +7,7 @@ from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee,
                              EmployeePermissionSetting, EmployeeModulePermission
 , EmployeeMarketingPermission, EmployeeSelectedService, SallarySlipPayrol, StaffGroup
 , StaffGroupModulePermission, Attendance
-, Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation, LeaveManagements, WeekendManagements,
+, Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation, LeaveManagements, WeekendManagement,
                              VacationDetails
                              )
 from Tenants.models import EmployeeTenantDetail, Tenant
@@ -5799,16 +5799,37 @@ def check_employee_existance(request):
 @permission_classes([AllowAny])
 def create_weekend_management(request):
     try:
+        monday = request.data.get('monday', False)
+        tuesday = request.data.get('tuesday', False)
+        wednesday = request.data.get('wednesday', False)
+        thursday = request.data.get('thursday', False)
+        friday = request.data.get('friday', False)
+        saturday = request.data.get('saturday', False)
+        sunday = request.data.get('sunday', False)
+        if monday =='true':
+            monday=True
+        if tuesday =='true':
+            tuesday=True
+        if wednesday =='true':
+            wednesday=True
+        if thursday =='true':
+            thursday=True
+        if friday =='true':
+            friday=True
+        if saturday == 'true':
+            saturday = True
+        if sunday == 'true':
+            sunday = True
         employee = Employee.objects.get(id=request.data.get('employee_id'))
-        weekend_management = WeekendManagements.objects.create(
+        weekend_management = WeekendManagement.objects.create(
             employee=employee,
-            monday=request.data.get('monday', False),
-            tuesday=request.data.get('tuesday', False),
-            wednesday=request.data.get('wednesday', False),
-            thursday=request.data.get('thursday', False),
-            friday=request.data.get('friday', False),
-            saturday=request.data.get('saturday', False),
-            sunday=request.data.get('sunday', False),
+            monday=monday,
+            tuesday=tuesday,
+            wednesday=wednesday,
+            thursday=thursday,
+            friday=friday,
+            saturday=saturday,
+            sunday=sunday,
         )
         weekend = WeekendManagementSerializer(weekend_management)
         return Response(
@@ -5857,16 +5878,36 @@ def update_weekend_management(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        weekend_instance = WeekendManagements.objects.get(id=id)
+        monday = request.data.get('monday', False)
+        tuesday = request.data.get('tuesday', False)
+        wednesday = request.data.get('wednesday', False)
+        thursday = request.data.get('thursday', False)
+        friday = request.data.get('friday', False)
+        saturday = request.data.get('saturday', False)
+        sunday = request.data.get('sunday', False)
+        if monday == 'true':
+            monday = True
+        if tuesday == 'true':
+            tuesday = True
+        if wednesday == 'true':
+            wednesday = True
+        if thursday == 'true':
+            thursday = True
+        if friday == 'true':
+            friday = True
+        if saturday == 'true':
+            saturday = True
+        if sunday == 'true':
+            sunday = True
+        weekend_instance = WeekendManagement.objects.get(id=id)
         # Update fields
-        weekend_instance.monday = request.data.get('monday', False)
-        weekend_instance.tuesday = request.data.get('tuesday', False)
-        weekend_instance.wednesday = request.data.get('wednesday', False)
-        weekend_instance.thursday = request.data.get('thursday', False)
-        weekend_instance.friday = request.data.get('friday', False)
-        weekend_instance.saturday = request.data.get('saturday', False)
-        weekend_instance.sunday = request.data.get('sunday', False)
+        weekend_instance.monday = monday
+        weekend_instance.tuesday = tuesday
+        weekend_instance.wednesday = wednesday
+        weekend_instance.thursday = thursday
+        weekend_instance.friday = friday
+        weekend_instance.saturday = saturday
+        weekend_instance.sunday = sunday
 
         # Save the updated instance
         weekend_instance.save()
@@ -5887,7 +5928,7 @@ def update_weekend_management(request):
             },
             status=status.HTTP_200_OK
         )
-    except WeekendManagements.DoesNotExist:
+    except WeekendManagement.DoesNotExist:
         return Response(
             {
                 'success': False,
@@ -5920,7 +5961,7 @@ def get_weekend_management(request):
     try:
         id = request.query_params.get('id', False)
         if id:
-            weekend = WeekendManagements.objects.filter(id=id)
+            weekend = WeekendManagement.objects.filter(id=id)
             weekend = WeekendManagementSerializer(weekend, many=True)
             return Response(
                 {
@@ -5936,7 +5977,7 @@ def get_weekend_management(request):
                 status=status.HTTP_200_OK
             )
         else:
-            weekend = WeekendManagements.objects.all()
+            weekend = WeekendManagement.objects.all()
             weekend = WeekendManagementSerializer(weekend, many=True)
             return Response(
                 {
@@ -5972,7 +6013,7 @@ def delete_weekend_management(request):
     try:
         id = request.query_params.get('id', None)
         if id:
-            weekend = WeekendManagements.objects.filter(id=id)
+            weekend = WeekendManagement.objects.filter(id=id)
             if weekend:
                 weekend.delete()
                 return Response(
