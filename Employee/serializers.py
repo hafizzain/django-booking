@@ -981,7 +981,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
 class ScheduleSerializerOP(serializers.ModelSerializer):
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'date', 'is_vacation', 'is_leave', 'from_date', 'day', 'end_time_shift', 'end_time','is_weekend',
+        fields = ['id','is_leo_day', 'date', 'is_vacation', 'is_leave', 'from_date', 'day', 'end_time_shift', 'end_time','is_weekend',
                   'start_time']
 
 
