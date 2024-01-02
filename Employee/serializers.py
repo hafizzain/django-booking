@@ -449,7 +449,7 @@ class EmployeeNameSerializer(serializers.ModelSerializer):
             'image',
             'designation',
             'location',
-            'note'
+
         ]
 
 
@@ -1589,7 +1589,7 @@ class NewAbsenceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Vacation
-        fields = ('id', 'employee', 'from_date', 'to_date', 'absence_details', 'holiday_type')
+        fields = ('id',         'note', 'employee', 'from_date', 'to_date', 'absence_details', 'holiday_type')
 
 
 class EmplooyeeAppointmentInsightsSerializer(serializers.ModelSerializer):
