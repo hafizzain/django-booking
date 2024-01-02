@@ -3932,8 +3932,8 @@ def create_vacation_emp(request):
             if leave_managements.casual_leave == 0:
                 return Response(
                     {
-                        'status': 200,
-                        'status_code': '200',
+                        'status': 400,
+                        'status_code': '400',
                         'response': {
                             'message': 'Cannot update the casual leaves',
                             'error_message': None,
@@ -3945,8 +3945,8 @@ def create_vacation_emp(request):
             if days > leave_managements.casual_leave:
                 return Response(
                     {
-                        'status': 200,
-                        'status_code': '200',
+                        'status': 400,
+                        'status_code': '400',
                         'response': {
                             'message': 'Cannot update the casual leaves',
                             'error_message': None,
@@ -3959,8 +3959,8 @@ def create_vacation_emp(request):
             if leave_managements.annual_leave == 0:
                 return Response(
                     {
-                        'status': 200,
-                        'status_code': '200',
+                        'status': 400,
+                        'status_code': '400',
                         'response': {
                             'message': 'Cannot update the annual_leaves',
                             'error_message': None,
@@ -3972,8 +3972,8 @@ def create_vacation_emp(request):
             if days > leave_managements.annual_leave:
                 return Response(
                     {
-                        'status': 200,
-                        'status_code': '200',
+                        'status': 400,
+                        'status_code': '400',
                         'response': {
                             'message': 'Cannot update the annual_leave',
                             'error_message': None,
@@ -3986,8 +3986,8 @@ def create_vacation_emp(request):
             if leave_managements.medical_leave == 0:
                 return Response(
                     {
-                        'status': 200,
-                        'status_code': '200',
+                        'status': 400,
+                        'status_code': '400',
                         'response': {
                             'message': 'Cannot update the annual_leaves',
                             'error_message': None,
@@ -3999,8 +3999,8 @@ def create_vacation_emp(request):
             if days > leave_managements.medical_leave:
                 return Response(
                     {
-                        'status': 200,
-                        'status_code': '200',
+                        'status': 400,
+                        'status_code': '400',
                         'response': {
                             'message': 'Cannot update the annual_leave',
                             'error_message': None,
