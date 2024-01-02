@@ -3839,6 +3839,7 @@ def create_vacation_emp(request):
     is_leave = request.data.get('is_leave', None)
     is_off = request.data.get('is_off', None)
     vacation_type = request.data.get('vacation_type', None)
+    difference = 0
 
     if not all([business_id, employee]):
         return Response(
@@ -3916,7 +3917,8 @@ def create_vacation_emp(request):
             },
             status=status.HTTP_200_OK
         )
-
+    if from_date and to_date:
+        difference = to_date - from_date
     empl_vacation = Vacation.objects.create(
         business=business,
         employee=employee_id,
@@ -3926,6 +3928,7 @@ def create_vacation_emp(request):
         vacation_type=vacation_type,
         vacation_status='pending'
     )
+    LeaveManagements.objects.get(employee_id=employee_id)
     # VacationDetails.objects.create(vacation_id=empl_vacation.id, vacation_status='pending')
     for i, value in enumerate(range(days + 1)):
         if i == 0:
@@ -3993,7 +3996,8 @@ def create_vacation_emp(request):
             'response': {
                 'message': 'Vacation added successfully',
                 'error_message': None,
-                'schedule': serialized.data
+                'schedule': serialized.data,
+                'difference':difference
             }
         },
         status=status.HTTP_200_OK
