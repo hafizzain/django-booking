@@ -429,6 +429,7 @@ class Vacation(models.Model):
     to_date = models.DateField(verbose_name='To Date', null=True)
     note = models.CharField(max_length=300, default='')
     vacation_status = models.TextField(null=True)
+    vacation_type = models.TextField(null=True)
 
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=now)
