@@ -3925,7 +3925,6 @@ def create_vacation_emp(request):
         from_date=from_date,
         to_date=to_date,
         note=note,
-        vacation_type=vacation_type,
         vacation_status='pending'
     )
     LeaveManagements.objects.get(employee_id=employee_id)
