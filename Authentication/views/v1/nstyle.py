@@ -522,7 +522,6 @@ def send_verification_otp(request):
     )
 
 
-@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):

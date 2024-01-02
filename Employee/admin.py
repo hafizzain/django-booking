@@ -190,13 +190,13 @@ class CategoryCommissionAdmin(admin.ModelAdmin):
         
         return '-------'
 
-from django.db.migrations.recorder import MigrationRecorder
-@admin.register(MigrationRecorder.Migration)
-class MigrationRecorderAdmin(admin.ModelAdmin):
+# from django.db.migrations.recorder import MigrationRecorder
+# @admin.register(MigrationRecorder.Migration)
+# class MigrationRecorderAdmin(admin.ModelAdmin):
 
-    search_fields = [
-        'name'
-    ]
-    list_filter = [
-        'name'
-    ]
+#     search_fields = [
+#         'name'
+#     ]
+#     list_filter = [
+#         'name'
+#     ]
