@@ -412,6 +412,7 @@ class EmployeeNameSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
     designation = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
+    leave_data = serializers.SerializerMethodField(read_only=True)
 
     def get_location(self, obj):
         loc = obj.location.all()
@@ -440,6 +441,17 @@ class EmployeeNameSerializer(serializers.ModelSerializer):
                 return obj.image
         return None
 
+    def get_leave_data(self, obj):
+
+        try:
+            leave_management = LeaveManagements.objects.get(
+                employee_id=obj.id,
+            )
+            leave_data = LeaveManagementSerializer(leave_management, many=False).data
+            return leave_data
+        except:
+            return None
+
     class Meta:
         model = Employee
         fields = [
@@ -449,6 +461,7 @@ class EmployeeNameSerializer(serializers.ModelSerializer):
             'image',
             'designation',
             'location',
+            'leave_data'
 
         ]
 
