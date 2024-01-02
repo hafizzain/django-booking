@@ -664,6 +664,18 @@ class LocationSerializerOP(serializers.ModelSerializer):
 class EmployeeDropdownSerializer(serializers.ModelSerializer):
     designation = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
+    leave_data = serializers.SerializerMethodField(read_only=True)
+
+    def get_leave_data(self, obj):
+
+        try:
+            leave_management = LeaveManagements.objects.get(
+                employee_id=obj.id,
+            )
+            leave_data = LeaveManagementSerializer(leave_management, many=False).data
+            return leave_data
+        except:
+            return None
 
     def get_designation(self, obj):
         emp_professional_info = EmployeeProfessionalInfo.objects.filter(employee=obj).first()
@@ -684,7 +696,7 @@ class EmployeeDropdownSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['id', 'full_name', 'mobile_number', 'email', 'employee_id', 'image', 'designation']
+        fields = ['id', 'full_name', 'leave_data','mobile_number', 'email', 'employee_id', 'image', 'designation']
 
 
 class LeaveManagementSerializer(serializers.ModelSerializer):
