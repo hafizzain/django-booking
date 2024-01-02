@@ -195,6 +195,18 @@ class EmployeSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     schedule = serializers.SerializerMethodField(read_only=True)
     employee_leaves = LeaveManagementSerializer()
+    leave_data = serializers.SerializerMethodField(read_only=True)
+
+
+    def get_leave_data(self , obj):
+        try:
+            leave_management = LeaveManagements.objects.filter(
+                employee_id=obj.id,
+            )
+            leave_data = LeaveManagementSerializer(leave_management, many=False).data
+            return leave_data
+        except:
+            return None
 
     def get_schedule(self, obj):
         try:
@@ -376,6 +388,7 @@ class EmployeSerializer(serializers.ModelSerializer):
             'location',
             'schedule',
             'employee_leaves',
+            'leave_data',
             # 'globel_permission',
             'permissions', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'
             # 'module_permissions',
