@@ -27,8 +27,8 @@ class ServerErrorLoggingMiddleware:
             tenant = connection.get_tenant()
             tenant_id = None
             if tenant:
-                if hasattr(tenant, 'id'):
-                    tenant_id = str(tenant.id)
+                tenant_id = str(tenant)
+
 
             try:
                 pub_tenant = Tenant.objects.get(schema_name = 'public')
@@ -41,7 +41,7 @@ class ServerErrorLoggingMiddleware:
                         try:
                             user_tenant = Tenant.objects.get(id = tenant_id)
                         except:
-                            pass
+                            user_tenant = None
                         else:
                             err_instance.tenant = user_tenant
                             err_instance.save()
