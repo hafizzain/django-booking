@@ -26,7 +26,7 @@ class ServerErrorLoggingMiddleware:
 
             tenant = connection.get_tenant()
             tenant_id = None
-            if tenant:
+            if tenant and hasattr(tenant, 'id'):
                 tenant_id = str(tenant.id)
 
             try:
