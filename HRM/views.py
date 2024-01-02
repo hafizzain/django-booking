@@ -30,7 +30,6 @@ class HolidayApiView(APIView):
         end_date = self.request.query_params.get('end_date', None)
         no_pagination = request.GET.get('no_pagination', None)
         location = request.GET.get('location', None)  #data deal with location
-        employee_id = request.GET.get('employee_id', None)
         
         if pk is not None:
             holiday = get_object_or_404(Holiday, id=pk)
@@ -73,20 +72,6 @@ class HolidayApiView(APIView):
                         }
                     }
                 return Response(data, status=status.HTTP_200_OK)
-            
-            if employee_id:
-                employee = Holiday.objects.filter(user=employee_id) \
-                                            .exists()
-                data = {
-                        "success": True,
-                        "status_code" : 200,
-                        "response" : {
-                            "message" : "Employee on holiday",
-                            "error_message" : None,
-                            "is_holiday" : employee
-                        }
-                    }
-                return Response(data, status=status.HTTP_200_OK)                           
             else:
                 paginator = self.pagination_class()
                 result_page = paginator.paginate_queryset(filtered_queryset, request)
