@@ -21,120 +21,133 @@ from .models import (EmployeDailySchedule, Employee, EmployeeProfessionalInfo,
                      StaffGroup, StaffGroupModulePermission, Attendance
 , Payroll, CommissionSchemeSetting, Asset, AssetDocument,
                      EmployeeSelectedService, Vacation, CategoryCommission, LeaveManagements,
-                     WeekendManagements
+                     WeekendManagements, VacationDetails
                      )
 from Authentication.models import AccountType, User
 from django_tenants.utils import tenant_context
 
 
+class VacationDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VacationDetails
+        fields = "__all__"
+
+
 class ServicesEmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        fields=['id', 'name', 'location']
+        fields = ['id', 'name', 'location']
+
 
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
         exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
-    
+
+
 class StateSerializer(serializers.ModelSerializer):
     class Meta:
         model = State
         exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
-        
+
+
 class CitySerializer(serializers.ModelSerializer):
     class Meta:
         model = City
         exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
- 
+
+
 class LocationSerializer(serializers.ModelSerializer):
     currency = serializers.SerializerMethodField(read_only=True)
-    
+
     def get_currency(self, obj):
         try:
-            cur = Currency.objects.get(id  = str(obj.currency) )
+            cur = Currency.objects.get(id=str(obj.currency))
             return cur.code
         except Exception as err:
             return str(err)
-            
+
     class Meta:
         model = BusinessAddress
         fields = ['id', 'address_name', 'currency']
-     
-        
+
+
 class EmployeInformationsSerializer(serializers.ModelSerializer):
-    
     class Meta:
         model = EmployeeProfessionalInfo
         exclude = ['employee', 'id']
 
 
 class EmployeInformationsSerializerOP(serializers.ModelSerializer):
-    
     class Meta:
         model = EmployeeProfessionalInfo
         fields = ['salary', 'income_type', 'designation']
 
 
 class EmployeInformationsSerializerForPayroll(serializers.ModelSerializer):
-    
     class Meta:
         model = EmployeeProfessionalInfo
         fields = ['income_type']
-        
-        
+
+
 class ScheduleSerializer(serializers.ModelSerializer):
     employee = serializers.SerializerMethodField(read_only=True)
-    
+
     def get_employee(self, obj):
         try:
-            data = Employee.objects.get(id = str(obj.employee))
+            data = Employee.objects.get(id=str(obj.employee))
             return EmployeeNameSerializer(data, context=self.context).data
         except Exception as err:
             print(err)
-         
+
     class Meta:
         model = EmployeDailySchedule
-        fields = '__all__'        
-        
+        fields = '__all__'
+
+
 class EmployPermissionSerializer(serializers.ModelSerializer):
     class Meta:
-        
         model = EmployeePermissionSetting
         exclude = ['employee', 'created_at', 'id']
-        
+
+
 class EmployeModulesSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeeModulePermission
         exclude = ['employee', 'created_at', 'id']
-        
+
+
 class EmployeeMarketingSerializers(serializers.ModelSerializer):
     class Meta:
         model = EmployeeMarketingPermission
         exclude = ['employee', 'created_at', 'id']
-        
+
+
 class EmployeeServiceSerializer(serializers.ModelSerializer):
     service_name = serializers.SerializerMethodField()
-    
+
     def get_service_name(self, obj):
         try:
-            name = Service.objects.get(id = obj.service.id)
+            name = Service.objects.get(id=obj.service.id)
             return name.name
         except Exception as err:
             print(err)
             return None
+
     class Meta:
         model = EmployeeSelectedService
-        fields = ['employee','level', 'service', 'id', 'service_name']
-        
+        fields = ['employee', 'level', 'service', 'id', 'service_name']
+
+
 class GlobalPermissionOptionSerializer(serializers.ModelSerializer):
-    
     class Meta:
         model = GlobalPermissionChoices
         fields = ['text']
 
+
 class EmployeeGlobelPermission(serializers.ModelSerializer):
     permissions = serializers.SerializerMethodField()
+
     def get_permissions(self, obj):
         returned_value = {}
         for permit in ALL_PERMISSIONS:
@@ -142,8 +155,7 @@ class EmployeeGlobelPermission(serializers.ModelSerializer):
             for opt in PERMISSIONS_MODEL_FIELDS[permit](obj).all():
                 returned_value[permit].append(opt.text)
         return returned_value
-    
-    
+
     class Meta:
         model = EmployePermission
         fields = ['permissions']
@@ -161,56 +173,55 @@ class WeekendManagementSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-
 class EmployeSerializer(serializers.ModelSerializer):
-    employee_info = serializers.SerializerMethodField(read_only=True)   
+    employee_info = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
-    
+
     country = serializers.SerializerMethodField(read_only=True)
     state = serializers.SerializerMethodField(read_only=True)
-    city = serializers.SerializerMethodField(read_only=True)   
+    city = serializers.SerializerMethodField(read_only=True)
     services = serializers.SerializerMethodField(read_only=True)
-    
-    monday =  serializers.SerializerMethodField(read_only=True)
-    tuesday =  serializers.SerializerMethodField(read_only=True)
-    wednesday =  serializers.SerializerMethodField(read_only=True)
-    thursday =  serializers.SerializerMethodField(read_only=True)
-    friday =  serializers.SerializerMethodField(read_only=True)
-    saturday =  serializers.SerializerMethodField(read_only=True)
-    sunday =  serializers.SerializerMethodField(read_only=True)
+
+    monday = serializers.SerializerMethodField(read_only=True)
+    tuesday = serializers.SerializerMethodField(read_only=True)
+    wednesday = serializers.SerializerMethodField(read_only=True)
+    thursday = serializers.SerializerMethodField(read_only=True)
+    friday = serializers.SerializerMethodField(read_only=True)
+    saturday = serializers.SerializerMethodField(read_only=True)
+    sunday = serializers.SerializerMethodField(read_only=True)
     permissions = serializers.SerializerMethodField()
-     
+
     staff_group = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
     schedule = serializers.SerializerMethodField(read_only=True)
-    employee_leaves =  LeaveManagementSerializer()
+    employee_leaves = LeaveManagementSerializer()
 
     def get_schedule(self, obj):
         try:
-            all_schedule = EmployeDailySchedule.objects.filter(employee = obj)
-            return ScheduleSerializer(all_schedule, many = True, context=self.context).data
+            all_schedule = EmployeDailySchedule.objects.filter(employee=obj)
+            return ScheduleSerializer(all_schedule, many=True, context=self.context).data
         except Exception as err:
             print(err)
             None
-            
+
     def get_location(self, obj):
         try:
-            #loc = BusinessAddress.objects.filter(id=obj.location.id)
+            # loc = BusinessAddress.objects.filter(id=obj.location.id)
             all_location = obj.location.all()
-            return LocationSerializer(all_location, many = True).data
+            return LocationSerializer(all_location, many=True).data
             # return EmployeeServiceSerializer(obj.services).data
         except Exception as err:
             print(err)
             None
-    
+
     def get_staff_group(self, obj):
         try:
-            staff = StaffGroup.objects.get(employees = obj)
+            staff = StaffGroup.objects.get(employees=obj)
             return str(staff.id)
-            
+
         except Exception as err:
             print(err)
-    
+
     # def get_staff_group(self, obj):
     #     try:
     #         staff = self.context["staff_id"]
@@ -218,33 +229,33 @@ class EmployeSerializer(serializers.ModelSerializer):
     #         return staff
     #     except Exception as err:
     #         print(err)
-    
-    
+
     def get_services(self, obj):
         try:
             service = EmployeeSelectedService.objects.filter(employee=obj)
-            return EmployeeServiceSerializer(service, many = True).data
+            return EmployeeServiceSerializer(service, many=True).data
             # return EmployeeServiceSerializer(obj.services).data
         except Exception as err:
             print(err)
             None
+
     def get_country(self, obj):
         try:
             return CountrySerializer(obj.country).data
         except Country.DoesNotExist:
             return None
+
     def get_state(self, obj):
         try:
             return StateSerializer(obj.state).data
         except State.DoesNotExist:
             return None
-    
+
     def get_city(self, obj):
         try:
             return CitySerializer(obj.city).data
         except City.DoesNotExist:
             return None
-    
 
     def get_image(self, obj):
         if obj.image:
@@ -255,12 +266,11 @@ class EmployeSerializer(serializers.ModelSerializer):
             except:
                 return obj.image
         return None
-    
-    
+
     # def get_field_names(self, declared_fields , obj):
-        
+
     #       expanded_fields = super(EmployPermissionSerializer, self).get_field_names(declared_fields, obj)
-          
+
     #       if getattr(self.Meta, 'extra_fields', None):
     #          return expanded_fields + self.Meta.extra_fields
     #       else:
@@ -272,8 +282,6 @@ class EmployeSerializer(serializers.ModelSerializer):
             return EmployeInformationsSerializer(professional).data
         except Exception as err:
             return None
-     
-   
 
     def get_permissions(self, obj):
         try:
@@ -282,7 +290,7 @@ class EmployeSerializer(serializers.ModelSerializer):
             return {}
         else:
             returned_value = {}
-            try:            
+            try:
                 for permit in ALL_PERMISSIONS:
                     returned_value[permit] = []
                     for opt in PERMISSIONS_MODEL_FIELDS[permit](permission).all():
@@ -290,7 +298,7 @@ class EmployeSerializer(serializers.ModelSerializer):
                 return returned_value
             except Exception as err:
                 pass
-                #return str(err)
+                # return str(err)
 
     def get_monday(self, obj):
         try:
@@ -298,108 +306,116 @@ class EmployeSerializer(serializers.ModelSerializer):
             return day.monday
         except Exception as err:
             return None
+
     def get_tuesday(self, obj):
         try:
             day = EmployeeProfessionalInfo.objects.get(employee=obj)
             return day.tuesday
         except Exception as err:
             return None
+
     def get_wednesday(self, obj):
         try:
             day = EmployeeProfessionalInfo.objects.get(employee=obj)
             return day.wednesday
         except Exception as err:
             print(err)
-            return None 
+            return None
+
     def get_thursday(self, obj):
         try:
             day = EmployeeProfessionalInfo.objects.get(employee=obj)
             return day.thursday
         except Exception as err:
-            return None       
+            return None
+
     def get_friday(self, obj):
         try:
             day = EmployeeProfessionalInfo.objects.get(employee=obj)
             return day.friday
         except Exception as err:
-            return None       
+            return None
+
     def get_saturday(self, obj):
         try:
             day = EmployeeProfessionalInfo.objects.get(employee=obj)
             return day.saturday
         except Exception as err:
-            return None       
+            return None
+
     def get_sunday(self, obj):
         try:
             day = EmployeeProfessionalInfo.objects.get(employee=obj)
             return day.sunday
         except Exception as err:
-            return None    
-  
+            return None
+
     class Meta:
         model = Employee
         fields = [
-                'id', 
-                'full_name',
-                'employee_id',
-                'email',
-                'mobile_number', 
-                'image',
-                'dob', 
-                'services',
-                'gender', 
-                'country',
-                'state',
-                'city',
-                'postal_code', 
-                'address' ,
-                'joining_date', 
-                'to_present', 
-                'ending_date',  
-                'is_active',
-                'employee_info',
-                'staff_group',
-                'location',
-                'schedule',
-                'employee_leaves',
-                # 'globel_permission',
-                'permissions' , 'monday','tuesday','wednesday','thursday','friday','saturday','sunday'    
-                #'module_permissions',
-                #'marketing_permissions',
-            ]
+            'id',
+            'full_name',
+            'employee_id',
+            'email',
+            'mobile_number',
+            'image',
+            'dob',
+            'services',
+            'gender',
+            'country',
+            'state',
+            'city',
+            'postal_code',
+            'address',
+            'joining_date',
+            'to_present',
+            'ending_date',
+            'is_active',
+            'employee_info',
+            'staff_group',
+            'location',
+            'schedule',
+            'employee_leaves',
+            # 'globel_permission',
+            'permissions', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'
+            # 'module_permissions',
+            # 'marketing_permissions',
+        ]
     # def to_representation(self, instace):
     #     permissions = self.get_permissions(instace)
     #     # return permissions.update({
     #     #     'id': instace.id,
     #     #     'name': instace.full_name,
-            
+
     #     # })
     #     return {
     #         "nme": instace.full_name,
     #         permissions: permissions
     #     }
+
+
 class EmployeeNameSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
     designation = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
-    
+
     def get_location(self, obj):
         loc = obj.location.all()
-        return LocationSerializer(loc, many =True ).data
+        return LocationSerializer(loc, many=True).data
         # try:
         #     loc = BusinessAddress.objects.get(id = str(obj.location))
         #     return LocationSerializer(loc).data
         # except Exception as err:
         #     print(err)
         #     None
-    
-    def get_designation(self, obj):        
+
+    def get_designation(self, obj):
         try:
             designation = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return designation.designation 
-        except: 
+            return designation.designation
+        except:
             return None
-    
+
     def get_image(self, obj):
         if obj.image:
             try:
@@ -409,29 +425,29 @@ class EmployeeNameSerializer(serializers.ModelSerializer):
             except:
                 return obj.image
         return None
+
     class Meta:
         model = Employee
         fields = [
-                'id', 
-                'full_name',
-                'employee_id',
-                'image',
-                'designation',
-                'location',
+            'id',
+            'full_name',
+            'employee_id',
+            'image',
+            'designation',
+            'location',
         ]
 
 
 class StaffGroupSerializers(serializers.ModelSerializer):
-
     staff_permission = serializers.SerializerMethodField()
     employees = serializers.SerializerMethodField()
-    #staff_permission = serializers.SerializerMethodField()
-    
+
+    # staff_permission = serializers.SerializerMethodField()
+
     def get_employees(self, obj):
         all_employees = obj.employees.all()
         return EmployeeSerializerForStaffGroup(all_employees, many=True, context=self.context).data
-            
-    
+
     def get_staff_permission(self, obj):
         try:
             permission = EmployePermission.objects.get(staffgroup=obj)
@@ -443,57 +459,59 @@ class StaffGroupSerializers(serializers.ModelSerializer):
                 returned_value[permit] = []
                 for opt in PERMISSIONS_MODEL_FIELDS[permit](permission).all():
                     returned_value[permit].append(opt.text)
-                    
+
             return returned_value
-           
-    
+
     class Meta:
         model = StaffGroup
         fields = [
             'id',
             'user',
             'business',
-            'name', 
+            'name',
             'is_active',
-            'staff_permission', 
+            'staff_permission',
             'created_at',
             'employees',
         ]
-        
+
+
 class StaffpermisionSerializers(serializers.ModelSerializer):
-    
     class Meta:
         model = StaffGroupModulePermission
         exclude = ['id']
 
+
 class AttendanceSerializers(serializers.ModelSerializer):
     employee = serializers.SerializerMethodField()
 
-    #employee= EmployeSerializer(read_only=True)
+    # employee= EmployeSerializer(read_only=True)
     def get_employee(self, obj):
         try:
             data = Employee.objects.get(id=obj.employee.id)
-            return EmployeSerializer( data, context=self.context).data
+            return EmployeSerializer(data, context=self.context).data
         except Exception as err:
             print(err)
-    
+
     class Meta:
         model = Attendance
-        
-        fields = ['id','user','business','employee','in_time','out_time','is_active','created_at','employee']
-        
+
+        fields = ['id', 'user', 'business', 'employee', 'in_time', 'out_time', 'is_active', 'created_at', 'employee']
+
+
 class InformationPayrollSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeeProfessionalInfo
         exclude = ['employee', 'id', 'designation']
-        
+
+
 class EmployPayrollSerializers(serializers.ModelSerializer):
     salary = serializers.SerializerMethodField(read_only=True)
     income_type = serializers.SerializerMethodField(read_only=True)
     start_time = serializers.SerializerMethodField(read_only=True)
     end_time = serializers.SerializerMethodField(read_only=True)
-    # payroll = serializers.SerializerMethodField(read_only=True)
 
+    # payroll = serializers.SerializerMethodField(read_only=True)
 
     # def get_salary(self, obj):
     #     try:
@@ -501,43 +519,42 @@ class EmployPayrollSerializers(serializers.ModelSerializer):
     #         return salary_info.salary
     #     except Exception:
     #         return None
-        
+
     def get_salary(self, obj):
         try:
             salary_info = EmployeeProfessionalInfo.objects.get(employee=obj)
             # income_type = salary_info.income_type
             # salary = salary_info.salary
-            
+
             # if income_type == 'Daily_Income':
             #     total_days = (datetime.today() - obj.date_of_joining).days
             #     absent_days = Attendance.object.filter(out_time=True).count()
             #     salary -= (absent_days * salary / total_days)
-                
+
             return salary_info.salary
         except Exception:
             return None
-        
+
     def get_income_type(self, obj):
         try:
             income_info = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return income_info.income_type 
-        except: 
+            return income_info.income_type
+        except:
             return None
-        
+
     def get_start_time(self, obj):
         try:
             start_time = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return start_time.start_time 
-        except: 
+            return start_time.start_time
+        except:
             return None
+
     def get_end_time(self, obj):
         try:
             end_time = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return end_time.end_time 
-        except: 
+            return end_time.end_time
+        except:
             return None
-        
-
 
     # def get_payroll(self, obj):
     #     try:
@@ -562,7 +579,7 @@ class EmployPayrollSerializers(serializers.ModelSerializer):
     #             elif salary_info.income_type == 'Monthly_Salary':
     #                 payroll_per_day = payroll / 30
     #                 payroll -= payroll_per_day
-                    
+
     #                 # Deduct additional payroll for each day of absence
     #                 absent_days = Attendance.object.filter(out_time=True).count()
     #                 payroll -= absent_days * payroll_per_day
@@ -571,10 +588,9 @@ class EmployPayrollSerializers(serializers.ModelSerializer):
 
     #     except Exception:
     #         return None
-                
-    
+
     class Meta:
-        model= Employee
+        model = Employee
         fields = [
             'id',
             'full_name',
@@ -584,49 +600,54 @@ class EmployPayrollSerializers(serializers.ModelSerializer):
             'end_time',
             'employee_id',
             # 'payroll',
-            
-         ]        
+
+        ]
+
 
 class SallarySlipPayrolSerializers(serializers.ModelSerializer):
     employee = EmployPayrollSerializers(read_only=True)
+
     class Meta:
         model = SallarySlipPayrol
         fields = [
             'id',
             'created_at',
-            'month' ,
+            'month',
             'employee',
-            ]
+        ]
+
+
 class SallarySlipPayrol_EmployeSerializers(serializers.ModelSerializer):
     class Meta:
         model = SallarySlipPayrol
         fields = [
             'id',
             'created_at',
-            'month' ,
-            ]
-        
+            'month',
+        ]
+
+
 class PayrollSerializers(serializers.ModelSerializer):
     employee = EmployPayrollSerializers(read_only=True)
+
     class Meta:
         model = Payroll
         fields = [
             'id',
             'name',
-            'created_at', 
-            #'employee',
+            'created_at',
+            # 'employee',
             'employee'
-            ]
-        
-class LocationSerializerOP(serializers.ModelSerializer):
+        ]
 
+
+class LocationSerializerOP(serializers.ModelSerializer):
     class Meta:
         model = BusinessAddress
         fields = ['id']
 
 
 class EmployeeDropdownSerializer(serializers.ModelSerializer):
-
     designation = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
 
@@ -636,7 +657,6 @@ class EmployeeDropdownSerializer(serializers.ModelSerializer):
             return emp_professional_info.designation
         else:
             return None
-
 
     def get_image(self, obj):
         if obj.image:
@@ -652,11 +672,12 @@ class EmployeeDropdownSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ['id', 'full_name', 'mobile_number', 'email', 'employee_id', 'image', 'designation']
 
-class LeaveManagementSerializer(serializers.ModelSerializer):
 
+class LeaveManagementSerializer(serializers.ModelSerializer):
     class Meta:
         model = LeaveManagements
         fields = "__all__"
+
 
 class singleEmployeeSerializer(serializers.ModelSerializer):
     total_sale = serializers.FloatField(read_only=True)
@@ -666,52 +687,49 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
     level = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     employee_info = serializers.SerializerMethodField(read_only=True)
-    
+
     country_name = serializers.SerializerMethodField(read_only=True)
     state_name = serializers.SerializerMethodField(read_only=True)
     city_name = serializers.SerializerMethodField(read_only=True)
     services = serializers.SerializerMethodField(read_only=True)
-        
+
     location = serializers.SerializerMethodField()
     total_sale_s = serializers.SerializerMethodField()
     employee_leaves = LeaveManagementSerializer()
 
-    
-    def get_total_sale_s(self,obj):
+    def get_total_sale_s(self, obj):
         return total_sale_employee(obj)
 
-    
     def get_location(self, obj):
         all_location = obj.location.all()
-        return LocationSerializerOP(all_location, many = True).data
-
+        return LocationSerializerOP(all_location, many=True).data
 
     def get_services(self, obj):
         try:
             service = EmployeeSelectedService.objects.filter(employee=obj)
-            return EmployeeServiceSerializer(service, many = True).data
+            return EmployeeServiceSerializer(service, many=True).data
         except Exception as err:
             print(err)
             None
-    
+
     def get_country_name(self, obj):
         try:
-           return obj.country.name
+            return obj.country.name
         except Exception as err:
             return None
-   
+
     def get_state_name(self, obj):
         try:
-           return obj.state.name
+            return obj.state.name
         except Exception as err:
             return None
-    
+
     def get_city_name(self, obj):
         try:
-           return obj.city.name
+            return obj.city.name
         except Exception as err:
             return None
-    
+
     def get_image(self, obj):
         if obj.image:
             try:
@@ -721,44 +739,44 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             except:
                 return obj.image
         return None
-    
+
     def get_salary(self, obj):
         try:
             salary_info = EmployeeProfessionalInfo.objects.get(employee=obj)
             return salary_info.salary
         except Exception:
             return None
-    
+
     def get_level(self, obj):
         try:
             level = EmployeeSelectedService.objects.get(employee=obj)
             return level.level
         except Exception:
             return None
-        
-    def get_income_type(self, obj):        
+
+    def get_income_type(self, obj):
         try:
             income_info = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return income_info.income_type 
-        except: 
+            return income_info.income_type
+        except:
             return None
-        
-    def get_designation(self, obj):        
+
+    def get_designation(self, obj):
         try:
             designation = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return designation.designation 
-        except: 
+            return designation.designation
+        except:
             return None
-        
+
     def get_employee_info(self, obj):
         try:
             professional = EmployeeProfessionalInfo.objects.get(employee=obj)
             return EmployeInformationsSerializer(professional).data
         except:
             return None
-        
+
     class Meta:
-        model =Employee
+        model = Employee
         fields = [
             'id',
             'employee_leaves',
@@ -767,29 +785,30 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'salary',
             'email',
             'gender',
-            'address', 
+            'address',
             'mobile_number',
             'full_name',
             'country_name',
             'state_name',
             'city_name',
             'income_type',
-            'designation', 
+            'designation',
             'level',
             'employee_id',
-            'employee_info',  
+            'employee_info',
             'services',
-            'created_at' ,
-            'location', 
+            'created_at',
+            'location',
             'is_active',
             'total_sale'
-            ]
-        
+        ]
+
+
 class singleEmployeeSerializerOP(serializers.ModelSerializer):
     # total_sale = serializers.FloatField(read_only=True)
     image = serializers.SerializerMethodField()
     employee_info = serializers.SerializerMethodField(read_only=True)
-    
+
     def get_image(self, obj):
         if obj.image:
             try:
@@ -799,66 +818,71 @@ class singleEmployeeSerializerOP(serializers.ModelSerializer):
             except:
                 return obj.image
         return None
-        
+
     def get_employee_info(self, obj):
         try:
             professional = EmployeeProfessionalInfo.objects.get(employee=obj)
             return EmployeInformationsSerializerOP(professional).data
         except:
             return None
-        
+
     class Meta:
         model = Employee
-        fields = ['id', 'image', 'email', 'full_name', 'employee_info', 'is_active']  
+        fields = ['id', 'image', 'email', 'full_name', 'employee_info', 'is_active']
+
 
 class EmployeeSerializerForStaffGroup(singleEmployeeSerializerOP):
     class Meta(singleEmployeeSerializerOP.Meta):
         model = Employee
         fields = singleEmployeeSerializerOP.Meta.fields + ['employee_id']
 
+
 class CategoryCommissionSerializer(serializers.ModelSerializer):
-    
     class Meta:
         model = CategoryCommission
         fields = '__all__'
-     
+
+
 class CommissionSerializer(serializers.ModelSerializer):
     category_comission = serializers.SerializerMethodField()
     employee = serializers.SerializerMethodField()
-    
-    def get_employee(self,obj):
+
+    def get_employee(self, obj):
         try:
-            emp = Employee.objects.get(id = str(obj.employee))
+            emp = Employee.objects.get(id=str(obj.employee))
             return EmployeeNameSerializer(emp, context=self.context).data
         except Exception as err:
             print(err)
-            
-    
+
     def get_category_comission(self, obj):
-        category = CategoryCommission.objects.filter(commission = obj)
-        return CategoryCommissionSerializer(category, many = True).data
+        category = CategoryCommission.objects.filter(commission=obj)
+        return CategoryCommissionSerializer(category, many=True).data
+
     class Meta:
         model = CommissionSchemeSetting
-        #fields = '__all__'
-        exclude = ('sale_price_before_discount','created_at' ,'from_value','to_value','percentage','user',
-                   'sale_price_including_tax','service_price_before_membership_discount')
-        
+        # fields = '__all__'
+        exclude = ('sale_price_before_discount', 'created_at', 'from_value', 'to_value', 'percentage', 'user',
+                   'sale_price_including_tax', 'service_price_before_membership_discount')
+
+
 class VacationSerializer(serializers.ModelSerializer):
     employee = serializers.SerializerMethodField()
-    
-    def get_employee(self,obj):
+
+    def get_employee(self, obj):
         try:
-            emp = Employee.objects.get(id = str(obj.employee))
+            emp = Employee.objects.get(id=str(obj.employee))
             return EmployeeNameSerializer(emp, context=self.context).data
         except Exception as err:
             print(err)
+
     class Meta:
         model = Vacation
         fields = '__all__'
-      
+
+
 class AssetdocmemtSerializer(serializers.ModelSerializer):
     document = serializers.SerializerMethodField()
-    
+
     def get_document(self, obj):
         try:
             request = self.context["request"]
@@ -867,61 +891,65 @@ class AssetdocmemtSerializer(serializers.ModelSerializer):
         except Exception as err:
             print(err)
             return None
-    
+
     class Meta:
         model = AssetDocument
-        fields= ['id', 'document']
-       
+        fields = ['id', 'document']
+
+
 class AssetSerializer(serializers.ModelSerializer):
     document = serializers.SerializerMethodField()
     employee = serializers.SerializerMethodField()
-    
+
     def get_employee(self, obj):
         try:
-            emp = Employee.objects.get(id = str(obj.employee))
+            emp = Employee.objects.get(id=str(obj.employee))
             print(emp)
             return EmployeeNameSerializer(emp).data
         except Exception as err:
             print(err)
-    
+
     def get_document(self, obj):
         try:
             doc = AssetDocument.objects.filter(asset=obj)
-            return AssetdocmemtSerializer(doc,many =True, context=self.context ).data
-        
+            return AssetdocmemtSerializer(doc, many=True, context=self.context).data
+
         except Exception as err:
             print(err)
             return None
-    
+
     class Meta:
-        model =Asset
-        fields = ['id','name','employee','given_date','return_date', 'document', 'created_at', 'is_active']
+        model = Asset
+        fields = ['id', 'name', 'employee', 'given_date', 'return_date', 'document', 'created_at', 'is_active']
+
 
 class ScheduleSerializer(serializers.ModelSerializer):
     employee = serializers.SerializerMethodField(read_only=True)
-    
+
     def get_employee(self, obj):
         try:
-            data = Employee.objects.get(id = str(obj.employee))
+            data = Employee.objects.get(id=str(obj.employee))
             return EmployeeNameSerializer(data, context=self.context).data
         except Exception as err:
             print(err)
-            
+
     class Meta:
         model = EmployeDailySchedule
         fields = '__all__'
 
 
-class ScheduleSerializerOP(serializers.ModelSerializer):            
+class ScheduleSerializerOP(serializers.ModelSerializer):
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'date','is_vacation', 'is_leave', 'from_date', 'day', 'end_time_shift', 'end_time', 'start_time']
-        
+        fields = ['id', 'date', 'is_vacation', 'is_leave', 'from_date', 'day', 'end_time_shift', 'end_time',
+                  'start_time']
+
+
 class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
     total_hours = serializers.SerializerMethodField(read_only=True)
     end_time = serializers.SerializerMethodField(read_only=True)
     total_hours_dummy = serializers.SerializerMethodField(read_only=True)
-    
+
     def get_end_time(self, obj):
         try:
             if obj.start_time_shift != None:
@@ -930,15 +958,14 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
                 return str(obj.end_time)
         except:
             pass
-                    
+
     def get_total_hours_dummy(self, obj):
         return obj.total_hours
-                    
-    
+
     def get_total_hours(self, obj):
 
         income_type = self.context.get('income_type', None)
-        
+
         try:
             if income_type == 'Hourly_Rate':
                 if obj.is_vacation:
@@ -947,7 +974,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
                     return '0'
                 else:
                     pass
-                
+
             if obj.start_time is None or obj.end_time is None:
                 return '0'  # Return '0' if any of the time values is None
 
@@ -966,7 +993,8 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
                 if shift2_end < shift2_start:
                     shift2_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
 
-                shift2_hours = (shift2_end - shift2_start).total_seconds() / 3600  # calculate the time difference in hours
+                shift2_hours = (
+                                       shift2_end - shift2_start).total_seconds() / 3600  # calculate the time difference in hours
                 total_hours += shift2_hours
 
             total_hours = float(total_hours)  # convert to integer
@@ -974,21 +1002,23 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
 
         except Exception as err:
             return str(err)
-        
+
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id','user','business','employee','day','vacation','start_time','end_time',
-                  'start_time_shift','end_time_shift','from_date','to_date','total_hours','note',
-                  'date','is_leave','is_off','is_vacation','is_active','created_at','updated_at', 'total_hours_dummy']
+        fields = ['id', 'user', 'business', 'employee', 'day', 'vacation', 'start_time', 'end_time',
+                  'start_time_shift', 'end_time_shift', 'from_date', 'to_date', 'total_hours', 'note',
+                  'date', 'is_leave', 'is_off', 'is_vacation', 'is_active', 'created_at', 'updated_at',
+                  'total_hours_dummy']
+
 
 class WorkingScheduleSerializer(serializers.ModelSerializer):
-    schedule =  serializers.SerializerMethodField(read_only=True)
+    schedule = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
-    
+
     def get_schedule(self, obj):
-        schedule =  EmployeDailySchedule.objects.filter(employee= obj )
-        return ScheduleSerializerOP(schedule, many = True,context=self.context).data
-    
+        schedule = EmployeDailySchedule.objects.filter(employee=obj)
+        return ScheduleSerializerOP(schedule, many=True, context=self.context).data
+
     def get_image(self, obj):
         if obj.image:
             try:
@@ -998,10 +1028,11 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
             except:
                 return obj.image
         return None
-    
+
     class Meta:
         model = Employee
-        fields = ['id', 'full_name','image', 'schedule', 'created_at']
+        fields = ['id', 'full_name', 'image', 'schedule', 'created_at']
+
 
 class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
@@ -1011,12 +1042,11 @@ class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
     country = CountrySerializer()
     state = StateSerializer()
 
-
     def get_city(self, obj):
         if obj.city:
             return obj.city.name
         return None
-    
+
     def get_employee_permission(self, obj):
         try:
             permission = EmployePermission.objects.get(employee=obj)
@@ -1024,7 +1054,7 @@ class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
             return {}
         else:
             returned_value = {}
-            try:            
+            try:
                 for permit in ALL_PERMISSIONS:
                     returned_value[permit] = []
                     for opt in PERMISSIONS_MODEL_FIELDS[permit](permission).all():
@@ -1032,11 +1062,11 @@ class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
                 return returned_value
             except Exception as err:
                 pass
-    
+
     def get_location(self, obj):
         loc = obj.location.all()
-        return LocationSerializer(loc, many =True ).data
-    
+        return LocationSerializer(loc, many=True).data
+
     def get_image(self, obj):
         if obj.image:
             try:
@@ -1046,14 +1076,17 @@ class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
             except:
                 return obj.image
         return None
-    
+
     class Meta:
         model = Employee
-        fields = ['id', 'image','location','full_name', 'email', 
-                  'mobile_number','country','state','city', 'address', 'postal_code', 'employee_permission', 'is_active']
+        fields = ['id', 'image', 'location', 'full_name', 'email',
+                  'mobile_number', 'country', 'state', 'city', 'address', 'postal_code', 'employee_permission',
+                  'is_active']
+
+
 class EmployeeInformationSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
-    
+
     def get_image(self, obj):
         if obj.image:
             try:
@@ -1063,27 +1096,28 @@ class EmployeeInformationSerializer(serializers.ModelSerializer):
             except:
                 return obj.image
         return None
-    
+
     class Meta:
         model = Employee
-        fields = ['id','business', 'image','full_name', 'email', 'mobile_number','country','state','city', 'address', 'postal_code']
+        fields = ['id', 'business', 'image', 'full_name', 'email', 'mobile_number', 'country', 'state', 'city',
+                  'address', 'postal_code']
+
 
 class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     total_commission = serializers.FloatField()
     total_tips = serializers.FloatField()
-    schedule =  serializers.SerializerMethodField(read_only=True)    
+    schedule = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     income_type = serializers.SerializerMethodField(read_only=True)
     salary = serializers.SerializerMethodField(read_only=True)
-    total_earning = serializers.SerializerMethodField(read_only=True)    
+    total_earning = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
     sallaryslip = serializers.SerializerMethodField(read_only=True)
     total_hours = serializers.SerializerMethodField(read_only=True)
-    
+
     def get_location(self, obj):
         loc = obj.location.all()
-        return LocationSerializer(loc, many =True ).data
-    
+        return LocationSerializer(loc, many=True).data
 
     def get_total_hours(self, obj):
         start_date = self.context.get('start_date', None)
@@ -1093,17 +1127,16 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
         month_end_date = end_date or now_date.strftime('%Y-%m-%d')
 
-        employee_schedules =  EmployeDailySchedule.objects.filter(
-            employee = obj,
-            is_leave = False,
-            date__range = (month_start_date, month_end_date)
+        employee_schedules = EmployeDailySchedule.objects.filter(
+            employee=obj,
+            is_leave=False,
+            date__range=(month_start_date, month_end_date)
         ).order_by('-date')
         hours = 0
         for schedule in employee_schedules:
             hours += schedule.total_hours
-        
-        return hours
 
+        return hours
 
     def get_total_earning(self, obj):
         now_date = datetime.now()
@@ -1116,10 +1149,10 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
         month_end_date = end_date or f'{now_date.year}-{now_date.month}-{total_days}'
 
-        employee_schedules =  EmployeDailySchedule.objects.filter(
-            employee = obj,
-            is_leave = False,
-            date__range = (month_start_date, month_end_date)
+        employee_schedules = EmployeDailySchedule.objects.filter(
+            employee=obj,
+            is_leave=False,
+            date__range=(month_start_date, month_end_date)
         ).order_by('-date')
 
         try:
@@ -1128,11 +1161,11 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
             income_type = None
         else:
             total_earning = 0
-            salary = income_type_info.salary # 300
+            salary = income_type_info.salary  # 300
             income_type = income_type_info.income_type
 
             if income_type == 'Monthly_Salary':
-                per_day_salary = salary / total_days # 10
+                per_day_salary = salary / total_days  # 10
                 total_earning += (employee_schedules.count() * per_day_salary)
 
             elif income_type == 'Daily_Income':
@@ -1142,23 +1175,23 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
                 total_hours = 0
                 for schedule in employee_schedules:
                     total_hours += schedule.total_hours
-                
+
                 total_earning += (total_hours * salary)
 
             return total_earning
 
-    def get_salary(self, obj):        
+    def get_salary(self, obj):
         try:
             income_info = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return income_info.salary 
-        except: 
+            return income_info.salary
+        except:
             return None
-        
-    def get_income_type(self, obj):        
+
+    def get_income_type(self, obj):
         try:
             income_info = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return income_info.income_type 
-        except: 
+            return income_info.income_type
+        except:
             return None
 
     def get_schedule(self, obj):
@@ -1171,22 +1204,22 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
         month_end_date = end_date or f'{now_date.year}-{now_date.month}-{total_days}'
 
-        schedule =  EmployeDailySchedule.objects.filter(
-            employee = obj,
-            date__range = (month_start_date, month_end_date)
-        ).exclude(is_leave = True).order_by('-date')
+        schedule = EmployeDailySchedule.objects.filter(
+            employee=obj,
+            date__range=(month_start_date, month_end_date)
+        ).exclude(is_leave=True).order_by('-date')
         # ).order_by('employee__employee_employedailyschedule__date')            
         context = self.context
         try:
             context['income_type'] = EmployeeProfessionalInfo.objects.get(employee=obj).income_type
         except:
             context['income_type'] = None
-        return WorkingSchedulePayrollSerializer(schedule, many = True,context=context).data
-    
+        return WorkingSchedulePayrollSerializer(schedule, many=True, context=context).data
+
     def get_sallaryslip(self, obj):
-        sallary =  SallarySlipPayrol.objects.filter(employee= obj )            
-        return SallarySlipPayrol_EmployeSerializers(sallary, many = True,context=self.context).data
-    
+        sallary = SallarySlipPayrol.objects.filter(employee=obj)
+        return SallarySlipPayrol_EmployeSerializers(sallary, many=True, context=self.context).data
+
     def get_image(self, obj):
         if obj.image:
             try:
@@ -1196,20 +1229,19 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
             except:
                 return obj.image
         return None
-    
-    
+
     class Meta:
         model = Employee
-        fields = ['id', 'employee_id','is_active','full_name','image','location','sallaryslip',
-                  'schedule','created_at', 'income_type', 'salary', 'total_earning', 'total_hours',
+        fields = ['id', 'employee_id', 'is_active', 'full_name', 'image', 'location', 'sallaryslip',
+                  'schedule', 'created_at', 'income_type', 'salary', 'total_earning', 'total_hours',
                   'total_commission', 'total_tips']
-        
+
 
 class Payroll_WorkingScheduleSerializerOP(serializers.ModelSerializer):
     total_commission = serializers.FloatField(read_only=True)
     total_tips = serializers.FloatField(read_only=True)
-    schedule =  serializers.SerializerMethodField(read_only=True)    
-    total_earning = serializers.SerializerMethodField(read_only=True)    
+    schedule = serializers.SerializerMethodField(read_only=True)
+    total_earning = serializers.SerializerMethodField(read_only=True)
     total_hours = serializers.SerializerMethodField(read_only=True)
     employee_info = serializers.SerializerMethodField(read_only=True)
 
@@ -1219,8 +1251,6 @@ class Payroll_WorkingScheduleSerializerOP(serializers.ModelSerializer):
             return EmployeInformationsSerializerForPayroll(employee_info).data
         except:
             return None
-            
-    
 
     def get_total_hours(self, obj):
         start_date = self.context.get('start_date', None)
@@ -1230,17 +1260,16 @@ class Payroll_WorkingScheduleSerializerOP(serializers.ModelSerializer):
         month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
         month_end_date = end_date or now_date.strftime('%Y-%m-%d')
 
-        employee_schedules =  EmployeDailySchedule.objects.filter(
-            employee = obj,
-            is_leave = False,
-            date__range = (month_start_date, month_end_date)
+        employee_schedules = EmployeDailySchedule.objects.filter(
+            employee=obj,
+            is_leave=False,
+            date__range=(month_start_date, month_end_date)
         ).order_by('-date')
         hours = 0
         for schedule in employee_schedules:
             hours += schedule.total_hours
-        
-        return hours
 
+        return hours
 
     def get_total_earning(self, obj):
         now_date = datetime.now()
@@ -1253,10 +1282,10 @@ class Payroll_WorkingScheduleSerializerOP(serializers.ModelSerializer):
         month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
         month_end_date = end_date or f'{now_date.year}-{now_date.month}-{total_days}'
 
-        employee_schedules =  EmployeDailySchedule.objects.filter(
-            employee = obj,
-            is_leave = False,
-            date__range = (month_start_date, month_end_date)
+        employee_schedules = EmployeDailySchedule.objects.filter(
+            employee=obj,
+            is_leave=False,
+            date__range=(month_start_date, month_end_date)
         ).order_by('-date')
 
         try:
@@ -1265,11 +1294,11 @@ class Payroll_WorkingScheduleSerializerOP(serializers.ModelSerializer):
             income_type = None
         else:
             total_earning = 0
-            salary = income_type_info.salary # 300
+            salary = income_type_info.salary  # 300
             income_type = income_type_info.income_type
 
             if income_type == 'Monthly_Salary':
-                per_day_salary = salary / total_days # 10
+                per_day_salary = salary / total_days  # 10
                 total_earning += (employee_schedules.count() * per_day_salary)
 
             elif income_type == 'Daily_Income':
@@ -1279,11 +1308,10 @@ class Payroll_WorkingScheduleSerializerOP(serializers.ModelSerializer):
                 total_hours = 0
                 for schedule in employee_schedules:
                     total_hours += schedule.total_hours
-                
+
                 total_earning += (total_hours * salary)
 
             return total_earning
-
 
     def get_schedule(self, obj):
         now_date = datetime.now()
@@ -1295,38 +1323,37 @@ class Payroll_WorkingScheduleSerializerOP(serializers.ModelSerializer):
         month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
         month_end_date = end_date or f'{now_date.year}-{now_date.month}-{total_days}'
 
-        schedule =  EmployeDailySchedule.objects.filter(
-            employee = obj,
-            date__range = (month_start_date, month_end_date)
-        ).exclude(is_leave = True).order_by('-date')
+        schedule = EmployeDailySchedule.objects.filter(
+            employee=obj,
+            date__range=(month_start_date, month_end_date)
+        ).exclude(is_leave=True).order_by('-date')
         # ).order_by('employee__employee_employedailyschedule__date')            
         context = self.context
         try:
             context['income_type'] = EmployeeProfessionalInfo.objects.get(employee=obj).income_type
         except:
             context['income_type'] = None
-        return WorkingSchedulePayrollSerializer(schedule, many = True,context=context).data
-    
-    
+        return WorkingSchedulePayrollSerializer(schedule, many=True, context=context).data
+
     class Meta:
         model = Employee
-        fields = ['id', 'full_name', 'schedule','created_at', 'total_earning', 'total_hours',
+        fields = ['id', 'full_name', 'schedule', 'created_at', 'total_earning', 'total_hours',
                   'total_commission', 'total_tips', 'employee_info']
-        
 
-class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSerializer):    
-    schedule =  serializers.SerializerMethodField(read_only=True)    
-    
+
+class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSerializer):
+    schedule = serializers.SerializerMethodField(read_only=True)
+
     def get_schedule(self, obj):
         range_start = self.context["range_start"]
         range_end = self.context["range_end"]
-        
+
         if range_start:
-            range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
-            range_end = datetime.strptime(range_end, "%Y-%m-%d")#.date()
+            range_start = datetime.strptime(range_start, "%Y-%m-%d")  # .date()
+            range_end = datetime.strptime(range_end, "%Y-%m-%d")  # .date()
         else:
             import calendar
-            current_date = datetime.now()#.date()
+            current_date = datetime.now()  # .date()
             month = current_date.month
             year = current_date.year
 
@@ -1334,64 +1361,66 @@ class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSeri
 
             range_start = f'{year}-{month}-01'
             range_end = f'{year}-{month}-{current_month_days}'
-        
-        #return f'range_start{range_start} range_end{range_end}' 
-        schedule =  EmployeDailySchedule.objects.filter(
-            employee = obj, 
-            date__range =  (range_start, range_end) ,
-            is_vacation = False
+
+        # return f'range_start{range_start} range_end{range_end}'
+        schedule = EmployeDailySchedule.objects.filter(
+            employee=obj,
+            date__range=(range_start, range_end),
+            is_vacation=False
             # created_at__gte =  range_start ,
             # created_at__lte = range_end
-            ) 
-                   
-        return WorkingSchedulePayrollSerializer(schedule, many = True,context=self.context).data
-    
+        )
+
+        return WorkingSchedulePayrollSerializer(schedule, many=True, context=self.context).data
+
     class Meta:
         model = Employee
-        fields = ['id', 'employee_id','is_active','full_name',
-                  'schedule','created_at',]
-class Payroll_Working_deviceScheduleSerializer(serializers.ModelSerializer):    
-    schedule =  serializers.SerializerMethodField(read_only=True)    
+        fields = ['id', 'employee_id', 'is_active', 'full_name',
+                  'schedule', 'created_at', ]
+
+
+class Payroll_Working_deviceScheduleSerializer(serializers.ModelSerializer):
+    schedule = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     income_type = serializers.SerializerMethodField(read_only=True)
     salary = serializers.SerializerMethodField(read_only=True)
-    #employe_id = serializers.SerializerMethodField(read_only=True)
-    
+    # employe_id = serializers.SerializerMethodField(read_only=True)
+
     location = serializers.SerializerMethodField(read_only=True)
     working_day = serializers.SerializerMethodField(read_only=True)
     off_day = serializers.SerializerMethodField(read_only=True)
-    
+
     def get_location(self, obj):
         loc = obj.location.all()
-        return LocationSerializer(loc, many =True ).data
-    
-    def get_salary(self, obj):        
+        return LocationSerializer(loc, many=True).data
+
+    def get_salary(self, obj):
         try:
             income_info = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return income_info.salary 
-        except: 
+            return income_info.salary
+        except:
             return None
-        
+
     def get_income_type(self, obj):
         try:
             income_info = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return income_info.income_type 
-        except: 
+            return income_info.income_type
+        except:
             return None
 
     def get_schedule(self, obj):
         total_price = 0
-        schedule =  EmployeDailySchedule.objects.filter(employee= obj )#.values_list('field1', flat=True)            
-        return WorkingSchedulePayrollSerializer(schedule, many = True,context=self.context).data
+        schedule = EmployeDailySchedule.objects.filter(employee=obj)  # .values_list('field1', flat=True)
+        return WorkingSchedulePayrollSerializer(schedule, many=True, context=self.context).data
         # for dt in serializer:
         #     total_price += int(dt['total_hours'])
         # return total_price
-        
+
     def get_working_day(self, obj):
         range_start = self.context["range_start"]
         range_end = self.context["range_end"]
         total = 0
-        
+
         if range_start:
             range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
             range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
@@ -1401,20 +1430,20 @@ class Payroll_Working_deviceScheduleSerializer(serializers.ModelSerializer):
             year = range_end.year
             range_start = f'{year}-{month}-01'
             range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
-            
-        schedule =  EmployeDailySchedule.objects.filter(employee= obj, is_vacation = False )
+
+        schedule = EmployeDailySchedule.objects.filter(employee=obj, is_vacation=False)
         for dt in schedule:
             create = str(dt.created_at)
             created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
-            if created_at >= range_start  and created_at <= range_end:
+            if created_at >= range_start and created_at <= range_end:
                 total += 1
         return total
-    
+
     def get_off_day(self, obj):
         range_start = self.context["range_start"]
         range_end = self.context["range_end"]
         total = 0
-        
+
         if range_start:
             range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
             range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
@@ -1424,14 +1453,14 @@ class Payroll_Working_deviceScheduleSerializer(serializers.ModelSerializer):
             year = range_end.year
             range_start = f'{year}-{month}-01'
             range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
-        schedule =  EmployeDailySchedule.objects.filter(employee= obj, is_vacation = True )
+        schedule = EmployeDailySchedule.objects.filter(employee=obj, is_vacation=True)
         for dt in schedule:
             create = str(dt.created_at)
             created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
-            if created_at >= range_start  and created_at <= range_end:
+            if created_at >= range_start and created_at <= range_end:
                 total += 1
         return total
-    
+
     def get_image(self, obj):
         if obj.image:
             try:
@@ -1441,23 +1470,23 @@ class Payroll_Working_deviceScheduleSerializer(serializers.ModelSerializer):
             except:
                 return obj.image
         return None
-    
-    
+
     class Meta:
         model = Employee
-        fields = ['id', 'employee_id','is_active','full_name','image','location','working_day','off_day',
-                  'schedule','created_at', 'income_type', 'salary']
+        fields = ['id', 'employee_id', 'is_active', 'full_name', 'image', 'location', 'working_day', 'off_day',
+                  'schedule', 'created_at', 'income_type', 'salary']
 
-class UserEmployeeSerializer(serializers.ModelSerializer): 
+
+class UserEmployeeSerializer(serializers.ModelSerializer):
     access_token = serializers.SerializerMethodField()
     domain = serializers.SerializerMethodField()
     employee = serializers.SerializerMethodField()
-    
-    def get_domain(self,obj):
+
+    def get_domain(self, obj):
         try:
             tenant = self.context["tenant"]
             user_domain = Tenant.objects.get(
-                id = tenant.id ,
+                id=tenant.id,
                 is_deleted=False,
                 is_blocked=False,
                 is_active=True
@@ -1465,88 +1494,86 @@ class UserEmployeeSerializer(serializers.ModelSerializer):
             return user_domain.domain
         except Exception as err:
             return str(err)
-        
-    def get_access_token(self,obj):
+
+    def get_access_token(self, obj):
         try:
             token = self.context["token"]
             return token
         except Exception as err:
             return str(err)
-        
+
     def get_employee(self, obj):
         try:
             tenant = self.context["tenant"]
             with tenant_context(tenant):
                 employee = Employee.objects.get(
-                    #id = 'd35183df-02e4-495e-9b33-976fe16d61fe',
-                    email__icontains = obj.email,
+                    # id = 'd35183df-02e4-495e-9b33-976fe16d61fe',
+                    email__icontains=obj.email,
                 )
                 return EmployeeInformationSerializer(employee, context=self.context).data
         except Exception as err:
             return f'{str(obj.email)} {str(err)}'
-        
-    
+
     class Meta:
         model = User
-        fields = ['id', 'access_token', 'domain','employee',]
+        fields = ['id', 'access_token', 'domain', 'employee', ]
 
 
 class NewScheduleSerializer(serializers.ModelSerializer):
-    
-
     class Meta:
         model = EmployeDailySchedule
         fields = ('id', 'from_date', 'to_date',)
 
+
 class NewVacationSerializer(serializers.ModelSerializer):
     employee = serializers.SerializerMethodField(read_only=True)
     vacation_details = serializers.SerializerMethodField(read_only=True)
-    
+
     def get_employee(self, obj):
         try:
             data = Employee.objects.get(id=str(obj.employee.id))
             return EmployeeNameSerializer(data, context=self.context).data
         except Exception as err:
             print(err)
-    
+
     def get_vacation_details(self, obj):
-        vacation = EmployeDailySchedule.objects.filter(vacation = obj, is_vacation = True )
-        return NewScheduleSerializer(vacation, many = True,context=self.context).data
+        vacation = EmployeDailySchedule.objects.filter(vacation=obj, is_vacation=True)
+        return NewScheduleSerializer(vacation, many=True, context=self.context).data
 
     class Meta:
         model = Vacation
         fields = ('id', 'employee', 'from_date', 'to_date', 'vacation_details',)
-    
-    
+
+
 class NewAbsenceSerializer(serializers.ModelSerializer):
     employee = serializers.SerializerMethodField(read_only=True)
     absence_details = serializers.SerializerMethodField(read_only=True)
-    
+
     def get_employee(self, obj):
         try:
             data = Employee.objects.get(id=str(obj.employee.id))
             return EmployeeNameSerializer(data, context=self.context).data
         except Exception as err:
             print(err)
-    
+
     def get_absence_details(self, obj):
-        vacation = EmployeDailySchedule.objects.filter(vacation = obj, is_leave = True )
-        return NewScheduleSerializer(vacation, many = True,context=self.context).data
+        vacation = EmployeDailySchedule.objects.filter(vacation=obj, is_leave=True)
+        return NewScheduleSerializer(vacation, many=True, context=self.context).data
 
     class Meta:
         model = Vacation
-        fields = ('id', 'employee', 'from_date', 'to_date', 'absence_details','holiday_type')
+        fields = ('id', 'employee', 'from_date', 'to_date', 'absence_details', 'holiday_type')
 
 
 class EmplooyeeAppointmentInsightsSerializer(serializers.ModelSerializer):
-    appointments_done = serializers.IntegerField() #annotated field from manager
+    appointments_done = serializers.IntegerField()  # annotated field from manager
+
     class Meta:
         model = Employee
         fields = ['id', 'full_name', 'appointments_done']
 
 
 class EmployeeDailyInsightSerializer(serializers.ModelSerializer):
-
     # annotated fields
     morning_count = serializers.IntegerField()
     afternoon_count = serializers.IntegerField()

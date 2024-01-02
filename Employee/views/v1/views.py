@@ -7,7 +7,8 @@ from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee,
                              EmployeePermissionSetting, EmployeeModulePermission
 , EmployeeMarketingPermission, EmployeeSelectedService, SallarySlipPayrol, StaffGroup
 , StaffGroupModulePermission, Attendance
-, Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation, LeaveManagements, WeekendManagements
+, Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation, LeaveManagements, WeekendManagements,
+                             VacationDetails
                              )
 from Tenants.models import EmployeeTenantDetail, Tenant
 from django_tenants.utils import tenant_context
@@ -1191,7 +1192,7 @@ def create_employee(request):
                 'error_message': None,
                 'employee_error': employees_error,
                 'employees': data,
-                'lev_id': lev_id
+                'lev_id': str(lev_id)
             }
         },
         status=status.HTTP_201_CREATED
@@ -3921,6 +3922,7 @@ def create_vacation_emp(request):
         to_date=to_date,
         note=note
     )
+    VacationDetails.objects.create(vacation_id=empl_vacation.id,status='pending')
     for i, value in enumerate(range(days + 1)):
         if i == 0:
             from_date = from_date
