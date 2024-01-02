@@ -3918,7 +3918,8 @@ def create_vacation_emp(request):
             status=status.HTTP_200_OK
         )
     if from_date and to_date:
-        difference = to_date - from_date
+        difference_days = to_date - from_date
+        difference_days= difference_days.days
     empl_vacation = Vacation.objects.create(
         business=business,
         employee=employee_id,
@@ -3996,7 +3997,7 @@ def create_vacation_emp(request):
                 'message': 'Vacation added successfully',
                 'error_message': None,
                 'schedule': serialized.data,
-                'difference':difference
+                'difference':difference_days
             }
         },
         status=status.HTTP_200_OK
