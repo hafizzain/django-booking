@@ -5806,19 +5806,19 @@ def create_weekend_management(request):
         friday = request.data.get('friday', False)
         saturday = request.data.get('saturday', False)
         sunday = request.data.get('sunday', False)
-        if monday =='true':
+        if monday =='true' or monday== 'True':
             monday=True
-        if tuesday =='true':
+        if tuesday =='true' or tuesday== 'True':
             tuesday=True
-        if wednesday =='true':
+        if wednesday =='true' or wednesday== 'True':
             wednesday=True
-        if thursday =='true':
+        if thursday =='true'  or thursday== 'True':
             thursday=True
-        if friday =='true':
+        if friday =='true' or friday== 'True':
             friday=True
-        if saturday == 'true':
+        if saturday == 'true' or saturday == 'True':
             saturday = True
-        if sunday == 'true':
+        if sunday == 'true' or sunday == 'True':
             sunday = True
         employee = Employee.objects.get(id=request.data.get('employee_id'))
         weekend_management = WeekManagement.objects.create(
