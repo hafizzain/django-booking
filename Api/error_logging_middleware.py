@@ -29,6 +29,7 @@ class ServerErrorLoggingMiddleware:
             if tenant:
                 tenant_id = str(tenant.id)
 
+
             try:
                 pub_tenant = Tenant.objects.get(schema_name = 'public')
             except:
@@ -40,7 +41,7 @@ class ServerErrorLoggingMiddleware:
                         try:
                             user_tenant = Tenant.objects.get(id = tenant_id)
                         except:
-                            pass
+                            user_tenant = None
                         else:
                             err_instance.tenant = user_tenant
                             err_instance.save()
