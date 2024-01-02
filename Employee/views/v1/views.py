@@ -4447,6 +4447,7 @@ def create_workingschedule(request):
         working_schedule.is_vacation = True
     else:
         working_schedule.is_vacation = False
+        working_schedule.is_weekend = True
 
     if is_leave is not None:
         working_schedule.is_leave = True
