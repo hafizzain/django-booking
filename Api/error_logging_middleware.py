@@ -27,7 +27,7 @@ class ServerErrorLoggingMiddleware:
             tenant = connection.get_tenant()
             tenant_id = None
             if tenant:
-                tenant_id = str(tenant)
+                tenant_id = str(tenant.id)
 
 
             try:
