@@ -1193,7 +1193,7 @@ def create_employee(request):
                 'error_message': None,
                 'employee_error': employees_error,
                 'employees': data,
-                'leave_data': leave_data
+                'leave_data': leave_data.data
             }
         },
         status=status.HTTP_201_CREATED
