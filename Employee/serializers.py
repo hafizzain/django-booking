@@ -449,6 +449,7 @@ class EmployeeNameSerializer(serializers.ModelSerializer):
             'image',
             'designation',
             'location',
+            'note'
         ]
 
 

@@ -4044,7 +4044,6 @@ def create_vacation_emp(request):
                 end_time=end_time,
                 start_time_shift=start_time_shift,
                 end_time_shift=end_time_shift,
-
                 date=from_date,
                 from_date=from_date,
                 to_date=to_date,
