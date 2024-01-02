@@ -204,7 +204,7 @@ class EmployeSerializer(serializers.ModelSerializer):
                 employee_id=obj.id,
             )
             leave_data = LeaveManagementSerializer(leave_management, many=False).data
-            return [leave_data , str(obj.id)]
+            return leave_data
         except:
             return None
 
