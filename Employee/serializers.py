@@ -199,6 +199,7 @@ class EmployeSerializer(serializers.ModelSerializer):
 
 
     def get_leave_data(self , obj):
+
         try:
             leave_management = LeaveManagements.objects.get(
                 employee_id=obj.id,
