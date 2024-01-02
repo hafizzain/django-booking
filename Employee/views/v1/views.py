@@ -3927,7 +3927,7 @@ def create_vacation_emp(request):
         note=note,
         vacation_status='pending'
     )
-    LeaveManagements.objects.get(employee_id=employee_id)
+    # LeaveManagements.objects.get(employee_id=employee_id)
     # VacationDetails.objects.create(vacation_id=empl_vacation.id, vacation_status='pending')
     for i, value in enumerate(range(days + 1)):
         if i == 0:
