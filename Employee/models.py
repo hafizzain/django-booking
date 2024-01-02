@@ -127,7 +127,7 @@ class Employee(models.Model):
     joining_date = models.DateField(null=True, blank=True)
     to_present = models.BooleanField(default=False)
     ending_date = models.DateField(null=True, blank=True)
-    can_refunds = models.BooleanField(default=True,null=True)
+    can_refunds = models.BooleanField(default=True, null=True)
     can_refund = models.BooleanField(default=True)
 
     is_default = models.BooleanField(default=False)
@@ -434,6 +434,13 @@ class Vacation(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+
+class VacationDetails(models.Model):
+    vacation = models.ForeignKey(Vacation, on_delete=models.CASCADE, null=True, related_name='vacation_detail')
+    status = models.TextField(null=True)
+    created_at = models.DateTimeField(auto_now_add=now, null=True)
+    updated_at = models.DateTimeField(null=True, blank=True)
 
 
 class EmployeDailySchedule(models.Model):
