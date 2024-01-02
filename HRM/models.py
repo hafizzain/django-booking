@@ -16,3 +16,6 @@ class Holiday(CommonField):
     end_date = models.DateTimeField(blank=True, null=True)
     
     REQUIRED_FIELDS = ['name', 'start_date']
+    
+    def __str__(self):
+        return self.name
