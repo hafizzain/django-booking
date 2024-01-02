@@ -4004,53 +4004,94 @@ def create_vacation_emp(request):
 @api_view(['PATCH'])
 @permission_classes([AllowAny])
 def update_vacation_status(request):
-    # user = request.user
-    business_id = request.data.get('business', None)
-    employee = request.data.get('employee', None)
-    vacation_id = request.data.get('vacation_id', None)
-    vacation_status = request.data.get('vacation_status', None)
-    vacation_type = request.data.get('vacation_type',None)
-    if vacation_status =='accepted':
-        vacations = Vacation.objects.filter(id=vacation_id)
-        vacations.update(vacation_status=vacation_status)
-        leave_managements = LeaveManagements.objects.get(employee_id=employee)
-        if vacation_type == leave_managements.casual_leave:
-            leave_managements = leave_managements.casual_leave -1
-            leave_managements.save()
-        if vacation_type == leave_managements.annual_leave:
-            leave_managements = leave_managements.annual_leave - 1
-            leave_managements.save()
-        if vacations == leave_managements.medical_leave:
-            leave_managements = leave_managements.medical_leave - 1
-            leave_managements.save()
-        return Response(
-            {
-                'status': 200,
-                'status_code': '200',
-                'response': {
-                    'message': 'Vacation updated successfully',
-                    'error_message': None,
-                    'data': []
-                }
-            },
-            status=status.HTTP_200_OK
-        )
-    if vacation_status =='declined':
-        vacations = Vacation.objects.filter(id=vacation_id)
-        vacations.update(vacation_status=vacation_status)
-        return Response(
-            {
-                'status': 200,
-                'status_code': '200',
-                'response': {
-                    'message': 'Vacation updated successfully',
-                    'error_message': None,
-                    'data': []
-                }
-            },
-            status=status.HTTP_200_OK
-        )
-
+    try:
+        business_id = request.data.get('business', None)
+        employee = request.data.get('employee', None)
+        vacation_id = request.data.get('vacation_id', None)
+        vacation_status = request.data.get('vacation_status', None)
+        vacation_type = request.data.get('vacation_type', None)
+        if vacation_status == 'accepted':
+            vacations = Vacation.objects.filter(id=vacation_id)
+            vacations.update(vacation_status=vacation_status)
+            leave_managements = LeaveManagements.objects.get(employee_id=employee)
+            if vacation_type == leave_managements.casual_leave:
+                if leave_managements.casual_leave != 0:
+                    return Response(
+                        {
+                            'status': 200,
+                            'status_code': '200',
+                            'response': {
+                                'message': 'Cannot update the casual leaves',
+                                'error_message': None,
+                                'data': []
+                            }
+                        },
+                        status=status.HTTP_200_OK
+                    )
+                leave_managements = leave_managements.casual_leave - 1
+                leave_managements.save()
+            if vacation_type == leave_managements.annual_leave:
+                if leave_managements.annual_leave != 0:
+                    return Response(
+                        {
+                            'status': 200,
+                            'status_code': '200',
+                            'response': {
+                                'message': 'Cannot update the annual_leaves',
+                                'error_message': None,
+                                'data': []
+                            }
+                        },
+                        status=status.HTTP_200_OK
+                    )
+                leave_managements = leave_managements.annual_leave - 1
+                leave_managements.save()
+            if vacation_type == leave_managements.medical_leave:
+                if leave_managements.medical_leave != 0:
+                    return Response(
+                        {
+                            'status': 200,
+                            'status_code': '200',
+                            'response': {
+                                'message': 'Cannot update the annual_leaves',
+                                'error_message': None,
+                                'data': []
+                            }
+                        },
+                        status=status.HTTP_200_OK
+                    )
+                leave_managements = leave_managements.medical_leave - 1
+                leave_managements.save()
+            return Response(
+                {
+                    'status': 200,
+                    'status_code': '200',
+                    'response': {
+                        'message': 'Vacation updated successfully',
+                        'error_message': None,
+                        'data': []
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+        if vacation_status == 'declined':
+            vacations = Vacation.objects.filter(id=vacation_id)
+            vacations.update(vacation_status=vacation_status)
+            return Response(
+                {
+                    'status': 200,
+                    'status_code': '200',
+                    'response': {
+                        'message': 'Vacation updated successfully',
+                        'error_message': None,
+                        'data': []
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+    except Exception as ex:
+        error = str(ex)
+        return error
 
 
 @transaction.atomic
