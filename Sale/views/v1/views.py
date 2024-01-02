@@ -2301,7 +2301,9 @@ def new_create_sale_order(request):
     )
 
     checkout.save()
-
+    '''
+    Invoice is being created here for QuickSale
+    '''
     invoice = SaleInvoice.objects.create(
         user=user,
         client=client,
