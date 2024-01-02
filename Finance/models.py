@@ -1,3 +1,4 @@
+
 from django.db import models
 from Authentication.models import User
 from Business.models import Business
@@ -26,15 +27,17 @@ class Refund(CommonField):
     total_refund_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)  
 
 class RefundProduct(CommonField):
-    refund = models.ForeignKey(Refund, on_delete=models.CASCADE, verbose_name = 'Refund id')
+    
+    refund = models.ForeignKey(Refund, on_delete=models.CASCADE, verbose_name = 'Refund id', related_name='refunded_products')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Product id')
+    
     
     refunded_quantity = models.PositiveIntegerField()
     refunded_amount = models.DecimalField(max_digits=10, decimal_places=2)
     in_stock = models.BooleanField(default = False)
     
 class RefundServices(CommonField):
-    refund = models.ForeignKey(Refund, on_delete=models.CASCADE, verbose_name = 'Refund id')
+    refund = models.ForeignKey(Refund, on_delete=models.CASCADE, verbose_name = 'Refund id', related_name='refunded_services')
     service = models.ForeignKey(Service, on_delete=models.CASCADE, verbose_name='Service id')
     
     refunded_amount = models.DecimalField(max_digits=10, decimal_places=2)
