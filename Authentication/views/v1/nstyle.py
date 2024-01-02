@@ -729,7 +729,6 @@ def login(request):
     )
 
 
-@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_flagged(request):
