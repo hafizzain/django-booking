@@ -3917,9 +3917,6 @@ def create_vacation_emp(request):
             },
             status=status.HTTP_200_OK
         )
-    if from_date and to_date:
-        difference_days = to_date - from_date
-        difference_days= difference_days.days
     empl_vacation = Vacation.objects.create(
         business=business,
         employee=employee_id,
@@ -3928,7 +3925,92 @@ def create_vacation_emp(request):
         note=note,
         vacation_status='pending'
     )
-    # LeaveManagements.objects.get(employee_id=employee_id)
+    check_employee_leave = LeaveManagements.objects.filter(employee_id=employee)
+    if check_employee_leave.exists():
+        leave_managements = LeaveManagements.objects.get(employee_id=employee)
+        if vacation_type == leave_managements.casual_leave:
+            if leave_managements.casual_leave == 0:
+                return Response(
+                    {
+                        'status': 200,
+                        'status_code': '200',
+                        'response': {
+                            'message': 'Cannot update the casual leaves',
+                            'error_message': None,
+                            'data': []
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+            if days > leave_managements.casual_leave:
+                return Response(
+                    {
+                        'status': 200,
+                        'status_code': '200',
+                        'response': {
+                            'message': 'Cannot update the casual leaves',
+                            'error_message': None,
+                            'data': []
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+        if vacation_type == leave_managements.annual_leave:
+            if leave_managements.annual_leave == 0:
+                return Response(
+                    {
+                        'status': 200,
+                        'status_code': '200',
+                        'response': {
+                            'message': 'Cannot update the annual_leaves',
+                            'error_message': None,
+                            'data': []
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+            if days > leave_managements.annual_leave:
+                return Response(
+                    {
+                        'status': 200,
+                        'status_code': '200',
+                        'response': {
+                            'message': 'Cannot update the annual_leave',
+                            'error_message': None,
+                            'data': []
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+        if vacation_type == leave_managements.medical_leave:
+            if leave_managements.medical_leave == 0:
+                return Response(
+                    {
+                        'status': 200,
+                        'status_code': '200',
+                        'response': {
+                            'message': 'Cannot update the annual_leaves',
+                            'error_message': None,
+                            'data': []
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+            if days > leave_managements.medical_leave:
+                return Response(
+                    {
+                        'status': 200,
+                        'status_code': '200',
+                        'response': {
+                            'message': 'Cannot update the annual_leave',
+                            'error_message': None,
+                            'data': []
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+
+
     # VacationDetails.objects.create(vacation_id=empl_vacation.id, vacation_status='pending')
     for i, value in enumerate(range(days + 1)):
         if i == 0:
