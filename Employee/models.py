@@ -428,6 +428,7 @@ class Vacation(models.Model):
     from_date = models.DateField(verbose_name='From Date', null=True)
     to_date = models.DateField(verbose_name='To Date', null=True)
     note = models.CharField(max_length=300, default='')
+    vacation_status = models.TextField(null=True)
 
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=now)
@@ -438,7 +439,7 @@ class Vacation(models.Model):
 
 class VacationDetails(models.Model):
     vacation = models.ForeignKey(Vacation, on_delete=models.CASCADE, null=True, related_name='vacation_detail')
-    status = models.TextField(null=True)
+    vacation_status = models.TextField(null=True)
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)
 

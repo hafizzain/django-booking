@@ -74,7 +74,8 @@ urlpatterns = [
     # path('get_vacation/', views.get_vacation),
     # path('delete_vacation/', views.delete_vacation),
     # path('update_vacation/', views.update_vacation),
-    
+    path('update_vacation_status/', views.update_vacation_status),
+
     path('create_vacation/', views.create_vacation_emp),
     path('get_vacation/', views.get_vacations),
     path('delete_vacation/', views.delete_workingschedule),
