@@ -194,7 +194,7 @@ class EmployeSerializer(serializers.ModelSerializer):
     staff_group = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
     schedule = serializers.SerializerMethodField(read_only=True)
-    employee_leaves = LeaveManagementSerializer()
+    # employee_leaves = LeaveManagementSerializer()
     leave_data = serializers.SerializerMethodField(read_only=True)
 
 
@@ -388,7 +388,7 @@ class EmployeSerializer(serializers.ModelSerializer):
             'staff_group',
             'location',
             'schedule',
-            'employee_leaves',
+            # 'employee_leaves',
             'leave_data',
             # 'globel_permission',
             'permissions', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'
