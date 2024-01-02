@@ -27,7 +27,7 @@ from Employee.serializers import (EmployeSerializer, EmployeInformationsSerializ
                                   CommissionSerializer, AssetSerializer, WorkingScheduleSerializer,
                                   NewVacationSerializer,
                                   NewAbsenceSerializer, singleEmployeeSerializerOP, Payroll_WorkingScheduleSerializerOP,
-                                  WeekendManagementSerializer ,LeaveManagementSerializer
+                                  WeekendManagementSerializer, LeaveManagementSerializer
                                   )
 from Employee.optimized_serializers import OptimizedEmployeeSerializerDashboard
 from django.db import connection, transaction
@@ -1073,7 +1073,7 @@ def create_employee(request):
             medical_leave=leave_data.get('medical_leave', 0),
             number_of_months=leave_data.get('number_of_months', 0)
         )
-        leave_data = LeaveManagementSerializer(leave_management ,many=False)
+        leave_data = LeaveManagementSerializer(leave_management, many=False)
 
     employee_p_info = EmployeeProfessionalInfo.objects.create(
         employee=employee,
@@ -3838,6 +3838,7 @@ def create_vacation_emp(request):
     is_vacation = request.data.get('is_vacation', None)
     is_leave = request.data.get('is_leave', None)
     is_off = request.data.get('is_off', None)
+    vacation_type = request.data.get('vacation_type', None)
 
     if not all([business_id, employee]):
         return Response(
@@ -3921,9 +3922,11 @@ def create_vacation_emp(request):
         employee=employee_id,
         from_date=from_date,
         to_date=to_date,
-        note=note
+        note=note,
+        vacation_type=vacation_type,
+        vacation_status='pending'
     )
-    VacationDetails.objects.create(vacation_id=empl_vacation.id,status='pending')
+    # VacationDetails.objects.create(vacation_id=empl_vacation.id, vacation_status='pending')
     for i, value in enumerate(range(days + 1)):
         if i == 0:
             from_date = from_date
@@ -3995,6 +3998,59 @@ def create_vacation_emp(request):
         },
         status=status.HTTP_200_OK
     )
+
+
+@transaction.atomic
+@api_view(['PATCH'])
+@permission_classes([AllowAny])
+def update_vacation_status(request):
+    # user = request.user
+    business_id = request.data.get('business', None)
+    employee = request.data.get('employee', None)
+    vacation_id = request.data.get('vacation_id', None)
+    vacation_status = request.data.get('vacation_status', None)
+    vacation_type = request.data.get('vacation_type',None)
+    if vacation_status =='accepted':
+        vacations = Vacation.objects.filter(id=vacation_id)
+        vacations.update(vacation_status=vacation_status)
+        leave_managements = LeaveManagements.objects.get(employee_id=employee)
+        if vacation_type == leave_managements.casual_leave:
+            leave_managements = leave_managements.casual_leave -1
+            leave_managements.save()
+        if vacation_type == leave_managements.annual_leave:
+            leave_managements = leave_managements.annual_leave - 1
+            leave_managements.save()
+        if vacations == leave_managements.medical_leave:
+            leave_managements = leave_managements.medical_leave - 1
+            leave_managements.save()
+        return Response(
+            {
+                'status': 200,
+                'status_code': '200',
+                'response': {
+                    'message': 'Vacation updated successfully',
+                    'error_message': None,
+                    'data': []
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    if vacation_status =='declined':
+        vacations = Vacation.objects.filter(id=vacation_id)
+        vacations.update(vacation_status=vacation_status)
+        return Response(
+            {
+                'status': 200,
+                'status_code': '200',
+                'response': {
+                    'message': 'Vacation updated successfully',
+                    'error_message': None,
+                    'data': []
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
 
 
 @transaction.atomic
@@ -5631,7 +5687,7 @@ def create_weekend_management(request):
         return Response(
             {
                 'status': 200,
-                'success':True,
+                'success': True,
                 'status_code': '200',
                 'response': {
                     'message': 'Week end created across employee!',
@@ -5738,10 +5794,10 @@ def get_weekend_management(request):
         id = request.query_params.get('id', False)
         if id:
             weekend = WeekendManagements.objects.filter(id=id)
-            weekend = WeekendManagementSerializer(weekend ,many=True)
+            weekend = WeekendManagementSerializer(weekend, many=True)
             return Response(
                 {
-                    'success':True,
+                    'success': True,
                     'status': 200,
                     'status_code': '200',
                     'response': {
@@ -5794,7 +5850,7 @@ def delete_weekend_management(request):
                 weekend.delete()
                 return Response(
                     {
-                        'success':True,
+                        'success': True,
                         'status': 200,
                         'status_code': '200',
                         'response': {
