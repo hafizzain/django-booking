@@ -3923,7 +3923,8 @@ def create_vacation_emp(request):
         from_date=from_date,
         to_date=to_date,
         note=note,
-        vacation_status='pending'
+        vacation_status='pending',
+        vacation_type=vacation_type,
     )
     check_employee_leave = LeaveManagements.objects.filter(employee_id=employee)
     if check_employee_leave.exists():
