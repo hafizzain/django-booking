@@ -1084,7 +1084,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
             )
             leave_data = LeaveManagementSerializer(leave_management, many=False).data
             return leave_data
-        except:
+        except Exception as ex:
             return None
 
     def get_schedule(self, obj):

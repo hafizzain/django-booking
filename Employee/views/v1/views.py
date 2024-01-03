@@ -1329,12 +1329,23 @@ def update_employee(request):
         )
     if len(leave_data) > 0:
         leave_data = json.loads(leave_data)
-        lev_id = LeaveManagements.objects.filter(employee_id=id).update(
+        leave_management = LeaveManagements.objects.filter(employee_id=id)
+        if leave_management:
+            leave_management.update(
             casual_leave=leave_data.get('casual_leave', 0),
             annual_leave=leave_data.get('annual_leave', 0),
             medical_leave=leave_data.get('medical_leave', 0),
             number_of_months=leave_data.get('number_of_months', 0)
-        )
+            )
+        else:
+            leave_management = LeaveManagements.objects.create(
+                employee_id=employee.id,
+                casual_leave=leave_data.get('casual_leave', 0),
+                annual_leave=leave_data.get('annual_leave', 0),
+                medical_leave=leave_data.get('medical_leave', 0),
+                number_of_months=leave_data.get('number_of_months', 0)
+            )
+
 
     try:
         staff = StaffGroup.objects.get(employees=id)
