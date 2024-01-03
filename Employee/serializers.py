@@ -988,10 +988,9 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             location_id = self.context.get('location_id', None)
             today_date = datetime.now().date()
             holidays = Holiday.objects.select_related('user', 'business') \
-                                        .filter(location_id=location_id,
-                                                start_date__lte=today_date,
-                                                end_date__gte=today_date)
-            return len(holidays) > 0    # Return True if there is any holiday                      
+                                        .filter(location_id=location_id)
+            for holiday in holidays:
+                return holiday.is_holiday()                   
         except Exception as err:
             error = str(err)
             return error
@@ -1072,18 +1071,6 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
 class WorkingScheduleSerializer(serializers.ModelSerializer):
     schedule = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
-    # available_holidays = serializers.SerializerMethodField()
-    
-    # is_holiday = serializers.SerializerMethodField(read_only=True)
-    
-        
-    # def get_is_holiday(self, obj):
-    #     try:
-    #         holidays = Holiday.objects.select_related('user','business').filter(location=obj.location)
-    #         return HolidaySerializer(holidays, many=True).data
-    #     except Exception as err:
-    #          error = str(err)
-    #          return error
 
     def get_schedule(self, obj):
         schedule = EmployeDailySchedule.objects.filter(employee=obj)

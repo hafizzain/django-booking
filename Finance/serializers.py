@@ -33,6 +33,8 @@ class RefundSerializer(serializers.ModelSerializer):
 
     def product_stock_update(self, location, refunded_products_data):
         try:
+            [ProductStock.objects.filter(product_id=product_data["product"], location_id = location).update(refunded_quantity=F('refunded_quantity') + product_data["refunded_quantity"])
+                                for product_data in refunded_products_data]
             [ProductStock.objects.filter(product_id=product_data["product"], location_id=location).update(sold_quantity=F('sold_quantity') - product_data["refunded_quantity"], available_quantity=F('available_quantity') + product_data['refunded_quantity'], is_refunded=True)
             for product_data in refunded_products_data if product_data['in_stock'] == True]
         except Exception as e:
@@ -46,22 +48,15 @@ class RefundSerializer(serializers.ModelSerializer):
         refunded_services_data = validated_data.pop('refunded_services', [])
         with transaction.atomic():
             refund = Refund.objects.create(**validated_data)
-
-            # Create refunded products
             refunded_products_instances = [
-                (
-                    ProductStock.objects.filter(product_id=product_data["product"]).update(
-                        refund_quantity=F(
-                            'refund_quantity') + product_data['refunded_quantity']
-                    ),
-                    RefundProduct(refund=refund, **product_data)
-                )
+                RefundProduct(refund=refund, **product_data)
                 for product_data in refunded_products_data
-                if product_data.get('in_stock', False)
             ]
 
-            RefundProduct.objects.bulk_create([instance for instance, _ in refunded_products_instances])
-            self.product_stock_update(location, refunded_products_data)
+            # Bulk create RefundedProduct instances ingoring the first instance
+            RefundProduct.objects.bulk_create(refunded_products_instances)
+            self.product_stock_update(location,refunded_products_data)
+            # self.product_stock_update(location, refunded_products_data)
 
             # Create refunded services
             refunded_services_instances = [
