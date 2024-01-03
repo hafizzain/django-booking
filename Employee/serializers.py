@@ -988,12 +988,10 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             location_id = self.context.get('location_id', None)
             today_date = datetime.now().date()
             holidays = Holiday.objects.select_related('user', 'business') \
-                                        .filter(location_id=location_id)
-            for holiday in holidays:
-                if holiday.start_date >= today_date or holiday.end_date <= today_date:
-                    return True
-                else:
-                    return False                      
+                                        .filter(location_id=location_id,
+                                                start_date__lte=today_date,
+                                                end_date__gte=today_date)
+            return True if holidays else False                        
         except Exception as err:
             error = str(err)
             return error
