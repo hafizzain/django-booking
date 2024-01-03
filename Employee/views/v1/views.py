@@ -4562,7 +4562,7 @@ def get_vacations(request):
 
     allvacations = Vacation.objects.filter(
         employee__location=location,
-        # holiday_type='Vacation',
+        holiday_type='Vacation',
         is_active=True,
         **queries
     ).order_by('-created_at')
