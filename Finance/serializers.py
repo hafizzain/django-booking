@@ -57,7 +57,7 @@ class RefundSerializer(serializers.ModelSerializer):
                 if product_data.get('in_stock', False)
             ]
 
-            RefundProduct.objects.bulk_create([instance for instance, _ in refunded_products_instances])
+            RefundProduct.objects.bulk_create(refunded_products_instances)
             self.product_stock_update(location, refunded_products_data)
 
             # Create refunded services
