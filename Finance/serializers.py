@@ -32,8 +32,11 @@ class RefundSerializer(serializers.ModelSerializer):
     '''
 
     def product_stock_update(self, location, refunded_products_data):
-        [ProductStock.objects.filter(product_id=product_data["product"], location_id=location).update(sold_quantity=F('sold_quantity') - product_data["refunded_quantity"], available_quantity=F('available_quantity') + product_data['refunded_quantity'], is_refunded=True)
-         for product_data in refunded_products_data if product_data['in_stock'] == True]
+        try:
+            [ProductStock.objects.filter(product_id=product_data["product"], location_id=location).update(sold_quantity=F('sold_quantity') - product_data["refunded_quantity"], available_quantity=F('available_quantity') + product_data['refunded_quantity'], is_refunded=True)
+            for product_data in refunded_products_data if product_data['in_stock'] == True]
+        except Exception as e:
+            return ({'error': str(e)})
         return True
 
     def create(self, validated_data):  # sourcery skip: extract-method
@@ -57,7 +60,7 @@ class RefundSerializer(serializers.ModelSerializer):
                 if product_data.get('in_stock', False)
             ]
 
-            RefundProduct.objects.bulk_create(refunded_products_instances)
+            RefundProduct.objects.bulk_create([instance for instance, _ in refunded_products_instances])
             self.product_stock_update(location, refunded_products_data)
 
             # Create refunded services
