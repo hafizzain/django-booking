@@ -31,4 +31,4 @@ class Holiday(CommonField):
         end_date = self.end_date.date() if self.end_date else None
 
         # Check if today is within the holiday period
-        return start_date >= today_date or end_date <= end_date
+        return start_date >= today_date or today_date <= end_date
