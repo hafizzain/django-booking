@@ -3888,31 +3888,32 @@ def create_vacation_emp(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    joined_at = employee_id.created_at
-    now = datetime.now()
-    # Retrieve the employee and their creation date
-    employee_id = Employee.objects.get(id=employee, is_deleted=False)
-    created_at = employee_id.created_at
-    # Define the required number of months
-    required_months = LeaveManagements.objects.get(employee_id=employee_id.id)
-    required_months = required_months.number_of_months # Change this to the desired number of months
-    # Calculate the difference in months
-    required_months = int(required_months)
-    months_difference = (now.year - created_at.year) * 12 + now.month - created_at.month
-    # Check if the required number of months have passed
-    months_difference = int(months_difference)
-    if months_difference < required_months:
-        return Response(
-            {
-                'status': 400,
-                'status_code': '400',
-                'response': {
-                    'message': 'You can not create annual vacation right now ',
-                    'error_message': None,
-                }
-            },
-            status=status.HTTP_200_OK
-        )
+    if vacation_type == 'annual':
+        joined_at = employee_id.created_at
+        now = datetime.now()
+        # Retrieve the employee and their creation date
+        employee_id = Employee.objects.get(id=employee, is_deleted=False)
+        created_at = employee_id.created_at
+        # Define the required number of months
+        required_months = LeaveManagements.objects.get(employee_id=employee_id.id)
+        required_months = required_months.number_of_months # Change this to the desired number of months
+        # Calculate the difference in months
+        required_months = int(required_months)
+        months_difference = (now.year - created_at.year) * 12 + now.month - created_at.month
+        # Check if the required number of months have passed
+        months_difference = int(months_difference)
+        if months_difference < required_months:
+            return Response(
+                {
+                    'status': 400,
+                    'status_code': '400',
+                    'response': {
+                        'message': 'You can not create annual vacation right now ',
+                        'error_message': None,
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
     # from_date ='2023-01-04'
     # to_date ='2023-01-06'
 
@@ -4141,7 +4142,7 @@ def update_vacation_status(request):
                 leave_managements.casual_leave -= 1
                 leave_managements.save()
             if vacation_type == 'annual':
-                if leave_managements.annual_leave != 0:
+                if leave_managements.annual_leave == 0:
                     return Response(
                         {
                             'status': 200,
@@ -4171,6 +4172,22 @@ def update_vacation_status(request):
                         status=status.HTTP_200_OK
                     )
                 leave_managements.medical_leave -= 1
+                leave_managements.save()
+            if vacation_type == 'leo_day':
+                if leave_managements.leo_leave == 0:
+                    return Response(
+                        {
+                            'status': 200,
+                            'status_code': '200',
+                            'response': {
+                                'message': 'Cannot update the annual_leaves',
+                                'error_message': None,
+                                'data': []
+                            }
+                        },
+                        status=status.HTTP_200_OK
+                    )
+                leave_managements.leo_leave -= 1
                 leave_managements.save()
 
             vacations = Vacation.objects.filter(id=vacation_id)
@@ -4478,7 +4495,9 @@ def create_workingschedule(request):
         working_schedule.is_vacation = False
         working_schedule.is_weekend = True
         working_schedule.is_leo_day = True
-
+        is_leo_day_update = LeaveManagements.objects.get(employee_id=employee_id.id)
+        is_leo_day_update.leo_leave += 1
+        is_leo_day_update.save()
 
     if is_leave is not None:
         working_schedule.is_leave = True

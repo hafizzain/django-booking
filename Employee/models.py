@@ -632,6 +632,7 @@ class LeaveManagements(CommonField):
     casual_leave = models.IntegerField(null=True, default=0, help_text='Number of casual leaves allowed')
     annual_leave = models.IntegerField(null=True, default=0, help_text='Number of annual leaves allowed')
     medical_leave = models.IntegerField(null=True, default=0, help_text='Number of medical leaves allowed')
+    leo_leave = models.IntegerField(null=True, default=0, help_text='Number of medical leaves allowed')
     number_of_months = models.TextField(null=True)
 
 
