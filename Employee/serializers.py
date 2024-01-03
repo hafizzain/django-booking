@@ -10,6 +10,8 @@ from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSION
 from Utility.models import Country, Currency, GlobalPermissionChoices, State, City
 from Service.models import Service
 from Permissions.models import EmployePermission
+from HRM.models import Holiday
+from HRM.serializers import HolidaySerializer
 # from datetime import datetime, timedelta
 from datetime import datetime, timedelta
 import calendar
@@ -979,9 +981,26 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
 
 class ScheduleSerializerOP(serializers.ModelSerializer):
+    is_holiday = serializers.SerializerMethodField(read_only=True)
+     
+    def get_is_holiday(self, obj):
+        try:
+            location_id = self.context.get('location_id', None)
+            holidays = Holiday.objects.select_related('user','business') \
+                                    .filter(location_id=location_id)
+                                    
+            if holidays.start_date >= datetime.now() or holidays.end_date <= datetime.now():
+                return True
+            else:
+                return False
+            # return HolidaySerializer(holidays, many=True).data
+        except Exception as err:
+            error = str(err)
+            return error
+    
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id','is_leo_day', 'date', 'is_vacation', 'is_leave', 'from_date', 'day', 'end_time_shift', 'end_time','is_weekend',
+        fields = ['id','is_leo_day','is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date', 'day', 'end_time_shift', 'end_time','is_weekend',
                   'start_time']
 
 
@@ -1054,10 +1073,24 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
 class WorkingScheduleSerializer(serializers.ModelSerializer):
     schedule = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
+    # available_holidays = serializers.SerializerMethodField()
+    
+    # is_holiday = serializers.SerializerMethodField(read_only=True)
+    
+        
+    # def get_is_holiday(self, obj):
+    #     try:
+    #         holidays = Holiday.objects.select_related('user','business').filter(location=obj.location)
+    #         return HolidaySerializer(holidays, many=True).data
+    #     except Exception as err:
+    #          error = str(err)
+    #          return error
 
     def get_schedule(self, obj):
         schedule = EmployeDailySchedule.objects.filter(employee=obj)
         return ScheduleSerializerOP(schedule, many=True, context=self.context).data
+    
+
 
     def get_image(self, obj):
         if obj.image:

@@ -3001,6 +3001,7 @@ def get_product_stock_report(request):
     if report_type:
         filter_queries['product_stock_report__report_choice'] = report_type
 
+    # Bringing the unique product records
     products = Product.objects.prefetch_related(
         'product_stock'
     ).filter(
@@ -3026,7 +3027,7 @@ def get_product_stock_report(request):
     response = paginator.get_paginated_response(paginated_data, 'product_stock_report')
     return response
 
-
+# This is Working for the Reports
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_product_stock_report_dummy(request):
