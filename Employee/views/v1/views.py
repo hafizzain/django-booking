@@ -4142,7 +4142,7 @@ def update_vacation_status(request):
                 leave_managements.casual_leave -= 1
                 leave_managements.save()
             if vacation_type == 'annual':
-                if leave_managements.annual_leave != 0:
+                if leave_managements.annual_leave == 0:
                     return Response(
                         {
                             'status': 200,
@@ -4172,6 +4172,22 @@ def update_vacation_status(request):
                         status=status.HTTP_200_OK
                     )
                 leave_managements.medical_leave -= 1
+                leave_managements.save()
+            if vacation_type == 'leo_day':
+                if leave_managements.leo_day == 0:
+                    return Response(
+                        {
+                            'status': 200,
+                            'status_code': '200',
+                            'response': {
+                                'message': 'Cannot update the annual_leaves',
+                                'error_message': None,
+                                'data': []
+                            }
+                        },
+                        status=status.HTTP_200_OK
+                    )
+                leave_managements.leo_day -= 1
                 leave_managements.save()
 
             vacations = Vacation.objects.filter(id=vacation_id)
@@ -4479,7 +4495,9 @@ def create_workingschedule(request):
         working_schedule.is_vacation = False
         working_schedule.is_weekend = True
         working_schedule.is_leo_day = True
-
+        is_leo_day_update = LeaveManagements.objects.get(employee_id=employee_id.id)
+        is_leo_day_update.leo_leave += 1
+        is_leo_day_update.save()
 
     if is_leave is not None:
         working_schedule.is_leave = True
