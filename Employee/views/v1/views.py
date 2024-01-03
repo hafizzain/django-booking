@@ -4112,7 +4112,7 @@ def update_vacation_status(request):
                         },
                         status=status.HTTP_200_OK
                     )
-                leave_managements = leave_managements.casual_leave - 1
+                leave_managements.casual_leave -= 1
                 leave_managements.save()
             if vacation_type == 'annual':
                 if leave_managements.annual_leave != 0:
@@ -4128,7 +4128,7 @@ def update_vacation_status(request):
                         },
                         status=status.HTTP_200_OK
                     )
-                leave_managements = leave_managements.annual_leave - 1
+                leave_managements.annual_leave -= 1
                 leave_managements.save()
             if vacation_type == 'medical':
                 if leave_managements.medical_leave == 0:
@@ -4144,7 +4144,7 @@ def update_vacation_status(request):
                         },
                         status=status.HTTP_200_OK
                     )
-                leave_managements = leave_managements.medical_leave - 1
+                leave_managements.medical_leave -= 1
                 leave_managements.save()
 
             vacations = Vacation.objects.filter(id=vacation_id)
