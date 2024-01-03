@@ -33,6 +33,8 @@ class RefundSerializer(serializers.ModelSerializer):
 
     def product_stock_update(self, location, refunded_products_data):
         try:
+            [ProductStock.objects.filter(product_id=product_data["product"], location_id = location).update(refunded_quantity=F('refunded_quantity') + product_data["refunded_quantity"])
+                                for product_data in refunded_products_data]
             [ProductStock.objects.filter(product_id=product_data["product"], location_id=location).update(sold_quantity=F('sold_quantity') - product_data["refunded_quantity"], available_quantity=F('available_quantity') + product_data['refunded_quantity'], is_refunded=True)
             for product_data in refunded_products_data if product_data['in_stock'] == True]
         except Exception as e:
