@@ -15,7 +15,7 @@ from HRM.serializers import HolidaySerializer
 # from datetime import datetime, timedelta
 from datetime import datetime, timedelta
 import calendar
-
+from datetime import datetime
 from rest_framework import serializers
 from .models import (EmployeDailySchedule, Employee, EmployeeProfessionalInfo,
                      EmployeePermissionSetting, EmployeeModulePermission
@@ -986,21 +986,20 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
     def get_is_holiday(self, obj):
         try:
             location_id = self.context.get('location_id', None)
-            holidays = Holiday.objects.select_related('user','business') \
-                                    .filter(location_id=location_id)
-                                    
-            if holidays.start_date >= datetime.now() or holidays.end_date <= datetime.now():
-                return True
-            else:
-                return False
-            # return HolidaySerializer(holidays, many=True).data
+            today_date = datetime.now().date()
+            holidays = Holiday.objects.select_related('user', 'business') \
+                                        .filter(location_id=location_id,
+                                                start_date__lte=today_date,
+                                                end_date__gte=today_date)
+            return len(holidays) > 0    # Return True if there is any holiday                      
         except Exception as err:
             error = str(err)
             return error
     
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id','is_leo_day','is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date', 'day', 'end_time_shift', 'end_time','is_weekend',
+        fields = ['id','is_leo_day','is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date',
+                  'day', 'end_time_shift', 'end_time','is_weekend',
                   'start_time']
 
 
