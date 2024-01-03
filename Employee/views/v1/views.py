@@ -4100,8 +4100,8 @@ def update_vacation_status(request):
             vacations = Vacation.objects.filter(id=vacation_id)
             vacations.update(vacation_status=vacation_status)
             leave_managements = LeaveManagements.objects.get(employee_id=employee)
-            if vacation_type == leave_managements.casual_leave:
-                if leave_managements.casual_leave != 0:
+            if vacation_type == 'casual':
+                if leave_managements.casual_leave == 0:
                     return Response(
                         {
                             'status': 200,
@@ -4116,7 +4116,7 @@ def update_vacation_status(request):
                     )
                 leave_managements = leave_managements.casual_leave - 1
                 leave_managements.save()
-            if vacation_type == leave_managements.annual_leave:
+            if vacation_type == 'annual':
                 if leave_managements.annual_leave != 0:
                     return Response(
                         {
@@ -4132,8 +4132,8 @@ def update_vacation_status(request):
                     )
                 leave_managements = leave_managements.annual_leave - 1
                 leave_managements.save()
-            if vacation_type == leave_managements.medical_leave:
-                if leave_managements.medical_leave != 0:
+            if vacation_type == 'medical':
+                if leave_managements.medical_leave == 0:
                     return Response(
                         {
                             'status': 200,
