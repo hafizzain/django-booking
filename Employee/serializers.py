@@ -15,7 +15,7 @@ from HRM.serializers import HolidaySerializer
 # from datetime import datetime, timedelta
 from datetime import datetime, timedelta
 import calendar
-
+from datetime import datetime
 from rest_framework import serializers
 from .models import (EmployeDailySchedule, Employee, EmployeeProfessionalInfo,
                      EmployeePermissionSetting, EmployeeModulePermission
@@ -986,13 +986,12 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
     def get_is_holiday(self, obj):
         try:
             location_id = self.context.get('location_id', None)
-            holidays = Holiday.objects.select_related('user','business') \
-                                    .filter(location_id=location_id)
-                                    
-            if holidays.start_date >= datetime.now() or holidays.end_date <= datetime.now():
-                return True
-            else:
-                return False
+            today_date = datetime.now().date()
+            holidays = Holiday.objects.select_related('user', 'business') \
+                                        .filter(location_id=location_id,
+                                                start_date__lte=today_date,
+                                                end_date__gte=today_date)
+            return len(holidays) > 0                       
             # return HolidaySerializer(holidays, many=True).data
         except Exception as err:
             error = str(err)
