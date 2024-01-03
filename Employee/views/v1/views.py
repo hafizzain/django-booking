@@ -4097,8 +4097,6 @@ def update_vacation_status(request):
         vacation_status = request.data.get('vacation_status', None)
         vacation_type = request.data.get('vacation_type', None)
         if vacation_status == 'accepted':
-            vacations = Vacation.objects.filter(id=vacation_id)
-            vacations.update(vacation_status=vacation_status)
             leave_managements = LeaveManagements.objects.get(employee_id=employee)
             if vacation_type == 'casual':
                 if leave_managements.casual_leave == 0:
@@ -4148,6 +4146,9 @@ def update_vacation_status(request):
                     )
                 leave_managements = leave_managements.medical_leave - 1
                 leave_managements.save()
+
+            vacations = Vacation.objects.filter(id=vacation_id)
+            vacations.update(vacation_status='accepted')
             return Response(
                 {
                     'status': 200,
@@ -4178,7 +4179,7 @@ def update_vacation_status(request):
             )
     except Exception as ex:
         error = str(ex)
-        return error
+        return Response({"msg":error})
 
 
 @transaction.atomic
