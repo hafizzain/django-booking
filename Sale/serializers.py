@@ -1947,7 +1947,7 @@ class SaleOrder_ProductSerializerOP(serializers.ModelSerializer):
 
 
 class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
-    service_id = serializers.SerializerMethodField(read_only = True)
+    # service_id = serializers.SerializerMethodField(read_only = True)
     service = serializers.SerializerMethodField()
     price = serializers.SerializerMethodField()
     selection_type = serializers.SerializerMethodField(read_only=True)
@@ -1965,16 +1965,18 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
         else:
             return None
 
-    def get_service_id(self, obj): # getting service id
-        if obj.service:
-            return obj.service.id
+    # def get_service_id(self, obj): # getting service id
+    #     if obj.service:
+    #         return obj.service.id
         
     def get_selection_type(self, obj):
         return 'SERVICE'
 
     def get_service(self, obj):
         if obj.service:
-            return {'name': obj.service.name, 'arabic_name': obj.service.arabic_name}
+            return {'name': obj.service.name,
+                    'arabic_name': obj.service.arabic_name,
+                    'service_id':obj.service.id}
         return None
 
     def get_service_original_price(self, obj):
