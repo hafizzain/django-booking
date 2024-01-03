@@ -55,7 +55,8 @@ class HolidayApiView(APIView):
             if end_date:
                 query &= Q(end_date__lte=end_date)
             
-            filtered_queryset = Holiday.objects.select_related('user','business','location') \
+            filtered_queryset = Holiday.objects \
+                                .select_related('user','business','location') \
                                 .filter(query) \
                                 .order_by('-created_at')
             serializer = HolidaySerializer(filtered_queryset, many=True)
@@ -103,7 +104,6 @@ class HolidayApiView(APIView):
         
         if 'is_active' not in holiday_data:     #due to unknown clash 
             holiday_data['is_active'] = True
-        # request.data['user'] = user.id
         serializer = HolidaySerializer(data=holiday_data,
                                        context={'request': request})
         if serializer.is_valid():
