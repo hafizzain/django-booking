@@ -34,7 +34,7 @@ class RefundProduct(CommonField):
     
     refunded_quantity = models.PositiveIntegerField()
     refunded_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    in_stock = models.BooleanField(default = False)
+    in_stock = models.BooleanField(default = False, blank = True)
     
 class RefundServices(CommonField):
     refund = models.ForeignKey(Refund, on_delete=models.CASCADE, verbose_name = 'Refund id', related_name='refunded_services')
