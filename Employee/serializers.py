@@ -1066,7 +1066,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
 class WorkingScheduleSerializer(serializers.ModelSerializer):
     schedule = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
-    available_holidays = serializers.SerializerMethodField()
+    # available_holidays = serializers.SerializerMethodField()
 
     def get_schedule(self, obj):
         schedule = EmployeDailySchedule.objects.filter(employee=obj)
