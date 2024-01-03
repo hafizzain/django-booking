@@ -3888,31 +3888,32 @@ def create_vacation_emp(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    joined_at = employee_id.created_at
-    now = datetime.now()
-    # Retrieve the employee and their creation date
-    employee_id = Employee.objects.get(id=employee, is_deleted=False)
-    created_at = employee_id.created_at
-    # Define the required number of months
-    required_months = LeaveManagements.objects.get(employee_id=employee_id.id)
-    required_months = required_months.number_of_months # Change this to the desired number of months
-    # Calculate the difference in months
-    required_months = int(required_months)
-    months_difference = (now.year - created_at.year) * 12 + now.month - created_at.month
-    # Check if the required number of months have passed
-    months_difference = int(months_difference)
-    if months_difference < required_months:
-        return Response(
-            {
-                'status': 400,
-                'status_code': '400',
-                'response': {
-                    'message': 'You can not create annual vacation right now ',
-                    'error_message': None,
-                }
-            },
-            status=status.HTTP_200_OK
-        )
+    if vacation_type == 'annual':
+        joined_at = employee_id.created_at
+        now = datetime.now()
+        # Retrieve the employee and their creation date
+        employee_id = Employee.objects.get(id=employee, is_deleted=False)
+        created_at = employee_id.created_at
+        # Define the required number of months
+        required_months = LeaveManagements.objects.get(employee_id=employee_id.id)
+        required_months = required_months.number_of_months # Change this to the desired number of months
+        # Calculate the difference in months
+        required_months = int(required_months)
+        months_difference = (now.year - created_at.year) * 12 + now.month - created_at.month
+        # Check if the required number of months have passed
+        months_difference = int(months_difference)
+        if months_difference < required_months:
+            return Response(
+                {
+                    'status': 400,
+                    'status_code': '400',
+                    'response': {
+                        'message': 'You can not create annual vacation right now ',
+                        'error_message': None,
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
     # from_date ='2023-01-04'
     # to_date ='2023-01-06'
 
