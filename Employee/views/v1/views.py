@@ -3,6 +3,21 @@ import random
 import string
 from time import strptime
 from django.shortcuts import render
+from django.db.models import Case, When, Value, F, CharField
+
+allvacations = Vacation.objects.filter(
+    employee__location=location,
+    holiday_type='Vacation',
+    is_active=True,
+    **queries
+).annotate(
+    matching_schedules=Case(
+        When(employeedailyschedule__is_vacation=True, then=Value(1)),
+        default=Value(0),
+        output_field=CharField(),
+    )
+).filter(matching_schedules=1).order_by('-created_at')
+
 from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee, EmployeeProfessionalInfo,
                              EmployeePermissionSetting, EmployeeModulePermission
 , EmployeeMarketingPermission, EmployeeSelectedService, SallarySlipPayrol, StaffGroup
@@ -4579,12 +4594,25 @@ def get_vacations(request):
     if employee_id:
         queries['employee__id'] = employee_id
 
+    # allvacations = Vacation.objects.filter(
+    #     employee__location=location,
+    #     holiday_type='Vacation',
+    #     is_active=True,
+    #     **queries
+    # ).order_by('-created_at')
     allvacations = Vacation.objects.filter(
         employee__location=location,
         holiday_type='Vacation',
         is_active=True,
         **queries
-    ).order_by('-created_at')
+    ).annotate(
+        matching_schedules=Case(
+            When(employeedailyschedule__is_vacation=True, then=Value(1)),
+            default=Value(0),
+            output_field=CharField(),
+        )
+    ).filter(matching_schedules=1).order_by('-created_at')
+
 
     allvacations_count = allvacations.count()
 
