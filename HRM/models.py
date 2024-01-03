@@ -24,11 +24,5 @@ class Holiday(CommonField):
     def is_holiday(self):
         today_date = datetime.now().date()
 
-        # Convert start_date to datetime.date
-        start_date = self.start_date.date() if self.start_date else None
-
-        # Convert end_date to datetime.date
-        end_date = self.end_date.date() if self.end_date else None
-
         # Check if today is within the holiday period
-        return start_date >= today_date or today_date <= end_date
+        return self.start_date.date() >= today_date or today_date <= self.end_date.date()
