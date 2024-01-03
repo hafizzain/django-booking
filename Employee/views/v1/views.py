@@ -4595,7 +4595,7 @@ def get_vacations(request):
         **queries
     ).annotate(
         matching_schedules=Case(
-            When(employeedailyschedule__is_vacation=True, then=Value(1)),
+            When(vacation_employedailyschedules=True, then=Value(1)),
             default=Value(0),
             output_field=CharField(),
         )
