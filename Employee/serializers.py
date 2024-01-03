@@ -991,15 +991,15 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
                                         .filter(location_id=location_id,
                                                 start_date__lte=today_date,
                                                 end_date__gte=today_date)
-            return len(holidays) > 0                       
-            # return HolidaySerializer(holidays, many=True).data
+            return len(holidays) > 0    # Return True if there is any holiday                      
         except Exception as err:
             error = str(err)
             return error
     
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id','is_leo_day','is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date', 'day', 'end_time_shift', 'end_time','is_weekend',
+        fields = ['id','is_leo_day','is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date',
+                  'day', 'end_time_shift', 'end_time','is_weekend',
                   'start_time']
 
 
