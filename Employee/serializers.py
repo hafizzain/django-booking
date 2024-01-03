@@ -981,16 +981,20 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
 
 class ScheduleSerializerOP(serializers.ModelSerializer):
-    is_holiday = serializers.SerializerMethodField(read_only=True)
+    
+    
+     is_holiday = serializers.SerializerMethodField(read_only=True)
     
         
     def get_is_holiday(self, obj):
         try:
-            holidays = Holiday.objects.select_related('user','business').filter(location=obj.location)
+            location_id = self.context.get('location_id', None)
+            holidays = Holiday.objects.select_related('user','business').filter(location_id=location_id)
             return HolidaySerializer(holidays, many=True).data
         except Exception as err:
              error = str(err)
              return error
+    
     class Meta:
         model = EmployeDailySchedule
         fields = ['id','is_leo_day','is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date', 'day', 'end_time_shift', 'end_time','is_weekend',
@@ -1067,6 +1071,17 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     schedule = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     # available_holidays = serializers.SerializerMethodField()
+    
+    # is_holiday = serializers.SerializerMethodField(read_only=True)
+    
+        
+    # def get_is_holiday(self, obj):
+    #     try:
+    #         holidays = Holiday.objects.select_related('user','business').filter(location=obj.location)
+    #         return HolidaySerializer(holidays, many=True).data
+    #     except Exception as err:
+    #          error = str(err)
+    #          return error
 
     def get_schedule(self, obj):
         schedule = EmployeDailySchedule.objects.filter(employee=obj)
