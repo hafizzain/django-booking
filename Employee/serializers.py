@@ -983,7 +983,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
 class ScheduleSerializerOP(serializers.ModelSerializer):
     
     
-     is_holiday = serializers.SerializerMethodField(read_only=True)
+    is_holiday = serializers.SerializerMethodField(read_only=True)
     
         
     def get_is_holiday(self, obj):
@@ -992,8 +992,8 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             holidays = Holiday.objects.select_related('user','business').filter(location_id=location_id)
             return HolidaySerializer(holidays, many=True).data
         except Exception as err:
-             error = str(err)
-             return error
+            error = str(err)
+            return error
     
     class Meta:
         model = EmployeDailySchedule
