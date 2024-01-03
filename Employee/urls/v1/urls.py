@@ -79,6 +79,7 @@ urlpatterns = [
     path('create_vacation/', views.create_vacation_emp),
     path('get_vacation/', views.get_vacations),
     path('delete_vacation/', views.delete_workingschedule),
+    path('delete_all_vacation/', views.delete_all_vacation),
     path('update_vacation/', views.update_workingschedule),
 
     # Absence for Employee

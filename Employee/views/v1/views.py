@@ -4749,6 +4749,16 @@ def delete_workingschedule(request):
     )
 
 
+
+
+
+@api_view(['DELETE'])
+@permission_classes([AllowAny])
+def delete_all_vacation(request):
+    vacation = Vacation.objects.all()
+    vaction.delete()
+    return Response({"msg":"All vacation data deleted successfully"})
+
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_absence(request):
