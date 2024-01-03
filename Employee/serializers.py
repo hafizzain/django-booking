@@ -981,16 +981,19 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
 
 class ScheduleSerializerOP(serializers.ModelSerializer):
-    
-    
     is_holiday = serializers.SerializerMethodField(read_only=True)
-    
-        
+     
     def get_is_holiday(self, obj):
         try:
             location_id = self.context.get('location_id', None)
-            holidays = Holiday.objects.select_related('user','business').filter(location_id=location_id)
-            return HolidaySerializer(holidays, many=True).data
+            holidays = Holiday.objects.select_related('user','business') \
+                                    .filter(location_id=location_id)
+                                    
+            if holidays.start_date >= datetime.now() or holidays.end_date <= datetime.now():
+                return True
+            else:
+                return False
+            # return HolidaySerializer(holidays, many=True).data
         except Exception as err:
             error = str(err)
             return error
