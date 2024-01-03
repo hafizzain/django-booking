@@ -1048,7 +1048,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'business', 'employee', 'day', 'vacation', 'start_time', 'end_time',
                   'start_time_shift', 'end_time_shift', 'from_date', 'to_date', 'total_hours', 'note',
                   'date', 'is_leave', 'is_off', 'is_vacation', 'is_active', 'created_at', 'updated_at',
-                  'total_hours_dummy']
+                  'total_hours_dummy', 'is_leo_day']
 
 
 class WorkingScheduleSerializer(serializers.ModelSerializer):
@@ -1162,39 +1162,60 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     def get_total_hours(self, obj):
         start_date = self.context.get('start_date', None)
         end_date = self.context.get('end_date', None)
+        leo_day = self.context.get('leo_day',None)
         now_date = datetime.now()
 
         month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
         month_end_date = end_date or now_date.strftime('%Y-%m-%d')
+        if leo_day is None:
+            employee_schedules = EmployeDailySchedule.objects.filter(
+                employee=obj,
+                is_leave=False,
+                date__range=(month_start_date, month_end_date)
+            ).order_by('-date')
+            hours = 0
+            for schedule in employee_schedules:
+                hours += schedule.total_hours
 
-        employee_schedules = EmployeDailySchedule.objects.filter(
-            employee=obj,
-            is_leave=False,
-            date__range=(month_start_date, month_end_date)
-        ).order_by('-date')
-        hours = 0
-        for schedule in employee_schedules:
-            hours += schedule.total_hours
+            return hours
+        else:
+            employee_schedules = EmployeDailySchedule.objects.filter(
+                employee=obj,
+                is_leave=False,
+                is_leo_day=True,
+                date__range=(month_start_date, month_end_date)
+            ).order_by('-date')
+            hours = 0
+            for schedule in employee_schedules:
+                hours += schedule.total_hours
 
-        return hours
+            return hours
 
     def get_total_earning(self, obj):
         now_date = datetime.now()
         total_days = calendar.monthrange(now_date.year, now_date.month)[1]
         date = now_date.date
+        employee_schedules = None
 
         start_date = self.context.get('start_date', None)
         end_date = self.context.get('end_date', None)
+        leo_day = self.context.get('leo_day', None)
 
         month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
         month_end_date = end_date or f'{now_date.year}-{now_date.month}-{total_days}'
-
-        employee_schedules = EmployeDailySchedule.objects.filter(
-            employee=obj,
-            is_leave=False,
-            date__range=(month_start_date, month_end_date)
-        ).order_by('-date')
-
+        if leo_day is not None:
+            employee_schedules = EmployeDailySchedule.objects.filter(
+                employee=obj,
+                is_leave=False,
+                date__range=(month_start_date, month_end_date)
+            ).order_by('-date')
+        else:
+            employee_schedules = EmployeDailySchedule.objects.filter(
+                leo_day=True,
+                employee=obj,
+                is_leave=False,
+                date__range=(month_start_date, month_end_date)
+            ).order_by('-date')
         try:
             income_type_info = EmployeeProfessionalInfo.objects.get(employee=obj)
         except:
@@ -1238,16 +1259,24 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         now_date = datetime.now()
         start_date = self.context.get('start_date', None)
         end_date = self.context.get('end_date', None)
+        leo_day = self.context.get('leo_day', None)
+        schedule = None
 
         total_days = calendar.monthrange(now_date.year, now_date.month)[1]
 
         month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
         month_end_date = end_date or f'{now_date.year}-{now_date.month}-{total_days}'
-
-        schedule = EmployeDailySchedule.objects.filter(
-            employee=obj,
-            date__range=(month_start_date, month_end_date)
-        ).exclude(is_leave=True).order_by('-date')
+        if leo_day is None:
+            schedule = EmployeDailySchedule.objects.filter(
+                employee=obj,
+                date__range=(month_start_date, month_end_date)
+            ).exclude(is_leave=True).order_by('-date')
+        else:
+            schedule = EmployeDailySchedule.objects.filter(
+                is_leo_day=True,
+                employee=obj,
+                date__range=(month_start_date, month_end_date)
+            ).exclude(is_leave=True).order_by('-date')
         # ).order_by('employee__employee_employedailyschedule__date')            
         context = self.context
         try:

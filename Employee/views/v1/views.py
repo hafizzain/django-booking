@@ -2132,6 +2132,7 @@ def get_attendence(request):
 
     start_date = request.GET.get('start_date', None)
     end_date = request.GET.get('end_date', None)
+    leo_day = request.GET.get('leo_day', None)
 
     query = Q(is_deleted=False)
     query &= Q(is_blocked=False)
@@ -2159,7 +2160,7 @@ def get_attendence(request):
     all_employe = paginator.get_page(page_number)
 
     serialized = Payroll_WorkingScheduleSerializer(all_employe, many=True,
-                                                   context={'request': request, 'start_date': start_date,
+                                                   context={'request': request, 'start_date': start_date, 'leo_day':leo_day,
                                                             'end_date': end_date})
 
     return Response(
