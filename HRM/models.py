@@ -3,7 +3,6 @@ from Authentication.models import User
 from Business.models import Business
 from Utility.models import CommonField
 from Business.models import BusinessAddress
-from datetime import datetime
 
 # Create your models here.
 class Holiday(CommonField):
@@ -20,9 +19,3 @@ class Holiday(CommonField):
     
     def __str__(self):
         return self.name
-    
-    def is_holiday(self):
-        today_date = datetime.now().date()
-
-        # Check if today is within the holiday period
-        return self.start_date.date() >= today_date or today_date <= self.end_date.date()
