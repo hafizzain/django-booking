@@ -4174,7 +4174,7 @@ def update_vacation_status(request):
                 leave_managements.medical_leave -= 1
                 leave_managements.save()
             if vacation_type == 'leo_day':
-                if leave_managements.leo_day == 0:
+                if leave_managements.leo_leave == 0:
                     return Response(
                         {
                             'status': 200,
@@ -4187,7 +4187,7 @@ def update_vacation_status(request):
                         },
                         status=status.HTTP_200_OK
                     )
-                leave_managements.leo_day -= 1
+                leave_managements.leo_leave -= 1
                 leave_managements.save()
 
             vacations = Vacation.objects.filter(id=vacation_id)
