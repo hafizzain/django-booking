@@ -317,7 +317,9 @@ class ProductStock(models.Model):
     product_unit = models.CharField(max_length=50, null=True, blank=True, verbose_name='Product Unit') 
 
     alert_when_stock_becomes_lowest = models.BooleanField(default=None, null=True, blank=True)
+    
     is_refunded = models.BooleanField(default = False)
+    refund_quantity = models.PositiveIntegerField(default=0) # Added new field Refund Quantity
     
     #turnover = models.CharField(default='Highest', choices=TURN_CHOICES, max_length=40)
 
@@ -418,6 +420,7 @@ class ProductOrderStockReport(models.Model):
         ('Purchase', 'Purchase'),
         ('Consumed', 'Consumed'),
         ('Sold', 'Sold'),
+        # ('Refund','Refund'), # Added extra Type Refund by Asad
         ('Transfer_to', 'Transfer_to'),
         ('Transfer_from', 'Transfer_From'),
         
