@@ -19,7 +19,7 @@ class HolidayApiView(APIView):
     pagination_class = PageNumberPagination
     page_size = 10
     
-    queryset = Holiday.objects.select_related('business', 'location')
+    queryset = Holiday.objects.select_related('business', 'location','user')
     serializer_class = HolidaySerializer
     filter_backends = [filters.OrderingFilter, filters.SearchFilter]
     search_fields = ['name', 'start_date', 'end_date']
@@ -55,7 +55,8 @@ class HolidayApiView(APIView):
             if end_date:
                 query &= Q(end_date__lte=end_date)
             
-            filtered_queryset = Holiday.objects.filter(query) \
+            filtered_queryset = Holiday.objects.select_related('user','business','location') \
+                                .filter(query) \
                                 .order_by('-created_at')
             serializer = HolidaySerializer(filtered_queryset, many=True)
 
