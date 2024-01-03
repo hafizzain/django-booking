@@ -3905,7 +3905,7 @@ def create_vacation_emp(request):
                 'status': 400,
                 'status_code': '400',
                 'response': {
-                    'message': 'Employee Vacation Already Exist',
+                    'message': 'You can not create annual vacation right now ',
                     'error_message': None,
                 }
             },
