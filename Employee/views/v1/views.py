@@ -3908,8 +3908,8 @@ def create_vacation_emp(request):
     if is_vacation_exist:
         return Response(
             {
-                'status': 200,
-                'status_code': '200',
+                'status': 400,
+                'status_code': '400',
                 'response': {
                     'message': 'Employee Vacation Already Exist',
                     'error_message': None,
