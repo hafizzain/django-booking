@@ -989,7 +989,8 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             today_date = datetime.now().date()
             holidays = Holiday.objects.select_related('user', 'business') \
                                         .filter(location_id=location_id)
-            return holidays.is_holiday()                       
+            for holiday in holidays:
+                return holiday.is_holiday()                   
         except Exception as err:
             error = str(err)
             return error
