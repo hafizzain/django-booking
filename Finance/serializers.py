@@ -31,7 +31,8 @@ class RefundSerializer(serializers.ModelSerializer):
 
     def product_stock_update(self, location, refunded_products_data):
         '''
-        This fundtion is updating the stock if the product has the in_stock key. Only thoes product record will be update in the ProductStock but the refund_quantity 
+        This fundtion is updating the stock if the product has the in_stock key. 
+        Only thoes product record will be update in the ProductStock but the refund_quantity 
         will be update for all the products!
         '''
         try:
@@ -96,18 +97,19 @@ class AllowRefundsSerializer(serializers.ModelSerializer):
         allowed_employees_data = validated_data.pop('allowed_refund', [])
         if AllowRefunds.objects.all().exists():
             AllowRefunds.objects.all().delete()
-        allow_refunds_instance = AllowRefunds.objects.create(**validated_data)
+        with transaction.atomic():
+            allow_refunds_instance = AllowRefunds.objects.create(**validated_data)
 
-        employees_instances = [
-            AllowRefundPermissionsEmployees(
-                allowed_refund=allow_refunds_instance,
-                employee=employee_data['employee'],
-                can_refund = True
-                )
-            for employee_data in allowed_employees_data
-        ]
+            employees_instances = [
+                AllowRefundPermissionsEmployees(
+                    allowed_refund=allow_refunds_instance,
+                    employee=employee_data['employee'],
+                    can_refund = True
+                    )
+                for employee_data in allowed_employees_data
+            ]
 
-        AllowRefundPermissionsEmployees.objects.bulk_create(employees_instances)
+            AllowRefundPermissionsEmployees.objects.bulk_create(employees_instances)
 
         return allow_refunds_instance
     
