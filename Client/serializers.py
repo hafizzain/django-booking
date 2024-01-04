@@ -333,7 +333,6 @@ class MembershipSerializer(serializers.ModelSerializer):
     services = serializers.SerializerMethodField()
     currency_membership = serializers.SerializerMethodField()
     is_expired = serializers.SerializerMethodField(read_only=True)
-    total_orders = serializers.IntegerField()
     
     def get_products(self, obj):
         try:
@@ -363,14 +362,13 @@ class MembershipSerializer(serializers.ModelSerializer):
     class Meta:
         model = Membership
         fields = ['id', 'name', 'arabic_name', 'is_expired', 'valid_for','discount','description', 
-                  'term_condition','products', 'services', 'currency_membership', 'total_orders']
+                  'term_condition','products', 'services', 'currency_membership']
         read_only_fields = ['arabic_name', 'is_expired']
 
 class VoucherSerializer(serializers.ModelSerializer):
     # currency_voucher_prices = serializers.SerializerMethodField(read_only=True)
     currency_voucher = serializers.SerializerMethodField()
     voucher_count = serializers.SerializerMethodField()
-    total_orders = serializers.IntegerField()
 
     def get_currency_voucher(self, obj):
         try:
@@ -385,7 +383,7 @@ class VoucherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Vouchers
-        fields = ['id', 'name', 'arabic_name', 'user','business','voucher_type', 'total_orders',
+        fields = ['id', 'name', 'arabic_name', 'user','business','voucher_type',
                 'validity','sales','is_deleted','is_active','created_at','currency_voucher','discount_percentage', 'voucher_count']
         read_only_fields = ['arabic_name']
 

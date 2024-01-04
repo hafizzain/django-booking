@@ -409,6 +409,7 @@ def create_service(request):
     is_package = request.data.get('is_package', None)
 
     invoices = request.data.get('invoices', None)
+    image = request.data.get('image', None)
 
     if not all([business, name, description]):
         return Response(
@@ -457,6 +458,7 @@ def create_service(request):
         client_can_book=client_can_book,
         slot_availible_for_online=slot_availible_for_online,
         enable_vouchers=enable_vouchers,
+        image=image,
 
     )
     if enable_team_comissions is not None:
@@ -863,6 +865,7 @@ def create_servicegroup(request):
     service = request.data.get('service', None)
     is_status = request.data.get('status', None)
     allow_client_to_select_team_member = request.data.get('allow_client_to_select_team_member', None)
+    # image = request.data.get('image', None)
 
     servicegroup_error = []
     if not all([business, name]):
@@ -902,6 +905,7 @@ def create_servicegroup(request):
         user=user,
         business=business_id,
         name=name,
+        # image=image,
     )
     if is_status is None:
         service_group.is_active = False

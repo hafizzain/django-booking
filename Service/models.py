@@ -201,10 +201,14 @@ class Service(models.Model):
     updated_at = models.DateTimeField(null=True, blank=True)
     
     is_package = models.BooleanField(default=False)
-
+    image = models.ImageField(upload_to='service/service_images/', null=True, blank=True)
+    is_image_uploaded_s3 = models.BooleanField(default=False)
     objects = ServiceManager.as_manager()
 
     def save(self, *args, **kwargs):
+        if self.image:
+            self.is_image_uploaded_s3 = True
+            
         translator = Translator()
 
         arabic_text = translator.translate(f'{self.name}'.title(), dest='ar')
@@ -233,7 +237,7 @@ class ServiceGroup(models.Model):
     is_active = models.BooleanField(default=True)
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
-    
+    # image = models.ImageField(upload_to='servicegroup/service_group_images/', null=True, blank=True)
 
     def __str__(self):
         return str(self.id)
