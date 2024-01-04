@@ -4585,16 +4585,10 @@ def get_vacations(request):
         is_active=True,
         **queries
     ).order_by('-created_at')
-    # Query EmployeDailySchedule instances related to the filtered Vacation instances
-    all_daily_schedules = EmployeDailySchedule.objects \
-                            .filter(vacation__in=all_vacations, is_vacation=True)
-    # Extract the distinct Vacation instances from the related EmployeDailySchedule instances
-    related_vacations = Vacation.objects \
-                        .filter(vacation_employedailyschedules__in=all_daily_schedules) \
-                        .distinct()
+    # EmployeDailySchedule.objects.filter(vacation=obj, is_vacation=True)
 
-    # all_vacations_count = all_vacations.count()
-    all_vacations_count = related_vacations.count()
+    all_vacations_count = all_vacations.count()
+
     page_count = all_vacations_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
@@ -4605,7 +4599,7 @@ def get_vacations(request):
     if page_number is not None:
         all_vacations = paginator.get_page(page_number)
 
-        serialized = NewVacationSerializer(related_vacations, many=True, context={'request': request})
+        serialized = NewVacationSerializer(all_vacations, many=True, context={'request': request})
         return Response(
             {
                 'status': 200,

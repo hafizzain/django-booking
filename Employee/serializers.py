@@ -982,7 +982,8 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
 class ScheduleSerializerOP(serializers.ModelSerializer):
     is_holiday = serializers.SerializerMethodField(read_only=True)
-     
+
+
     def get_is_holiday(self, obj):
         try:
             location_id = self.context.get('location_id', None)
@@ -1072,6 +1073,19 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
 class WorkingScheduleSerializer(serializers.ModelSerializer):
     schedule = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
+    leave_data = serializers.SerializerMethodField(read_only=True)
+
+
+    def get_leave_data(self , obj):
+
+        try:
+            leave_management = LeaveManagements.objects.get(
+                employee_id=obj.id,
+            )
+            leave_data = LeaveManagementSerializer(leave_management, many=False).data
+            return leave_data
+        except Exception as ex:
+            return None
 
     def get_schedule(self, obj):
         schedule = EmployeDailySchedule.objects.filter(employee=obj)
@@ -1091,7 +1105,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['id', 'full_name', 'image', 'schedule', 'created_at']
+        fields = ['id', 'leave_data','full_name', 'image', 'schedule', 'created_at']
 
 
 class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
