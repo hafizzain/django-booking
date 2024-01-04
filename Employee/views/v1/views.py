@@ -6184,7 +6184,7 @@ def delete_weekend_management(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_weekend(request):
-    # user = request.user
+    user = request.user
     business_id = request.data.get('business', None)
     employee = request.data.get('employee', None)
     day = request.data.get('day', None)
