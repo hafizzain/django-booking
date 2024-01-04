@@ -4559,6 +4559,7 @@ def create_workingschedule(request):
             working_schedule.save()
         working_schedule = EmployeDailySchedule.objects.filter(
             employee__id__in=week_end_employee,
+            is_weekend=True
         )
         serializers = ScheduleSerializer(working_schedule, context={'request': request}, many=True)
         return Response(
