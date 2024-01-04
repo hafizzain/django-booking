@@ -4,6 +4,7 @@ from Authentication.models import User
 from Business.models import Business
 from Product.models import Product
 from Service.models import Service
+from Employee.models import Employee
 
 from Business.models import BusinessAddress
 from Client.models import Client
@@ -53,3 +54,11 @@ class RefundCoupon(CommonField):
     related_refund = models.ForeignKey(Refund, on_delete=models.CASCADE, null=True)
 
 
+class AllowRefunds(CommonField):
+    location = models.ForeignKey(BusinessAddress, on_delete = models.CASCADE, related_name = 'allowed_refund_locations')
+    number_of_days = models.PositiveIntegerField(default = 30)
+    
+class AllowRefundPermissionsEmployees(CommonField):
+    allowed_refund = models.ForeignKey(AllowRefunds, on_delete= models.CASCADE, related_name = 'allowed_refund')
+    employee = models.ForeignKey(Employee, on_delete = models.CASCADE, related_name = 'employee')
+    can_refund = models.BooleanField(default=False)

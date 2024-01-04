@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.timezone import now
 from Authentication.models import User
+# from Employee.models import Employee
 from Profile.models import Profile, UserLanguage
 from Utility.models import Country, State, City, Software, Currency, CommonField
 from Utility.Constants.compressImage import upload_to_bucket

@@ -2323,15 +2323,15 @@ class CouponSerializer(serializers.ModelSerializer):
                   ]
 
 
-class Locationserializerresponse(serializers.ModelSerializer):
-    class Meta:
-        model = BusinessAddress
-        fields = ['id', 'address_name']
+# class Locationserializerresponse(serializers.ModelSerializer):
+#     class Meta:
+#         model = BusinessAddress
+#         fields = ['id', 'address_name']
 
 
-class RefundSettingSerializer(serializers.ModelSerializer):
-    location = Locationserializerresponse()
+# class RefundSettingSerializer(serializers.ModelSerializer):
+#     location = Locationserializerresponse()
 
-    class Meta:
-        model = RefundSetting
-        fields = ['id', 'number_of_days', 'location']
+#     class Meta:
+#         model = RefundSetting
+#         fields = ['id', 'number_of_days', 'location']
