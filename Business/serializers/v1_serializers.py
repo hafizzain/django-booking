@@ -748,8 +748,9 @@ class BusinessPrivacySerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessPrivacy
         fields = '__all__'
-class RefundSettingSerializer(serializers.ModelSerializer):
 
-    class Meta:
-        model = RefundSetting
-        fields = '__all__'
+# class RefundSettingSerializer(serializers.ModelSerializer):
+
+#     class Meta:
+#         model = RefundSetting
+#         fields = '__all__'

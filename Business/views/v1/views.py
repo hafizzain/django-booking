@@ -28,7 +28,7 @@ from Business.serializers.v1_serializers import (BusinessAddress_CustomerSeriali
                                                  StaffNotificationSettingSerializer, StockNotificationSettingSerializer,
                                                  BusinessTaxSerializer, PaymentMethodSerializer,
                                                  BusinessTaxSettingSerializer, BusinessPrivacySerializer,
-                                                 BusinessPolicySerializer, BusinessVendorSerializerDropdown, RefundSettingSerializer)
+                                                 BusinessPolicySerializer, BusinessVendorSerializerDropdown)
 from Client.models import Client
 from Employee.models import EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeeSelectedService
 from Employee.Constants.Add_Employe import add_employee
@@ -4849,6 +4849,6 @@ class BusinessTaxSettingView(APIView):
 #     queryset = BusinessPolicy.objects.all()
 #     serializer_class = BusinessPolicySerializer
 
-class RefundSettingViewset(viewsets.ModelViewSet):
-    queryset = RefundSetting.objects.all()
-    serializer_class = RefundSettingSerializer
+# class RefundSettingViewset(viewsets.ModelViewSet):
+#     queryset = RefundSetting.objects.all()
+#     serializer_class = RefundSettingSerializer
