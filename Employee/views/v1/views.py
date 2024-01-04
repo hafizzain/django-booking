@@ -4543,7 +4543,7 @@ def create_workingschedule(request):
             working_schedule = EmployeDailySchedule.objects.create(
                 user=user,
                 business_id=business_id,
-                employee__id=employee,
+                employee_id=employee,
                 date=date,
                 is_weekend=True,
                 is_vacation=False
