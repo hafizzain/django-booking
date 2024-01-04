@@ -1329,23 +1329,12 @@ def update_employee(request):
         )
     if len(leave_data) > 0:
         leave_data = json.loads(leave_data)
-        leave_management = LeaveManagements.objects.filter(employee_id=id)
-        if leave_management:
-            leave_management.update(
+        lev_id = LeaveManagements.objects.filter(employee_id=id).update(
             casual_leave=leave_data.get('casual_leave', 0),
             annual_leave=leave_data.get('annual_leave', 0),
             medical_leave=leave_data.get('medical_leave', 0),
             number_of_months=leave_data.get('number_of_months', 0)
-            )
-        else:
-            leave_management = LeaveManagements.objects.create(
-                employee_id=employee.id,
-                casual_leave=leave_data.get('casual_leave', 0),
-                annual_leave=leave_data.get('annual_leave', 0),
-                medical_leave=leave_data.get('medical_leave', 0),
-                number_of_months=leave_data.get('number_of_months', 0)
-            )
-
+        )
 
     try:
         staff = StaffGroup.objects.get(employees=id)
@@ -4590,34 +4579,34 @@ def get_vacations(request):
     if employee_id:
         queries['employee__id'] = employee_id
 
-    allvacations = Vacation.objects.filter(
+    all_vacations = Vacation.objects.filter(
         employee__location=location,
         holiday_type='Vacation',
         is_active=True,
         **queries
     ).order_by('-created_at')
+    # EmployeDailySchedule.objects.filter(vacation=obj, is_vacation=True)
 
+    all_vacations_count = all_vacations.count()
 
-    allvacations_count = allvacations.count()
-
-    page_count = allvacations_count / 10
+    page_count = all_vacations_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
     per_page_results = 10000 if no_paginnation else 10
-    paginator = Paginator(allvacations, per_page_results)
+    paginator = Paginator(all_vacations, per_page_results)
     page_number = request.GET.get("page", None)
     if page_number is not None:
-        allvacations = paginator.get_page(page_number)
+        all_vacations = paginator.get_page(page_number)
 
-        serialized = NewVacationSerializer(allvacations, many=True, context={'request': request})
+        serialized = NewVacationSerializer(all_vacations, many=True, context={'request': request})
         return Response(
             {
                 'status': 200,
                 'status_code': '200',
                 'response': {
                     'message': f'Page {page_number} Schedule',
-                    'count': allvacations_count,
+                    'count': all_vacations_count,
                     'pages': page_count,
                     'per_page_result': per_page_results,
                     'error_message': None,
@@ -4627,14 +4616,14 @@ def get_vacations(request):
             status=status.HTTP_200_OK
         )
     else:
-        serialized = NewVacationSerializer(allvacations, many=True, context={'request': request})
+        serialized = NewVacationSerializer(all_vacations, many=True, context={'request': request})
         return Response(
             {
                 'status': 200,
                 'status_code': '200',
                 'response': {
                     'message': f'Page {page_number} Schedule',
-                    'count': allvacations_count,
+                    'count': all_vacations_count,
                     'pages': page_count,
                     'per_page_result': 10,
                     'error_message': None,
