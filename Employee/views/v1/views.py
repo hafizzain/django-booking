@@ -4602,10 +4602,10 @@ def get_vacations(request):
         page_count = int(page_count) + 1
 
     per_page_results = 10000 if no_paginnation else 10
-    paginator = Paginator(all_vacations, per_page_results)
+    paginator = Paginator(related_vacations, per_page_results)
     page_number = request.GET.get("page", None)
     if page_number is not None:
-        all_vacations = paginator.get_page(page_number)
+        related_vacations = paginator.get_page(page_number)
 
         serialized = NewVacationSerializer(related_vacations, many=True, context={'request': request})
         return Response(
@@ -4624,7 +4624,7 @@ def get_vacations(request):
             status=status.HTTP_200_OK
         )
     else:
-        serialized = NewVacationSerializer(all_vacations, many=True, context={'request': request})
+        serialized = NewVacationSerializer(related_vacations, many=True, context={'request': request})
         return Response(
             {
                 'status': 200,
