@@ -237,7 +237,7 @@ class ServiceGroup(models.Model):
     is_active = models.BooleanField(default=True)
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
-    
+    # image = models.ImageField(upload_to='servicegroup/service_group_images/', null=True, blank=True)
 
     def __str__(self):
         return str(self.id)
