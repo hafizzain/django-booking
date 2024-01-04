@@ -4579,33 +4579,40 @@ def get_vacations(request):
     if employee_id:
         queries['employee__id'] = employee_id
 
-    allvacations = Vacation.objects.filter(
+    all_vacations = Vacation.objects.filter(
         employee__location=location,
         holiday_type='Vacation',
         is_active=True,
         **queries
     ).order_by('-created_at')
+    # Query EmployeDailySchedule instances related to the filtered Vacation instances
+    all_daily_schedules = EmployeDailySchedule.objects \
+                            .filter(vacation__in=all_vacations, is_vacation=True)
+    # Extract the distinct Vacation instances from the related EmployeDailySchedule instances
+    related_vacations = Vacation.objects \
+                        .filter(vacation_employedailyschedules__in=all_daily_schedules) \
+                        .distinct()
 
-    allvacations_count = allvacations.count()
-
-    page_count = allvacations_count / 10
+    # all_vacations_count = all_vacations.count()
+    all_vacations_count = related_vacations.count()
+    page_count = all_vacations_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
     per_page_results = 10000 if no_paginnation else 10
-    paginator = Paginator(allvacations, per_page_results)
+    paginator = Paginator(all_vacations, per_page_results)
     page_number = request.GET.get("page", None)
     if page_number is not None:
-        allvacations = paginator.get_page(page_number)
+        all_vacations = paginator.get_page(page_number)
 
-        serialized = NewVacationSerializer(allvacations, many=True, context={'request': request})
+        serialized = NewVacationSerializer(related_vacations, many=True, context={'request': request})
         return Response(
             {
                 'status': 200,
                 'status_code': '200',
                 'response': {
                     'message': f'Page {page_number} Schedule',
-                    'count': allvacations_count,
+                    'count': all_vacations_count,
                     'pages': page_count,
                     'per_page_result': per_page_results,
                     'error_message': None,
@@ -4615,14 +4622,14 @@ def get_vacations(request):
             status=status.HTTP_200_OK
         )
     else:
-        serialized = NewVacationSerializer(allvacations, many=True, context={'request': request})
+        serialized = NewVacationSerializer(all_vacations, many=True, context={'request': request})
         return Response(
             {
                 'status': 200,
                 'status_code': '200',
                 'response': {
                     'message': f'Page {page_number} Schedule',
-                    'count': allvacations_count,
+                    'count': all_vacations_count,
                     'pages': page_count,
                     'per_page_result': 10,
                     'error_message': None,
