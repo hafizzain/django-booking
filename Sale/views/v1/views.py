@@ -409,6 +409,7 @@ def create_service(request):
     is_package = request.data.get('is_package', None)
 
     invoices = request.data.get('invoices', None)
+    image = request.data.get('image', None)
 
     if not all([business, name, description]):
         return Response(
@@ -457,6 +458,7 @@ def create_service(request):
         client_can_book=client_can_book,
         slot_availible_for_online=slot_availible_for_online,
         enable_vouchers=enable_vouchers,
+        image= image,
 
     )
     if enable_team_comissions is not None:

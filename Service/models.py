@@ -201,10 +201,14 @@ class Service(models.Model):
     updated_at = models.DateTimeField(null=True, blank=True)
     
     is_package = models.BooleanField(default=False)
-
+    image = models.ImageField(upload_to='service/service_images/', null=True, blank=True)
+    is_image_uploaded_s3 = models.BooleanField(default=False)
     objects = ServiceManager.as_manager()
 
     def save(self, *args, **kwargs):
+        if self.image:
+            self.is_image_uploaded_s3 = True
+            
         translator = Translator()
 
         arabic_text = translator.translate(f'{self.name}'.title(), dest='ar')
