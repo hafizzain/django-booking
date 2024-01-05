@@ -1743,5 +1743,5 @@ class EmployeeInfoSerializer(serializers.ModelSerializer):
         return None
     class Meta:
         model = Employee
-        fields = ['id','full_name','location', 'employee_image']
+        fields = ['id','full_name', 'employee_image']
         
