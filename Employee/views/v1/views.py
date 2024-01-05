@@ -4812,8 +4812,8 @@ def get_absence(request):
 @permission_classes([IsAuthenticated])
 def delete_workingschedule(request):
     schedule_id = request.data.get('id', None)
-    is_weekend_true = request.data.get('is_weekend_true',None)
-    employee_ids = request.data.get('employee_ids',[])
+    is_weekend_true = request.data.get('is_weekend',None)
+    ids = request.data.get('ids',[])
     if is_weekend_true is None:
         if schedule_id is None:
             return Response(
