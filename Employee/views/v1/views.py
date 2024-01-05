@@ -4870,7 +4870,7 @@ def delete_workingschedule(request):
             status=status.HTTP_200_OK
         )
     else:
-        employee_ids = json.loads(employee_ids)
+        employee_ids = json.loads(ids)
         employee_schedule = EmployeDailySchedule.objects.filter(id__in=employee_ids)
         if employee_schedule:
             employee_schedule.delete()
