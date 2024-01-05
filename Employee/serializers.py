@@ -1707,7 +1707,7 @@ Serializer added for employee info only is being using in following Apps seriali
 class EmployeeInfoSerializer(serializers.ModelSerializer):
     employee_image = serializers.SerializerMethodField()
     
-    def get_image(self, obj):
+    def get_employee_image(self, obj):
         if obj.image:
             try:
                 request = self.context["request"]
