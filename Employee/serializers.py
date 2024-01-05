@@ -1015,7 +1015,7 @@ class ScheduleSerializerResponse(serializers.ModelSerializer):
 
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'date', 'employee']
+        fields = ['id', 'title','date', 'employee']
 
 
 class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
