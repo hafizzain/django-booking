@@ -505,6 +505,7 @@ class ServiceSerializer(serializers.ModelSerializer):
 
 
 class ServiceSerializerMainpage(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
     employees = serializers.SerializerMethodField(read_only=True)
     service_group = serializers.SerializerMethodField(read_only=True)
@@ -526,6 +527,16 @@ class ServiceSerializerMainpage(serializers.ModelSerializer):
     def get_location(self, obj):
         locations = obj.location.filter(is_deleted=False)
         return LocationServiceSerializerOP(locations, many=True, ).data
+    
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
+                return f'{url}{obj.image}'
+            except:
+                return f'{obj.image}'
+        return None
 
     class Meta:
         model = Service
@@ -536,6 +547,7 @@ class ServiceSerializerMainpage(serializers.ModelSerializer):
             'price',
             'location',
             'service_group',
+            'image',
         ]
 
 
