@@ -5135,11 +5135,9 @@ def update_workingschedule(request):
     else:
         week_end_employee = json.loads(week_end_employee)
         for employee in week_end_employee:
-            weekend_scedule = EmployeDailySchedule.objects.filter(
-                employee_id=employee,
-                is_weekend=True
-            )
-            weekend_scedule.delete()
+            EmployeDailySchedule.objects.filter(
+                Q(employee_id=employee) & Q(is_weekend=True)
+            ).delete()
             EmployeDailySchedule.objects.create(
                 employee_id=employee,
                 is_weekend=True
