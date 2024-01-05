@@ -5142,7 +5142,7 @@ def update_workingschedule(request):
                     is_vacation=False
                 )
         working_schedule = EmployeDailySchedule.objects.filter(
-            employee__id__in=week_end_employee,
+            # employee__id__in=week_end_employee,
             is_weekend=True,
             date__date=date
         )
