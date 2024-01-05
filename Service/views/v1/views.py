@@ -27,7 +27,7 @@ def get_services(request):
     
     query = Q(is_deleted=False)
     service= Service.objects.filter(query).order_by('-created_at')
-    serialized = ServiceSerializer(service,  many=True, )
+    serialized = ServiceSerializer(service,  many=True, context={'request': request})
     return Response(
         {
             'status' : 200,
