@@ -1010,6 +1010,8 @@ class EmployeeSerializerResponse(serializers.ModelSerializer):
 
 class ScheduleSerializerResponse(serializers.ModelSerializer):
     employee = EmployeeSerializerResponse()
+    date = serializers.DateTimeField(format="%Y-%m-%d", input_formats=['iso-8601', 'date'])
+
 
     class Meta:
         model = EmployeDailySchedule
