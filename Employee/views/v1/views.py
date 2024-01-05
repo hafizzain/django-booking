@@ -5129,17 +5129,14 @@ def update_workingschedule(request):
                 employee_id=employee,
                 date=date,
                 is_weekend=True
+            ).delete()
+            working_schedule = EmployeDailySchedule.objects.create(
+                business_id=business_id,
+                employee_id=employee,
+                date=date,
+                is_weekend=True,
+                is_vacation=False
             )
-            if working_schedule.exists():
-                pass
-            else:
-                working_schedule = EmployeDailySchedule.objects.create(
-                    business_id=business_id,
-                    employee_id=employee,
-                    date=date,
-                    is_weekend=True,
-                    is_vacation=False
-                )
         working_schedule = EmployeDailySchedule.objects.filter(
             employee__id__in=week_end_employee,
             is_weekend=True
