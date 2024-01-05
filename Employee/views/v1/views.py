@@ -5137,7 +5137,7 @@ def update_workingschedule(request):
         for employee in week_end_employee:
             weekend_scedule = EmployeDailySchedule.objects.filter(
                 employee_id=employee,
-                # date=date,
+                date=date,
                 is_weekend=True
             )
             weekend_scedule.delete()
@@ -5163,6 +5163,7 @@ def update_workingschedule(request):
                     'message': 'Weekend UPDATED successfully across employees!',
                     'error_message': None,
                     'schedule': serializers.data,
+                    'date':date
                 }
             },
             status=status.HTTP_200_OK
