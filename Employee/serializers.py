@@ -1016,7 +1016,7 @@ class ScheduleSerializerResponse(serializers.ModelSerializer):
     def get_checker(self, obj):
         weekend_list = []
         if obj.title == 'weekend':
-            weekend_list.append(obj)
+            weekend_list.append(str(obj))
             return weekend_list
 
 
