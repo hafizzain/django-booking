@@ -1005,7 +1005,7 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
 class EmployeeSerializerResponse(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        fields = ['id', 'name', 'full_name', 'image']
+        fields = ['id','full_name', 'image','email']
 
 
 class ScheduleSerializerResponse(serializers.ModelSerializer):
