@@ -181,7 +181,7 @@ class AllowRefundsAndPermissionsView(APIView):
                 'success': False,
                 'status_code': 400,
                 'response': {
-                    'message': 'Refund not Created!',
+                    'message': 'Permission not Created!',
                     'error_message': serializer.errors,
                     'data': None
                 }
