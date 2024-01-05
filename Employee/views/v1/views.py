@@ -5045,7 +5045,7 @@ def update_absence(request):
     )
 @transaction.atomic
 @api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def delete_all__workingschedule(request):
     weekends  = EmployeDailySchedule.objects.filter(is_weekend=True)
     if weekends:
