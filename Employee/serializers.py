@@ -1010,7 +1010,7 @@ class EmployeeSerializerResponse(serializers.ModelSerializer):
 
 class ScheduleSerializerResponse(serializers.ModelSerializer):
     employee = EmployeeSerializerResponse()
-    grouped_data = serializers.SerializerMethodField(read_only=True)
+    # grouped_data = serializers.SerializerMethodField(read_only=True)
     date = serializers.DateTimeField(format="%Y-%m-%d", input_formats=['iso-8601', 'date'])
 
     # def get_grouped_data(self, obj):
@@ -1028,7 +1028,7 @@ class ScheduleSerializerResponse(serializers.ModelSerializer):
 
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'title','date','grouped_data','employee']
+        fields = ['id', 'title','date','employee']
 
 
 
