@@ -684,7 +684,7 @@ def single_employee_schedule(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_workingschedule(request):
-    is_weekend = request.data.get('is_weekend', None)
+    is_weekend = request.GET.get('is_weekend', None)
     location_id = request.GET.get('location_id', None)
     if is_weekend is None:
         query = Q(is_active=True, is_deleted=False, is_blocked=False)
@@ -707,6 +707,7 @@ def get_workingschedule(request):
             status=status.HTTP_200_OK
         )
     else:
+        all_employee = Employee.objects.filter(query).order_by('-created_at')
         employee_ids_in_schedule = EmployeDailySchedule.objects.filter(is_weekend=True)
         serialized = ScheduleSerializerResponse(employee_ids_in_schedule, many=True, context={'request': request,
                                                                                  'location_id': location_id})
