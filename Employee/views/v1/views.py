@@ -5043,6 +5043,16 @@ def update_absence(request):
         },
         status=status.HTTP_200_OK
     )
+@transaction.atomic
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_all__workingschedule(request):
+    weekends  = EmployeDailySchedule.objects.filter(is_weekend=True)
+    if weekends:
+        weekends=weekends.delete()
+        return Response({"msg":"Success fully deleted"})
+
+
 
 
 @transaction.atomic

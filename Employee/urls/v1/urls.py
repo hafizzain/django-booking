@@ -92,7 +92,8 @@ urlpatterns = [
     path('create_workingschedule/', views.create_workingschedule),
     path('get_workingschedule/', views.get_workingschedule),
     path('delete_workingschedule/', views.delete_workingschedule), 
-    path('update_workingschedule/', views.update_workingschedule), 
+    path('update_workingschedule/', views.update_workingschedule),
+    path('delete_all__workingschedule/', views.delete_all__workingschedule),
     
     #Create User Account
     path('create_employe_account/', views.create_employe_account),
