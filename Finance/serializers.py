@@ -1,8 +1,9 @@
 from rest_framework import serializers
-from django.db.models import F
+from django.db.models import F, Q
 from django.db import transaction
 
 from Product.models import ProductStock
+from Employee.models import Employee
 from Employee.serializers import EmployeeInfoSerializer 
 from Finance.models import Refund, RefundProduct, RefundServices, RefundCoupon, AllowRefunds, AllowRefundPermissionsEmployees
 
@@ -113,4 +114,25 @@ class AllowRefundsSerializer(serializers.ModelSerializer):
                 AllowRefundPermissionsEmployees.objects.bulk_create(employees_instances)
 
         return allow_refunds_instance
+    
+    def update(self, instance, validated_data):
+        instance.location = validated_data.get('location', instance.location)
+        instance.number_of_days = validated_data.get('number_of_days', instance.number_of_days)
+        instance.save()
+        allowed_employees_data = validated_data.get('allowed_refund', [])
+        provided_employee_ids = {str(data['employee']) for data in allowed_employees_data}
+        print(provided_employee_ids)
+        instance.allowed_refund.filter(~Q(employee_id__in=provided_employee_ids)).delete()
+
+        for employee_data in allowed_employees_data:
+            employee_id = str(employee_data['employee'])
+            employee_instance = Employee.objects.get(id=employee_id)
+
+            obj, created = AllowRefundPermissionsEmployees.objects.update_or_create(
+                allowed_refund=instance,
+                employee=employee_instance,
+                defaults={'can_refund': employee_data.get('can_refund', False)}
+            )
+
+        return instance
     
