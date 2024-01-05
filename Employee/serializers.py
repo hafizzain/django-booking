@@ -199,8 +199,7 @@ class EmployeSerializer(serializers.ModelSerializer):
     # employee_leaves = LeaveManagementSerializer()
     leave_data = serializers.SerializerMethodField(read_only=True)
 
-
-    def get_leave_data(self , obj):
+    def get_leave_data(self, obj):
 
         try:
             leave_management = LeaveManagements.objects.get(
@@ -712,7 +711,7 @@ class EmployeeDropdownSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['id', 'full_name', 'leave_data','mobile_number', 'email', 'employee_id', 'image', 'designation']
+        fields = ['id', 'full_name', 'leave_data', 'mobile_number', 'email', 'employee_id', 'image', 'designation']
 
 
 class LeaveManagementSerializer(serializers.ModelSerializer):
@@ -983,25 +982,38 @@ class ScheduleSerializer(serializers.ModelSerializer):
 class ScheduleSerializerOP(serializers.ModelSerializer):
     is_holiday = serializers.SerializerMethodField(read_only=True)
 
-
     def get_is_holiday(self, obj):
         try:
             location_id = self.context.get('location_id', None)
             today_date = datetime.now().date()
-            holidays = Holiday.objects.select_related('user', 'business','location') \
-                                        .filter(location_id=location_id,
-                                                start_date__lte=today_date,
-                                                end_date__gte=today_date)
-            return len(holidays) > 0    # Return True if there is any holiday                      
+            holidays = Holiday.objects.select_related('user', 'business', 'location') \
+                .filter(location_id=location_id,
+                        start_date__lte=today_date,
+                        end_date__gte=today_date)
+            return len(holidays) > 0  # Return True if there is any holiday
         except Exception as err:
             error = str(err)
             return error
-    
+
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id','is_leo_day','is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date',
-                  'day', 'end_time_shift', 'end_time','is_weekend',
+        fields = ['id', 'is_leo_day', 'is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date',
+                  'day', 'end_time_shift', 'end_time', 'is_weekend',
                   'start_time']
+
+
+class EmployeeSerializerResponse(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = ['id', 'name', 'full_name', 'image']
+
+
+class ScheduleSerializerResponse(serializers.ModelSerializer):
+    employee = EmployeeSerializerResponse()
+
+    class Meta:
+        model = EmployeDailySchedule
+        fields = ['id', 'date', 'employee']
 
 
 class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
@@ -1075,8 +1087,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     leave_data = serializers.SerializerMethodField(read_only=True)
 
-
-    def get_leave_data(self , obj):
+    def get_leave_data(self, obj):
 
         try:
             leave_management = LeaveManagements.objects.get(
@@ -1090,8 +1101,6 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     def get_schedule(self, obj):
         schedule = EmployeDailySchedule.objects.filter(employee=obj)
         return ScheduleSerializerOP(schedule, many=True, context=self.context).data
-    
-
 
     def get_image(self, obj):
         if obj.image:
@@ -1105,7 +1114,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['id', 'leave_data','full_name', 'image', 'schedule', 'created_at']
+        fields = ['id', 'leave_data', 'full_name', 'image', 'schedule', 'created_at']
 
 
 class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
@@ -1196,7 +1205,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     def get_total_hours(self, obj):
         start_date = self.context.get('start_date', None)
         end_date = self.context.get('end_date', None)
-        leo_day = self.context.get('leo_day',None)
+        leo_day = self.context.get('leo_day', None)
         now_date = datetime.now()
 
         month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
@@ -1644,7 +1653,8 @@ class NewVacationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Vacation
-        fields = ('id','vacation_type','vacation_status', 'employee', 'from_date', 'to_date', 'vacation_details','note')
+        fields = (
+        'id', 'vacation_type', 'vacation_status', 'employee', 'from_date', 'to_date', 'vacation_details', 'note')
 
 
 class NewAbsenceSerializer(serializers.ModelSerializer):
@@ -1662,10 +1672,9 @@ class NewAbsenceSerializer(serializers.ModelSerializer):
         vacation = EmployeDailySchedule.objects.filter(vacation=obj, is_leave=True)
         return NewScheduleSerializer(vacation, many=True, context=self.context).data
 
-
     class Meta:
         model = Vacation
-        fields = ('id',         'note', 'employee', 'from_date', 'to_date', 'absence_details', 'holiday_type')
+        fields = ('id', 'note', 'employee', 'from_date', 'to_date', 'absence_details', 'holiday_type')
 
 
 class EmplooyeeAppointmentInsightsSerializer(serializers.ModelSerializer):

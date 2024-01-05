@@ -27,7 +27,8 @@ from Employee.serializers import (EmployeSerializer, EmployeInformationsSerializ
                                   CommissionSerializer, AssetSerializer, WorkingScheduleSerializer,
                                   NewVacationSerializer,
                                   NewAbsenceSerializer, singleEmployeeSerializerOP, Payroll_WorkingScheduleSerializerOP,
-                                  WeekendManagementSerializer, LeaveManagementSerializer
+                                  WeekendManagementSerializer, LeaveManagementSerializer, ScheduleSerializerOP,
+                                  ScheduleSerializerResponse
                                   )
 from Employee.optimized_serializers import OptimizedEmployeeSerializerDashboard
 from django.db import connection, transaction
@@ -683,29 +684,46 @@ def single_employee_schedule(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_workingschedule(request):
+    is_weekend = request.data.get('is_weekend', None)
     location_id = request.GET.get('location_id', None)
+    if is_weekend is None:
+        query = Q(is_active=True, is_deleted=False, is_blocked=False)
+        if location_id:
+            query &= Q(location__id=location_id)
+        all_employee = Employee.objects.filter(query).order_by('-created_at')
+        serialized = WorkingScheduleSerializer(all_employee, many=True, context={'request': request,
+                                                                                'location_id' :location_id })
 
-    query = Q(is_active=True, is_deleted=False, is_blocked=False)
+        return Response(
+            {
+                'status': 200,
+                'status_code': '200',
+                'response': {
+                    'message': 'All Employee',
+                    'error_message': None,
+                    'employees': serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    else:
+        employee_ids_in_schedule = EmployeDailySchedule.objects.filter(is_weekend=True)
+        serialized = ScheduleSerializerResponse(employee_ids_in_schedule, many=True, context={'request': request,
+                                                                                 'location_id': location_id})
 
-    if location_id:
-        query &= Q(location__id=location_id)
+        return Response(
+            {
+                'status': 200,
+                'status_code': '200',
+                'response': {
+                    'message': 'All Employee',
+                    'error_message': None,
+                    'employees': serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
 
-    all_employee = Employee.objects.filter(query).order_by('-created_at')
-    serialized = WorkingScheduleSerializer(all_employee, many=True, context={'request': request,
-                                                                            'location_id' :location_id })
-
-    return Response(
-        {
-            'status': 200,
-            'status_code': '200',
-            'response': {
-                'message': 'All Employee',
-                'error_message': None,
-                'employees': serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
 
 
 @api_view(['GET'])
@@ -4396,7 +4414,7 @@ def create_workingschedule(request):
     employee = request.data.get('employee', None)
     day = request.data.get('day', None)
 
-    start_time = request.data.get('start_time', None)
+    start_time = request.dschedule_idsata.get('start_time', None)
     end_time = request.data.get('end_time', None)
     start_time_shift = request.data.get('start_time_shift', None)
     end_time_shift = request.data.get('end_time_shift', None)
@@ -5000,73 +5018,113 @@ def update_absence(request):
 def update_workingschedule(request):
     schedule_id = request.data.get('schedule_id', None)
     employee = request.data.get('employee', None)
-
-    if schedule_id is None:
-        return Response(
-            {
-                'status': False,
-                'status_code': StatusCodes.MISSING_FIELDS_4001,
-                'status_code_text': 'MISSING_FIELDS_4001',
-                'response': {
-                    'message': 'Invalid Data!',
-                    'error_message': 'All fields are required.',
-                    'fields': [
-                        'schedule_id',
-                    ]
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    try:
-        schedule = EmployeDailySchedule.objects.get(id=schedule_id)
-    except Exception as err:
-        return Response(
-            {
-                'status': False,
-                'status_code_text': 'INVALID_SCHEDULE_ID',
-                'response': {
-                    'message': 'Schedule Not Found',
-                    'error_message': str(err),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
-
-    if employee is not None:
+    week_end_employee = request.data.get('week_end_employee', [])
+    schedule_ids = request.data.get('schedule_ids', [])
+    is_weekend = request.data.get('is_weekend', None)
+    if is_weekend is None:
+        if schedule_id is None:
+            return Response(
+                {
+                    'status': False,
+                    'status_code': StatusCodes.MISSING_FIELDS_4001,
+                    'status_code_text': 'MISSING_FIELDS_4001',
+                    'response': {
+                        'message': 'Invalid Data!',
+                        'error_message': 'All fields are required.',
+                        'fields': [
+                            'schedule_id',
+                        ]
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
         try:
-            emp = Employee.objects.get(id=employee)
-            schedule.employee = emp
+            schedule = EmployeDailySchedule.objects.get(id=schedule_id)
         except Exception as err:
-            pass
+            return Response(
+                {
+                    'status': False,
+                    'status_code_text': 'INVALID_SCHEDULE_ID',
+                    'response': {
+                        'message': 'Schedule Not Found',
+                        'error_message': str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
 
-    schedule.save()
-    serializer = ScheduleSerializer(schedule, data=request.data, partial=True, context={'request': request})
-    if not serializer.is_valid():
+        if employee is not None:
+            try:
+                emp = Employee.objects.get(id=employee)
+                schedule.employee = emp
+            except Exception as err:
+                pass
+
+        schedule.save()
+        serializer = ScheduleSerializer(schedule, data=request.data, partial=True, context={'request': request})
+        if not serializer.is_valid():
+            return Response(
+                {
+                    'status': False,
+                    'status_code': StatusCodes.SERIALIZER_INVALID_4024,
+                    'response': {
+                        'message': 'Schedule Serializer Invalid',
+                        'error_message': serializer.errors,
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        serializer.save()
         return Response(
             {
-                'status': False,
-                'status_code': StatusCodes.SERIALIZER_INVALID_4024,
+                'status': True,
+                'status_code': 200,
                 'response': {
-                    'message': 'Schedule Serializer Invalid',
-                    'error_message': serializer.errors,
+                    'message': 'Schedule Updated Successfully',
+                    'error_message': None,
+                    'schedule': serializer.data
                 }
             },
-            status=status.HTTP_404_NOT_FOUND
+            status=status.HTTP_200_OK
         )
-    serializer.save()
-    return Response(
-        {
-            'status': True,
-            'status_code': 200,
-            'response': {
-                'message': 'Schedule Updated Successfully',
-                'error_message': None,
-                'schedule': serializer.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    else:
+        week_end_employee = json.loads(week_end_employee)
+        for employee in week_end_employee:
+            working_schedule = EmployeDailySchedule.objects.create(
+                user=user,
+                business_id=business_id,
+                employee_id=employee,
+                date=date,
+                is_weekend=True,
+                is_vacation=False
+            )
+            working_schedule.day = day
+            working_schedule.start_time = start_time
+            working_schedule.end_time = end_time
+            working_schedule.start_time_shift = start_time_shift
+            working_schedule.end_time_shift = end_time_shift
+            working_schedule.from_date = from_date
+            working_schedule.to_date = to_date
+            working_schedule.note = note
+            working_schedule.save()
+        working_schedule = EmployeDailySchedule.objects.filter(
+            employee__id__in=week_end_employee,
+            is_weekend=True
+        )
+        serializers = ScheduleSerializer(working_schedule, context={'request': request}, many=True)
+        return Response(
+            {
+                'status': True,
+                'status_code': 201,
+                'response': {
+                    'message': 'Weekend created successfully across employees!',
+                    'error_message': None,
+                    'schedule': serializers.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+
 
 
 @transaction.atomic
