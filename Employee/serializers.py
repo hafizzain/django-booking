@@ -1730,7 +1730,7 @@ Serializer added for employee info only is being using in following Apps seriali
 '''
 
 class EmployeeInfoSerializer(serializers.ModelSerializer):
-    employee_image = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
     
     def get_employee_image(self, obj):
         if obj.image:
@@ -1743,5 +1743,5 @@ class EmployeeInfoSerializer(serializers.ModelSerializer):
         return None
     class Meta:
         model = Employee
-        fields = ['id','full_name', 'employee_image']
+        fields = ['id','full_name', 'image']
         
