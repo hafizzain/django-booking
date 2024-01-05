@@ -1016,6 +1016,32 @@ class ScheduleSerializerResponse(serializers.ModelSerializer):
     def get_employee(self, obj):
         return str(obj.employee)
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        # Group the data based on the date
+        grouped_data = {}
+        date_key = representation['date']
+
+        if date_key not in grouped_data:
+            grouped_data[date_key] = []
+
+        grouped_data[date_key].append({
+            'id': representation['id'],
+            'title': representation['title'],
+            'employee': representation['employee'],
+        })
+
+        # Remove unnecessary fields from the representation
+        for field in ['id', 'title', 'employee']:
+            if field in representation:
+                del representation[field]
+
+        # Add the grouped data under the 'employees' key
+        representation['employees'] = grouped_data[date_key]
+
+        return representation
+
     class Meta:
         model = EmployeDailySchedule
         fields = ['id', 'title','date', 'employee']
