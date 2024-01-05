@@ -6936,122 +6936,122 @@ def delete_all_coupon(request):
     )
 
 
-@transaction.atomic
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def create_refund(request):
-    detail = None
-    number_of_days = request.data.get('number_of_days', None)
-    location = request.data.get('location', None)
-    refundcheck = RefundSetting.objects.filter(
-        location_id=location
-    )
-    if refundcheck:
-        return Response(
-            {
-                'status': False,
-                'status_code': 400,
-                'response': {
-                    'message': 'Refund already exists',
-                    'error_message': None,
+# @transaction.atomic
+# @api_view(['POST'])
+# @permission_classes([AllowAny])
+# def create_refund(request):
+#     detail = None
+#     number_of_days = request.data.get('number_of_days', None)
+#     location = request.data.get('location', None)
+#     refundcheck = RefundSetting.objects.filter(
+#         location_id=location
+#     )
+#     if refundcheck:
+#         return Response(
+#             {
+#                 'status': False,
+#                 'status_code': 400,
+#                 'response': {
+#                     'message': 'Refund already exists',
+#                     'error_message': None,
 
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    refundsetting = RefundSetting.objects.create(
-        number_of_days=number_of_days,
-        location_id=location
-    )
-    serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request})
-    return Response(
-        {
-            'status': True,
-            'status_code': 201,
-            'response': {
-                'message': 'Refund created successfully!',
-                'error_message': None,
-                'errors': [],
-                'data': serializer.data,
+#                 }
+#             },
+#             status=status.HTTP_400_BAD_REQUEST
+#         )
+#     refundsetting = RefundSetting.objects.create(
+#         number_of_days=number_of_days,
+#         location_id=location
+#     )
+#     serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request})
+#     return Response(
+#         {
+#             'status': True,
+#             'status_code': 201,
+#             'response': {
+#                 'message': 'Refund created successfully!',
+#                 'error_message': None,
+#                 'errors': [],
+#                 'data': serializer.data,
 
-            }
-        },
-        status=status.HTTP_200_OK
-    )
-
-
-@api_view(['PATCH'])
-@permission_classes([AllowAny])
-def update_refund(request):
-    number_of_days = request.data.get('number_of_days', None)
-    id = request.query_params.get('id', None)
-    refundsetting = RefundSetting.objects.get(id=id)
-    if refundsetting:
-        refundsetting.number_of_days=number_of_days
-        refundsetting.save()
-    else:
-        return Response(
-            {
-                'status': False,
-                'status_code': 400,
-                'response': {
-                    'message': 'Refund already exists',
-                    'error_message': None,
-
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request}, many=False)
-    return Response(
-        {
-            'status': True,
-            'status_code': 201,
-            'response': {
-                'message': 'Refund updated successfully!',
-                'error_message': None,
-                'errors': [],
-                'data': serializer.data,
-
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+#             }
+#         },
+#         status=status.HTTP_200_OK
+#     )
 
 
-@api_view(['DELETE'])
-@permission_classes([AllowAny])
-def delete_refund(request):
-    id = request.query_params.get('id', None)
-    refundsetting = RefundSetting.objects.filter(id=id)
-    if refundsetting:
-        refundsetting.delete()
-        return Response(
-            {
-                'status': True,
-                'status_code': 200,
-                'response': {
-                    'message': 'Refund deleted successfully!',
-                    'error_message': None,
-                    'errors': [],
-                }
-            },
-            status=status.HTTP_200_OK
-        )
-    else:
-        return Response(
-            {
-                'status': False,
-                'status_code': 400,
-                'response': {
-                    'message': 'Refund doesnot exists',
-                    'error_message': None,
+# @api_view(['PATCH'])
+# @permission_classes([AllowAny])
+# def update_refund(request):
+#     number_of_days = request.data.get('number_of_days', None)
+#     id = request.query_params.get('id', None)
+#     refundsetting = RefundSetting.objects.get(id=id)
+#     if refundsetting:
+#         refundsetting.number_of_days=number_of_days
+#         refundsetting.save()
+#     else:
+#         return Response(
+#             {
+#                 'status': False,
+#                 'status_code': 400,
+#                 'response': {
+#                     'message': 'Refund already exists',
+#                     'error_message': None,
 
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
+#                 }
+#             },
+#             status=status.HTTP_400_BAD_REQUEST
+#         )
+
+#     serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request}, many=False)
+#     return Response(
+#         {
+#             'status': True,
+#             'status_code': 201,
+#             'response': {
+#                 'message': 'Refund updated successfully!',
+#                 'error_message': None,
+#                 'errors': [],
+#                 'data': serializer.data,
+
+#             }
+#         },
+#         status=status.HTTP_200_OK
+#     )
+
+
+# @api_view(['DELETE'])
+# @permission_classes([AllowAny])
+# def delete_refund(request):
+#     id = request.query_params.get('id', None)
+#     refundsetting = RefundSetting.objects.filter(id=id)
+#     if refundsetting:
+#         refundsetting.delete()
+#         return Response(
+#             {
+#                 'status': True,
+#                 'status_code': 200,
+#                 'response': {
+#                     'message': 'Refund deleted successfully!',
+#                     'error_message': None,
+#                     'errors': [],
+#                 }
+#             },
+#             status=status.HTTP_200_OK
+#         )
+#     else:
+#         return Response(
+#             {
+#                 'status': False,
+#                 'status_code': 400,
+#                 'response': {
+#                     'message': 'Refund doesnot exists',
+#                     'error_message': None,
+
+#                 }
+#             },
+#             status=status.HTTP_400_BAD_REQUEST
+#         )
 
 
 @api_view(['GET'])

@@ -1705,3 +1705,27 @@ class EmployeeDailyInsightSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['id', 'full_name', 'image', 'morning_count', 'afternoon_count', 'evening_count']
+
+
+
+'''
+Serializer added for employee info only is being using in following Apps serializers:
+1- Finance -> serializers -> AllowRefundsEmployees
+'''
+
+class EmployeeInfoSerializer(serializers.ModelSerializer):
+    employee_image = serializers.SerializerMethodField()
+    
+    def get_employee_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
+                return f'{url}{obj.image}'
+            except:
+                return f'{obj.image}'
+        return None
+    class Meta:
+        model = Employee
+        fields = ['id','full_name','location', 'employee_image']
+        
