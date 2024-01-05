@@ -4812,61 +4812,92 @@ def get_absence(request):
 @permission_classes([IsAuthenticated])
 def delete_workingschedule(request):
     schedule_id = request.data.get('id', None)
+    is_weekend_true = request.data.get('is_weekend_true',None)
+    employee_ids = request.data.get('employee_ids',[])
+    if is_weekend_true is None:
+        if schedule_id is None:
+            return Response(
+                {
+                    'status': False,
+                    'status_code': StatusCodes.MISSING_FIELDS_4001,
+                    'status_code_text': 'MISSING_FIELDS_4001',
+                    'response': {
+                        'message': 'Invalid Data!',
+                        'error_message': 'fields are required!',
+                        'fields': [
+                            'id'
+                        ]
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            schedule = EmployeDailySchedule.objects.get(id=schedule_id)
+        except Exception as err:
+            return Response(
+                {
+                    'status': False,
+                    'status_code': 404,
+                    'status_code_text': '404',
+                    'response': {
+                        'message': 'Invalid Schedule ID!',
+                        'error_message': str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        schedule.delete()
+        if schedule.vacation:
 
-    if schedule_id is None:
+            vacation = schedule.vacation
+            remaingin_schedue = EmployeDailySchedule.objects.filter(
+                vacation=vacation,
+
+            ).exclude(id=schedule.id)
+            if len(remaingin_schedue) == 0:
+                vacation.delete()
+
         return Response(
             {
-                'status': False,
-                'status_code': StatusCodes.MISSING_FIELDS_4001,
-                'status_code_text': 'MISSING_FIELDS_4001',
+                'status': True,
+                'status_code': 200,
+                'status_code_text': '200',
                 'response': {
-                    'message': 'Invalid Data!',
-                    'error_message': 'fields are required!',
-                    'fields': [
-                        'id'
-                    ]
+                    'message': 'Schedule deleted successfully',
+                    'error_message': None
                 }
             },
-            status=status.HTTP_400_BAD_REQUEST
+            status=status.HTTP_200_OK
         )
-    try:
-        schedule = EmployeDailySchedule.objects.get(id=schedule_id)
-    except Exception as err:
-        return Response(
-            {
-                'status': False,
-                'status_code': 404,
-                'status_code_text': '404',
-                'response': {
-                    'message': 'Invalid Schedule ID!',
-                    'error_message': str(err),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
-    schedule.delete()
-    if schedule.vacation:
+    else:
+        employee_ids = json.loads(employee_ids)
+        employee_schedule = EmployeDailySchedule.objects.filter(id__in=employee_ids)
+        if employee_schedule:
+            employee_schedule.delete()
+            return Response(
+                {
+                    'status': 200,
+                    'status_code': '200',
+                    'response': {
+                        'message': 'Weekend deleted successfully',
+                        'error_message': None,
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                {
+                    'status': 400,
+                    'status_code': '400',
+                    'response': {
+                        'message': 'Weekend NOTFOUND',
+                        'error_message': None,
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-        vacation = schedule.vacation
-        remaingin_schedue = EmployeDailySchedule.objects.filter(
-            vacation=vacation,
-
-        ).exclude(id=schedule.id)
-        if len(remaingin_schedue) == 0:
-            vacation.delete()
-
-    return Response(
-        {
-            'status': True,
-            'status_code': 200,
-            'status_code_text': '200',
-            'response': {
-                'message': 'Schedule deleted successfully',
-                'error_message': None
-            }
-        },
-        status=status.HTTP_200_OK
-    )
 
 
 @api_view(['DELETE'])
