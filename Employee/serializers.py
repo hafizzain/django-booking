@@ -1010,10 +1010,10 @@ class EmployeeSerializerResponse(serializers.ModelSerializer):
 
 class ScheduleSerializerResponse(serializers.ModelSerializer):
     employee = EmployeeSerializerResponse()
-    checker = serializers.SerializerMethodField(read_only=True)
+    grouped_data = serializers.SerializerMethodField(read_only=True)
     date = serializers.DateTimeField(format="%Y-%m-%d", input_formats=['iso-8601', 'date'])
 
-    def get_checker(self, obj):
+    def get_grouped_data(self, obj):
         employee_list = []
         # Retrieve all records with the same title and date
         matching_records = EmployeDailySchedule.objects.filter(title=obj.title, date=obj.date)
@@ -1028,7 +1028,7 @@ class ScheduleSerializerResponse(serializers.ModelSerializer):
 
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'title','date', 'employee','checker']
+        fields = ['id', 'title','date','grouped_data']
 
 
 
