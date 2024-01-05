@@ -1009,7 +1009,7 @@ class EmployeeSerializerResponse(serializers.ModelSerializer):
 
 
 class ScheduleSerializerResponse(serializers.ModelSerializer):
-    employee = EmployeeSerializerResponse()
+    # employee = EmployeeSerializerResponse()
     grouped_data = serializers.SerializerMethodField(read_only=True)
     date = serializers.DateTimeField(format="%Y-%m-%d", input_formats=['iso-8601', 'date'])
 
