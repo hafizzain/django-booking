@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from Invoices.models import SaleInvoice
-from Finance.models import Refund, RefundCoupon
+from Finance.models import Refund, RefundCoupon, AllowRefunds
 from Finance.serializers import RefundSerializer, CouponSerializer, AllowRefundsSerializer
 from Finance.helpers import short_uuid
 from Product.models import Product
@@ -142,6 +142,39 @@ class RefundAPIView(APIView):
 
 
 class AllowRefundsAndPermissionsView(APIView):
+    
+    def get(self, request, format = None):
+        try:
+            allowed_employees = AllowRefunds.objects.select_related('location').prefetch_related('allowed_refund').all()
+            serializer = AllowRefundsSerializer(allowed_employees, many=True)
+            if not allowed_employees:
+                response_data = {
+                    'status': True,
+                    'status_code': 200,
+                    'response': {
+                        'message': 'No records found!',
+                        'error_message': None,
+                        'errors': [],
+                        'data': [],
+                    }
+                }
+                return Response(response_data,status=status.HTTP_200_OK)
+            
+            response_data = {
+                    'status': True,
+                    'status_code': 200,
+                    'response': {
+                        'message': 'Refund get successfully!',
+                        'error_message': None,
+                        'errors': [],
+                        'data': serializer.data,
+
+                    }
+                }
+            return Response(response_data,status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
     '''
     POST REQUEST FOR THE REFUND PERMISSION
     Payload formate:
@@ -157,9 +190,7 @@ class AllowRefundsAndPermissionsView(APIView):
             }
         ]
     }
-    
-    '''
-
+    '''    
     def post(self, request, format=None):
         try:
             serializer = AllowRefundsSerializer(data=request.data)
@@ -189,6 +220,60 @@ class AllowRefundsAndPermissionsView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def put(self, request, uuid, format=None):
+        try:
+            instance = AllowRefunds.objects.get(id=uuid)
+            serializer = AllowRefundsSerializer(instance, data=request.data)
+
+            if serializer.is_valid():
+                serializer.save()
+                response_data = {
+                    'status': True,
+                    'status_code': 200,
+                    'response': {
+                        'message': 'Record updated successfully!',
+                        'error_message': None,
+                        'errors': [],
+                        'data': serializer.data,
+                    }
+                }
+                return Response(response_data, status=status.HTTP_200_OK)
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except AllowRefunds.DoesNotExist:
+            response_data = {
+                'status': False,
+                'status_code': 404,
+                'response': {
+                    'message': 'Record not found.',
+                    'error_message': None,
+                    'errors': [],
+                    'data': [],
+                }
+            }
+            return Response(response_data, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def delete(self, request, uuid, format = None):
+        try:
+            AllowRefunds.objects.get(id = uuid).delete()
+            response_data = {
+                    'status': True,
+                    'status_code': 200,
+                    'response': {
+                        'message': 'Record deleted successfully!',
+                        'error_message': None,
+                        'errors': [],
+                        'data': [],
+
+                    }
+                }
+            return Response(response_data,status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 
 
 class RefundedCoupons(APIView):
