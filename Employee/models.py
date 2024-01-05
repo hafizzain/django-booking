@@ -456,7 +456,7 @@ class EmployeDailySchedule(models.Model):
         ('Sunday', 'Sunday'),
     ]
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-    title = models.TextField(default='weekend',null=True)
+    title = models.TextField(default='Weekend',null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='user_employedailyschedule')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, null=True,
                                  related_name='business_employedailyschedule')
