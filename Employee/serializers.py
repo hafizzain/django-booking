@@ -1009,13 +1009,13 @@ class EmployeeSerializerResponse(serializers.ModelSerializer):
 
 
 class ScheduleSerializerResponse(serializers.ModelSerializer):
-    # employee = EmployeeSerializerResponse()
-    employee = serializers.SerializerMethodField(read_only=True)
+    employee = EmployeeSerializerResponse()
+    # employee = serializers.SerializerMethodField(read_only=True)
     date = serializers.DateTimeField(format="%Y-%m-%d", input_formats=['iso-8601', 'date'])
 
-    def get_employee(self, obj):
-        if obj.title == 'weekend':
-            return [str(obj)]
+    # def get_employee(self, obj):
+    #     if obj.title == 'weekend'
+    #     return str(obj.employee)
 
 
     class Meta:
