@@ -4520,7 +4520,7 @@ def create_workingschedule(request):
             working_schedule.is_vacation = True
         else:
             working_schedule.is_vacation = False
-            working_schedule.is_weekend = True
+            # working_schedule.is_weekend = True
             working_schedule.is_leo_day = True
             is_leo_day_update = LeaveManagements.objects.get(employee_id=employee_id.id)
             is_leo_day_update.leo_leave += 1
@@ -5139,23 +5139,7 @@ def update_workingschedule(request):
                 employee_id=employee,
                 is_weekend=True,
                 date=date
-
             )
-
-        # for employee in week_end_employee:
-        #     EmployeDailySchedule.objects.filter(
-        #         Q(employee_id=employee) & Q(is_weekend=True))
-        # ).delete()
-        # EmployeDailySchedule.objects.create(
-        #     employee_id=employee,
-        #     is_weekend=True
-        # )
-
-        # qs = EmployeDailySchedule.objects.filter(
-        #     # employee__id__in=week_end_employee,
-        #     is_weekend=True,
-        #     # date__date=date
-        # )
         qs =  EmployeDailySchedule.objects.filter(
             is_weekend=True,
         )
