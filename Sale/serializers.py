@@ -150,7 +150,17 @@ class ServiceGroupSerializer(serializers.ModelSerializer):
 
 class ServiceGroupSerializerMainPage(serializers.ModelSerializer):
     services = ServiceSerializerForServiceGroup(many=True)
+    # image = serializers.SerializerMethodField(read_only=True)
 
+    # def get_image(self, obj):
+    #     if obj.image:
+    #         try:
+    #             request = self.context["request"]
+    #             url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
+    #             return f'{url}{obj.image}'
+    #         except:
+    #             return f'{obj.image}'
+    #     return None
     class Meta:
         model = ServiceGroup
         fields = ['id', 'business', 'name', 'services', 'is_active']
