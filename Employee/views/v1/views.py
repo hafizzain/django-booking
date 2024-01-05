@@ -4559,6 +4559,7 @@ def create_workingschedule(request):
     else:
         week_end_employee = json.loads(week_end_employee)
         for employee in week_end_employee:
+
             working_schedule = EmployeDailySchedule.objects.create(
                 user=user,
                 business_id=business_id,
@@ -5049,9 +5050,11 @@ def update_absence(request):
 @permission_classes([IsAuthenticated])
 def update_workingschedule(request):
     schedule_id = request.data.get('schedule_id', None)
+    business_id = request.data.get('business_id',None)
     employee = request.data.get('employee', None)
     week_end_employee = request.data.get('week_end_employee', [])
     schedule_ids = request.data.get('schedule_ids', [])
+    date = request.data.get('date',None)
     is_weekend = request.data.get('is_weekend', None)
     if is_weekend is None:
         if schedule_id is None:
@@ -5122,23 +5125,21 @@ def update_workingschedule(request):
     else:
         week_end_employee = json.loads(week_end_employee)
         for employee in week_end_employee:
-            working_schedule = EmployeDailySchedule.objects.create(
-                user=user,
-                business_id=business_id,
+            working_schedule = EmployeDailySchedule.objects.filter(
                 employee_id=employee,
                 date=date,
-                is_weekend=True,
-                is_vacation=False
+                is_weekend=True
             )
-            working_schedule.day = day
-            working_schedule.start_time = start_time
-            working_schedule.end_time = end_time
-            working_schedule.start_time_shift = start_time_shift
-            working_schedule.end_time_shift = end_time_shift
-            working_schedule.from_date = from_date
-            working_schedule.to_date = to_date
-            working_schedule.note = note
-            working_schedule.save()
+            if working_schedule.exists():
+                pass
+            else:
+                working_schedule = EmployeDailySchedule.objects.create(
+                    business_id=business_id,
+                    employee_id=employee,
+                    date=date,
+                    is_weekend=True,
+                    is_vacation=False
+                )
         working_schedule = EmployeDailySchedule.objects.filter(
             employee__id__in=week_end_employee,
             is_weekend=True
