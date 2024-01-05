@@ -1009,32 +1009,16 @@ class EmployeeSerializerResponse(serializers.ModelSerializer):
 
 
 class ScheduleSerializerResponse(serializers.ModelSerializer):
-    employee = EmployeeSerializerResponse()
+    # employee = EmployeeSerializerResponse()
+    employee = serializers.SerializerMethodField(read_only=True)
     date = serializers.DateTimeField(format="%Y-%m-%d", input_formats=['iso-8601', 'date'])
 
+    def get_employee(self, obj):
+        return obj
 
     class Meta:
         model = EmployeDailySchedule
         fields = ['id', 'title','date', 'employee']
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-
-        # Group employees with the same date into a single array
-        grouped_data = {}
-
-        if representation['date'] in grouped_data:
-            grouped_data[representation['date']].append(representation['employee'])
-        else:
-            grouped_data[representation['date']] = [representation['employee']]
-
-        # Remove the 'employee' key from the original representation
-        del representation['employee']
-
-        # Add the grouped data under the 'employees' key
-        representation['employees'] = grouped_data
-
-        return representation
 
 
 
