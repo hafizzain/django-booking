@@ -1017,13 +1017,6 @@ class ScheduleSerializerResponse(serializers.ModelSerializer):
         model = EmployeDailySchedule
         fields = ['id', 'title','date', 'employee']
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        # Extract the employee id and format it as a dictionary
-        employee_id = representation['employee']['id']
-        formatted_employee = {'id': employee_id}
-        representation['employee'] = formatted_employee
-        return representation
 
 
 class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
