@@ -146,7 +146,7 @@ class AllowRefundsAndPermissionsView(APIView):
     def get(self, request, format = None):
         try:
             allowed_employees = AllowRefunds.objects.select_related('location').prefetch_related('allowed_refund').all()
-            serializer = AllowRefundsSerializer(allowed_employees, many=True)
+            serializer = AllowRefundsSerializer(allowed_employees, many=True, context={'request':request})
             if not allowed_employees:
                 response_data = {
                     'status': True,
@@ -193,7 +193,7 @@ class AllowRefundsAndPermissionsView(APIView):
     '''    
     def post(self, request, format=None):
         try:
-            serializer = AllowRefundsSerializer(data=request.data)
+            serializer = AllowRefundsSerializer(data=request.data, context={'request':request})
             if serializer.is_valid():
                 serializer.save()
                 response_data = {
@@ -225,7 +225,7 @@ class AllowRefundsAndPermissionsView(APIView):
     def put(self, request, uuid, format=None):
         try:
             instance = AllowRefunds.objects.get(id=uuid)
-            serializer = AllowRefundsSerializer(instance, data=request.data)
+            serializer = AllowRefundsSerializer(instance, data=request.data, context={'request':request})
 
             if serializer.is_valid():
                 serializer.save()
