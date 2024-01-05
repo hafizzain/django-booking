@@ -5127,7 +5127,7 @@ def update_workingschedule(request):
         for employee in week_end_employee:
             working_schedule = EmployeDailySchedule.objects.filter(
                 employee_id=employee,
-                date=date,
+                # date=date,
                 is_weekend=True
             )
             if working_schedule.exists():
