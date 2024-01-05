@@ -5131,7 +5131,7 @@ def update_workingschedule(request):
                 is_weekend=True
             )
             if working_schedule.exists():
-                pass
+                working_schedule.delete()
             else:
                 print("in here")
                 # working_schedule = EmployeDailySchedule.objects.create(
