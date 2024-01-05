@@ -4520,7 +4520,7 @@ def create_workingschedule(request):
             working_schedule.is_vacation = True
         else:
             working_schedule.is_vacation = False
-            # working_schedule.is_weekend = True
+            working_schedule.is_weekend = True
             working_schedule.is_leo_day = True
             is_leo_day_update = LeaveManagements.objects.get(employee_id=employee_id.id)
             is_leo_day_update.leo_leave += 1
