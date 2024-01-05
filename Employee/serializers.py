@@ -1014,10 +1014,16 @@ class ScheduleSerializerResponse(serializers.ModelSerializer):
     date = serializers.DateTimeField(format="%Y-%m-%d", input_formats=['iso-8601', 'date'])
 
     def get_checker(self, obj):
-        weekend_list = []
-        if obj.title == 'weekend':
-            weekend_list.append(str(obj))
-            return weekend_list
+        checker_list = []
+
+        # Retrieve all records with the same title and date
+        matching_records = EmployeDailySchedule.objects.filter(title=obj.title, date=obj.date)
+
+        # Populate checker_list with the IDs of the matching records
+        for record in matching_records:
+            checker_list.append(str(record.id))
+
+        return checker_list
 
 
     class Meta:
