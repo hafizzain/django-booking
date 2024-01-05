@@ -5127,23 +5127,24 @@ def update_workingschedule(request):
         for employee in week_end_employee:
             working_schedule = EmployeDailySchedule.objects.filter(
                 employee_id=employee,
-                # date=date,
+                date__date=date,
                 is_weekend=True
             )
             if working_schedule.exists():
                 working_schedule.delete()
             else:
                 print("in here")
-                # working_schedule = EmployeDailySchedule.objects.create(
-                #     business_id=business_id,
-                #     employee_id=employee,
-                #     date=date,
-                #     is_weekend=True,
-                #     is_vacation=False
-                # )
+                working_schedule = EmployeDailySchedule.objects.create(
+                    business_id=business_id,
+                    employee_id=employee,
+                    date=date,
+                    is_weekend=True,
+                    is_vacation=False
+                )
         working_schedule = EmployeDailySchedule.objects.filter(
-            # employee__id__in=week_end_employee,
-            is_weekend=True
+            employee__id__in=week_end_employee,
+            is_weekend=True,
+            date__date=date
         )
         serializers = ScheduleSerializer(working_schedule, context={'request': request}, many=True)
         return Response(
