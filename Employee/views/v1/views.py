@@ -5132,8 +5132,6 @@ def update_workingschedule(request):
             )
             if working_schedule.exists():
                 working_schedule.delete()
-            else:
-                print("in here")
                 working_schedule = EmployeDailySchedule.objects.create(
                     business_id=business_id,
                     employee_id=employee,
