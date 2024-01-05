@@ -197,27 +197,28 @@ class AllowRefundsAndPermissionsView(APIView):
             if serializer.is_valid():
                 serializer.save()
                 response_data = {
-                    'success': True,
-                    'status_code': 201,
+                    'status': True,
+                    'status_code': 200,
                     'response': {
-                        'message': 'Permission created successfully',
+                        'message': 'Permission created successfully!',
                         'error_message': None,
-                        'data': {
-                            'permission_data': AllowRefundsSerializer(serializer.instance).data,
-                        }
+                        'errors': [],
+                        'data': serializer.data,
+
                     }
                 }
                 return Response(response_data, status=status.HTTP_200_OK)
             response_data = {
-                'success': False,
-                'status_code': 400,
+                'status': False,
+                'status_code': 200,
                 'response': {
-                    'message': 'Permission not Created!',
-                    'error_message': serializer.errors,
-                    'data': None
+                    'message': 'Permission not found.',
+                    'error_message': None,
+                    'errors': serializer.errors,
+                    'data': [],
                 }
             }
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
@@ -232,15 +233,24 @@ class AllowRefundsAndPermissionsView(APIView):
                     'status': True,
                     'status_code': 200,
                     'response': {
-                        'message': 'Record updated successfully!',
+                        'message': 'Permissions updated successfully!',
                         'error_message': None,
                         'errors': [],
                         'data': serializer.data,
                     }
                 }
                 return Response(response_data, status=status.HTTP_200_OK)
-
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            response_data = {
+                    'status': True,
+                    'status_code': 200,
+                    'response': {
+                        'message': 'Error Occured!',
+                        'error_message': None,
+                        'errors': serializer.data,
+                        'data': [],
+                    }
+            }
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
         except AllowRefunds.DoesNotExist:
             response_data = {
                 'status': False,
