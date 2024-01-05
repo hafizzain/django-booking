@@ -4528,8 +4528,8 @@ def create_workingschedule(request):
                 is_leo_day_update.save()
             except:
                 is_leo_day_created =  LeaveManagements.objects.create(employee_id=employee_id.id)
-                is_leo_day_update.leo_leave += 1
-                is_leo_day_update.save()
+                is_leo_day_created.leo_leave += 1
+                is_leo_day_created.save()
 
         if is_leave is not None:
             working_schedule.is_leave = True
