@@ -1015,7 +1015,7 @@ class ScheduleSerializerResponse(serializers.ModelSerializer):
 
     def get_employee(self, obj):
         if obj.title == 'weekend':
-            return [obj]
+            return [str(obj)]
 
 
     class Meta:
