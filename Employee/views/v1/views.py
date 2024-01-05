@@ -5153,7 +5153,10 @@ def update_workingschedule(request):
         #     is_weekend=True,
         #     # date__date=date
         # )
-        serializers = ScheduleSerializer(date_sceduale, context={'request': request}, many=True)
+        qs =  EmployeDailySchedule.objects.filter(
+            is_weekend=True,
+        )
+        serializers = ScheduleSerializer(qs, context={'request': request}, many=True)
         return Response(
             {
                 'status': True,
