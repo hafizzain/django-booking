@@ -692,7 +692,7 @@ def get_workingschedule(request):
             query &= Q(location__id=location_id)
         all_employee = Employee.objects.filter(query).order_by('-created_at')
         serialized = WorkingScheduleSerializer(all_employee, many=True, context={'request': request,
-                                                                                'location_id' :location_id })
+                                                                                 'location_id': location_id})
 
         return Response(
             {
@@ -710,7 +710,7 @@ def get_workingschedule(request):
         # all_employee = Employee.objects.filter(query).order_by('-created_at')
         employee_ids_in_schedule = EmployeDailySchedule.objects.filter(is_weekend=True)
         serialized = ScheduleSerializerResponse(employee_ids_in_schedule, many=True, context={'request': request,
-                                                                                 'location_id': location_id})
+                                                                                              'location_id': location_id})
 
         return Response(
             {
@@ -724,7 +724,6 @@ def get_workingschedule(request):
             },
             status=status.HTTP_200_OK
         )
-
 
 
 @api_view(['GET'])
@@ -4559,7 +4558,6 @@ def create_workingschedule(request):
     else:
         week_end_employee = json.loads(week_end_employee)
         for employee in week_end_employee:
-
             working_schedule = EmployeDailySchedule.objects.create(
                 user=user,
                 business_id=business_id,
@@ -4655,11 +4653,11 @@ def get_vacations(request):
 
     # Query EmployeDailySchedule instances related to the filtered Vacation instances
     all_daily_schedules = EmployeDailySchedule.objects \
-                            .filter(vacation__in=all_vacations, is_vacation=True)
+        .filter(vacation__in=all_vacations, is_vacation=True)
     # Extract the distinct Vacation instances from the related EmployeDailySchedule instances
     related_vacations = Vacation.objects \
-                        .filter(vacation_employedailyschedules__in=all_daily_schedules) \
-                        .distinct()
+        .filter(vacation_employedailyschedules__in=all_daily_schedules) \
+        .distinct()
 
     all_vacations_count = related_vacations.count()
 
@@ -4813,8 +4811,8 @@ def get_absence(request):
 @permission_classes([IsAuthenticated])
 def delete_workingschedule(request):
     schedule_id = request.data.get('id', None)
-    is_weekend_true = request.data.get('is_weekend',None)
-    ids = request.data.get('ids',[])
+    is_weekend_true = request.data.get('is_weekend', None)
+    ids = request.data.get('ids', [])
     if is_weekend_true is None:
         if schedule_id is None:
             return Response(
@@ -4898,7 +4896,6 @@ def delete_workingschedule(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-
 
 
 @api_view(['DELETE'])
@@ -5043,16 +5040,16 @@ def update_absence(request):
         },
         status=status.HTTP_200_OK
     )
+
+
 @transaction.atomic
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def delete_all__workingschedule(request):
-    weekends  = EmployeDailySchedule.objects.filter(is_weekend=True)
+    weekends = EmployeDailySchedule.objects.filter(is_weekend=True)
     if weekends:
-        weekends=weekends.delete()
-        return Response({"msg":"Success fully deleted"})
-
-
+        weekends = weekends.delete()
+        return Response({"msg": "Success fully deleted"})
 
 
 @transaction.atomic
@@ -5060,11 +5057,11 @@ def delete_all__workingschedule(request):
 @permission_classes([IsAuthenticated])
 def update_workingschedule(request):
     schedule_id = request.data.get('schedule_id', None)
-    business_id = request.data.get('business_id',None)
+    business_id = request.data.get('business_id', None)
     employee = request.data.get('employee', None)
     week_end_employee = request.data.get('week_end_employee', [])
     schedule_ids = request.data.get('schedule_ids', [])
-    date = request.data.get('date',None)
+    date = request.data.get('date', None)
     is_weekend = request.data.get('is_weekend', None)
     if is_weekend is None:
         if schedule_id is None:
@@ -5134,16 +5131,22 @@ def update_workingschedule(request):
         )
     else:
         week_end_employee = json.loads(week_end_employee)
-        date_sceduale = EmployeDailySchedule.objects.filter(date__date=date ,is_weekend=True)
+        qs_to_del = EmployeDailySchedule.objects.filter(date__date=date, is_weekend=True)
+        if qs_to_del:
+            qs_to_del.delete()
+            EmployeDailySchedule.objects.create(
+                employee_id=employee,
+                is_weekend=True
+            )
 
         # for employee in week_end_employee:
         #     EmployeDailySchedule.objects.filter(
         #         Q(employee_id=employee) & Q(is_weekend=True))
-            # ).delete()
-            # EmployeDailySchedule.objects.create(
-            #     employee_id=employee,
-            #     is_weekend=True
-            # )
+        # ).delete()
+        # EmployeDailySchedule.objects.create(
+        #     employee_id=employee,
+        #     is_weekend=True
+        # )
 
         # qs = EmployeDailySchedule.objects.filter(
         #     # employee__id__in=week_end_employee,
@@ -5159,12 +5162,11 @@ def update_workingschedule(request):
                     'message': 'Weekend UPDATED successfully across employees!',
                     'error_message': None,
                     'schedule': serializers.data,
-                    'date':date
+                    'date': date
                 }
             },
             status=status.HTTP_200_OK
         )
-
 
 
 @transaction.atomic
