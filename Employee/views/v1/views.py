@@ -5134,21 +5134,22 @@ def update_workingschedule(request):
         )
     else:
         week_end_employee = json.loads(week_end_employee)
-        for employee in week_end_employee:
-            EmployeDailySchedule.objects.filter(
-                Q(employee_id=employee) & Q(is_weekend=True)
-            ).delete()
-            EmployeDailySchedule.objects.create(
-                employee_id=employee,
-                is_weekend=True
-            )
+        date_sceduale = EmployeDailySchedule.objects.filter(date_date=date ,is_weekend=True)
+        # for employee in week_end_employee:
+        #     EmployeDailySchedule.objects.filter(
+        #         Q(employee_id=employee) & Q(is_weekend=True))
+            # ).delete()
+            # EmployeDailySchedule.objects.create(
+            #     employee_id=employee,
+            #     is_weekend=True
+            # )
 
-        qs = EmployeDailySchedule.objects.filter(
-            # employee__id__in=week_end_employee,
-            is_weekend=True,
-            # date__date=date
-        )
-        serializers = ScheduleSerializer(qs, context={'request': request}, many=True)
+        # qs = EmployeDailySchedule.objects.filter(
+        #     # employee__id__in=week_end_employee,
+        #     is_weekend=True,
+        #     # date__date=date
+        # )
+        serializers = ScheduleSerializer(date_sceduale, context={'request': request}, many=True)
         return Response(
             {
                 'status': True,
