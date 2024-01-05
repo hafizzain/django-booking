@@ -4415,7 +4415,7 @@ def create_workingschedule(request):
     employee = request.data.get('employee', None)
     day = request.data.get('day', None)
 
-    start_time = request.dschedule_idsata.get('start_time', None)
+    start_time = request.data.get('start_time', None)
     end_time = request.data.get('end_time', None)
     start_time_shift = request.data.get('start_time_shift', None)
     end_time_shift = request.data.get('end_time_shift', None)
@@ -5149,7 +5149,7 @@ def update_workingschedule(request):
                 'status': True,
                 'status_code': 201,
                 'response': {
-                    'message': 'Weekend created successfully across employees!',
+                    'message': 'Weekend UPDATED successfully across employees!',
                     'error_message': None,
                     'schedule': serializers.data,
                 }
