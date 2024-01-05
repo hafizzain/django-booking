@@ -5043,6 +5043,16 @@ def update_absence(request):
         },
         status=status.HTTP_200_OK
     )
+@transaction.atomic
+@api_view(['DELETE'])
+@permission_classes([AllowAny])
+def delete_all__workingschedule(request):
+    weekends  = EmployeDailySchedule.objects.filter(is_weekend=True)
+    if weekends:
+        weekends=weekends.delete()
+        return Response({"msg":"Success fully deleted"})
+
+
 
 
 @transaction.atomic
@@ -5125,27 +5135,27 @@ def update_workingschedule(request):
     else:
         week_end_employee = json.loads(week_end_employee)
         for employee in week_end_employee:
-            working_schedule = EmployeDailySchedule.objects.filter(
+            EmployeDailySchedule.objects.create(
+                business_id=business_id,
                 employee_id=employee,
-                date=date,
-                is_weekend=True
+                # date=date,
+                is_weekend=True,
+                is_vacation=False
             )
-            if working_schedule.exists():
-                pass
-            else:
-                print("in here")
-                # working_schedule = EmployeDailySchedule.objects.create(
-                #     business_id=business_id,
-                #     employee_id=employee,
-                #     date=date,
-                #     is_weekend=True,
-                #     is_vacation=False
-                # )
-        working_schedule = EmployeDailySchedule.objects.filter(
+            # working_schedule = EmployeDailySchedule.objects.filter(
+            #     employee_id=employee,
+            #     # date__date=date,
+            #     is_weekend=True
+            # )
+            # if working_schedule.exists():
+            #     working_schedule.delete()
+
+        qs = EmployeDailySchedule.objects.filter(
             # employee__id__in=week_end_employee,
-            is_weekend=True
+            is_weekend=True,
+            # date__date=date
         )
-        serializers = ScheduleSerializer(working_schedule, context={'request': request}, many=True)
+        serializers = ScheduleSerializer(qs, context={'request': request}, many=True)
         return Response(
             {
                 'status': True,
