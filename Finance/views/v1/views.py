@@ -210,15 +210,15 @@ class AllowRefundsAndPermissionsView(APIView):
                 return Response(response_data, status=status.HTTP_200_OK)
             response_data = {
                 'status': False,
-                'status_code': 404,
+                'status_code': 200,
                 'response': {
                     'message': 'Permission not found.',
                     'error_message': None,
-                    'errors': [],
+                    'errors': serializer.errors,
                     'data': [],
                 }
             }
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
@@ -240,8 +240,17 @@ class AllowRefundsAndPermissionsView(APIView):
                     }
                 }
                 return Response(response_data, status=status.HTTP_200_OK)
-
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            response_data = {
+                    'status': True,
+                    'status_code': 200,
+                    'response': {
+                        'message': 'Error Occured!',
+                        'error_message': None,
+                        'errors': serializer.data,
+                        'data': [],
+                    }
+            }
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
         except AllowRefunds.DoesNotExist:
             response_data = {
                 'status': False,
