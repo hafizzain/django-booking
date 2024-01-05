@@ -7,7 +7,6 @@ from Finance.serializers import RefundSerializer, CouponSerializer, AllowRefunds
 from Finance.helpers import short_uuid
 
 
-
 class RefundAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
