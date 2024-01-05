@@ -5139,6 +5139,7 @@ def update_workingschedule(request):
                 employee_id=employee,
                 is_weekend=True,
                 date=date
+
             )
 
         # for employee in week_end_employee:
