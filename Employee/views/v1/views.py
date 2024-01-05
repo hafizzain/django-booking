@@ -5125,36 +5125,38 @@ def update_workingschedule(request):
     else:
         week_end_employee = json.loads(week_end_employee)
         for employee in week_end_employee:
-            working_schedule_to_del = EmployeDailySchedule.objects.filter(
-                employee_id=employee,
-                is_weekend=True
-            )
-            if working_schedule_to_del:
-                working_schedule_to_del.delete()
-            working_schedule = EmployeDailySchedule.objects.create(
-                business_id=business_id,
+            working_schedule = EmployeDailySchedule.objects.filter(
                 employee_id=employee,
                 date=date,
-                is_weekend=True,
-                is_vacation=False
+                is_weekend=True
             )
+            if working_schedule.exists():
+                pass
+            else:
+                print("in here")
+                # working_schedule = EmployeDailySchedule.objects.create(
+                #     business_id=business_id,
+                #     employee_id=employee,
+                #     date=date,
+                #     is_weekend=True,
+                #     is_vacation=False
+                # )
         working_schedule = EmployeDailySchedule.objects.filter(
             # employee__id__in=week_end_employee,
-            is_weekend=True,
-            date=date
+            is_weekend=True
         )
         serializers = ScheduleSerializer(working_schedule, context={'request': request}, many=True)
         return Response(
             {
                 'status': True,
-                'status_code': 201,
+                'status_code': 200,
                 'response': {
                     'message': 'Weekend UPDATED successfully across employees!',
                     'error_message': None,
                     'schedule': serializers.data,
                 }
             },
-            status=status.HTTP_201_CREATED
+            status=status.HTTP_200_OK
         )
 
 
