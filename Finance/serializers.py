@@ -96,22 +96,18 @@ class AllowRefundsSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         allowed_employees_data = validated_data.pop('allowed_refund', [])
-        with transaction.atomic():
-            if AllowRefunds.objects.all().exists():
-                AllowRefunds.objects.all().delete()
-            
-                allow_refunds_instance = AllowRefunds.objects.create(**validated_data)
+        allow_refunds_instance = AllowRefunds.objects.create(**validated_data)
 
-                employees_instances = [
-                    AllowRefundPermissionsEmployees(
-                        allowed_refund=allow_refunds_instance,
-                        employee=employee_data['employee'],
-                        can_refund = True
-                        )
-                    for employee_data in allowed_employees_data
-                ]
+        employees_instances = [
+            AllowRefundPermissionsEmployees(
+                allowed_refund=allow_refunds_instance,
+                employee=employee_data['employee'],
+                can_refund = True
+                )
+            for employee_data in allowed_employees_data
+        ]
 
-                AllowRefundPermissionsEmployees.objects.bulk_create(employees_instances)
+        AllowRefundPermissionsEmployees.objects.bulk_create(employees_instances)
 
         return allow_refunds_instance
     
