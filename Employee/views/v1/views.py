@@ -707,7 +707,7 @@ def get_workingschedule(request):
             status=status.HTTP_200_OK
         )
     else:
-        all_employee = Employee.objects.filter(query).order_by('-created_at')
+        # all_employee = Employee.objects.filter(query).order_by('-created_at')
         employee_ids_in_schedule = EmployeDailySchedule.objects.filter(is_weekend=True)
         serialized = ScheduleSerializerResponse(employee_ids_in_schedule, many=True, context={'request': request,
                                                                                  'location_id': location_id})
