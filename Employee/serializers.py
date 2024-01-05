@@ -1010,17 +1010,19 @@ class EmployeeSerializerResponse(serializers.ModelSerializer):
 
 class ScheduleSerializerResponse(serializers.ModelSerializer):
     employee = EmployeeSerializerResponse()
-    # employee = serializers.SerializerMethodField(read_only=True)
+    checker = serializers.SerializerMethodField(read_only=True)
     date = serializers.DateTimeField(format="%Y-%m-%d", input_formats=['iso-8601', 'date'])
 
-    # def get_employee(self, obj):
-    #     if obj.title == 'weekend'
-    #     return str(obj.employee)
+    def get_checker(self, obj):
+        weekend_list = []
+        if obj.title == 'weekend':
+            weekend_list.append(obj)
+            return weekend_list
 
 
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'title','date', 'employee']
+        fields = ['id', 'title','date', 'employee','checker']
 
 
 
