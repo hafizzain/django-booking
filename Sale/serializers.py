@@ -543,7 +543,7 @@ class ServiceSerializerMainpage(serializers.ModelSerializer):
             try:
                 request = self.context["request"]
                 url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
-                return f'{url}{obj.image}'
+                return f'{url}{obj.image.name}' if obj.is_image_uploaded_s3 else f'{obj.image}'
             except:
                 return f'{obj.image}'
         return None
