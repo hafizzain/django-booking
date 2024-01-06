@@ -5067,6 +5067,7 @@ def update_workingschedule(request):
     week_end_employee = request.data.get('week_end_employee', [])
     schedule_ids = request.data.get('schedule_ids', [])
     date = request.data.get('date', None)
+    from_date = reques.data.get('from_date',None)
     is_weekend = request.data.get('is_weekend', None)
     if is_weekend is None:
         if schedule_id is None:
@@ -5143,7 +5144,8 @@ def update_workingschedule(request):
             EmployeDailySchedule.objects.create(
                 employee_id=employee,
                 is_weekend=True,
-                date=date
+                date=date,
+                from_date=from_date
             )
         qs =  EmployeDailySchedule.objects.filter(
             is_weekend=True,
