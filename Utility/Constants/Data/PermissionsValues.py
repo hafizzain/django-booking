@@ -81,6 +81,7 @@ ALL_PERMISSIONS = [
     'calender_root_access',
     'calender_appointment',
     'calender_block_time',
+    'system_root_access',
 ]
      
 PERMISSIONS_MODEL_FIELDS = {
@@ -143,5 +144,6 @@ PERMISSIONS_MODEL_FIELDS = {
     'calender_root_access' : lambda employee_permission : employee_permission.calender_root_access,
     'calender_appointment' : lambda employee_permission : employee_permission.calender_appointment,
     'calender_block_time' : lambda employee_permission : employee_permission.calender_block_time,
+    'system_root_access' : lambda employee_permission : employee_permission.system_root_access,
 
 }
