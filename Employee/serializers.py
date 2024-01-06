@@ -1101,7 +1101,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     schedule = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     leave_data = serializers.SerializerMethodField(read_only=True)
-    false_scedule =  serializers.SerializerMethodField(read_only=True)
+    # false_scedule =  serializers.SerializerMethodField(read_only=True)
 
     def get_leave_data(self, obj):
 
@@ -1135,7 +1135,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['id', 'leave_data', 'full_name', 'image', 'schedule', 'created_at', 'is_active', 'is_deleted',
-                  'is_blocked','false_scedule']
+                  'is_blocked']
 
 
 class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
