@@ -89,6 +89,9 @@ class EmployePermission(models.Model):
     calender_root_access = models.ManyToManyField(GlobalPermissionChoices, verbose_name ='Calender Root Access', related_name='global_permissions_calender_root_access')
     calender_appointment = models.ManyToManyField(GlobalPermissionChoices, verbose_name ='Calender Appointment', related_name='global_permissions_calender_appointment')
     calender_block_time = models.ManyToManyField(GlobalPermissionChoices, verbose_name ='Calender Block time', related_name='global_permissions_calender_block_time')
+
+
+    system_root_access = models.ManyToManyField(GlobalPermissionChoices, verbose_name ='System Administration Root Access', related_name='global_permissions_system_root_access')
     
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
