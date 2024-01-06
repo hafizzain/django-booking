@@ -1135,7 +1135,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['id', 'leave_data', 'full_name', 'image', 'schedule', 'created_at', 'is_active', 'is_deleted',
-                  'is_blocked','get_false_scedule']
+                  'is_blocked','false_scedule']
 
 
 class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
