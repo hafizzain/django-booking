@@ -1101,7 +1101,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     schedule = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     leave_data = serializers.SerializerMethodField(read_only=True)
-    get_false_scedule =  serializers.SerializerMethodField(read_only=True)
+    false_scedule =  serializers.SerializerMethodField(read_only=True)
 
     def get_leave_data(self, obj):
 
