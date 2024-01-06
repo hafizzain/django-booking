@@ -688,8 +688,8 @@ def get_workingschedule(request):
     location_id = request.GET.get('location_id', None)
     if is_weekend is None:
         query = Q(is_active=True, is_deleted=False, is_blocked=False)
-        # if location_id:
-            # query &= Q(location__id=location_id)
+        if location_id:
+            query &= Q(location__id=location_id)
         all_employee = Employee.objects.filter(query).order_by('-created_at')
         serialized = WorkingScheduleSerializer(all_employee, many=True, context={'request': request,
                                                                                  'location_id': location_id})
