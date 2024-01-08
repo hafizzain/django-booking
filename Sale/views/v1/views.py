@@ -663,7 +663,7 @@ def update_service(request):
     location = request.data.get('location', None)
     check = True
     invoices = request.data.get('invoices', None)
-    image = request.data.get('image', None)
+    # image = request.data.get('image', None)
 
     if id is None:
         return Response(
@@ -697,9 +697,9 @@ def update_service(request):
         )
 
     error = []
-    if image is not None:
-        service_id.image = image
-        service_id.save()
+    # if image is not None:
+    #     service_id.image = image
+    #     service_id.save()
         
     if location is not None:
         if type(location) == str:
