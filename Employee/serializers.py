@@ -985,15 +985,15 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
 
     def get_is_holiday(self, obj):
         try:
-            # start_date = self.context.get('start_date', None)
-            # end_date = self.context.get('end_date', None)
+            start_date = self.context.get('start_date', None)
+            end_date = self.context.get('end_date', None)
             location_id = self.context.get('location_id', None)
             today_date = datetime.now().date()
             holidays = Holiday.objects.select_related('user', 'business', 'location') \
-                .filter(location_id=location_id)
-                        # start_date__range=(start_date,end_date)
+                .filter(location_id=location_id,
+                        start_date__range=(start_date,end_date)
                         # start_date__range=start_date,
-                        
+                        )
             return len(holidays) > 0  # Return True if there is any holiday
         except Exception as err:
             error = str(err)
