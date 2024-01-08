@@ -5,8 +5,7 @@ from django.db.models import Q
 
 from Finance.models import Refund, RefundCoupon, AllowRefunds,AllowRefundPermissionsEmployees
 from Finance.serializers import RefundSerializer, CouponSerializer, AllowRefundsSerializer
-from Finance.helpers import short_uuid, check_permission
-
+from Finance.helpers import short_uuid, check_permission, check_days
 
 
 class RefundAPIView(APIView):
@@ -196,8 +195,9 @@ class AllowRefundsAndPermissionsView(APIView):
             user = request.user
             user_id = user.id
             request.data['user'] = user_id
-
-            if check_permission(user_id):
+            invoice_id = request.get('refund_invoice_id')
+            location = request.data.get('location')
+            if check_days(invoice_id, location) or check_permission(user_id, location):
                 expiry_date = request.data.get('expiry_date')
                 serializer = RefundSerializer(data=request.data, context={'request': request})
 
