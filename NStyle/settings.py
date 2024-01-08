@@ -202,7 +202,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django_tenants.postgresql_backend',
         'OPTIONS': {
-            'options': '-c search_path=public', 'autocommit': True,
+            'options': '-c search_path=public', 
         },
         'NAME': env('DATABASE_NAME'),
         'USER': env('DATABASE_USER'),
