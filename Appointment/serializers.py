@@ -162,7 +162,7 @@ class TodayAppoinmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentService
         fields = ('id', 'duration', 'appointment_time', 'appointment_date',
-                  'member', 'service', 'appointment')
+                  'member', 'service', 'appointment', 'image')
 
 
 class AppointmentServiceSerializer(serializers.ModelSerializer):
