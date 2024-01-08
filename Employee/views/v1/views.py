@@ -6436,7 +6436,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             return Response({"msg": "Gift card added successfully"},status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
-        id = self.kwargs['pk']
+        id = self.query_params.get('id',None)
         if id is not None:
             instance = GiftCard.objects.get(id=id)
             serializer = GiftCardSerializer(instance = instance, data=request.data, partial=True)
@@ -6448,7 +6448,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             return Response({"msg":"Id is None"},status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, *args, **kwargs):
-        id = self.kwargs['pk']
+        id = self.query_params.get('id',None)
         if id is not None:
             giftcard = GiftCard.objects.filter(id=id)
             giftcard.delete()
