@@ -699,6 +699,7 @@ def update_service(request):
     error = []
     if image is not None:
         service_id.image = image
+        service_id.save()
         
     if location is not None:
         if type(location) == str:
