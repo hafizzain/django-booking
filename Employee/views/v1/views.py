@@ -4007,7 +4007,7 @@ def create_vacation_emp(request):
     serialized = ScheduleSerializer(all_employe, many=True, context={'request': request})
     employee_leave_management_obj = LeaveManagements.objects.get(employee_id=employee)
     total_medical_leave = employee_leave_management_obj.medical_leave
-    if days < int(total_medical_leave):
+    if int(days) < int(total_medical_leave):
         return Response(
             {
                 'status': 400,
@@ -4022,6 +4022,7 @@ def create_vacation_emp(request):
     return Response(
         {
             'days':days,
+            'total_medical_leave':total_medical_leave,
             'status': 200,
             'status_code': '200',
             'response': {
