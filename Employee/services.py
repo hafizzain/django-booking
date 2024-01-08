@@ -11,8 +11,8 @@ def annual_vacation_check(vacation_type=None, employee=None, from_date=None, to_
         to_date = datetime.strptime(to_date, "%Y-%m-%d")
         diff = to_date - from_date
         days = int(diff.days)
-    except :
-        days=0
+    except:
+        days = 0
     if vacation_type == 'annual':
         now = datetime.now()
         employee_id = Employee.objects.get(id=employee, is_deleted=False)
@@ -22,7 +22,7 @@ def annual_vacation_check(vacation_type=None, employee=None, from_date=None, to_
         required_months = int(required_months)
         months_difference = (now.year - created_at.year) * 12 + now.month - created_at.month
         months_difference = int(months_difference)
-        if months_difference < required_months:
+        if required_months < months_difference:
             return Response(
                 {
                     'status': 400,
@@ -38,7 +38,7 @@ def annual_vacation_check(vacation_type=None, employee=None, from_date=None, to_
     if vacation_type == 'medical':
         employee_leave_management_obj = LeaveManagements.objects.get(employee_id=employee)
         total_medical_leave = employee_leave_management_obj.medical_leave
-        if total_medical_leave < days:
+        if days < total_medical_leave:
             return Response(
                 {
                     'status': 400,
@@ -53,7 +53,7 @@ def annual_vacation_check(vacation_type=None, employee=None, from_date=None, to_
     if vacation_type == 'casual':
         employee_leave_management_obj = LeaveManagements.objects.get(employee_id=employee)
         casual_leave = employee_leave_management_obj.casual_leave
-        if casual_leave < days:
+        if days <casual_leave:
             return Response(
                 {
                     'status': 400,
