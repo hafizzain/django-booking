@@ -3874,6 +3874,7 @@ def create_vacation_emp(request):
     vacation_type = request.data.get('vacation_type', None)
     value=0
     difference_days = 0
+    working_sch=None
 
     if not all([business_id, employee]):
         return Response(
