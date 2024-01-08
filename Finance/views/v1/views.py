@@ -1,11 +1,47 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view, permission_classes
 from django.db.models import Q
 
 from Finance.models import Refund, RefundCoupon, AllowRefunds,AllowRefundPermissionsEmployees
 from Finance.serializers import RefundSerializer, CouponSerializer, AllowRefundsSerializer
 from Finance.helpers import short_uuid, check_permission, check_days
+
+
+
+
+@api_view(['GET'])
+def check_permission_view(request):
+    invoice_id = request.data.get('invoice_id')
+    location = request.data.get('location')
+    user = request.user.id
+    try:
+        if check_days(invoice_id, location) or check_permission(user, location):
+            response_data = {
+                            'success': True,
+                            'status_code': 201,
+                            'response': {
+                                'message': 'Permission granted!',
+                                'error_message': None,
+                                'data': []
+                            }
+                        }
+            return Response(response_data, status=status.HTTP_200_OK)
+        response_data = {
+                            'success': True,
+                            'status_code': 404,
+                            'response': {
+                                'message': 'Permission Deneid!',
+                                'error_message': None,
+                                'data': []
+                            }
+                        }
+        return Response(response_data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'erorr': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    
 
 
 class RefundAPIView(APIView):
@@ -140,8 +176,6 @@ class RefundAPIView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
-
 # ==================================================== Refund Permission Work After =============================================================
 class AllowRefundsAndPermissionsView(APIView):
     
@@ -177,23 +211,23 @@ class AllowRefundsAndPermissionsView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-    '''
-    POST REQUEST FOR THE REFUND PERMISSION
-    Payload formate:
-    {
-        "location": "742cad40-eeaa-4b84-84a0-3935d4d359dd",
-        "number_of_days": 56,
-        "allowed_refund": [
-            {
-                "employee": "cb8c5d9d-9412-47e4-9e4d-c7b686097009"
-            },
-            {
-                "employee": "0e4990e1-9f8b-4b21-83d1-67ca01b04303"
-            }
-        ]
-    }
-    '''    
     def post(self, request, format=None):
+        '''
+            POST REQUEST FOR THE REFUND PERMISSION
+            Payload formate:
+            {
+                "location": "742cad40-eeaa-4b84-84a0-3935d4d359dd",
+                "number_of_days": 56,
+                "allowed_refund": [
+                    {
+                        "employee": "cb8c5d9d-9412-47e4-9e4d-c7b686097009"
+                    },
+                    {
+                        "employee": "0e4990e1-9f8b-4b21-83d1-67ca01b04303"
+                    }
+                ]
+            }
+        '''    
         try:
             serializer = AllowRefundsSerializer(data=request.data, context={'request':request})
             if serializer.is_valid():

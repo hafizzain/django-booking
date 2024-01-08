@@ -7,5 +7,6 @@ urlpatterns = [
     path('get-all-refund-coupons/', views.RefundedCoupons.as_view(), name='get-all-refund-coupons'),
     path('refund-permission/',views.AllowRefundsAndPermissionsView.as_view(), name='permission-refund'),
     path('refund-permission/<uuid:uuid>',views.AllowRefundsAndPermissionsView.as_view(), name='permission-refund'),
+    path('check-refund-permission/',views.check_permission_view, name='check-permission-view')
 ]
 
