@@ -4005,7 +4005,20 @@ def create_vacation_emp(request):
             working_schedule.save()
     all_employe = EmployeDailySchedule.objects.select_related('business').order_by('created_at')
     serialized = ScheduleSerializer(all_employe, many=True, context={'request': request})
-
+    employee_leave_management_obj = LeaveManagements.objects.get(employee_id=employee)
+    total_medical_leave = employee_leave_management_obj.medical_leave
+    if days < int(total_medical_leave):
+        return Response(
+            {
+                'status': 400,
+                'status_code': '400',
+                'response': {
+                    'message': 'Medical leave requests exceed',
+                    'error_message': None,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
     return Response(
         {
             'days':days,
