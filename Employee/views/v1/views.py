@@ -3959,7 +3959,7 @@ def create_vacation_emp(request):
                 'status': 400,
                 'status_code': '400',
                 'response': {
-                    'message': 'Leave request exceed!',
+                    'message': 'Exceeded {vacation_type} quota. Please adjust and retry.'.format(vacation_type=vacation_type),
                     'error_message': None,
                 }
             },
