@@ -164,7 +164,7 @@ class ServiceGroupSerializerMainPage(serializers.ModelSerializer):
         return None
     class Meta:
         model = ServiceGroup
-        fields = ['id', 'business', 'name', 'services', 'is_active','image']
+        fields = ['id', 'business', 'name', 'services', 'is_active','image', 'is_deleted']
 
 
 class ServiceGroupSerializerOptimized(serializers.ModelSerializer):
