@@ -24,7 +24,7 @@ from .models import (EmployeDailySchedule, Employee, EmployeeProfessionalInfo,
                      StaffGroup, StaffGroupModulePermission, Attendance
 , Payroll, CommissionSchemeSetting, Asset, AssetDocument,
                      EmployeeSelectedService, Vacation, CategoryCommission, LeaveManagements,
-                     WeekManagement, VacationDetails, GiftCard
+                     WeekManagement, VacationDetails, GiftCards
                      )
 from Authentication.models import AccountType, User
 from django_tenants.utils import tenant_context
@@ -1754,11 +1754,11 @@ class EmployeeInfoSerializer(serializers.ModelSerializer):
 
 class GiftCardSerializer(serializers.ModelSerializer):
     class Meta:
-        model = GiftCard
+        model = GiftCards
         fields = ['name','gift_card_value','retail_price','expire_date','discount_to_show']
 
     def create(self, validated_data):
-        return GiftCard.objects.create(**validated_data)
+        return GiftCards.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
@@ -1775,5 +1775,5 @@ class GiftCardSerializer(serializers.ModelSerializer):
 
 class GiftCardSerializerResponse(serializers.ModelSerializer):
     class Meta:
-        model = GiftCard
+        model = GiftCards
         fields = "__all__"

@@ -9,7 +9,7 @@ from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee,
 , EmployeeMarketingPermission, EmployeeSelectedService, SallarySlipPayrol, StaffGroup
 , StaffGroupModulePermission, Attendance
 , Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation, LeaveManagements, WeekManagement,
-                             VacationDetails, GiftCard
+                             VacationDetails, GiftCard, GiftCards
                              )
 from Tenants.models import EmployeeTenantDetail, Tenant
 from django_tenants.utils import tenant_context
@@ -6425,7 +6425,7 @@ def create_weekend(request):
 
 
 class GiftCardViewSet(viewsets.ModelViewSet):
-    queryset = GiftCard.objects.all()
+    queryset = GiftCards.objects.all()
     serializer_class = GiftCardSerializerResponse
 
     def create(self, request, *args, **kwargs):
@@ -6438,7 +6438,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         id = self.query_params.get('id',None)
         if id is not None:
-            instance = GiftCard.objects.get(id=id)
+            instance = GiftCards.objects.get(id=id)
             serializer = GiftCardSerializer(instance = instance, data=request.data, partial=True)
             if serializer.is_valid(raise_exception=True):
                 instance = serializer.save()
@@ -6448,9 +6448,9 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             return Response({"msg":"Id is None"},status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, *args, **kwargs):
-        id = kwargs.get('id', None)
+        id = request.query_params.get('id',None)
         if id is not None:
-            giftcard = GiftCard.objects.filter(id=id)
+            giftcard = GiftCards.objects.filter(id=id)
             if giftcard.exists():
                 giftcard.delete()
                 return Response({"msg": f"Gift card with id {id} deleted successfully"}, status=status.HTTP_200_OK)

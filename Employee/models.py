@@ -662,6 +662,16 @@ class WeekManagement(CommonField):
 
 class GiftCard(models.Model):
     # id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    # id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    name = models.TextField(null=True, blank=True)
+    gift_card_value = models.FloatField(default=0, null=True)
+    retail_price = models.FloatField(default=0, null=True)
+    expire_date = models.DateField(auto_now_add=now, null=True)
+    discount_to_show = models.TextField(null=True)
+
+
+class GiftCards(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     name = models.TextField(null=True, blank=True)
     gift_card_value = models.FloatField(default=0, null=True)
     retail_price = models.FloatField(default=0, null=True)
