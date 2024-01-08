@@ -18,6 +18,19 @@ def annual_vacation_check(vacation_type=None, employee=None, from_date=None, to_
         employee_id = Employee.objects.get(id=employee, is_deleted=False)
         created_at = employee_id.created_at
         employee_leave_management_obj = LeaveManagements.objects.get(employee_id=employee)
+        total_annual_leave = employee_leave_management_obj.annual_leave
+        if days < total_annual_leave:
+            return Response(
+                {
+                    'status': 400,
+                    'status_code': '400',
+                    'response': {
+                        'message': 'Annual leave requests exceed',
+                        'error_message': None,
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
         required_months = employee_leave_management_obj.number_of_months
         required_months = int(required_months)
         months_difference = (now.year - created_at.year) * 12 + now.month - created_at.month
