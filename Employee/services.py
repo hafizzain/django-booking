@@ -17,8 +17,8 @@ def annual_vacation_check(vacation_type=None, employee=None, from_date=None, to_
         now = datetime.now()
         employee_id = Employee.objects.get(id=employee, is_deleted=False)
         created_at = employee_id.created_at
-        required_months = LeaveManagements.objects.get(employee_id=employee)
-        required_months = required_months.number_of_months
+        employee_leave_management_obj = LeaveManagements.objects.get(employee_id=employee)
+        required_months = employee_leave_management_obj.number_of_months
         required_months = int(required_months)
         months_difference = (now.year - created_at.year) * 12 + now.month - created_at.month
         months_difference = int(months_difference)
