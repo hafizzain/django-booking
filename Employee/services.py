@@ -20,7 +20,7 @@ def annual_vacation_check(vacation_type=None, employee=None):
                     'status': 400,
                     'status_code': '400',
                     'response': {
-                        'message': 'You can not create annual vacation right now ',
+                        'message': 'Annual leave requests available after {required_months}'.format(required_months=required_months),
                         'error_message': None,
                     }
                 },
