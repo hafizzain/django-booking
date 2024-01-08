@@ -32,6 +32,21 @@ from Utility.models import ExceptionRecord
 from Service.models import Service
 
 
+class ServiceImageSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField(read_only=True)
+    
+    def get_image(self, obj):   # get client image url from AWS 
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
+                return f'{url}{obj.image}'
+            except:
+                return f'{obj.image}'
+        return None
+    class Meta:
+        model = Service
+        fields = ('image',)
 class PriceServiceSaleSerializer(serializers.ModelSerializer):
     currency = CurrencySerializer()
 
@@ -122,21 +137,7 @@ class EmployeAppoinmentSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ('id', 'full_name', 'image')
 
-class ServiceImageSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField(read_only=True)
-    
-    def get_image(self, obj):   # get client image url from AWS 
-        if obj.image:
-            try:
-                request = self.context["request"]
-                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
-                return f'{url}{obj.image}'
-            except:
-                return f'{obj.image}'
-        return None
-    class Meta:
-        model = Service
-        fields = ('image')
+
 class TodayAppoinmentSerializer(serializers.ModelSerializer):
     member = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
@@ -601,12 +602,11 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             'appointments',
         ]
 
-
 class AppointmentSerializerDashboard(serializers.ModelSerializer):
-    # image = serializers.SerializerMethodField(read_only=True)
     member = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
+    service_image = serializers.SerializerMethodField(read_only=True)
 
     def get_client(self, obj):
         try:
@@ -625,10 +625,16 @@ class AppointmentSerializerDashboard(serializers.ModelSerializer):
             return obj.service.name
         except Exception as err:
             return None
+    
+    def get_service_image(self, obj):
+        request = self.context.get('request')
+        service = obj.service
+        serializer = ServiceImageSerializer(service, context={'request': request})
+        return serializer.data 
 
     class Meta:
         model = AppointmentService
-        fields = ['id', 'service', 'member', 'price', 'client']
+        fields = ['id', 'service', 'member', 'price', 'client', 'service_image',]
 
 
 class AllAppoinmentSerializer(serializers.ModelSerializer):
