@@ -909,9 +909,9 @@ def create_servicegroup(request):
         is_deleted=is_deleted,
     )
     if is_status is None:
-        service_group.is_active = True
-    else:
         service_group.is_active = False
+    else:
+        service_group.is_active = True
 
     if allow_client_to_select_team_member is None:
         service_group.allow_client_to_select_team_member = False
