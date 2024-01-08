@@ -900,26 +900,12 @@ def create_servicegroup(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    try:
-        service_group = ServiceGroup.objects.create(
-            user=user,
-            business=business_id,
-            name=name,
-            image=image,
-        )
-    except Exception as err:
-        return Response(
-            {
-                'status': False,
-                'status_code': 404,
-                'status_code_text': '404',
-                'response': {
-                    'message': 'Invalid Service Group ID!',
-                    'error_message': str(err),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
+    service_group = ServiceGroup.objects.create(
+        user=user,
+        business=business_id,
+        name=name,
+        image=image,
+    )
     if is_status is None:
         service_group.is_active = False
     else:
@@ -994,7 +980,7 @@ def get_servicegroup_main_page(request):
     page = request.GET.get('page', None)
     is_searched = False
 
-    query = Q(is_deleted=False)
+    query = Q(is_deleted=True)
 
     if is_active:
         query &= Q(is_active=True)
