@@ -140,6 +140,9 @@ class RefundAPIView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+
+
+# ==================================================== Refund Permission Work After =============================================================
 class AllowRefundsAndPermissionsView(APIView):
     
     def get(self, request, format = None):
@@ -192,62 +195,34 @@ class AllowRefundsAndPermissionsView(APIView):
     '''    
     def post(self, request, format=None):
         try:
-            user = request.user
-            user_id = user.id
-            request.data['user'] = user_id
-            invoice_id = request.get('refund_invoice_id')
-            location = request.data.get('location')
-            if check_days(invoice_id, location) or check_permission(user_id, location):
-                expiry_date = request.data.get('expiry_date')
-                serializer = RefundSerializer(data=request.data, context={'request': request})
-
-                if serializer.is_valid():
-                    refund_instance = serializer.save()
-                    client_id = request.data.get('client')
-
-                    if expiry_date:
-                        coupon_data = {
-                            'user': request.user.id,
-                            'client': client_id,
-                            'refund_coupon_code': f"REFUND_{short_uuid(refund_instance.id)}",
-                            'amount': refund_instance.total_refund_amount,
-                            'expiry_date': expiry_date,
-                            'related_refund': refund_instance.id,
-                        }
-
-                        try:
-                            coupon_serializer = CouponSerializer(data=coupon_data)
-                            coupon_serializer.is_valid(raise_exception=True)
-                            coupon_serializer.save()
-                        except Exception as e:
-                            return Response({'Error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-                    else:
-                        response_data = {
-                            'success': True,
-                            'status_code': 201,
-                            'response': {
-                                'message': 'Refund created successfully',
-                                'error_message': None,
-                                'data': {
-                                    'refund': RefundSerializer(serializer.instance).data,
-                                    # 'coupon': CouponSerializer(coupon_serializer.instance).data,
-                                }
-                            }
-                        }
-                        return Response(response_data, status=status.HTTP_200_OK)
+            serializer = AllowRefundsSerializer(data=request.data, context={'request':request})
+            if serializer.is_valid():
+                serializer.save()
                 response_data = {
-                    'success': True,
+                    'status': True,
                     'status_code': 200,
                     'response': {
-                        'message': 'Permission Denied!',
+                        'message': 'Permission created successfully!',
                         'error_message': None,
-                        'data': []
+                        'errors': [],
+                        'data': serializer.data,
+
                     }
                 }
                 return Response(response_data, status=status.HTTP_200_OK)
-
+            response_data = {
+                'status': False,
+                'status_code': 200,
+                'response': {
+                    'message': 'Permission not Created.',
+                    'error_message': None,
+                    'errors': serializer.errors,
+                    'data': [],
+                }
+            }
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     def put(self, request, uuid, format=None):
         try:
