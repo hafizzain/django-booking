@@ -29,6 +29,7 @@ from . import choices
 
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Utility.models import ExceptionRecord
+from Service.models import Service
 
 
 class PriceServiceSaleSerializer(serializers.ModelSerializer):
@@ -121,11 +122,26 @@ class EmployeAppoinmentSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ('id', 'full_name', 'image')
 
-
+class ServiceImageSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    
+    def get_image(self, obj):   # get client image url from AWS 
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
+                return f'{url}{obj.image}'
+            except:
+                return f'{obj.image}'
+        return None
+    class Meta:
+        model = Service
+        fields = ('image')
 class TodayAppoinmentSerializer(serializers.ModelSerializer):
     member = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
-
+    image = serializers.SerializerMethodField(read_only=True)
+    
     def get_member(self, obj):
         try:
             return obj.member.full_name
@@ -137,10 +153,16 @@ class TodayAppoinmentSerializer(serializers.ModelSerializer):
             return obj.service.name
         except Exception as err:
             None
-
+    
+    def get_service_image(self, obj):
+        request = self.context.get('request')
+        service = obj.service.all()
+        serializer = ServiceImageSerializer(service, many=True, context={'request': request})
+        return serializer.data 
     class Meta:
         model = AppointmentService
-        fields = ('id', 'duration', 'appointment_time', 'appointment_date', 'member', 'service', 'appointment')
+        fields = ('id', 'duration', 'appointment_time', 'appointment_date',
+                  'member', 'service', 'appointment', 'image')
 
 
 class AppointmentServiceSerializer(serializers.ModelSerializer):
@@ -581,6 +603,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
 
 
 class AppointmentSerializerDashboard(serializers.ModelSerializer):
+    # image = serializers.SerializerMethodField(read_only=True)
     member = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)

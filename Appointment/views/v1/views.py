@@ -286,7 +286,7 @@ def get_today_appointments(request):
         .select_related('member', 'service') \
         .order_by('appointment_time')
 
-    serialize = TodayAppoinmentSerializer(today_appointment, many=True)
+    serialize = TodayAppoinmentSerializer(today_appointment, many=True, context={'request': request})
     return Response(
         {
             'status': 200,
