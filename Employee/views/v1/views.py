@@ -4008,6 +4008,7 @@ def create_vacation_emp(request):
 
     return Response(
         {
+            'days':days,
             'status': 200,
             'status_code': '200',
             'response': {
