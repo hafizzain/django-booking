@@ -441,6 +441,7 @@ class VacationDetails(models.Model):
     vacation = models.ForeignKey(Vacation, on_delete=models.CASCADE, null=True, related_name='vacation_detail')
     # business = models.ForeignKey(Business, on_delete=models.CASCADE, null=True, related_name='business_vacation')
     # employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_vacation')
+
     vacation_status = models.TextField(null=True)
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)
