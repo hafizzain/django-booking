@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import random
 import string
+from rest_framework import viewsets
 from time import strptime
 from django.shortcuts import render
 from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee, EmployeeProfessionalInfo,
@@ -8,7 +9,7 @@ from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee,
 , EmployeeMarketingPermission, EmployeeSelectedService, SallarySlipPayrol, StaffGroup
 , StaffGroupModulePermission, Attendance
 , Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation, LeaveManagements, WeekManagement,
-                             VacationDetails
+                             VacationDetails, GiftCard
                              )
 from Tenants.models import EmployeeTenantDetail, Tenant
 from django_tenants.utils import tenant_context
@@ -28,7 +29,7 @@ from Employee.serializers import (EmployeSerializer, EmployeInformationsSerializ
                                   NewVacationSerializer,
                                   NewAbsenceSerializer, singleEmployeeSerializerOP, Payroll_WorkingScheduleSerializerOP,
                                   WeekendManagementSerializer, LeaveManagementSerializer, ScheduleSerializerOP,
-                                  ScheduleSerializerResponse
+                                  ScheduleSerializerResponse, GiftCardSerializer, GiftCardSerializerResponse
                                   )
 from Employee.optimized_serializers import OptimizedEmployeeSerializerDashboard
 from django.db import connection, transaction
@@ -6421,3 +6422,37 @@ def create_weekend(request):
         },
         status=status.HTTP_201_CREATED
     )
+
+
+class GiftCardViewSet(viewsets.ModelViewSet):
+    queryset = GiftCard.objects.all()
+    serializer_class = GiftCardSerializerResponse
+
+    def create(self, request, *args, **kwargs):
+        serializer = GiftCardSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            instance = serializer.save()
+            gift_card = GiftCardSerializer(instance, many=False).data
+            return Response({"msg": "Gift card added successfully"},status=status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        id = self.kwargs['pk']
+        if id is not None:
+            instance = GiftCard.objects.filter(id=id)
+            serializer = GiftCardSerializer(instance, data=request.data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                instance = serializer.save()
+                gift_card = GiftCardSerializer(instance, many=False).data
+                return Response({"msg": "Gift card added successfully"},status=status.HTTP_200_OK)
+        else:
+            return Response({"msg":"Id is None"},status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, *args, **kwargs):
+        id = self.kwargs['pk']
+        if id is not None:
+            giftcard = GiftCard.objects.filter(id=id)
+            giftcard.delete()
+            return Response({"msg":"Gift card delete"},status=status.HTTP_200_OK)
+        else:
+            return Response({"msg":"Un able to delete the card"}, status=status.HTTP_400_BAD_REQUEST)
+
