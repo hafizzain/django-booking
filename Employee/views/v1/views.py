@@ -3919,7 +3919,33 @@ def create_vacation_emp(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    check_available_vacation_type(vacation_type=vacation_type, employee=employee, from_date=from_date, to_date=to_date)
+    value=0
+    employee_leave_management_obj = LeaveManagements.objects.get(employee_id=employee_id.id)
+    if vacation_type == 'medical':
+        value = employee_leave_management_obj.medical_leave
+    if vacation_type == 'annual':
+        value = employee_leave_management_obj.annual_leave
+    if vacation_type == 'casual':
+        value = employee_leave_management_obj.casual_leave
+    from_date = datetime.strptime(from_date, "%Y-%m-%d")
+    to_date = datetime.strptime(to_date, "%Y-%m-%d")
+    diff = to_date - from_date
+    days = int(diff.days)
+    available_value = int(value)
+    if days > available_value:
+        return Response(
+            {
+                'status': 400,
+                'status_code': '400',
+                'response': {
+                    'message': 'Requests exceed',
+                    'error_message': None,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
+    # check_available_vacation_type(vacation_type=vacation_type, employee=employee, from_date=from_date, to_date=to_date)
     annual_vacation_check(vacation_type=vacation_type, employee=employee_id)
     if not to_date:
         to_date = from_date
@@ -4008,8 +4034,7 @@ def create_vacation_emp(request):
     serialized = ScheduleSerializer(all_employe, many=True, context={'request': request})
     employee_leave_management_obj = LeaveManagements.objects.get(employee_id=employee)
     total_medical_leave = employee_leave_management_obj.medical_leave
-    if int(days) > int(total_medical_leave):
-        return Response({"msg": "Error!!!!!!"})
+
     return Response(
         {
             'status': 200,
