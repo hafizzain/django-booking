@@ -4428,6 +4428,7 @@ def create_workingschedule(request):
     is_weekend = request.data.get('is_weekend', None)
     is_leave = request.data.get('is_leave', None)
     is_off = request.data.get('is_off', None)
+    leo_value = request.data.get('leo_value', None)
     week_end_employee = request.data.get('week_end_employee', [])
     if is_weekend is None:
         if not all([business_id, employee]):
@@ -4476,11 +4477,10 @@ def create_workingschedule(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
         check_working_schedule = EmployeDailySchedule.objects.filter(
-            # user=user,
+            user=user,
             business=business,
             employee=employee_id,
-            is_weekend=True
-            # date=date,
+            date=date,
 
         )
         record_count = check_working_schedule.count()
@@ -4512,22 +4512,18 @@ def create_workingschedule(request):
         working_schedule.to_date = to_date
         working_schedule.note = note
 
-        # if is_vacation == 'false':
-        #     working_schedule.is_vacation = False
-        #     working_schedule.is_weekend = True
-
         if is_vacation is not None:
             working_schedule.is_vacation = True
         else:
             working_schedule.is_vacation = False
-            # working_schedule.is_weekend = True
+        if leo_value is not None:
             working_schedule.is_leo_day = True
             try:
                 is_leo_day_update = LeaveManagements.objects.get(employee_id=employee_id.id)
                 is_leo_day_update.leo_leave += 1
                 is_leo_day_update.save()
             except:
-                is_leo_day_created =  LeaveManagements.objects.create(employee_id=employee_id.id)
+                is_leo_day_created = LeaveManagements.objects.create(employee_id=employee_id.id)
                 is_leo_day_created.leo_leave += 1
                 is_leo_day_created.save()
 
@@ -5067,7 +5063,7 @@ def update_workingschedule(request):
     week_end_employee = request.data.get('week_end_employee', [])
     schedule_ids = request.data.get('schedule_ids', [])
     date = request.data.get('date', None)
-    from_date = reques.data.get('from_date',None)
+    from_date = reques.data.get('from_date', None)
     is_weekend = request.data.get('is_weekend', None)
     if is_weekend is None:
         if schedule_id is None:
@@ -5147,7 +5143,7 @@ def update_workingschedule(request):
                 date=date,
                 from_date=from_date
             )
-        qs =  EmployeDailySchedule.objects.filter(
+        qs = EmployeDailySchedule.objects.filter(
             is_weekend=True,
         )
         serializers = ScheduleSerializer(qs, context={'request': request}, many=True)
