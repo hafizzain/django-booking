@@ -157,7 +157,7 @@ class TodayAppoinmentSerializer(serializers.ModelSerializer):
     def get_service_image(self, obj):
         request = self.context.get('request')
         service = obj.service
-        serializer = ServiceImageSerializer(service, many=True, context={'request': request})
+        serializer = ServiceImageSerializer(service, context={'request': request})
         return serializer.data 
     class Meta:
         model = AppointmentService
