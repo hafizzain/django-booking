@@ -123,7 +123,7 @@ class EmployeAppoinmentSerializer(serializers.ModelSerializer):
         fields = ('id', 'full_name', 'image')
 
 class ServiceImageSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField(read_only=True)
     
     def get_image(self, obj):   # get client image url from AWS 
         if obj.image:
@@ -140,7 +140,7 @@ class ServiceImageSerializer(serializers.ModelSerializer):
 class TodayAppoinmentSerializer(serializers.ModelSerializer):
     member = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
-    image = serializers.SerializerMethodField(read_only=True)
+    service_image = serializers.SerializerMethodField(read_only=True)
     
     def get_member(self, obj):
         try:
@@ -162,7 +162,7 @@ class TodayAppoinmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentService
         fields = ('id', 'duration', 'appointment_time', 'appointment_date',
-                  'member', 'service', 'appointment', 'image')
+                  'member', 'service', 'appointment', 'service_image')
 
 
 class AppointmentServiceSerializer(serializers.ModelSerializer):
