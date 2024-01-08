@@ -41,9 +41,6 @@ def check_permission_view(request):
     except Exception as e:
         return Response({'erorr': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-    
-
-
 class RefundAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
@@ -175,6 +172,34 @@ class RefundAPIView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class RefundedCoupons(APIView):
+    '''Getting coupons with the refund Data'''
+
+    def get(self, request, *args, **kwargs):
+        coupons = RefundCoupon.objects.select_related(
+            'related_refund__business', 'related_refund__location').all()
+        serializer = CouponSerializer(coupons, many=True)
+        if not coupons:
+            response_data = {
+                'success': False,
+                'status_code': 400,
+                'response': {
+                    'message': 'No Records found',
+                    'error_message': serializer.errors,
+                    'data': None
+                }
+            }
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+        response_data = {
+            'success': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Record created successfully',
+                'error_message': None,
+                'data': serializer.data
+            }
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
 
 # ==================================================== Refund Permission Work After =============================================================
 class AllowRefundsAndPermissionsView(APIView):
@@ -322,31 +347,3 @@ class AllowRefundsAndPermissionsView(APIView):
         
 
 
-class RefundedCoupons(APIView):
-    '''Getting coupons with the refund Data'''
-
-    def get(self, request, *args, **kwargs):
-        coupons = RefundCoupon.objects.select_related(
-            'related_refund__business', 'related_refund__location').all()
-        serializer = CouponSerializer(coupons, many=True)
-        if not coupons:
-            response_data = {
-                'success': False,
-                'status_code': 400,
-                'response': {
-                    'message': 'No Records found',
-                    'error_message': serializer.errors,
-                    'data': None
-                }
-            }
-            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
-        response_data = {
-            'success': True,
-            'status_code': 200,
-            'response': {
-                'message': 'Record created successfully',
-                'error_message': None,
-                'data': serializer.data
-            }
-        }
-        return Response(response_data, status=status.HTTP_200_OK)
