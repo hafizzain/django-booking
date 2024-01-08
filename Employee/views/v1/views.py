@@ -3874,6 +3874,7 @@ def create_vacation_emp(request):
     vacation_type = request.data.get('vacation_type', None)
     value=0
     difference_days = 0
+    working_sch=None
 
     if not all([business_id, employee]):
         return Response(
@@ -3959,7 +3960,7 @@ def create_vacation_emp(request):
                 'status': 400,
                 'status_code': '400',
                 'response': {
-                    'message': 'Exceeded {vacation_type} quota. Please adjust and retry.'.format(vacation_type=vacation_type),
+                    'message': 'Exceeded {vacation_type} quota. Please adjust and retry. {days}'.format(vacation_type=vacation_type,days=days),
                     'error_message': None,
                 }
             },
@@ -3971,11 +3972,11 @@ def create_vacation_emp(request):
     if not to_date:
         to_date = from_date
 
-    from_date = datetime.strptime(from_date, "%Y-%m-%d")
-    to_date = datetime.strptime(to_date, "%Y-%m-%d")
-    diff = to_date - from_date
-    working_sch = None
-    days = int(diff.days)
+    # from_date = datetime.strptime(from_date, "%Y-%m-%d")
+    # to_date = datetime.strptime(to_date, "%Y-%m-%d")
+    # diff = to_date - from_date
+    # working_sch = None
+    # days = int(diff.days)
     is_vacation_exist = Vacation.objects.filter(
         business=business,
         employee=employee_id,
@@ -4590,7 +4591,7 @@ def get_vacations(request):
     # Extract the distinct Vacation instances from the related EmployeDailySchedule instances
     related_vacations = Vacation.objects \
         .filter(vacation_employedailyschedules__in=all_daily_schedules) \
-        .distinct()
+        .distinct().order_by('-created_at')
 
     all_vacations_count = related_vacations.count()
 
