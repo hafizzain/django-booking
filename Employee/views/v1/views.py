@@ -5063,7 +5063,8 @@ def update_workingschedule(request):
     week_end_employee = request.data.get('week_end_employee', [])
     schedule_ids = request.data.get('schedule_ids', [])
     date = request.data.get('date', None)
-    from_date = reques.data.get('from_date', None)
+    from_date = request.data.get('from_date', None)
+    leo_value = request.data.get('is_leo_day', None)
     is_weekend = request.data.get('is_weekend', None)
     if is_weekend is None:
         if schedule_id is None:
@@ -5101,6 +5102,7 @@ def update_workingschedule(request):
             try:
                 emp = Employee.objects.get(id=employee)
                 schedule.employee = emp
+                schedule.leo_value = leo_value
             except Exception as err:
                 pass
 
