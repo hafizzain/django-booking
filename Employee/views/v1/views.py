@@ -3971,11 +3971,11 @@ def create_vacation_emp(request):
     if not to_date:
         to_date = from_date
 
-    from_date = datetime.strptime(from_date, "%Y-%m-%d")
-    to_date = datetime.strptime(to_date, "%Y-%m-%d")
-    diff = to_date - from_date
-    working_sch = None
-    days = int(diff.days)
+    # from_date = datetime.strptime(from_date, "%Y-%m-%d")
+    # to_date = datetime.strptime(to_date, "%Y-%m-%d")
+    # diff = to_date - from_date
+    # working_sch = None
+    # days = int(diff.days)
     is_vacation_exist = Vacation.objects.filter(
         business=business,
         employee=employee_id,
