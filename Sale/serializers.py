@@ -425,6 +425,7 @@ class ServiceSerializer(serializers.ModelSerializer):
     total_orders = serializers.IntegerField(read_only=True)
     priceservice = serializers.SerializerMethodField(read_only=True)
     price = serializers.SerializerMethodField(read_only=True)
+    image = serializers.SerializerMethodField(read_only=True)
 
     invoices = serializers.SerializerMethodField(read_only=True)
 
@@ -435,7 +436,16 @@ class ServiceSerializer(serializers.ModelSerializer):
         except Exception as err:
             pass
             # print(err)
-
+    def get_image(self, obj):   # get client image url from AWS 
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
+                return f'{url}{obj.image}'
+            except:
+                return f'{obj.image}'
+        return None
+    
     def get_priceservice(self, obj):
 
         try:
@@ -511,7 +521,8 @@ class ServiceSerializer(serializers.ModelSerializer):
             'enable_team_comissions',
             'enable_vouchers',
             'invoices',
-            'total_orders'
+            'total_orders',
+            'image',
         ]
 
 
