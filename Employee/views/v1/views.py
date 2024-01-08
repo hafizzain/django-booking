@@ -6438,8 +6438,8 @@ class GiftCardViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         id = self.kwargs['pk']
         if id is not None:
-            instance = GiftCard.objects.filter(id=id)
-            serializer = GiftCardSerializer(instance, data=request.data, partial=True)
+            instance = GiftCard.objects.get(id=id)
+            serializer = GiftCardSerializer(instance = instance, data=request.data, partial=True)
             if serializer.is_valid(raise_exception=True):
                 instance = serializer.save()
                 gift_card = GiftCardSerializer(instance, many=False).data

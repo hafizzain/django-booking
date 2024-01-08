@@ -1760,6 +1760,18 @@ class GiftCardSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return GiftCard.objects.create(**validated_data)
 
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.gift_card_value = validated_data.get('gift_card_value', instance.gift_card_value)
+        instance.retail_price = validated_data.get('retail_price', instance.retail_price)
+        instance.expire_date = validated_data.get('expire_date', instance.expire_date)
+        instance.discount_to_show = validated_data.get('discount_to_show', instance.discount_to_show)
+
+        # Save the updated instance
+        instance.save()
+
+        return instance
+
 
 class GiftCardSerializerResponse(serializers.ModelSerializer):
     class Meta:
