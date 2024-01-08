@@ -990,7 +990,7 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             location_id = self.context.get('location_id', None)
             today_date = datetime.now().date()
             holidays = Holiday.objects.select_related('user', 'business', 'location') \
-                .filter(location_id=location_id,
+                .filter(location_id=location_id
                         # start_date__range=(start_date,end_date)
                         # start_date__range=start_date,
                         )
