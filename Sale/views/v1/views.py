@@ -985,7 +985,7 @@ def get_servicegroup_main_page(request):
     query = Q()
 
     if is_active:
-        query &= Q(is_active=True)
+        query &= Q()
 
     if search_text:
         is_searched = True
