@@ -4021,8 +4021,8 @@ def create_vacation_emp(request):
         )
     return Response(
         {
+            'total_medical_leave': total_medical_leave,
             'days':days,
-            'total_medical_leave':total_medical_leave,
             'status': 200,
             'status_code': '200',
             'response': {
