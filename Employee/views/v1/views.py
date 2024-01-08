@@ -6447,12 +6447,15 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         else:
             return Response({"msg":"Id is None"},status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, *args, **kwargs):
-        id = self.query_params.get('id',None)
+    def delete(self, request, *args, **kwargs):
+        id = kwargs.get('pk', None)
         if id is not None:
             giftcard = GiftCard.objects.filter(id=id)
-            giftcard.delete()
-            return Response({"msg":"Gift card delete"},status=status.HTTP_200_OK)
+            if giftcard.exists():
+                giftcard.delete()
+                return Response({"msg": f"Gift card with id {id} deleted successfully"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"msg": f"Gift card with id {id} not found"}, status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response({"msg":"Un able to delete the card"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"msg": "Unable to delete the card. Please provide a valid ID"}, status=status.HTTP_400_BAD_REQUEST)
 

@@ -661,6 +661,7 @@ class WeekManagement(CommonField):
 
 
 class GiftCard(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     name = models.TextField(null=True, blank=True)
     gift_card_value = models.FloatField(default=0, null=True)
     retail_price = models.FloatField(default=0, null=True)
