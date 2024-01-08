@@ -3919,7 +3919,7 @@ def create_vacation_emp(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    annual_vacation_check(vacation_type=vacation_type , employee=employee)
+    annual_vacation_check(vacation_type=vacation_type, employee=employee_id)
     if not to_date:
         to_date = from_date
 
