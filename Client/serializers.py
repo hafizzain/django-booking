@@ -350,8 +350,20 @@ class MembershipSerializer(serializers.ModelSerializer):
     
     
     def get_currency_membership(self, obj):
+        location_id = self.context.get('location_id', None)
+        query = {}
+        if location_id:
+            try:
+                location = BusinessAddress.objects.get(id = location_id)
+            except:
+                pass
+            else:
+                query['currency'] = location.currency
         try:
-            pro = CurrencyPriceMembership.objects.filter(membership = obj).distinct()
+            pro = CurrencyPriceMembership.objects.filter(
+                membership = obj,
+                **query,
+            ).distinct()
             return CurrencyPriceMembershipSerializers(pro, many= True).data
         except Exception as err:
             print(err)
