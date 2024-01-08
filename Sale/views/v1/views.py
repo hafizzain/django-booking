@@ -865,7 +865,7 @@ def create_servicegroup(request):
     service = request.data.get('service', None)
     is_status = request.data.get('status', None)
     allow_client_to_select_team_member = request.data.get('allow_client_to_select_team_member', None)
-    # image = request.data.get('image', None)
+    image = request.data.get('image', None)
 
     servicegroup_error = []
     if not all([business, name]):
@@ -905,7 +905,7 @@ def create_servicegroup(request):
         user=user,
         business=business_id,
         name=name,
-        # image=image,
+        image=image,
     )
     if is_status is None:
         service_group.is_active = False
@@ -993,7 +993,8 @@ def get_servicegroup_main_page(request):
     service_group = ServiceGroup.objects \
         .prefetch_related('services') \
         .filter(query).order_by('-created_at')
-    serialized = list(ServiceGroupSerializerMainPage(service_group, many=True).data)
+    serialized = list(ServiceGroupSerializerMainPage(service_group, many=True,
+                                                    context={'request': request}).data)
 
     paginator = CustomPagination()
     paginator.page_size = 100000 if no_pagination else 10
