@@ -27,5 +27,5 @@ def check_permission(user_id, location):
             Q(allowed_refund__number_of_days__gte=30) |
             Q(can_refund=True)
         ) &
-        Q(allowed_refund_location_id=location)
+        Q(allowed_refund__location=location)
     ).exists()
