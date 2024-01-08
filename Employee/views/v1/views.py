@@ -4005,10 +4005,15 @@ def create_vacation_emp(request):
             working_schedule.save()
     all_employe = EmployeDailySchedule.objects.select_related('business').order_by('created_at')
     serialized = ScheduleSerializer(all_employe, many=True, context={'request': request})
+    employee_leave_management_obj = LeaveManagements.objects.get(employee_id=employee_id)
+    total_medical_leave = employee_leave_management_obj.medical_leave
+
     return Response(
         {
             'status': 200,
             'status_code': '200',
+            'days':days,
+            'total_medical_leave':total_medical_leave,
             'response': {
                 'message': 'Vacation added successfully',
                 'error_message': None,
