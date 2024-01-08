@@ -11,7 +11,7 @@ from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee,
 , Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation, LeaveManagements, WeekManagement,
                              VacationDetails, GiftCard, GiftCards
                              )
-from Employee.services import annual_vacation_check
+from Employee.services import annual_vacation_check, check_available_vacation_type
 from Tenants.models import EmployeeTenantDetail, Tenant
 from django_tenants.utils import tenant_context
 from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSIONS_MODEL_FIELDS
@@ -3919,6 +3919,7 @@ def create_vacation_emp(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    check_available_vacation_type(vacation_type=vacation_type, employee=employee, from_date=from_date, to_date=to_date)
     annual_vacation_check(vacation_type=vacation_type, employee=employee_id)
     if not to_date:
         to_date = from_date
@@ -4010,9 +4011,9 @@ def create_vacation_emp(request):
     return Response(
         {
             'status': 200,
-            'total_medical_leave':total_medical_leave,
-            'vacation_type':vacation_type,
-            'days':days,
+            'total_medical_leave': total_medical_leave,
+            'vacation_type': vacation_type,
+            'days': days,
             'status_code': '200',
             'response': {
                 'message': 'Vacation added successfully',
@@ -6315,22 +6316,22 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         if serializer.is_valid(raise_exception=True):
             instance = serializer.save()
             gift_card = GiftCardSerializer(instance, many=False).data
-            return Response({"msg": "Gift card added successfully"},status=status.HTTP_200_OK)
+            return Response({"msg": "Gift card added successfully"}, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
-        id = self.query_params.get('id',None)
+        id = self.query_params.get('id', None)
         if id is not None:
             instance = GiftCards.objects.get(id=id)
-            serializer = GiftCardSerializer(instance = instance, data=request.data, partial=True)
+            serializer = GiftCardSerializer(instance=instance, data=request.data, partial=True)
             if serializer.is_valid(raise_exception=True):
                 instance = serializer.save()
                 gift_card = GiftCardSerializer(instance, many=False).data
-                return Response({"msg": "Gift card added successfully"},status=status.HTTP_200_OK)
+                return Response({"msg": "Gift card added successfully"}, status=status.HTTP_200_OK)
         else:
-            return Response({"msg":"Id is None"},status=status.HTTP_400_BAD_REQUEST)
+            return Response({"msg": "Id is None"}, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, *args, **kwargs):
-        id = request.query_params.get('id',None)
+        id = request.query_params.get('id', None)
         if id is not None:
             giftcard = GiftCards.objects.filter(id=id)
             if giftcard.exists():
@@ -6339,5 +6340,5 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             else:
                 return Response({"msg": f"Gift card with id {id} not found"}, status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response({"msg": "Unable to delete the card. Please provide a valid ID"}, status=status.HTTP_400_BAD_REQUEST)
-
+            return Response({"msg": "Unable to delete the card. Please provide a valid ID"},
+                            status=status.HTTP_400_BAD_REQUEST)
