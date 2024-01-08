@@ -4590,7 +4590,7 @@ def get_vacations(request):
     # Extract the distinct Vacation instances from the related EmployeDailySchedule instances
     related_vacations = Vacation.objects \
         .filter(vacation_employedailyschedules__in=all_daily_schedules) \
-        .distinct()
+        .distinct().order_by('-created_at')
 
     all_vacations_count = related_vacations.count()
 
