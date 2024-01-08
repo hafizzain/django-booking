@@ -6448,7 +6448,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             return Response({"msg":"Id is None"},status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, *args, **kwargs):
-        id = kwargs.get('pk', None)
+        id = kwargs.get('id', None)
         if id is not None:
             giftcard = GiftCard.objects.filter(id=id)
             if giftcard.exists():
