@@ -865,7 +865,8 @@ def create_servicegroup(request):
     is_status = request.data.get('status', None)
     allow_client_to_select_team_member = request.data.get('allow_client_to_select_team_member', None)
     image = request.data.get('image', None)
-
+    is_deleted = False
+            
     servicegroup_error = []
     if not all([business, name]):
         return Response(
@@ -905,6 +906,7 @@ def create_servicegroup(request):
         business=business_id,
         name=name,
         image=image,
+        is_deleted=is_deleted,
     )
     if is_status is None:
         service_group.is_active = False
@@ -980,7 +982,7 @@ def get_servicegroup_main_page(request):
     page = request.GET.get('page', None)
     is_searched = False
 
-    query = Q(is_deleted=True)
+    query = Q(is_deleted=False)
 
     if is_active:
         query &= Q(is_active=True)
