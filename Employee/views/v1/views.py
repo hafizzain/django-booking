@@ -3928,7 +3928,6 @@ def create_vacation_emp(request):
     diff = to_date - from_date
     working_sch = None
     days = int(diff.days)
-
     is_vacation_exist = Vacation.objects.filter(
         business=business,
         employee=employee_id,
