@@ -420,7 +420,6 @@ class Vacation(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='user_vacation')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, null=True, related_name='business_vacation')
-
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_vacation')
 
     holiday_type = models.CharField(choices=HOLIDAY_TYPE, default='Vacation', max_length=100)
@@ -440,6 +439,8 @@ class Vacation(models.Model):
 
 class VacationDetails(models.Model):
     vacation = models.ForeignKey(Vacation, on_delete=models.CASCADE, null=True, related_name='vacation_detail')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, null=True, related_name='business_vacation')
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_vacation')
     vacation_status = models.TextField(null=True)
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)
@@ -632,7 +633,10 @@ class LeaveManagements(CommonField):
     casual_leave = models.IntegerField(null=True, default=0, help_text='Number of casual leaves allowed')
     annual_leave = models.IntegerField(null=True, default=0, help_text='Number of annual leaves allowed')
     medical_leave = models.IntegerField(null=True, default=0, help_text='Number of medical leaves allowed')
-    leo_leave = models.IntegerField(null=True, default=0, help_text='Number of medical leaves allowed')
+    operational_casual_leave = models.IntegerField(null=True, default=0, help_text='Number of casual leaves allowed')
+    operational_dedected_annual_leave = models.IntegerField(null=True, default=0, help_text='Number of annual leaves allowed')
+    operational_dedected_medical_leave = models.IntegerField(null=True, default=0, help_text='Number of medical leaves allowed')
+    operational_leo_leave = models.IntegerField(null=True, default=0, help_text='Number of medical leaves allowed')
     number_of_months = models.TextField(null=True)
 
 

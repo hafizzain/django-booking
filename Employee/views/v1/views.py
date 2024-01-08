@@ -695,7 +695,6 @@ def get_workingschedule(request):
         all_employee = Employee.objects.filter(query).order_by('-created_at')
         serialized = WorkingScheduleSerializer(all_employee, many=True, context={'request': request,
                                                                                  'location_id': location_id})
-
         return Response(
             {
                 'status': 200,
@@ -709,7 +708,6 @@ def get_workingschedule(request):
             status=status.HTTP_200_OK
         )
     else:
-        # all_employee = Employee.objects.filter(query).order_by('-created_at')
         employee_ids_in_schedule = EmployeDailySchedule.objects.filter(is_weekend=True)
         serialized = ScheduleSerializerResponse(employee_ids_in_schedule, many=True, context={'request': request,
                                                                                               'location_id': location_id})
@@ -3960,7 +3958,7 @@ def create_vacation_emp(request):
                 'status': 400,
                 'status_code': '400',
                 'response': {
-                    'message': 'Exceeded {vacation_type} quota. Please adjust and retry. {days}'.format(vacation_type=vacation_type,days=days),
+                    'message': 'Exceeded {vacation_type} quota. Please adjust and retry.'.format(vacation_type=vacation_type),
                     'error_message': None,
                 }
             },
