@@ -2027,6 +2027,7 @@ def create_memberships(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_memberships(request):
+    location_id = request.GET.get('location_id')
     search_text = request.GET.get('search_text')
     all_memberships= Membership.objects \
                         .with_total_orders() \
@@ -2045,7 +2046,7 @@ def get_memberships(request):
     page_number = request.GET.get("page") 
     all_memberships = paginator.get_page(page_number)
 
-    serialized = MembershipSerializer(all_memberships, many=True)
+    serialized = MembershipSerializer(all_memberships, many=True, context={'request' : request, 'location_id' : location_id})
     return Response(
         {
             'status' : 200,
