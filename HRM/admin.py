@@ -5,4 +5,4 @@ from HRM.models import *
 @admin.register(Holiday)
 class HolidayAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'note', 'start_date', 'end_date', 'created_at', 'updated_at']
-    filter = ['name', 'start_date', 'end_date']
+    list_filter = ['name', 'start_date', 'end_date']

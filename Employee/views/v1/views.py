@@ -687,6 +687,8 @@ def single_employee_schedule(request):
 @permission_classes([AllowAny])
 def get_workingschedule(request):
     is_weekend = request.GET.get('is_weekend', None)
+    start_date = request.GET.get('is_weekend', None)
+    end_date = request.GET.get('is_weekend', None)
     location_id = request.GET.get('location_id', None)
     if is_weekend is None:
         query = Q(is_active=True, is_deleted=False, is_blocked=False)
@@ -694,6 +696,8 @@ def get_workingschedule(request):
             query &= Q(location__id=location_id)
         all_employee = Employee.objects.filter(query).order_by('-created_at')
         serialized = WorkingScheduleSerializer(all_employee, many=True, context={'request': request,
+                                                                                 'start_date':start_date,
+                                                                                 'end_date':end_date,
                                                                                  'location_id': location_id})
         return Response(
             {
