@@ -237,15 +237,15 @@ class ServiceGroup(models.Model):
     is_active = models.BooleanField(default=True)
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
-    # image = models.ImageField(upload_to='servicegroup/service_group_images/', null=True, blank=True)
-    # is_image_uploaded_s3 = models.BooleanField(default=False)
+    image = models.ImageField(upload_to='servicegroup/service_group_images/', null=True, blank=True)
+    is_image_uploaded_s3 = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.id)
     
-    # def save(self, *args, **kwargs):
-    #     if self.image:
-    #         self.is_image_uploaded_s3 = True
+    def save(self, *args, **kwargs):
+        if self.image:
+            self.is_image_uploaded_s3 = True
     
 class PriceService(models.Model):
     DURATION_CHOICES = [
