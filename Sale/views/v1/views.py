@@ -982,7 +982,7 @@ def get_servicegroup_main_page(request):
     page = request.GET.get('page', None)
     is_searched = False
 
-    query = Q(is_deleted=False)
+    query = Q()
 
     if is_active:
         query &= Q(is_active=True)
