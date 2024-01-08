@@ -286,7 +286,7 @@ def get_today_appointments(request):
         .select_related('member', 'service') \
         .order_by('appointment_time')
 
-    serialize = TodayAppoinmentSerializer(today_appointment, many=True)
+    serialize = TodayAppoinmentSerializer(today_appointment, many=True, context={'request': request})
     return Response(
         {
             'status': 200,
@@ -407,7 +407,7 @@ def get_recent_ten_appointments(request):
                                   .select_related('member', 'service', 'appointment__client') \
                                   .order_by('-created_at')[:10]
 
-    serialized = AppointmentSerializerDashboard(recent_ten_appointments, many=True)
+    serialized = AppointmentSerializerDashboard(recent_ten_appointments, many=True , context={'request': request})
 
     return Response(
         {

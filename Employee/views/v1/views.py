@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import random
 import string
+from rest_framework import viewsets
 from time import strptime
 from django.shortcuts import render
 from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee, EmployeeProfessionalInfo,
@@ -8,7 +9,7 @@ from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee,
 , EmployeeMarketingPermission, EmployeeSelectedService, SallarySlipPayrol, StaffGroup
 , StaffGroupModulePermission, Attendance
 , Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation, LeaveManagements, WeekManagement,
-                             VacationDetails
+                             VacationDetails, GiftCard
                              )
 from Tenants.models import EmployeeTenantDetail, Tenant
 from django_tenants.utils import tenant_context
@@ -28,7 +29,7 @@ from Employee.serializers import (EmployeSerializer, EmployeInformationsSerializ
                                   NewVacationSerializer,
                                   NewAbsenceSerializer, singleEmployeeSerializerOP, Payroll_WorkingScheduleSerializerOP,
                                   WeekendManagementSerializer, LeaveManagementSerializer, ScheduleSerializerOP,
-                                  ScheduleSerializerResponse
+                                  ScheduleSerializerResponse, GiftCardSerializer, GiftCardSerializerResponse
                                   )
 from Employee.optimized_serializers import OptimizedEmployeeSerializerDashboard
 from django.db import connection, transaction
@@ -4428,6 +4429,7 @@ def create_workingschedule(request):
     is_weekend = request.data.get('is_weekend', None)
     is_leave = request.data.get('is_leave', None)
     is_off = request.data.get('is_off', None)
+    leo_value = request.data.get('is_leo_day', None)
     week_end_employee = request.data.get('week_end_employee', [])
     if is_weekend is None:
         if not all([business_id, employee]):
@@ -4476,11 +4478,10 @@ def create_workingschedule(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
         check_working_schedule = EmployeDailySchedule.objects.filter(
-            # user=user,
+            user=user,
             business=business,
             employee=employee_id,
-            is_weekend=True
-            # date=date,
+            date=date,
 
         )
         record_count = check_working_schedule.count()
@@ -4512,22 +4513,18 @@ def create_workingschedule(request):
         working_schedule.to_date = to_date
         working_schedule.note = note
 
-        # if is_vacation == 'false':
-        #     working_schedule.is_vacation = False
-        #     working_schedule.is_weekend = True
-
         if is_vacation is not None:
             working_schedule.is_vacation = True
         else:
             working_schedule.is_vacation = False
-            # working_schedule.is_weekend = True
+        if leo_value is not None:
             working_schedule.is_leo_day = True
             try:
                 is_leo_day_update = LeaveManagements.objects.get(employee_id=employee_id.id)
                 is_leo_day_update.leo_leave += 1
                 is_leo_day_update.save()
             except:
-                is_leo_day_created =  LeaveManagements.objects.create(employee_id=employee_id.id)
+                is_leo_day_created = LeaveManagements.objects.create(employee_id=employee_id.id)
                 is_leo_day_created.leo_leave += 1
                 is_leo_day_created.save()
 
@@ -5067,6 +5064,8 @@ def update_workingschedule(request):
     week_end_employee = request.data.get('week_end_employee', [])
     schedule_ids = request.data.get('schedule_ids', [])
     date = request.data.get('date', None)
+    from_date = request.data.get('from_date', None)
+    leo_value = request.data.get('is_leo_day', None)
     is_weekend = request.data.get('is_weekend', None)
     if is_weekend is None:
         if schedule_id is None:
@@ -5104,6 +5103,7 @@ def update_workingschedule(request):
             try:
                 emp = Employee.objects.get(id=employee)
                 schedule.employee = emp
+                schedule.leo_value = leo_value
             except Exception as err:
                 pass
 
@@ -5143,9 +5143,10 @@ def update_workingschedule(request):
             EmployeDailySchedule.objects.create(
                 employee_id=employee,
                 is_weekend=True,
-                date=date
+                date=date,
+                from_date=from_date
             )
-        qs =  EmployeDailySchedule.objects.filter(
+        qs = EmployeDailySchedule.objects.filter(
             is_weekend=True,
         )
         serializers = ScheduleSerializer(qs, context={'request': request}, many=True)
@@ -6421,3 +6422,40 @@ def create_weekend(request):
         },
         status=status.HTTP_201_CREATED
     )
+
+
+class GiftCardViewSet(viewsets.ModelViewSet):
+    queryset = GiftCard.objects.all()
+    serializer_class = GiftCardSerializerResponse
+
+    def create(self, request, *args, **kwargs):
+        serializer = GiftCardSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            instance = serializer.save()
+            gift_card = GiftCardSerializer(instance, many=False).data
+            return Response({"msg": "Gift card added successfully"},status=status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        id = self.query_params.get('id',None)
+        if id is not None:
+            instance = GiftCard.objects.get(id=id)
+            serializer = GiftCardSerializer(instance = instance, data=request.data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                instance = serializer.save()
+                gift_card = GiftCardSerializer(instance, many=False).data
+                return Response({"msg": "Gift card added successfully"},status=status.HTTP_200_OK)
+        else:
+            return Response({"msg":"Id is None"},status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, *args, **kwargs):
+        id = request.query_params.get('id',None)
+        if id is not None:
+            giftcard = GiftCard.objects.filter(id=id)
+            if giftcard.exists():
+                giftcard.delete()
+                return Response({"msg": f"Gift card with id {id} deleted successfully"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"msg": f"Gift card with id {id} not found"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({"msg": "Unable to delete the card. Please provide a valid ID"}, status=status.HTTP_400_BAD_REQUEST)
+

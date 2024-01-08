@@ -124,6 +124,7 @@ class ServiceGroupOP(serializers.ModelSerializer):
 class ServiceGroupSerializer(serializers.ModelSerializer):
     services = serializers.SerializerMethodField(read_only=True)
     status = serializers.SerializerMethodField(read_only=True)
+    image = serializers.SerializerMethodField(read_only=True)
 
     def get_status(self, obj):
         return obj.is_active
@@ -133,37 +134,37 @@ class ServiceGroupSerializer(serializers.ModelSerializer):
         # ser = Service.objects.get(id = obj.services)
         return ServiceSearchSerializer(all_service, many=True, context=self.context).data
     
-    # def get_image(self, obj):
-    #     if obj.image:
-    #         try:
-    #             request = self.context["request"]
-    #             url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
-    #             return f'{url}{obj.image}'
-    #         except:
-    #             return f'{obj.image}'
-    #     return None
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
+                return f'{url}{obj.image}'
+            except:
+                return f'{obj.image}'
+        return None
 
     class Meta:
         model = ServiceGroup
-        fields = ['id', 'business', 'name', 'services', 'status', 'allow_client_to_select_team_member']
+        fields = ['id', 'business', 'name', 'services', 'status', 'allow_client_to_select_team_member','image']
 
 
 class ServiceGroupSerializerMainPage(serializers.ModelSerializer):
     services = ServiceSerializerForServiceGroup(many=True)
-    # image = serializers.SerializerMethodField(read_only=True)
+    image = serializers.SerializerMethodField(read_only=True)
 
-    # def get_image(self, obj):
-    #     if obj.image:
-    #         try:
-    #             request = self.context["request"]
-    #             url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
-    #             return f'{url}{obj.image}'
-    #         except:
-    #             return f'{obj.image}'
-    #     return None
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
+                return f'{url}{obj.image}'
+            except:
+                return f'{obj.image}'
+        return None
     class Meta:
         model = ServiceGroup
-        fields = ['id', 'business', 'name', 'services', 'is_active']
+        fields = ['id', 'business', 'name', 'services', 'is_active','image']
 
 
 class ServiceGroupSerializerOptimized(serializers.ModelSerializer):
@@ -424,6 +425,7 @@ class ServiceSerializer(serializers.ModelSerializer):
     total_orders = serializers.IntegerField(read_only=True)
     priceservice = serializers.SerializerMethodField(read_only=True)
     price = serializers.SerializerMethodField(read_only=True)
+    image = serializers.SerializerMethodField(read_only=True)
 
     invoices = serializers.SerializerMethodField(read_only=True)
 
@@ -434,7 +436,16 @@ class ServiceSerializer(serializers.ModelSerializer):
         except Exception as err:
             pass
             # print(err)
-
+    def get_image(self, obj):   # get client image url from AWS 
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
+                return f'{url}{obj.image}'
+            except:
+                return f'{obj.image}'
+        return None
+    
     def get_priceservice(self, obj):
 
         try:
@@ -510,7 +521,8 @@ class ServiceSerializer(serializers.ModelSerializer):
             'enable_team_comissions',
             'enable_vouchers',
             'invoices',
-            'total_orders'
+            'total_orders',
+            'image',
         ]
 
 
@@ -543,7 +555,7 @@ class ServiceSerializerMainpage(serializers.ModelSerializer):
             try:
                 request = self.context["request"]
                 url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
-                return f'{url}{obj.image.name}' if obj.is_image_uploaded_s3 else f'{obj.image}'
+                return f'{url}{obj.image}'
             except:
                 return f'{obj.image}'
         return None
@@ -562,6 +574,7 @@ class ServiceSerializerMainpage(serializers.ModelSerializer):
 
 
 class ServiceSerializerOP(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField(read_only=True)
     priceservice = serializers.SerializerMethodField(read_only=True)
     price = serializers.SerializerMethodField(read_only=True)
     avaliableservicegroup = serializers.SerializerMethodField(read_only=True)
@@ -574,6 +587,16 @@ class ServiceSerializerOP(serializers.ModelSerializer):
         except Exception as err:
             pass
             # print(err)
+            
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
+                return f'{url}{obj.image}'
+            except:
+                return f'{obj.image}'
+        return None
 
     def get_priceservice(self, obj):
         is_mobile = self.context.get('is_mobile', None)
@@ -601,7 +624,7 @@ class ServiceSerializerOP(serializers.ModelSerializer):
     class Meta:
         model = Service
         fields = ['id', 'name', 'price', 'controls_time_slot', 'client_can_book', 'slot_availible_for_online',
-                  'priceservice', 'avaliableservicegroup', 'avaliablesobj']
+                  'priceservice', 'avaliableservicegroup', 'avaliablesobj', 'image']
 
 
 class ServiceTranlationsSerializer(serializers.ModelSerializer):

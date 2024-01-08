@@ -1,4 +1,5 @@
 from dataclasses import fields
+from django.db.models import Q
 from genericpath import exists
 from pyexpat import model
 from Appointment.models import AppointmentCheckout
@@ -23,7 +24,7 @@ from .models import (EmployeDailySchedule, Employee, EmployeeProfessionalInfo,
                      StaffGroup, StaffGroupModulePermission, Attendance
 , Payroll, CommissionSchemeSetting, Asset, AssetDocument,
                      EmployeeSelectedService, Vacation, CategoryCommission, LeaveManagements,
-                     WeekManagement, VacationDetails
+                     WeekManagement, VacationDetails, GiftCard
                      )
 from Authentication.models import AccountType, User
 from django_tenants.utils import tenant_context
@@ -1005,7 +1006,7 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
 class EmployeeSerializerResponse(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        fields = ['id','full_name', 'image','email']
+        fields = ['id', 'full_name', 'image', 'email', 'is_active', 'is_deleted', 'is_blocked']
 
 
 class ScheduleSerializerResponse(serializers.ModelSerializer):
@@ -1025,11 +1026,9 @@ class ScheduleSerializerResponse(serializers.ModelSerializer):
     #     response = EmployeeSerializerResponse(qs , many=True).data
     #     return response
 
-
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'title','date','employee']
-
+        fields = ['id', 'title', 'date', 'employee']
 
 
 class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
@@ -1102,6 +1101,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     schedule = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     leave_data = serializers.SerializerMethodField(read_only=True)
+    # false_scedule =  serializers.SerializerMethodField(read_only=True)
 
     def get_leave_data(self, obj):
 
@@ -1115,8 +1115,12 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
             return None
 
     def get_schedule(self, obj):
-        schedule = EmployeDailySchedule.objects.filter(employee=obj)
-        return ScheduleSerializerOP(schedule, many=True, context=self.context).data
+        qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) | Q(is_weekend=False)))
+        return ScheduleSerializerOP(qs, many=True, context=self.context).data
+
+    # def get_false_scedule(self, obj):
+    #     qs = EmployeDailySchedule.objects.filter(employee=obj, is_weekend=False)
+    #     return ScheduleSerializerOP(qs, many=True, context=self.context).data
 
     def get_image(self, obj):
         if obj.image:
@@ -1130,7 +1134,8 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['id', 'leave_data', 'full_name', 'image', 'schedule', 'created_at']
+        fields = ['id', 'leave_data', 'full_name', 'image', 'schedule', 'created_at', 'is_active', 'is_deleted',
+                  'is_blocked']
 
 
 class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
@@ -1670,7 +1675,7 @@ class NewVacationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vacation
         fields = (
-        'id', 'vacation_type', 'vacation_status', 'employee', 'from_date', 'to_date', 'vacation_details', 'note')
+            'id', 'vacation_type', 'vacation_status', 'employee', 'from_date', 'to_date', 'vacation_details', 'note')
 
 
 class NewAbsenceSerializer(serializers.ModelSerializer):
@@ -1723,15 +1728,15 @@ class EmployeeDailyInsightSerializer(serializers.ModelSerializer):
         fields = ['id', 'full_name', 'image', 'morning_count', 'afternoon_count', 'evening_count']
 
 
-
 '''
 Serializer added for employee info only is being using in following Apps serializers:
 1- Finance -> serializers -> AllowRefundsEmployees
 '''
 
+
 class EmployeeInfoSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
-    
+
     def get_image(self, obj):
         if obj.image:
             try:
@@ -1741,7 +1746,34 @@ class EmployeeInfoSerializer(serializers.ModelSerializer):
             except:
                 return f'{obj.image}'
         return None
+
     class Meta:
         model = Employee
-        fields = ['id','full_name', 'image']
-        
+        fields = ['id', 'full_name', 'image']
+
+
+class GiftCardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GiftCard
+        fields = ['name','gift_card_value','retail_price','expire_date','discount_to_show']
+
+    def create(self, validated_data):
+        return GiftCard.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.gift_card_value = validated_data.get('gift_card_value', instance.gift_card_value)
+        instance.retail_price = validated_data.get('retail_price', instance.retail_price)
+        instance.expire_date = validated_data.get('expire_date', instance.expire_date)
+        instance.discount_to_show = validated_data.get('discount_to_show', instance.discount_to_show)
+
+        # Save the updated instance
+        instance.save()
+
+        return instance
+
+
+class GiftCardSerializerResponse(serializers.ModelSerializer):
+    class Meta:
+        model = GiftCard
+        fields = "__all__"
