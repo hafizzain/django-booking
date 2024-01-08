@@ -1,4 +1,4 @@
-from Tenants.models import Domain
+from Tenants.models import Tenant
 from django.db.models import Q,F
 from Finance.models import AllowRefundPermissionsEmployees
 from Invoices.models import SaleInvoice
@@ -21,7 +21,7 @@ def check_days(invoice_id, location):
         return False
 
 def check_permission(user_id, location):
-    if Domain.objects.get(user_domain__id = user_id):
+    if Tenant.objects.get(tenant__id = user_id).exists():
         return True
     return AllowRefundPermissionsEmployees.objects.filter(
         Q(employee_id=user_id) &
