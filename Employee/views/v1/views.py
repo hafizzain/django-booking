@@ -4011,6 +4011,7 @@ def create_vacation_emp(request):
         {
             'status': 200,
             'total_medical_leave':total_medical_leave,
+            'vacation_type':vacation_type,
             'days':days,
             'status_code': '200',
             'response': {

@@ -51,7 +51,7 @@ def annual_vacation_check(vacation_type=None, employee=None, from_date=None, to_
     if vacation_type == 'medical':
         employee_leave_management_obj = LeaveManagements.objects.get(employee_id=employee)
         total_medical_leave = employee_leave_management_obj.medical_leave
-        if days > int(total_medical_leave):
+        if days < int(total_medical_leave):
             return Response(
                 {
                     'status': 400,
