@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 
 from Employee.models import Employee, LeaveManagements
-from rest_framework.response import Response ,status
-
+from rest_framework.response import Response
+from rest_framework import status
 
 def annual_vacation_check(vacation_type=None, employee=None):
     if vacation_type == 'annual':
