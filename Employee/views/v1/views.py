@@ -3872,6 +3872,7 @@ def create_vacation_emp(request):
     is_leave = request.data.get('is_leave', None)
     is_off = request.data.get('is_off', None)
     vacation_type = request.data.get('vacation_type', None)
+    value=0
     difference_days = 0
 
     if not all([business_id, employee]):
@@ -3919,7 +3920,6 @@ def create_vacation_emp(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    value=0
     employee_leave_management_obj = LeaveManagements.objects.get(employee_id=employee_id.id)
     if vacation_type == 'medical':
         value = employee_leave_management_obj.medical_leave
@@ -3959,7 +3959,7 @@ def create_vacation_emp(request):
                 'status': 400,
                 'status_code': '400',
                 'response': {
-                    'message': 'Requests exceed',
+                    'message': 'Leave request exceed!',
                     'error_message': None,
                 }
             },
