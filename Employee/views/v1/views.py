@@ -5041,7 +5041,7 @@ def update_absence(request):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def delete_all__workingschedule(request):
-    weekends = EmployeDailySchedule.objects.filter(is_weekend=True)
+    weekends = EmployeDailySchedule.objects.all()
     if weekends:
         weekends = weekends.delete()
         return Response({"msg": "Success fully deleted"})
