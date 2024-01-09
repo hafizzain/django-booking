@@ -246,7 +246,7 @@ class ServiceGroup(models.Model):
     def save(self, *args, **kwargs):
         if self.image:
             self.is_image_uploaded_s3 = True
-        return super(ServiceGroup, self).save(*args, **kwargs)
+        super(ServiceGroup, self).save(*args, **kwargs)
     
 class PriceService(models.Model):
     DURATION_CHOICES = [
