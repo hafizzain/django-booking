@@ -991,8 +991,8 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             today_date = datetime.now().date()
             holidays = Holiday.objects.select_related('user', 'business', 'location') \
                 .filter(location_id=location_id,
-                        start_date__range=(start_date,end_date)
-                        # start_date__range=start_date,
+                        start_date__gte=start_date,
+                        end_date__lte=end_date,
                         )
             return len(holidays) > 0  # Return True if there is any holiday
         except Exception as err:
