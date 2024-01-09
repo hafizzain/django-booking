@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta ,timezone
+from datetime import datetime, timedelta, timezone
 import random
 import string
 from rest_framework import viewsets
@@ -690,24 +690,24 @@ def get_workingschedule(request):
     start_date = request.query_params.get('start_date', None)
     end_date = request.query_params.get('end_date', None)
     location_id = request.GET.get('location_id', None)
-
     if is_weekend is None:
         query = {}
         if location_id:
-            query['location__id']=location_id
+            query['location__id'] = location_id
         if start_date:
-            query['employee_employedailyschedule__date__gte']=start_date
+            query['employee_employedailyschedule__date__date__gte'] = start_date
         if end_date:
-            query['employee_employedailyschedule__date__lte'] =end_date
+            query['employee_employedailyschedule__date__date__lte'] = end_date
 
-        all_employee = Employee.objects.filter(is_active=True, is_deleted=False, is_blocked=False, **query).order_by('-created_at')
+        all_employee = Employee.objects.filter(is_active=True, is_deleted=False, is_blocked=False, **query).order_by(
+            '-created_at')
         serialized = WorkingScheduleSerializer(all_employee, many=True, context={'request': request,
-                                                                                 'start_date':start_date,
-                                                                                 'end_date':end_date,
+                                                                                 'start_date': start_date,
+                                                                                 'end_date': end_date,
                                                                                  'location_id': location_id})
         return Response(
             {
-                'start_date':start_date,'end_date':end_date,
+                'start_date': start_date, 'end_date': end_date,
                 'status': 200,
                 'status_code': '200',
                 'response': {
@@ -3881,9 +3881,9 @@ def create_vacation_emp(request):
     is_leave = request.data.get('is_leave', None)
     is_off = request.data.get('is_off', None)
     vacation_type = request.data.get('vacation_type', None)
-    value=0
+    value = 0
     difference_days = 0
-    working_sch=None
+    working_sch = None
 
     if not all([business_id, employee]):
         return Response(
@@ -3969,7 +3969,8 @@ def create_vacation_emp(request):
                 'status': 400,
                 'status_code': '400',
                 'response': {
-                    'message': 'Exceeded {vacation_type} quota. Please adjust and retry.'.format(vacation_type=vacation_type),
+                    'message': 'Exceeded {vacation_type} quota. Please adjust and retry.'.format(
+                        vacation_type=vacation_type),
                     'error_message': None,
                 }
             },
