@@ -381,6 +381,7 @@ class EmployeSerializer(serializers.ModelSerializer):
         model = Employee
         fields = [
             'id',
+            'leave_data_not_updated',
             'full_name',
             'employee_id',
             'email',
