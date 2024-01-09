@@ -4363,7 +4363,7 @@ def create_workingschedule(request):
     end_time = request.data.get('end_time', None)
     start_time_shift = request.data.get('start_time_shift', None)
     end_time_shift = request.data.get('end_time_shift', None)
-
+    location_id = request.data.get('location_id',None)
     from_date = request.data.get('from_date', None)
     to_date = request.data.get('to_date', None)
     date = request.data.get('date', None)
