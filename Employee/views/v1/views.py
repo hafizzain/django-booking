@@ -4755,7 +4755,7 @@ def get_absence(request):
     ).order_by('-created_at')
 
     allvacations = EmployeDailySchedule.objects \
-        .filter(vacation__in=allvacations, is_leave=True)
+        .filter(vacation__in=allvacations,holiday_type='Absence')
 
     allvacations_count = allvacations.count()
 
