@@ -686,10 +686,11 @@ def single_employee_schedule(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_workingschedule(request):
-    is_weekend = request.GET.get('is_weekend', None)
+    employee_ids_in_schedule=None
+    is_weekend = request.query_params.get('is_weekend', None)
     start_date = request.query_params.get('start_date', None)
     end_date = request.query_params.get('end_date', None)
-    location_id = request.GET.get('location_id', None)
+    location_id = request.query_params.get('location_id', None)
     if is_weekend is None:
         query = {}
         if location_id:
@@ -725,6 +726,7 @@ def get_workingschedule(request):
 
         return Response(
             {
+                'employee_ids_in_schedule':str(employee_ids_in_schedule),
                 'status': 200,
                 'status_code': '200',
                 'response': {
