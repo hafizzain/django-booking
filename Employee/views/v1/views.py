@@ -4491,6 +4491,10 @@ def create_workingschedule(request):
         else:
             working_schedule.is_off = False
 
+        # if is_absense is not None:
+        #     working_schedule.is_leave = True
+        # else:
+        #     working_schedule.is_leave = False
 
         working_schedule.save()
         serializers = ScheduleSerializer(working_schedule, context={'request': request})
@@ -4754,22 +4758,19 @@ def get_absence(request):
         **queries
     ).order_by('-created_at')
 
-    allvacation = EmployeDailySchedule.objects \
-        .filter(vacation__in=allvacations, is_leave=True)
-
-    allvacations_count = allvacation.count()
+    allvacations_count = allvacations.count()
 
     page_count = allvacations_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
     per_page_results = 10000 if no_pagination else 10
-    paginator = Paginator(allvacation, per_page_results)
+    paginator = Paginator(allvacations, per_page_results)
     page_number = request.GET.get("page", None)
     if page_number is not None:
-        allvacation = paginator.get_page(page_number)
+        allvacations = paginator.get_page(page_number)
 
-        serialized = NewAbsenceSerializer(allvacation, many=True, context={'request': request})
+        serialized = NewAbsenceSerializer(allvacations, many=True, context={'request': request})
         return Response(
             {
                 'status': 200,
@@ -4786,7 +4787,7 @@ def get_absence(request):
             status=status.HTTP_200_OK
         )
     else:
-        serialized = NewAbsenceSerializer(allvacation, many=True, context={'request': request})
+        serialized = NewAbsenceSerializer(allvacations, many=True, context={'request': request})
         return Response(
             {
                 'status': 200,
