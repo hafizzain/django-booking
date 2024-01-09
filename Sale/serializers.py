@@ -425,7 +425,7 @@ class ServiceSerializer(serializers.ModelSerializer):
     total_orders = serializers.IntegerField(read_only=True)
     priceservice = serializers.SerializerMethodField(read_only=True)
     price = serializers.SerializerMethodField(read_only=True)
-    image = serializers.SerializerMethodField(ready_only=True)
+    image = serializers.SerializerMethodField(read_only=True)
 
     invoices = serializers.SerializerMethodField(read_only=True)
 
