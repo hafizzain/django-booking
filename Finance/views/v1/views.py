@@ -37,12 +37,12 @@ def check_permission_view(request):
                                 'message': 'Permission Deneid!',
                                 'error_message': None,
                                 'data': [],
-                                'flag':flag
+                                # 'flag':flag
                             }
                         }
         return Response(response_data, status=status.HTTP_200_OK)
     except Exception as e:
-        return Response({'erorr': str(e), 'flag': flag}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'erorr': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 class RefundAPIView(APIView):
 
