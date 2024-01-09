@@ -5045,6 +5045,8 @@ def delete_all__workingschedule(request):
     if weekends:
         weekends = weekends.delete()
         return Response({"msg": "Success fully deleted"})
+    else:
+        return Response({"msg": "all deleted"})
 
 
 @transaction.atomic
