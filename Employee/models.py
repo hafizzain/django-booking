@@ -499,7 +499,7 @@ class EmployeDailySchedule(models.Model):
             self.start_time_shift = None
             self.end_time_shift = None
 
-        super(EmployeDailySchedule, self).save(*args, **kwargs)
+        return super(EmployeDailySchedule, self).save(*args, **kwargs)
 
     @property
     def total_hours(self):
