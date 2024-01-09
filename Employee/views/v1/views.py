@@ -4542,7 +4542,6 @@ def create_workingschedule(request):
                 is_weekend=True,
                 is_vacation=False
             )
-            schedule_ids.append(working_schedule.id)
             working_schedule.day = day
             working_schedule.start_time = start_time
             working_schedule.end_time = end_time
@@ -4552,6 +4551,8 @@ def create_workingschedule(request):
             working_schedule.to_date = to_date
             working_schedule.note = note
             working_schedule.save()
+            schedule_ids.append(working_schedule.id)
+
 
         working_schedule = EmployeDailySchedule.objects.filter(
             id__in = schedule_ids
