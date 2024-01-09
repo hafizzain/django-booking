@@ -687,8 +687,8 @@ def single_employee_schedule(request):
 @permission_classes([AllowAny])
 def get_workingschedule(request):
     is_weekend = request.GET.get('is_weekend', None)
-    start_date = request.GET.get('start_date', None)
-    end_date = request.GET.get('end_date', None)
+    start_date = request.query_params.get('start_date', None)
+    end_date = request.query_params.get('end_date', None)
     location_id = request.GET.get('location_id', None)
     start_datetime=None
     end_datetime=None
