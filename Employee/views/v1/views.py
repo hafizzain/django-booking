@@ -706,8 +706,8 @@ def get_workingschedule(request):
             end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
             start_datetime = datetime.combine(start_date, datetime.min.time())
             end_datetime = datetime.combine(end_date, datetime.max.time())
-            query &= Q(employee_employedailyschedule__created_at__gte=start_datetime) | Q(employee_employedailyschedule__created_at__lte=end_datetime)
-                       
+            query &= Q(employee_employedailyschedule__created_at__gte=start_datetime,
+                       employee_employedailyschedule__created_at__lte=end_datetime)
             # query &= Q(employee_employedailyschedule__from_date__gte=start_date ,employee_employedailyschedule__from_date__lte = end_date)
         all_employee = Employee.objects.filter(query).order_by('-created_at')
         serialized = WorkingScheduleSerializer(all_employee, many=True, context={'request': request,
