@@ -456,6 +456,7 @@ class EmployeeNameSerializer(serializers.ModelSerializer):
                 return obj.image
         return None
 
+
     def get_leave_data(self, obj):
 
         try:

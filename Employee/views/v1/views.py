@@ -1103,6 +1103,9 @@ def create_employee(request):
             casual_leave=leave_data.get('casual_leave', 0),
             annual_leave=leave_data.get('annual_leave', 0),
             medical_leave=leave_data.get('medical_leave', 0),
+            operational_casual_leave=leave_data.get('casual_leave', 0),
+            operational_annual_leave=leave_data.get('annual_leave', 0),
+            operational_medical_leave=leave_data.get('medical_leave', 0),
             number_of_months=leave_data.get('number_of_months', 0)
         )
         leave_data = LeaveManagementSerializer(leave_management, many=False)
@@ -1367,6 +1370,10 @@ def update_employee(request):
                 annual_leave=leave_data.get('annual_leave', 0),
                 medical_leave=leave_data.get('medical_leave', 0),
                 number_of_months=leave_data.get('number_of_months', 0)
+                # operational_casual_leave = leave_data.get('casual_leave', 0),
+                # annual_leave = leave_data.get('annual_leave', 0),
+                # medical_leave = leave_data.get('medical_leave', 0),
+                # number_of_months = leave_data.get('number_of_months', 0)
             )
         else:
             leave_management = LeaveManagements.objects.create(
@@ -1374,7 +1381,10 @@ def update_employee(request):
                 casual_leave=leave_data.get('casual_leave', 0),
                 annual_leave=leave_data.get('annual_leave', 0),
                 medical_leave=leave_data.get('medical_leave', 0),
-                number_of_months=leave_data.get('number_of_months', 0)
+                number_of_months=leave_data.get('number_of_months', 0),
+                operational_casual_leave = leave_data.get('casual_leave', 0),
+                operational_medical_leave = leave_data.get('medical_leave', 0),
+                operational_annual_leave =leave_data.get('annual_leave', 0)
             )
 
     try:
