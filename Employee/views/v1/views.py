@@ -704,8 +704,6 @@ def get_workingschedule(request):
                                                                                  'location_id': location_id})
         return Response(
             {
-                'start_date':start_date,
-                'end_date':end_date,
                 'status': 200,
                 'status_code': '200',
                 'response': {
