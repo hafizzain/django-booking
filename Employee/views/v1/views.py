@@ -4504,11 +4504,40 @@ def create_workingschedule(request):
     else:
         week_end_employee = json.loads(week_end_employee)
         schedule_ids = []
-        for employee in week_end_employee:
+        try:
+            business = Business.objects.get(id = business_id)
+        except:
+            return Response(
+                {
+                    'status': False,
+                    'status_code': StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response': {
+                        'message': 'Business not found',
+                        'error_message': str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        for employee_id in week_end_employee:
+            try:
+                employee = Employee.objects.get(id = employee_id)
+            except:
+                return Response(
+                    {
+                        'status': False,
+                        'status_code': StatusCodes.INVALID_EMPLOYEE_4025,
+                        'response': {
+                            'message': 'Employee not found',
+                            'error_message': str(err),
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             working_schedule = EmployeDailySchedule.objects.create(
                 user=user,
-                business_id=business_id,
-                employee_id=employee,
+                business=business_id,
+                employee=employee,
                 date=date,
                 is_weekend=True,
                 is_vacation=False
