@@ -988,12 +988,15 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             start_date = self.context.get('start_date', None)
             end_date = self.context.get('end_date', None)
             location_id = self.context.get('location_id', None)
-            today_date = datetime.now().date()
+            query = Q(location_id=location_id)
+            if start_date:
+                query &= Q(start_date__gte=start_date)
+            if end_date:
+                query &= Q(end_date__lte=end_date)
+            
             holidays = Holiday.objects.select_related('user', 'business', 'location') \
-                .filter(location_id=location_id,
-                        start_date__gte=start_date,
-                        end_date__lte=end_date,
-                        )
+                .filter(query)
+                
             return len(holidays) > 0  # Return True if there is any holiday
         except Exception as err:
             error = str(err)
