@@ -1381,9 +1381,9 @@ def update_employee(request):
                 annual_leave=leave_data.get('annual_leave', 0),
                 medical_leave=leave_data.get('medical_leave', 0),
                 number_of_months=leave_data.get('number_of_months', 0),
-                operational_casual_leave = leave_data.get('casual_leave', 0),
-                operational_medical_leave = leave_data.get('medical_leave', 0),
-                operational_annual_leave =leave_data.get('annual_leave', 0)
+                operational_casual_leave=leave_data.get('casual_leave', 0),
+                operational_medical_leave=leave_data.get('medical_leave', 0),
+                operational_annual_leave=leave_data.get('annual_leave', 0)
             )
 
     try:
@@ -4372,7 +4372,7 @@ def create_workingschedule(request):
     end_time = request.data.get('end_time', None)
     start_time_shift = request.data.get('start_time_shift', None)
     end_time_shift = request.data.get('end_time_shift', None)
-    location_id = request.data.get('location_id',None)
+    location_id = request.data.get('location_id', None)
     from_date = request.data.get('from_date', None)
     to_date = request.data.get('to_date', None)
     date = request.data.get('date', None)
