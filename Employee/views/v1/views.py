@@ -1366,14 +1366,10 @@ def update_employee(request):
         leave_management = LeaveManagements.objects.filter(employee_id=id)
         if leave_management:
             leave_management.update(
-                casual_leave=leave_data.get('casual_leave', 0),
-                annual_leave=leave_data.get('annual_leave', 0),
-                medical_leave=leave_data.get('medical_leave', 0),
+                operational_casual_leave=leave_data.get('casual_leave', 0),
+                operational_annual_leave=leave_data.get('annual_leave', 0),
+                operational_medical_leave=leave_data.get('medical_leave', 0),
                 number_of_months=leave_data.get('number_of_months', 0)
-                # operational_casual_leave = leave_data.get('casual_leave', 0),
-                # annual_leave = leave_data.get('annual_leave', 0),
-                # medical_leave = leave_data.get('medical_leave', 0),
-                # number_of_months = leave_data.get('number_of_months', 0)
             )
         else:
             leave_management = LeaveManagements.objects.create(
