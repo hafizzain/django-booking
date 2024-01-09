@@ -686,7 +686,7 @@ def single_employee_schedule(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_workingschedule(request):
-    employee_ids_in_schedule=None
+    employee_ids_in_schedule = None
     is_weekend = request.query_params.get('is_weekend', None)
     start_date = request.query_params.get('start_date', None)
     end_date = request.query_params.get('end_date', None)
@@ -726,7 +726,7 @@ def get_workingschedule(request):
 
         return Response(
             {
-                'employee_ids_in_schedule':str(employee_ids_in_schedule),
+                'employee_ids_in_schedule': str(employee_ids_in_schedule),
                 'status': 200,
                 'status_code': '200',
                 'response': {
@@ -4505,7 +4505,7 @@ def create_workingschedule(request):
         week_end_employee = json.loads(week_end_employee)
         schedule_ids = []
         try:
-            business = Business.objects.get(id = business_id)
+            business = Business.objects.get(id=business_id)
         except:
             return Response(
                 {
@@ -4520,7 +4520,7 @@ def create_workingschedule(request):
             )
         for employee_id in week_end_employee:
             try:
-                employee = Employee.objects.get(id = employee_id)
+                employee = Employee.objects.get(id=employee_id)
             except:
                 return Response(
                     {
@@ -4540,22 +4540,29 @@ def create_workingschedule(request):
                 employee=employee,
                 date=date,
                 is_weekend=True,
-                is_vacation=False
+                is_vacation=False,
+                day=day,
+                start_time=start_time,
+                end_time=end_time,
+                start_time_shift=start_time_shift,
+                end_time_shift=end_time_shift,
+                from_date=from_date,
+                to_date=to_date,
+                note=note
             )
-            working_schedule.day = day
-            working_schedule.start_time = start_time
-            working_schedule.end_time = end_time
-            working_schedule.start_time_shift = start_time_shift
-            working_schedule.end_time_shift = end_time_shift
-            working_schedule.from_date = from_date
-            working_schedule.to_date = to_date
-            working_schedule.note = note
-            working_schedule.save()
+            # working_schedule.day = day
+            # working_schedule.start_time = start_time
+            # working_schedule.end_time = end_time
+            # working_schedule.start_time_shift = start_time_shift
+            # working_schedule.end_time_shift = end_time_shift
+            # working_schedule.from_date = from_date
+            # working_schedule.to_date = to_date
+            # working_schedule.note = note
+            # working_schedule.save()
             schedule_ids.append(working_schedule.id)
 
-
         working_schedule = EmployeDailySchedule.objects.filter(
-            id__in = schedule_ids
+            id__in=schedule_ids
         )
         serializers = ScheduleSerializer(working_schedule, context={'request': request}, many=True)
         return Response(
