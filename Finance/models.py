@@ -52,9 +52,9 @@ class RefundCoupon(CommonField):
     is_used = models.BooleanField(default=False)
     related_refund = models.ForeignKey(Refund, on_delete=models.CASCADE, null=True)
 
-
 class AllowRefunds(CommonField):
     location = models.ForeignKey(BusinessAddress, on_delete = models.CASCADE, related_name = 'allowed_refund_locations')
+    # sale_invoice = models.ForeignKey(SaleInvoice, on_delete = models.CASCADE, null=True)
     number_of_days = models.PositiveIntegerField(default = 30)
     
 class AllowRefundPermissionsEmployees(CommonField):
