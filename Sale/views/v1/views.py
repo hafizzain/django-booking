@@ -990,7 +990,7 @@ def get_servicegroup_main_page(request):
     query = {}
 
     if is_active:
-        query['is_active'] =True
+        query['is_active'] = True
 
     if search_text:
         is_searched = True
