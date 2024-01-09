@@ -14,7 +14,7 @@ def short_uuid(uuid):
 
 def check_days(invoice_id, location):
     try:
-        instance = SaleInvoice.objects.filter(id=invoice_id, location=location)
+        instance = SaleInvoice.objects.get(id=invoice_id, location=location)
         days_difference = (timezone.now() - instance.created_at).days
         return days_difference <= 30
     except SaleInvoice.DoesNotExist:
