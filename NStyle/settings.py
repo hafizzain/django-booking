@@ -210,8 +210,7 @@ DATABASES = {
         'HOST': env('DATABASE_HOST'),
         'PORT': env('DATABASE_PORT'),
         'CONN_MAX_AGE': None,
-
-        'ATOMIC_REQUESTS': True,  # Enable global transactions
+        # 'ATOMIC_REQUESTS': True,  # Enable global transactions
     }
 }
 
