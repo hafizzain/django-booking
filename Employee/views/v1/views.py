@@ -4503,6 +4503,7 @@ def create_workingschedule(request):
         )
     else:
         week_end_employee = json.loads(week_end_employee)
+        schedule_ids = []
         for employee in week_end_employee:
             working_schedule = EmployeDailySchedule.objects.create(
                 user=user,
@@ -4512,6 +4513,7 @@ def create_workingschedule(request):
                 is_weekend=True,
                 is_vacation=False
             )
+            schedule_ids.append(working_schedule.id)
             working_schedule.day = day
             working_schedule.start_time = start_time
             working_schedule.end_time = end_time
@@ -4521,9 +4523,9 @@ def create_workingschedule(request):
             working_schedule.to_date = to_date
             working_schedule.note = note
             working_schedule.save()
+
         working_schedule = EmployeDailySchedule.objects.filter(
-            employee__id__in=week_end_employee,
-            is_weekend=True
+            id__in = schedule_ids
         )
         serializers = ScheduleSerializer(working_schedule, context={'request': request}, many=True)
         return Response(
