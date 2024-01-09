@@ -1121,7 +1121,15 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
             return None
 
     def get_schedule(self, obj):
-        qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) | Q(is_weekend=False)))
+        start_date = self.context.get('start_date',None)
+        end_date = self.context.get('end_date',None)
+        query = {}
+        if start_date:
+            query['date__date__gte'] = start_date
+        if end_date:
+            query['date__date__lte'] = end_date
+        # qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) | Q(is_weekend=False)))
+        qs = EmployeDailySchedule.objects.filter(employee=obj ,**query)
         return ScheduleSerializerOP(qs, many=True, context=self.context).data
 
     # def get_false_scedule(self, obj):
