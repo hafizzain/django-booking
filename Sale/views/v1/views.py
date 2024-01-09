@@ -982,23 +982,22 @@ def get_servicegroup(request):
 @permission_classes([AllowAny])
 def get_servicegroup_main_page(request):
     no_pagination = request.GET.get('no_pagination', None)
-    search_text = request.GET.get('search_text', None)
+    search_text = request.GET.get('search_text', '')
     is_active = request.GET.get('is_active', None)
     page = request.GET.get('page', None)
     is_searched = False
 
-    query = Q(is_deleted=False)
+    query = {}
 
     if is_active:
-        query &= Q(is_active=True)
+        query['is_active'] =True
 
     if search_text:
         is_searched = True
-        query &= Q(name__icontains=search_text)
 
     service_group = ServiceGroup.objects \
         .prefetch_related('services') \
-        .filter(query).order_by('-created_at')
+        .filter(is_deleted=False, name__icontains=search_text, **query).order_by('-created_at')
     serialized = list(ServiceGroupSerializerMainPage(service_group, many=True,
                                                     context={'request': request}).data)
 
