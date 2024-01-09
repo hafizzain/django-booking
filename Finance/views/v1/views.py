@@ -8,6 +8,7 @@ from Finance.models import Refund, RefundCoupon, AllowRefunds,AllowRefundPermiss
 from Finance.serializers import RefundSerializer, CouponSerializer, AllowRefundsSerializer
 from Finance.helpers import short_uuid, check_permission, check_days
 from Invoices.models import SaleInvoice
+from Client.serializers import SaleInvoiceSerializer
 
 
 
@@ -108,6 +109,7 @@ class RefundAPIView(APIView):
 
     def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
         refund_invoice_id = request.data.get('refund_invoice_id')
+        refund_price = request.data.get('total_refund_amount')
         try:
             user = request.user
             request.data['user'] = user.id
@@ -149,20 +151,29 @@ class RefundAPIView(APIView):
                     # create invoice
                     invoice = SaleInvoice.objects.get(id=refund_invoice_id) \
                                 .select_related('client', 'business', 'location', 'user', 'member')
-                    user = request.user
-                    user_id = user.id
-                    client_id = invoice.client
-                    location = invoice.location
-                    member = invoice.member
-                    client_type = invoice.client_type
-                    payment_type = invoice.payment_type
-                    total_voucher_price = invoice.total_voucher_price
-                    total_service_price = invoice.total_service_price
-                    total_product_price = invoice.total_product_price
-                    service_commission_type = invoice.service_commission_type
-                    product_commission_type = invoice.product_commission_type
-                    voucher_commission_type = invoice.voucher_commission_type
-                    checkout = invoice.checkout
+                    try:
+                        #create invoice
+                        create_invoice = SaleInvoice.objects.create(
+                        user=user.id,
+
+                        client=invoice.client,
+                        location=invoice.location,
+                        member=invoice.member,
+                        client_type=invoice.client_type,
+                        payment_type=invoice.payment_type,
+
+                        total_voucher_price=invoice.total_voucher_price,
+                        total_service_price=invoice.total_service_price,
+                        total_product_price=-refund_price,
+
+                        service_commission_type=invoice.service_commission_type,
+                        product_commission_type=invoice.product_commission_type,
+                        voucher_commission_type=invoice.voucher_commission_type,
+                        checkout=invoice.checkout,
+                        )
+                        create_invoice.save()
+                    except Exception as e:
+                        return Response({'Error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     response_data = {
                         'success': True,
                         'status_code': 201,
@@ -172,6 +183,7 @@ class RefundAPIView(APIView):
                             'data': {
                                 'refund': RefundSerializer(serializer.instance).data,
                                 # 'coupon': CouponSerializer(coupon_serializer.instance).data,
+                                'invoice': SaleInvoiceSerializer(create_invoice).data,
                             }
                             
                         }
