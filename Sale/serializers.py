@@ -436,6 +436,7 @@ class ServiceSerializer(serializers.ModelSerializer):
         except Exception as err:
             pass
             # print(err)
+            
     def get_image(self, obj):   # get client image url from AWS 
         if obj.image:
             try:
