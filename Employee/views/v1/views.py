@@ -690,6 +690,8 @@ def get_workingschedule(request):
     start_date = request.GET.get('start_date', None)
     end_date = request.GET.get('end_date', None)
     location_id = request.GET.get('location_id', None)
+    start_datetime=None
+    end_datetime=None
     if is_weekend is None:
         query = Q(is_active=True, is_deleted=False, is_blocked=False)
         if location_id:
@@ -714,6 +716,8 @@ def get_workingschedule(request):
                                                                                  'location_id': location_id})
         return Response(
             {
+                'start_datetime':start_datetime,
+                'end_datetime':end_datetime,
                 'start_date':start_date,'end_date':end_date,
                 'status': 200,
                 'status_code': '200',
