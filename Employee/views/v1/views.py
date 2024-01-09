@@ -697,6 +697,9 @@ def get_workingschedule(request):
             query &= Q(location__id=location_id)
         if start_date:
             query &= Q(employee_employedailyschedule__date__gte=start_date)
+        if end_date:
+            query &= Q(employee_employedailyschedule__date__lte=end_date)
+
         all_employee = Employee.objects.filter(query).order_by('-created_at')
         serialized = WorkingScheduleSerializer(all_employee, many=True, context={'request': request,
                                                                                  'start_date':start_date,
