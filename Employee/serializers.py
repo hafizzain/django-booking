@@ -199,8 +199,20 @@ class EmployeSerializer(serializers.ModelSerializer):
     schedule = serializers.SerializerMethodField(read_only=True)
     # employee_leaves = LeaveManagementSerializer()
     leave_data = serializers.SerializerMethodField(read_only=True)
+    leave_data_not_updated = serializers.SerializerMethodField(read_only=True)
 
     def get_leave_data(self, obj):
+
+        try:
+            leave_management = LeaveManagements.objects.get(
+                employee_id=obj.id,
+            )
+            leave_data = LeaveManagementSerializer(leave_management, many=False).data
+            return leave_data
+        except:
+            return None
+
+    def get_leave_data_not_updated(self, obj):
 
         try:
             leave_management = LeaveManagements.objects.get(

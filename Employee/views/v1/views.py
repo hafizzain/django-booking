@@ -4506,7 +4506,8 @@ def create_workingschedule(request):
         schedule_ids = []
         try:
             business = Business.objects.get(id=business_id)
-        except:
+        except Exception as err:
+
             return Response(
                 {
                     'status': False,
