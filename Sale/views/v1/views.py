@@ -1036,7 +1036,7 @@ def get_servicegroup_optimized(request):
 @permission_classes([IsAuthenticated])
 def delete_servicegroup(request):
     service_id = request.data.get('id', None)
-    if id is None:
+    if service_id is None:
         return Response(
             {
                 'status': False,
