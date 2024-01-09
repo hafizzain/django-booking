@@ -7,7 +7,7 @@ from django.db.models import Q
 from Finance.models import Refund, RefundCoupon, AllowRefunds,AllowRefundPermissionsEmployees
 from Finance.serializers import RefundSerializer, CouponSerializer, AllowRefundsSerializer
 from Finance.helpers import short_uuid, check_permission, check_days
-
+from Invoices.models import SaleInvoice
 
 
 
@@ -107,6 +107,7 @@ class RefundAPIView(APIView):
             '''
 
     def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
+        refund_invoice_id = request.data.get('refund_invoice_id')
         try:
             user = request.user
             request.data['user'] = user.id
@@ -145,6 +146,23 @@ class RefundAPIView(APIView):
                     }
                     return Response(response_data, status=status.HTTP_200_OK)
                 else:
+                    # create invoice
+                    invoice = SaleInvoice.objects.get(id=refund_invoice_id) \
+                                .select_related('client', 'business', 'location', 'user', 'member')
+                    user = request.user
+                    user_id = user.id
+                    client_id = invoice.client
+                    location = invoice.location
+                    member = invoice.member
+                    client_type = invoice.client_type
+                    payment_type = invoice.payment_type
+                    total_voucher_price = invoice.total_voucher_price
+                    total_service_price = invoice.total_service_price
+                    total_product_price = invoice.total_product_price
+                    service_commission_type = invoice.service_commission_type
+                    product_commission_type = invoice.product_commission_type
+                    voucher_commission_type = invoice.voucher_commission_type
+                    checkout = invoice.checkout
                     response_data = {
                         'success': True,
                         'status_code': 201,
@@ -155,6 +173,7 @@ class RefundAPIView(APIView):
                                 'refund': RefundSerializer(serializer.instance).data,
                                 # 'coupon': CouponSerializer(coupon_serializer.instance).data,
                             }
+                            
                         }
                     }
                 return Response(response_data, status=status.HTTP_200_OK)
