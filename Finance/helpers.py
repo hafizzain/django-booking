@@ -21,7 +21,7 @@ def check_days(invoice_id, location):
         return False
 
 def check_permission(user_id, location):
-    if Tenant.objects.get(tenant_id = user_id).exists():
+    if Tenant.objects.get(user__id = user_id).exists():
         return True
     return AllowRefundPermissionsEmployees.objects.filter(
         Q(employee_id=user_id) &
