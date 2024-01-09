@@ -21,41 +21,40 @@ from Notification.notification_processor import NotificationProcessor
 from django.conf import settings
 
 
-
 class SegmentAPIView(APIView):
     permission_classes = [IsAuthenticated]
     pagination_class = PageNumberPagination
     page_size = 10
-    
+
     queryset = Segment.objects.prefetch_related('client') \
-                            .select_related('user', 'business') \
-                            .order_by('-created_at')
-                            
+        .select_related('user', 'business') \
+        .order_by('-created_at')
+
     serializer_class = SegmentSerializer
     filter_backends = [filters.OrderingFilter, filters.SearchFilter]
     search_fields = ['name', 'segment_type', 'is_active']
-    
-    def get(self, request , pk=None):
-        no_pagination = request.GET.get('no_pagination', None) # for frontend 
-        
+
+    def get(self, request, pk=None):
+        no_pagination = request.GET.get('no_pagination', None)  # for frontend
+
         if pk is not None:
             segment = get_object_or_404(Segment, id=pk)
             serializer = SegmentSerializer(segment)
             data = {
-                    "success": True,
-                    "status_code" : 200,
-                    "response" : {
-                        "message" : "Segment get Successfully",
-                        "error_message" : None,
-                        "data" : serializer.data
-                    }
+                "success": True,
+                "status_code": 200,
+                "response": {
+                    "message": "Segment get Successfully",
+                    "error_message": None,
+                    "data": serializer.data
                 }
+            }
             return Response(data, status=status.HTTP_200_OK)
         else:
             filtered_queryset = Segment.objects.prefetch_related('client') \
-                            .select_related('user', 'business') \
-                            .order_by('-created_at')
-                            
+                .select_related('user', 'business') \
+                .order_by('-created_at')
+
             name = self.request.query_params.get('search_text', None)
             if name:
                 filtered_queryset = filtered_queryset.filter(name__icontains=name)
@@ -67,20 +66,20 @@ class SegmentAPIView(APIView):
             is_active = self.request.query_params.get('is_active', None)
             if is_active:
                 filtered_queryset = filtered_queryset.filter(is_active=is_active)
-              
+
             if no_pagination:
                 serializer = SegmentSerializer(filtered_queryset,
                                                many=True,
                                                context={'request': request})
                 data = {
-                        "success": True,
-                        "status_code" : 200,
-                        "response" : {
-                            "message" : "Segment get Successfully",
-                            "error_message" : None,
-                            "data" : serializer.data
-                        }
+                    "success": True,
+                    "status_code": 200,
+                    "response": {
+                        "message": "Segment get Successfully",
+                        "error_message": None,
+                        "data": serializer.data
                     }
+                }
                 return Response(data, status=status.HTTP_200_OK)
             else:
                 paginator = self.pagination_class()
@@ -89,65 +88,65 @@ class SegmentAPIView(APIView):
                                                many=True,
                                                context={'request': request})
                 data = {
-                        'count': paginator.page.paginator.count,
-                        'next': paginator.get_next_link(),
-                        'previous': paginator.get_previous_link(),
-                        'current_page': paginator.page.number,
-                        'per_page': self.page_size,
-                        'total_pages': paginator.page.paginator.num_pages,
-                        "success": True,
-                        "status_code" : 200,
-                        "response" : {
-                            "message" : "Segment get Successfully",
-                            "error_message" : None,
-                            "data" : serializer.data
-                        }
+                    'count': paginator.page.paginator.count,
+                    'next': paginator.get_next_link(),
+                    'previous': paginator.get_previous_link(),
+                    'current_page': paginator.page.number,
+                    'per_page': self.page_size,
+                    'total_pages': paginator.page.paginator.num_pages,
+                    "success": True,
+                    "status_code": 200,
+                    "response": {
+                        "message": "Segment get Successfully",
+                        "error_message": None,
+                        "data": serializer.data
                     }
+                }
                 return Response(data, status=status.HTTP_200_OK)
-             
-    @transaction.atomic       
+
+    @transaction.atomic
     def post(self, request):
         user = request.user
         request.data['user'] = user.id
         name = request.data.get('name', None)
-        
+
         if Segment.objects.filter(name=name).exists():
             data = {
-                    "success": False,
-                    "status_code" : 200,
-                    "response" : {
-                        "message" : "Segment with this name already exist",
-                        "error_message" : None,
-                        "data" : None
-                    }
+                "success": False,
+                "status_code": 200,
+                "response": {
+                    "message": "Segment with this name already exist",
+                    "error_message": None,
+                    "data": None
                 }
+            }
             return Response(data, status=status.HTTP_200_OK)
-        
+
         serializer = SegmentSerializer(data=request.data,
                                        context={'request': request})
         if serializer.is_valid():
             serializer.save()
             data = {
-                    "status" : True,
-                    "status_code" : 201,
-                    "response" : {
-                        "message" : "Segment created successfully",
-                        "error_message" : None,
-                        "data" : serializer.data
-                    }
+                "status": True,
+                "status_code": 201,
+                "response": {
+                    "message": "Segment created successfully",
+                    "error_message": None,
+                    "data": serializer.data
                 }
+            }
             return Response(data, status=status.HTTP_200_OK)
-        else:   
+        else:
             data = {
-                    "success": False,
-                    "status_code" : 400,
-                    "response" : {
-                        "message" : "Segment not created",
-                        "error_message" : serializer.errors,
-                        "data" : None
-                    }
+                "success": False,
+                "status_code": 400,
+                "response": {
+                    "message": "Segment not created",
+                    "error_message": serializer.errors,
+                    "data": None
                 }
-            return Response(data, status=status.HTTP_400_BAD_REQUEST) 
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
     @transaction.atomic
     def put(self, request, pk):
@@ -158,7 +157,7 @@ class SegmentAPIView(APIView):
         name = request.data.get('name')
         # check if segment with this name already exist
         existing_segment = Segment.objects.filter(name=name) \
-                            .exclude(id=pk).first()
+            .exclude(id=pk).first()
         if existing_segment:
             data = {
                 "success": False,
@@ -169,56 +168,56 @@ class SegmentAPIView(APIView):
                 }
             }
             return Response(data, status=status.HTTP_200_OK)
-        
-        if not segment.is_static():     # check if segment type is static user can't update it
+
+        if not segment.is_static():  # check if segment type is static user can't update it
             if serializer.is_valid():
                 serializer.save()
                 data = {
                     "success": True,
-                    "status_code" : 201,
-                    "response" : {
-                        "message" : "Segment updated successfully",
-                        "error_message" : None,
-                        "data" : serializer.data
+                    "status_code": 201,
+                    "response": {
+                        "message": "Segment updated successfully",
+                        "error_message": None,
+                        "data": serializer.data
                     }
                 }
                 return Response(data, status=status.HTTP_200_OK)
-            else:    
+            else:
                 data = {
-                        "success": False,
-                        "status_code" : 400,
-                        "response" : {
-                            "message" : "Segment not updated",
-                            "error_message" : serializer.errors,
-                            "data" : None
-                        }
+                    "success": False,
+                    "status_code": 400,
+                    "response": {
+                        "message": "Segment not updated",
+                        "error_message": serializer.errors,
+                        "data": None
                     }
+                }
                 return Response(data, status=status.HTTP_400_BAD_REQUEST)
         else:
-                data = {
-                        "success": False,
-                        "status_code" : 400,
-                        "response" : {
-                            "message" : "Segment not updated",
-                            "error_message" : "Segment type is static",
-                            "data" : None
-                        }
-                    }
-                return Response(data, status=status.HTTP_400_BAD_REQUEST)
+            data = {
+                "success": False,
+                "status_code": 400,
+                "response": {
+                    "message": "Segment not updated",
+                    "error_message": "Segment type is static",
+                    "data": None
+                }
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
     @transaction.atomic
     def delete(self, request, pk):
         segment = get_object_or_404(Segment, id=pk)
         segment.delete()
         data = {
-                "success": True,
-                "status_code" : 200,
-                "response" : {
-                    "message" : "Segment deleted successfully",
-                    "error_message" : None,
-                    "data" : None
-                }
+            "success": True,
+            "status_code": 200,
+            "response": {
+                "message": "Segment deleted successfully",
+                "error_message": None,
+                "data": None
             }
+        }
         return Response(data, status=status.HTTP_200_OK)
 
 
@@ -226,134 +225,134 @@ class SegmentDropdownAPIView(APIView):
     permission_classes = [IsAuthenticated]
     pagination_class = PageNumberPagination
     page_size = 10
-    
+
     queryset = Segment.objects.prefetch_related('client') \
-                            .select_related('user', 'business') \
-                            .order_by('-created_at')
-    
+        .select_related('user', 'business') \
+        .order_by('-created_at')
+
     serializer_class = SegmentDropdownSerializer
     filter_backends = [filters.OrderingFilter, filters.SearchFilter]
     search_fields = ['name']
-    
+
     def get(self, request):
-        is_search = False   # for frontend
-        filtered_queryset = Segment.objects.filter(is_deleted=False)\
-                            .order_by('-created_at')
-                            
+        is_search = False  # for frontend
+        filtered_queryset = Segment.objects.filter(is_deleted=False) \
+            .order_by('-created_at')
+
         name = self.request.query_params.get('search_text', None)
         if name:
             filtered_queryset = filtered_queryset.filter(name__icontains=name)
             is_search = True
-            
+
         paginator = self.pagination_class()
         result_page = paginator.paginate_queryset(filtered_queryset, request)
         serializer = SegmentDropdownSerializer(result_page, many=True)
         data = {
-                
-                'count': paginator.page.paginator.count,
-                'next': paginator.get_next_link(),
-                'previous': paginator.get_previous_link(),
-                'current_page': paginator.page.number,
-                'per_page': self.page_size,
-                'total_pages': paginator.page.paginator.num_pages,
-                "success": True,
-                "status_code" : 200,
-                'is_search': is_search,
-                "response" : {
-                    "message" : "Segment get Successfully",
-                    "error_message" : None,
-                    "data" : serializer.data,
-                    
-                }
-            }
-        return Response(data, status=status.HTTP_200_OK)
-                        
 
-@permission_classes([IsAuthenticated])                       
+            'count': paginator.page.paginator.count,
+            'next': paginator.get_next_link(),
+            'previous': paginator.get_previous_link(),
+            'current_page': paginator.page.number,
+            'per_page': self.page_size,
+            'total_pages': paginator.page.paginator.num_pages,
+            "success": True,
+            "status_code": 200,
+            'is_search': is_search,
+            "response": {
+                "message": "Segment get Successfully",
+                "error_message": None,
+                "data": serializer.data,
+
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+@permission_classes([IsAuthenticated])
 class CampaignsAPIView(APIView):
     permission_classes = [IsAuthenticated]
     pagination_class = PageNumberPagination
     page_size = 10
-    
-    queryset =  Campaign.objects.select_related('user', 'segment') \
-                            .order_by('-created_at')
-                            
+
+    queryset = Campaign.objects.select_related('user', 'segment') \
+        .order_by('-created_at')
+
     serializer_class = CampaignsSerializer
     filter_backends = [filters.OrderingFilter, filters.SearchFilter]
     search_fields = ['name', 'campaign_type', 'is_active']
-    
-    def get(self, request , pk=None):
+
+    def get(self, request, pk=None):
         no_pagination = request.GET.get('no_pagination', None)
-        
+
         if pk is not None:
             campaign = get_object_or_404(Campaign, id=pk)
             serialized = CampaignsSerializer(campaign)
             data = {
-                    "success": True,
-                    "status_code" : 200,
-                    "response" : {
-                        "message" : "Campaign get Successfully",
-                        "error_message" : None,
-                        "data" : serialized.data
-                    }
+                "success": True,
+                "status_code": 200,
+                "response": {
+                    "message": "Campaign get Successfully",
+                    "error_message": None,
+                    "data": serialized.data
                 }
+            }
             return Response(data, status=status.HTTP_200_OK)
         else:
-            query = Q()     # empty query for filter
-            
+            query = Q()  # empty query for filter
+
             title = self.request.query_params.get('search_text', None)
             if title:
                 query &= Q(title__icontains=title)
-            
+
             campaign_type = self.request.query_params.get('campaign_type', None)
             if campaign_type:
                 query &= Q(campaign_type=campaign_type)
-                
+
             is_active = self.request.query_params.get('is_active', None)
             if is_active:
                 query &= Q(is_active=is_active)
-            
+
             filtered_queryset = Campaign.objects.filter(query) \
-                            .order_by('-created_at')
-            serialized = CampaignsSerializer(filtered_queryset, many=True)    
-            if no_pagination:    
+                .order_by('-created_at')
+            serialized = CampaignsSerializer(filtered_queryset, many=True)
+            if no_pagination:
                 data = {
-                        "success": True,
-                        "status_code" : 200,
-                        "response" : {
-                            "message" : "Campaign get Successfully",
-                            "error_message" : None,
-                            "data" : serialized.data
-                        }
+                    "success": True,
+                    "status_code": 200,
+                    "response": {
+                        "message": "Campaign get Successfully",
+                        "error_message": None,
+                        "data": serialized.data
                     }
-                return Response(data, status=status.HTTP_200_OK) 
+                }
+                return Response(data, status=status.HTTP_200_OK)
             else:
                 paginator = self.pagination_class()
                 result_page = paginator.paginate_queryset(filtered_queryset, request)
                 serializer = CampaignsSerializer(result_page, many=True)
                 data = {
-                        'count': paginator.page.paginator.count,
-                        'next': paginator.get_next_link(),
-                        'previous': paginator.get_previous_link(),
-                        'current_page': paginator.page.number,
-                        'per_page': self.page_size,
-                        'total_pages': paginator.page.paginator.num_pages,
-                        "success": True,
-                        "status_code" : 200,
-                        "response" : {
-                            "message" : "Campaign get Successfully",
-                            "error_message" : None,
-                            "data" : serializer.data
-                        }
+                    'count': paginator.page.paginator.count,
+                    'next': paginator.get_next_link(),
+                    'previous': paginator.get_previous_link(),
+                    'current_page': paginator.page.number,
+                    'per_page': self.page_size,
+                    'total_pages': paginator.page.paginator.num_pages,
+                    "success": True,
+                    "status_code": 200,
+                    "response": {
+                        "message": "Campaign get Successfully",
+                        "error_message": None,
+                        "data": serializer.data
                     }
+                }
                 return Response(data, status=status.HTTP_200_OK)
-            
+
     @transaction.atomic
     def post(self, request):
         user = request.user
         request.data['user'] = user.id
         title = request.data.get('title', None)
-        
+
         # check if campaign with this title already exist
         if Campaign.objects.filter(title=title, is_deleted=False).exists():
             data = {
@@ -371,7 +370,7 @@ class CampaignsAPIView(APIView):
         serializer = CampaignsSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
-            
+
             new_campaign = serializer.instance
             send_campaign_email(new_campaign=new_campaign)
             data = {
@@ -402,8 +401,8 @@ class CampaignsAPIView(APIView):
         serializer = CampaignsSerializer(campaign, data=request.data)
         title = request.data.get('title')
         existing_campaign = Campaign.objects.filter(title=title) \
-                            .exclude(id=pk).first()
-        
+            .exclude(id=pk).first()
+
         if existing_campaign:
             data = {
                 "success": False,
@@ -414,42 +413,42 @@ class CampaignsAPIView(APIView):
                 }
             }
             return Response(data, status=status.HTTP_200_OK)
-    
+
         if serializer.is_valid():
             serializer.save()
             data = {
-                    "success": True,
-                    "status_code" : 201,
-                    "response" : {
-                        "message" : "Campaign updated successfully",
-                        "error_message" : None,
-                        "data" : serializer.data
-                    }
+                "success": True,
+                "status_code": 201,
+                "response": {
+                    "message": "Campaign updated successfully",
+                    "error_message": None,
+                    "data": serializer.data
                 }
+            }
             return Response(data, status=status.HTTP_200_OK)
-        else:    
+        else:
             data = {
-                    "success": False,
-                    "status_code" : 400,
-                    "response" : {
-                        "message" : "Campaign not updated",
-                        "error_message" : serializer.errors,
-                        "data" : None
-                    }
+                "success": False,
+                "status_code": 400,
+                "response": {
+                    "message": "Campaign not updated",
+                    "error_message": serializer.errors,
+                    "data": None
                 }
+            }
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
-        
-    @transaction.atomic   
+
+    @transaction.atomic
     def delete(self, request, pk):
         campaign = get_object_or_404(Campaign, id=pk)
         campaign.delete()
         data = {
-                "success": True,
-                "status_code" : 200,
-                "response" : {
-                    "message" : "Campaign deleted successfully",
-                    "error_message" : None,
-                    "data" : None
-                }
+            "success": True,
+            "status_code": 200,
+            "response": {
+                "message": "Campaign deleted successfully",
+                "error_message": None,
+                "data": None
             }
+        }
         return Response(data, status=status.HTTP_200_OK)

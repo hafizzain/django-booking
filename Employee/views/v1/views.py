@@ -4362,6 +4362,7 @@ def create_absence(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_workingschedule(request):
+    check_working_schedule=None
     user = request.user
     business_id = request.data.get('business', None)
 
@@ -4490,10 +4491,6 @@ def create_workingschedule(request):
         else:
             working_schedule.is_off = False
 
-        # if is_absense is not None:
-        #     working_schedule.is_leave = True
-        # else:
-        #     working_schedule.is_leave = False
 
         working_schedule.save()
         serializers = ScheduleSerializer(working_schedule, context={'request': request})
@@ -4756,6 +4753,9 @@ def get_absence(request):
         is_active=True,
         **queries
     ).order_by('-created_at')
+
+    allvacations = EmployeDailySchedule.objects \
+        .filter(vacation__in=allvacations, is_leave=True)
 
     allvacations_count = allvacations.count()
 
