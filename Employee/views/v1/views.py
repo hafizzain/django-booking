@@ -700,6 +700,8 @@ def get_workingschedule(request):
             # date_range = (start_date, end_date)
             # start_date__gte = start_date,
             # end_date__lte = end_date,
+            start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+            end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
             start_datetime = datetime.combine(start_date, datetime.min.time())
             end_datetime = datetime.combine(end_date, datetime.max.time())
             query &= Q(employee_employedailyschedule__date__gte=start_datetime,
