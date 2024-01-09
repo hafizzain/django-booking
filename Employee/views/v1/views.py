@@ -1366,14 +1366,13 @@ def update_employee(request):
         leave_management = LeaveManagements.objects.filter(employee_id=id)
         if leave_management:
             leave_management.update(
+                operational_casual_leave=leave_data.get('casual_leave', 0),
+                operational_annual_leave=leave_data.get('annual_leave', 0),
+                operational_medical_leave=leave_data.get('medical_leave', 0),
+                number_of_months=leave_data.get('number_of_months', 0),
                 casual_leave=leave_data.get('casual_leave', 0),
                 annual_leave=leave_data.get('annual_leave', 0),
-                medical_leave=leave_data.get('medical_leave', 0),
-                number_of_months=leave_data.get('number_of_months', 0)
-                # operational_casual_leave = leave_data.get('casual_leave', 0),
-                # annual_leave = leave_data.get('annual_leave', 0),
-                # medical_leave = leave_data.get('medical_leave', 0),
-                # number_of_months = leave_data.get('number_of_months', 0)
+                medical_leave=leave_data.get('medical_leave', 0)
             )
         else:
             leave_management = LeaveManagements.objects.create(
@@ -1382,9 +1381,9 @@ def update_employee(request):
                 annual_leave=leave_data.get('annual_leave', 0),
                 medical_leave=leave_data.get('medical_leave', 0),
                 number_of_months=leave_data.get('number_of_months', 0),
-                operational_casual_leave = leave_data.get('casual_leave', 0),
-                operational_medical_leave = leave_data.get('medical_leave', 0),
-                operational_annual_leave =leave_data.get('annual_leave', 0)
+                operational_casual_leave=leave_data.get('casual_leave', 0),
+                operational_medical_leave=leave_data.get('medical_leave', 0),
+                operational_annual_leave=leave_data.get('annual_leave', 0)
             )
 
     try:
@@ -4373,7 +4372,7 @@ def create_workingschedule(request):
     end_time = request.data.get('end_time', None)
     start_time_shift = request.data.get('start_time_shift', None)
     end_time_shift = request.data.get('end_time_shift', None)
-    location_id = request.data.get('location_id',None)
+    location_id = request.data.get('location_id', None)
     from_date = request.data.get('from_date', None)
     to_date = request.data.get('to_date', None)
     date = request.data.get('date', None)
@@ -5042,10 +5041,12 @@ def update_absence(request):
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
 def delete_all__workingschedule(request):
-    weekends = EmployeDailySchedule.objects.filter(is_weekend=True)
+    weekends = EmployeDailySchedule.objects.all()
     if weekends:
         weekends = weekends.delete()
         return Response({"msg": "Success fully deleted"})
+    else:
+        return Response({"msg": "all deleted"})
 
 
 @transaction.atomic

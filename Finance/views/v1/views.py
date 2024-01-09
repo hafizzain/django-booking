@@ -35,8 +35,7 @@ def check_permission_view(request):
                             'response': {
                                 'message': 'Permission Deneid!',
                                 'error_message': None,
-                                'data': [],
-                                # 'flag':flag
+                                'data': []
                             }
                         }
         return Response(response_data, status=status.HTTP_200_OK)
