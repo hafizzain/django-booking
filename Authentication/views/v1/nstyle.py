@@ -665,6 +665,7 @@ def login(request):
     if employee:
         # s_data['id'] = None
         employe_user = EmployeeTenantDetail.objects.get(user=user)
+        employee_location_id = None
         with tenant_context(employe_user.tenant):
             user = User.objects.get(
                 email=email,
@@ -676,6 +677,10 @@ def login(request):
             except:
                 pass
             else:
+                employee_locations = emp.location.all()
+                if len(employee_locations) > 0:
+                    employee_location_id = employee_locations[0].id
+                    
                 if not emp.is_active:
                     return Response(
                         {
@@ -700,6 +705,8 @@ def login(request):
                                                             'tenant': domain_name
                                                             })
             s_data = dict(serialized.data)
+            if employee_location_id:
+                s_data['employee_location_id'] = employee_location_id
 
     else:
         serialized = UserLoginSerializer(user, context={'employee': False,
