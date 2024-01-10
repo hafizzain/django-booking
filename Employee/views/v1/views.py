@@ -4174,7 +4174,7 @@ def update_vacation_status(request):
 
             vacations = Vacation.objects.filter(id=vacation_id)
             vacations.update(vacation_status='accepted')
-            EmployeDailySchedule.objects.filter(vacation_id=vacation_id).update(is_display=True,vacation_status=True)
+            EmployeDailySchedule.objects.filter(vacation_id=vacation_id).update(is_display=True,vacation_status='accepted')
             return Response(
                 {
                     'status': 200,
