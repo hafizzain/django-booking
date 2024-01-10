@@ -9,15 +9,19 @@ class HolidaySerializer(serializers.ModelSerializer):
         
     
     def validate(self, attrs):
-        start_date = attrs.get('start_date',None)
-        end_date = attrs.get('end_date',None)
+        start_date = attrs.get('start_date', None)
+        end_date = attrs.get('end_date', None)
+
+        # Check if a holiday already exists for the start_date
         start_date_check = Holiday.objects.filter(start_date=start_date).exists()
         if start_date_check:
-            raise serializers.ValidationError({'message':"Holiday already set for this date."})
+            raise serializers.ValidationError({'message': "Holiday already set for this date."})
+
+        # Check if there is any holiday overlapping with the date range
         if start_date is not None and end_date is not None:
-            holiday_check = Holiday.objects.filter(start_date__gte=start_date, end_date__lte=end_date).exists()
+            holiday_check = Holiday.objects.filter(start_date__lte=end_date, end_date__gte=start_date).exists()
             if holiday_check:
-                raise serializers.ValidationError({'message':"Holiday already set for this date."})
+                raise serializers.ValidationError({'message': "Holiday already set for this date range."})
         return attrs
     
     def create(self, validated_data):
