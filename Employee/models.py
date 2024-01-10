@@ -489,6 +489,7 @@ class EmployeDailySchedule(models.Model):
     is_weekend = models.BooleanField(default=False)
     is_leo_day = models.BooleanField(default=False)
     is_holiday = models.BooleanField(default=False)
+    is_schedule = models.BooleanField(default=False) 
 
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=now)
