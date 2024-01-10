@@ -154,22 +154,21 @@ class RefundAPIView(APIView):
                     try:
                         #create invoice
                         create_invoice = SaleInvoice.objects.create(
-                        user=user.id,
+                            user=user.id,
+                            client=invoice.client,
+                            location=invoice.location,
+                            member=invoice.member,
+                            client_type=invoice.client_type,
+                            payment_type=invoice.payment_type,
 
-                        client=invoice.client,
-                        location=invoice.location,
-                        member=invoice.member,
-                        client_type=invoice.client_type,
-                        payment_type=invoice.payment_type,
+                            total_voucher_price=invoice.total_voucher_price,
+                            total_service_price=invoice.total_service_price,
+                            total_product_price=-refund_price,
 
-                        total_voucher_price=invoice.total_voucher_price,
-                        total_service_price=invoice.total_service_price,
-                        total_product_price=-refund_price,
-
-                        service_commission_type=invoice.service_commission_type,
-                        product_commission_type=invoice.product_commission_type,
-                        voucher_commission_type=invoice.voucher_commission_type,
-                        checkout=invoice.checkout,
+                            service_commission_type=invoice.service_commission_type,
+                            product_commission_type=invoice.product_commission_type,
+                            voucher_commission_type=invoice.voucher_commission_type,
+                            checkout=invoice.checkout,
                         )
                         create_invoice.save()
                     except Exception as e:
@@ -185,7 +184,6 @@ class RefundAPIView(APIView):
                                 # 'coupon': CouponSerializer(coupon_serializer.instance).data,
                                 'invoice': SaleInvoiceSerializer(create_invoice).data, 
                             }
-                            
                         }
                     }
                 return Response(response_data, status=status.HTTP_200_OK)
