@@ -4176,7 +4176,8 @@ def update_vacation_status(request):
 
             vacations = Vacation.objects.filter(id=vacation_id)
             vacations.update(vacation_status='accepted')
-            EmployeDailySchedule.objects.filter(vacation_id=vacation_id).update(is_display=True,vacation_status='accepted')
+            EmployeDailySchedule.objects.filter(vacation_id=vacation_id).update(is_display=True,
+                                                                                vacation_status='accepted')
             return Response(
                 {
                     'status': 200,
@@ -4365,7 +4366,7 @@ def create_absence(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_workingschedule(request):
-    check_working_schedule=None
+    check_working_schedule = None
     user = request.user
     business_id = request.data.get('business', None)
 
@@ -4514,7 +4515,7 @@ def create_workingschedule(request):
             },
             status=status.HTTP_201_CREATED
         )
-    else:
+    if is_weekend is not None:
         week_end_employee = json.loads(week_end_employee)
         schedule_ids = []
         try:
@@ -4585,6 +4586,112 @@ def create_workingschedule(request):
                 'status_code': 201,
                 'response': {
                     'message': 'Weekend created successfully across employees!',
+                    'error_message': None,
+                    'schedule': serializers.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+    if leo_value is not None:
+        if not all([business_id, employee]):
+            return Response(
+                {
+                    'status': False,
+                    'status_code': StatusCodes.MISSING_FIELDS_4001,
+                    'status_code_text': 'MISSING_FIELDS_4001',
+                    'response': {
+                        'message': 'Invalid Daata!',
+                        'error_message': 'All fields are required.',
+                        'fields': [
+                            'business',
+                            'employee'
+                        ]
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            business = Business.objects.get(id=business_id)
+        except Exception as err:
+            return Response(
+                {
+                    'status': False,
+                    'status_code': StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response': {
+                        'message': 'Business not found',
+                        'error_message': str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            employee_id = Employee.objects.get(id=employee, is_deleted=False)
+        except Exception as err:
+            return Response(
+                {
+                    'status': False,
+                    'status_code': StatusCodes.INVALID_EMPLOYEE_4025,
+                    'response': {
+                        'message': 'Employee not found',
+                        'error_message': str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        check_working_schedule = EmployeDailySchedule.objects.filter(
+            user=user,
+            business=business,
+            employee=employee_id,
+            date=date,
+
+        )
+        record_count = check_working_schedule.count()
+        if record_count > max_records:
+            return Response(
+                {
+                    'status': True,
+                    'message': 'more than weekends working not allowed',
+                    'status_code': 400,
+                    'response': {
+                        'message': 'more than weekends working not allowed',
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        working_schedule, created = EmployeDailySchedule.objects.get_or_create(
+            user=user,
+            business=business,
+            employee=employee_id,
+            date=date,
+        )
+        working_schedule.day = day
+        working_schedule.start_time = start_time
+        working_schedule.end_time = end_time
+        working_schedule.start_time_shift = start_time_shift
+        working_schedule.end_time_shift = end_time_shift
+        working_schedule.from_date = date
+        working_schedule.to_date = to_date
+        working_schedule.note = note
+        working_schedule.is_leo_day = True
+        working_schedule.save()
+        try:
+            is_leo_day_update = LeaveManagements.objects.get(employee_id=employee_id.id)
+            is_leo_day_update.leo_leave += 1
+            is_leo_day_update.save()
+        except:
+            is_leo_day_created = LeaveManagements.objects.create(employee_id=employee_id.id)
+            is_leo_day_created.leo_leave += 1
+            is_leo_day_created.save()
+
+        serializers = ScheduleSerializer(working_schedule, context={'request': request})
+
+        return Response(
+            {
+                'status': True,
+                'status_code': 201,
+                'response': {
+                    'message': 'Working Schedule Created Successfully!',
                     'error_message': None,
                     'schedule': serializers.data,
                 }
@@ -4762,7 +4869,7 @@ def get_absence(request):
     ).order_by('-created_at')
 
     all_daily_schedules = EmployeDailySchedule.objects \
-        .filter(vacation__in=allvacations,is_vacation=False , is_weekend=False)
+        .filter(vacation__in=allvacations, is_vacation=False, is_weekend=False)
     # Extract the distinct Vacation instances from the related EmployeDailySchedule instances
     related_vacations = Vacation.objects \
         .filter(vacation_employedailyschedules__in=all_daily_schedules) \
