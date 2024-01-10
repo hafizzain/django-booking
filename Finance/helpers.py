@@ -10,8 +10,6 @@ def short_uuid(uuid):
     uuid = str(uuid).replace('-','')[:6]
     return uuid
 
-
-
 def check_days(invoice_id, location):
     try:
         # print(f"Checking for location: {location}")
