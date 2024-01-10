@@ -1145,8 +1145,8 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         is_vacation_qs = qs.filter(is_vacation=True)
         if is_vacation_qs.exists():
             qs = is_vacation_qs.filter(vacation_status='accepted')
-            if not qs.exists():
-                qs = is_vacation_qs.filter(vacation_status='pending')
+            # if not qs.exists():
+            #     qs = is_vacation_qs.filter(vacation_status='pending')
         # qs = EmployeDailySchedule.objects.filter(employee=obj ,**query)
         # qs = EmployeDailySchedule.objects.filter(
         #     Q(employee=obj) &
