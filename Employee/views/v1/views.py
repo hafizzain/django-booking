@@ -4409,7 +4409,7 @@ def create_workingschedule(request):
     is_off = request.data.get('is_off', None)
     leo_value = request.data.get('is_leo_day', None)
     week_end_employee = request.data.get('week_end_employee', [])
-    if is_vacation is None:
+    if is_weekend is None and leo_value is None:
         if not all([business_id, employee]):
             return Response(
                 {
@@ -4510,8 +4510,8 @@ def create_workingschedule(request):
         working_schedule.from_date = from_date
         working_schedule.to_date = to_date
         working_schedule.note = note
-        working_schedule.is_schedule = True
-        # working_schedule.vacation_status='pending'
+        working_schedule.is_vacation = True
+        working_schedule.vacation_status='pending'
         if is_leave is not None:
             working_schedule.is_leave = True
         else:
