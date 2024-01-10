@@ -38,12 +38,13 @@ class HolidaySerializer(serializers.ModelSerializer):
                         .prefetch_related('location') \
                         .filter(location=location)
                                         
-        for employee in all_employees: 
+        current_date = start_date
+        while current_date <= end_date:
             employee_schedule_id = EmployeDailySchedule.objects \
                         .create(is_holiday=True,
                                 start_time=start_date,
                                 end_time=end_date,
-                                employee_id = employee.id,
+                                employee_id__in = all_employees,
                                 date=end_date,
                                 from_date=start_date,
                                 )
