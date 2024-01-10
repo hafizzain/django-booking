@@ -26,4 +26,4 @@ class AllowRefundAdmin(admin.ModelAdmin):
     
 @admin.register(AllowRefundPermissionsEmployees)
 class AllowedRefundEmployeesAdmin(admin.ModelAdmin):
-    list_display = ['id']
+    list_display = ['id', 'allowed_refund','employee']
