@@ -31,10 +31,11 @@ class HolidaySerializer(serializers.ModelSerializer):
         employee_schedule_id = None
         start_date = validated_data['start_date']
         end_date = validated_data['end_date']
+        location = validated_data['location']
         all_employees = Employee.objects \
                         .select_related('user', 'business','country', 'state', 'city') \
                         .prefetch_related('location') \
-                        .filter(location=validated_data['location'])
+                        .filter(location=location)
                                         
         for employee in all_employees: 
             employee_schedule_id = EmployeDailySchedule.objects \
@@ -43,9 +44,9 @@ class HolidaySerializer(serializers.ModelSerializer):
                                 end_time=end_date,
                                 employee_id = employee.id,
                                 date=end_date,
-                                from_date= start_date,
+                                from_date=start_date,
                                 )
-        validated_data['employee_schedule_id'] = employee_schedule_id.id
+        # validated_data['employee_schedule_id'] = employee_schedule_id.id
         holiday = Holiday.objects.create(**validated_data)
         return holiday
     
