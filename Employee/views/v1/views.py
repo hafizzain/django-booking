@@ -4705,7 +4705,7 @@ def create_workingschedule(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_vacations(request):
-    employee_id = request.GET.get('employee_id', working_scheduleNone)
+    employee_id = request.GET.get('employee_id', None)
     location = request.GET.get('location_id', None)
     search_text = request.GET.get('search_text', None)
     no_paginnation = request.GET.get('no_paginnation', None)
