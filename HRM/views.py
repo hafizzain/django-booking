@@ -109,7 +109,7 @@ class HolidayApiView(APIView):
         employee_schedule =list(EmployeDailySchedule.objects \
                             .select_related('user','business','employee','vacation') \
                             .filter(employee__location=location) \
-                            .values('id'), flat=True)
+                            .values_list('id'), flat=True)
         holiday_data['employee_schedule'] = employee_schedule
         serializer = HolidaySerializer(data=holiday_data,
                                        context={'request': request})
