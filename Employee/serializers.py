@@ -1150,16 +1150,16 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         #     qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) | Q(is_weekend=False)),
         #                                              **query)
         #     # if not qs.exists():
-        qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) | Q(is_weekend=False)), **query)
-        qs = qs.annotate(
-            is_vacation_accepted=Case(
-                When(is_vacation=True, vacation_status='accepted', then=Value(True)),
-                default=Value(False),
-                output_field=BooleanField()
-            )
-        ).filter(is_vacation_accepted=True)
-
-        is_vacation_qs = qs.filter(is_vacation=True)
+        qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) |  Q(is_weekend=False)) & (Q(is_vacation=True) |  Q(vacation_status='accepted')), **query)
+        # qs = qs.annotate(
+        #     is_vacation_accepted=Case(
+        #         When(is_vacation=True, vacation_status='accepted', then=Value(True)),
+        #         default=Value(False),
+        #         output_field=BooleanField()
+        #     )
+        # ).filter(is_vacation_accepted=True)
+        #
+        # is_vacation_qs = qs.filter(is_vacation=True)
 
         # if is_vacation_qs.exists():
         #     # If there are vacations marked as 'accepted', use them
