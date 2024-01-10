@@ -691,7 +691,8 @@ def get_workingschedule(request):
     start_date = request.query_params.get('start_date', None)
     end_date = request.query_params.get('end_date', None)
     location_id = request.query_params.get('location_id', None)
-    if is_weekend is None:
+    # is_vacation = request.query_params.get('is_vacation',None)
+    if is_weekend is not None:
         query = {}
         if location_id:
             query['location__id'] = location_id
@@ -720,7 +721,7 @@ def get_workingschedule(request):
             status=status.HTTP_200_OK
         )
     else:
-        employee_ids_in_schedule = EmployeDailySchedule.objects.filter(is_weekend=True)
+        employee_ids_in_schedule = EmployeDailySchedule.objects.filter(is_vacation=True)
         serialized = ScheduleSerializerResponse(employee_ids_in_schedule, many=True, context={'request': request,
                                                                                               'location_id': location_id})
 
