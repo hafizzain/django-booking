@@ -4442,6 +4442,25 @@ def create_workingschedule(request):
             date=date,
 
         )
+        check_leo_day = EmployeDailySchedule.objects.filter(
+            employee=employee_id,
+            date=date,
+            is_leo_day=True
+        )
+        if check_leo_day:
+            return Response(
+                {
+                    'status': True,
+                    'message': 'Can not create vacation on lieu day',
+                    'status_code': 400,
+                    'response': {
+                        'message': 'Can not create vacation on lieu day',
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
         record_count = check_working_schedule.count()
         if record_count > max_records:
             return Response(
@@ -4685,7 +4704,7 @@ def create_workingschedule(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_vacations(request):
-    employee_id = request.GET.get('employee_id', None)
+    employee_id = request.GET.get('employee_id', working_scheduleNone)
     location = request.GET.get('location_id', None)
     search_text = request.GET.get('search_text', None)
     no_paginnation = request.GET.get('no_paginnation', None)
