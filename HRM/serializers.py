@@ -10,8 +10,8 @@ class HolidaySerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         start_date = validated_data['start_date']
         end_date = validated_data['end_date']
-        start_date = datetime.strptime(start_date, "%Y-%m-%d")
-        end_date = datetime.strptime(end_date, "%Y-%m-%d")
+        # start_date = datetime.strptime(start_date, "%Y-%m-%d")
+        # end_date = datetime.strptime(end_date, "%Y-%m-%d")
         all_employees = Employee.objects.all()
         for employee in all_employees: 
             employee_schedule_id = EmployeDailySchedule.objects \
