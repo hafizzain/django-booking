@@ -62,8 +62,6 @@ class HolidaySerializer(serializers.ModelSerializer):
                     start_time=None,
                     end_time=None,
                     is_holiday=True,
-                    start_time=start_date,
-                    end_time=end_date,
                     employee_id=employee.id,
                     date=current_date,
                     from_date=start_date,
