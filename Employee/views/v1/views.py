@@ -4757,24 +4757,20 @@ def get_absence(request):
         is_active=True,
         **queries
     ).order_by('-created_at')
-    all_daily_schedules = EmployeDailySchedule.objects.filter(vacation_id=allvacations, is_leave=True)
-    all_vacations = Vacation.objects \
-        .filter(vacation_employedailyschedules__in=all_daily_schedules) \
-        .distinct().order_by('-created_at')
 
-    allvacations_count = all_vacations.count()
+    allvacations_count = allvacations.count()
 
     page_count = allvacations_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
     per_page_results = 10000 if no_pagination else 10
-    paginator = Paginator(all_vacations, per_page_results)
+    paginator = Paginator(allvacations, per_page_results)
     page_number = request.GET.get("page", None)
     if page_number is not None:
-        all_vacations = paginator.get_page(page_number)
+        allvacations = paginator.get_page(page_number)
 
-        serialized = NewAbsenceSerializer(all_vacations, many=True, context={'request': request})
+        serialized = NewAbsenceSerializer(allvacations, many=True, context={'request': request})
         return Response(
             {
                 'status': 200,
