@@ -4696,6 +4696,7 @@ def create_workingschedule(request):
         working_schedule.note = note
         working_schedule.is_leo_day = True
         working_schedule.is_vacation = False
+        working_schedule.vacation_status=None
         working_schedule.save()
         try:
             is_leo_day_update = LeaveManagements.objects.get(employee_id=employee_id.id)
