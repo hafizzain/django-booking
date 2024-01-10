@@ -10,10 +10,10 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import filters
 from datetime import datetime
+from Employee.models import Employee, EmployeDailySchedule
 
 from HRM.models import *
 from HRM.serializers import *
-from Employee.models import EmployeDailySchedule
 # Create your views here.
 
 class HolidayApiView(APIView):
@@ -100,6 +100,7 @@ class HolidayApiView(APIView):
     
     @transaction.atomic
     def post(self, request):
+        employee_schedules = []
         start_date_str = request.data.get('start_date', None)
         end_date_str = request.data.get('end_date', None)
          # Convert date strings to datetime objects
@@ -112,12 +113,15 @@ class HolidayApiView(APIView):
         
         if 'is_active' not in holiday_data:     #due to unknown clash 
             holiday_data['is_active'] = True
-            
+        
+        all_employees = Employee.objects.filter(location=location)
         employee_schedule_id =EmployeDailySchedule.objects \
-                            .create(is_holiday=True,
-                                    start_time=start_date,
-                                    end_time=end_date,
-                                    date=end_date )
+                                .create(is_holiday=True,
+                                        start_time=start_date,
+                                        end_time=end_date,
+                                        date=end_date)
+        for employee in all_employees: 
+            EmployeDailySchedule.objects.filter(id=employee_schedule_id.id)   
         holiday_data['employee_schedule'] = employee_schedule_id
         serializer = HolidaySerializer(data=holiday_data,
                                        context={'request': request})
