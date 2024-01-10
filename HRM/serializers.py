@@ -4,7 +4,7 @@ from Employee.models import Employee, EmployeDailySchedule
 
 class HolidaySerializer(serializers.ModelSerializer):
     class Meta:
-        model = Holiday
+        model = Hol=iday
         fields = '__all__'
         
     
@@ -46,7 +46,7 @@ class HolidaySerializer(serializers.ModelSerializer):
                                 date=end_date,
                                 from_date=start_date,
                                 )
-        # validated_data['employee_schedule_id'] = employee_schedule_id.id
+        validated_data['employee_schedule_id'] = employee_schedule_id.id
         holiday = Holiday.objects.create(**validated_data)
         return holiday
     
