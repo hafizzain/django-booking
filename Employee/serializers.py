@@ -1011,9 +1011,8 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
                 .filter(query)
 
             return len(holidays) > 0  # Return True if there is any holiday
-        except Exception as err:
-            error = str(err)
-            return error
+        except:
+            return False
 
     class Meta:
         model = EmployeDailySchedule
