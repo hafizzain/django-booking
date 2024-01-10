@@ -1138,6 +1138,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         start_date = self.context.get('start_date', None)
         end_date = self.context.get('end_date', None)
         query = {}
+        query['is_leo_day'] = True
         if start_date:
             query['date__date__gte'] = start_date
         if end_date:
