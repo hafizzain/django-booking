@@ -4759,7 +4759,7 @@ def get_absence(request):
     ).order_by('-created_at')
 
     all_daily_schedules = EmployeDailySchedule.objects \
-        .filter(vacation__in=allvacations, holiday_type='Absence')
+        .filter(vacation__in=allvacations,is_vacation=False , is_weekend=False)
     # Extract the distinct Vacation instances from the related EmployeDailySchedule instances
     related_vacations = Vacation.objects \
         .filter(vacation_employedailyschedules__in=all_daily_schedules) \
