@@ -15,8 +15,8 @@ from Client.serializers import SaleInvoiceSerializer
 @api_view(['GET'])
 def check_permission_view(request):
     try:
-        invoice_id = request.data.get('invoice_id')
-        location = request.data.get('location')
+        invoice_id = request.query_params.get('invoice_id')
+        location = request.query_params.get('location')
         user = request.user.id
         if check_days(invoice_id, location) or check_permission(user, location):
             response_data = {
