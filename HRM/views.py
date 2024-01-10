@@ -110,20 +110,8 @@ class HolidayApiView(APIView):
         holiday_data = request.data.copy()
         holiday_data['user'] = user.id
         location = request.data.get('location', None)  #data deal with location
-        
         if 'is_active' not in holiday_data:     #due to unknown clash 
             holiday_data['is_active'] = True
-        
-        all_employees = Employee.objects.filter(location=location)
-        employee_schedule_id = EmployeDailySchedule.objects \
-                                .create(is_holiday=True,
-                                        start_time=start_date,
-                                        end_time=end_date,
-                                        date=end_date)
-        for employee in all_employees: 
-            obj_to_update = EmployeDailySchedule.objects.filter(id=employee_schedule_id.id)   
-            obj_to_update.update(employee_id=employee.id)
-        holiday_data['employee_schedule'] = employee_schedule_id
         serializer = HolidaySerializer(data=holiday_data,
                                        context={'request': request})
         if serializer.is_valid():
