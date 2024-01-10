@@ -3899,7 +3899,7 @@ def create_vacation_emp(request):
     working_sch = None
     check_leo_day = EmployeDailySchedule.objects.filter(
         employee=employee,
-        # date=from_date,
+        date=from_date,
         is_leo_day=True
     )
     if check_leo_day:
