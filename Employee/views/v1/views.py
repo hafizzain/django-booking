@@ -3905,14 +3905,15 @@ def create_vacation_emp(request):
     if check_leo_day:
         return Response(
             {
-                'status': True,
-                'message': 'Can not create vacation on lieu day',
-                'status_code': 400,
+                'status': False,
+                'status_code': 404,
+                'status_code_text': '404',
                 'response': {
-                    'message': 'Can not create vacation on lieu day',
+                    'message': f'Cannot create vacation on leo day.',
+                    'error_message': None,
                 }
             },
-            status=status.HTTP_400_BAD_REQUEST
+            status=status.HTTP_404_NOT_FOUND
         )
 
     if not all([business_id, employee]):
@@ -4468,14 +4469,15 @@ def create_workingschedule(request):
         if check_leo_day:
             return Response(
                 {
-                    'status': True,
-                    'message': 'Can not create vacation on lieu day',
-                    'status_code': 400,
+                    'status': False,
+                    'status_code': 404,
+                    'status_code_text': '404',
                     'response': {
-                        'message': 'Can not create vacation on lieu day',
+                        'message': f'Cannot create vacation on leo day.',
+                        'error_message': None,
                     }
                 },
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_404_NOT_FOUND
             )
 
 
