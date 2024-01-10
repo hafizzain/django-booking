@@ -56,7 +56,7 @@ class HolidayApiView(APIView):
                 query &= Q(end_date__lte=end_date)
             
             filtered_queryset = Holiday.objects \
-                                .select_related('user','business','location') \
+                                .select_related('user','business','location','employee_schedule') \
                                 .filter(query) \
                                 .order_by('-created_at')
             serializer = HolidaySerializer(filtered_queryset, many=True)
