@@ -28,6 +28,7 @@ class HolidaySerializer(serializers.ModelSerializer):
         return attrs
     
     def create(self, validated_data):
+        employee_schedule_ids = []
         employee_schedule_id = None
         start_date = validated_data['start_date']
         end_date = validated_data['end_date']
@@ -46,7 +47,10 @@ class HolidaySerializer(serializers.ModelSerializer):
                                 date=end_date,
                                 from_date=start_date,
                                 )
-        validated_data['employee_schedule_id'] = employee_schedule_id.id
+            employee_schedule_ids.append(employee_schedule_id.id)
+        # validated_data['employee_schedule_id'] = employee_schedule_id.id
         holiday = Holiday.objects.create(**validated_data)
+        for employee_schedule_id in employee_schedule_ids:
+            holiday.update(employee_schedule_id=employee_schedule_ids)
         return holiday
     
