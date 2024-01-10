@@ -4674,6 +4674,7 @@ def create_workingschedule(request):
                     'message': 'Working Schedule Created Successfully!',
                     'error_message': None,
                     'schedule': serializers.data,
+                    'leo_value':leo_value
                 }
             },
             status=status.HTTP_201_CREATED
