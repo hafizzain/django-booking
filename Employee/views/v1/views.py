@@ -3895,7 +3895,25 @@ def create_vacation_emp(request):
     vacation_type = request.data.get('vacation_type', None)
     value = 0
     difference_days = 0
+    
     working_sch = None
+    check_leo_day = EmployeDailySchedule.objects.filter(
+        employee=employee,
+        # date=from_date,
+        is_leo_day=True
+    )
+    if check_leo_day:
+        return Response(
+            {
+                'status': True,
+                'message': 'Can not create vacation on lieu day',
+                'status_code': 400,
+                'response': {
+                    'message': 'Can not create vacation on lieu day',
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     if not all([business_id, employee]):
         return Response(
