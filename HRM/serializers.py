@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from HRM.models import *
 from Employee.models import Employee, EmployeDailySchedule
+from datetime import date, timedelta
+from django.db import transaction
+
 
 class HolidaySerializer(serializers.ModelSerializer):
     class Meta:
@@ -38,21 +41,38 @@ class HolidaySerializer(serializers.ModelSerializer):
                         .prefetch_related('location') \
                         .filter(location=location)
                                         
+        # current_date = start_date
+        # while start_date <= end_date:
+        #     for employee in all_employees:
+        #         employee_schedule_id = EmployeDailySchedule.objects \
+        #                     .create(is_holiday=True,
+        #                             start_time=start_date,
+        #                             end_time=end_date,
+        #                             employee_id = employee.id,
+        #                             date=end_date,
+        #                             from_date=start_date,
+        #                             )
+                # employee_schedule_ids.append(employee_schedule_id.id)
+        # validated_data['employee_schedule_id'] = employee_schedule_id.id
         current_date = start_date
+        employee_schedules = []
         while current_date <= end_date:
             for employee in all_employees:
-                employee_schedule_id = EmployeDailySchedule.objects \
-                            .create(is_holiday=True,
-                                    start_time=start_date,
-                                    end_time=end_date,
-                                    employee_id = employee.id,
-                                    date=end_date,
-                                    from_date=start_date,
-                                    )
-                employee_schedule_ids.append(employee_schedule_id.id)
-        # validated_data['employee_schedule_id'] = employee_schedule_id.id
+                employee_schedule = EmployeDailySchedule(
+                    is_holiday=True,
+                    start_time=start_date,
+                    end_time=end_date,
+                    employee_id=employee.id,
+                    date=current_date,
+                    from_date=start_date,
+                )
+                employee_schedules.append(employee_schedule)
+
+            current_date += timedelta(days=1)
+
+        # Use bulk_create to insert all EmployeeDailySchedule objects in a single query
+        with transaction.atomic():
+            EmployeDailySchedule.objects.bulk_create(employee_schedules)
         holiday = Holiday.objects.create(**validated_data)
-        for employee_schedule_id in employee_schedule_ids:
-            holiday.employee_schedule_id=employee_schedule_ids
         return holiday
     
