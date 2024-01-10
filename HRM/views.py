@@ -9,8 +9,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import filters
-from datetime import datetime
-from Employee.models import Employee, EmployeDailySchedule
 
 from HRM.models import *
 from HRM.serializers import *
@@ -99,21 +97,15 @@ class HolidayApiView(APIView):
                 return Response(data, status=status.HTTP_200_OK)
     
     @transaction.atomic
-    def post(self, request):
-        # start_date_str = request.data.get('start_date', None)
-        # end_date_str = request.data.get('end_date', None)
-        # # Convert date strings to datetime objects
-        # start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
-        # end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
-        
+    def post(self, request): 
         user = request.user
         holiday_data = request.data.copy()
         holiday_data['user'] = user.id
-       
+        
         if 'is_active' not in holiday_data:     #due to unknown clash 
             holiday_data['is_active'] = True
         serializer = HolidaySerializer(data=holiday_data,
-                                       context={'request': request})
+                                        context={'request': request})
         if serializer.is_valid():
             serializer.save()
             data = {
@@ -143,8 +135,8 @@ class HolidayApiView(APIView):
         holiday = get_object_or_404(Holiday, id=pk)
         request.data.get('user', None)
         serializer = HolidaySerializer(holiday,
-                                       data=request.data,
-                                       partial=True)
+                                        data=request.data,
+                                        partial=True)
         if serializer.is_valid():
             serializer.save()
             data = {
