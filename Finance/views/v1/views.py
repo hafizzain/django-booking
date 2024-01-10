@@ -112,7 +112,7 @@ class RefundAPIView(APIView):
             '''
 
     def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
-        refund_invoice_id = request.data.get('refund_invoice_id')
+        refund_invoice_id = request.invoice_id
         refund_price = request.data.get('total_refund_amount')
         try:
             user = request.user

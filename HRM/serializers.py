@@ -14,9 +14,10 @@ class HolidaySerializer(serializers.ModelSerializer):
         start_date_check = Holiday.objects.filter(start_date=start_date).exists()
         if start_date_check:
             raise serializers.ValidationError({'message':"Holiday already set for this date."})
-        holiday_check = Holiday.objects.filter(start_date__gte=start_date, end_date__lte=end_date).exists()
-        if holiday_check:
-            raise serializers.ValidationError({'message':"Holiday already set for this date."})
+        if start_date is not None and end_date is not None:
+            holiday_check = Holiday.objects.filter(start_date__gte=start_date, end_date__lte=end_date).exists()
+            if holiday_check:
+                raise serializers.ValidationError({'message':"Holiday already set for this date."})
         return attrs
     
     def create(self, validated_data):
