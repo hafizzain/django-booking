@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import filters
+from datetime import datetime
 
 from HRM.models import *
 from HRM.serializers import *
@@ -99,15 +100,19 @@ class HolidayApiView(APIView):
     
     @transaction.atomic
     def post(self, request):
-        start_date = request.data.get('start_date', None)
-        end_date = request.data.get('end_date', None)
+        start_date_str = request.data.get('start_date', None)
+        end_date_str = request.data.get('end_date', None)
+         # Convert date strings to datetime objects
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%d %H:%M:%S")
+        end_date = datetime.strptime(end_date_str, "%Y-%m-%d %H:%M:%S")
         user = request.user
         holiday_data = request.data.copy()
         holiday_data['user'] = user.id
         location = request.data.get('location', None)  #data deal with location
+        
         if 'is_active' not in holiday_data:     #due to unknown clash 
             holiday_data['is_active'] = True
-        # get employee_schedule list filter with location
+            
         employee_schedule_id =EmployeDailySchedule.objects \
                             .create(is_holiday=True,
                                     start_time=start_date,
