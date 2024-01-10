@@ -41,19 +41,6 @@ class HolidaySerializer(serializers.ModelSerializer):
                         .prefetch_related('location') \
                         .filter(location=location)
                                         
-        # current_date = start_date
-        # while start_date <= end_date:
-        #     for employee in all_employees:
-        #         employee_schedule_id = EmployeDailySchedule.objects \
-        #                     .create(is_holiday=True,
-        #                             start_time=start_date,
-        #                             end_time=end_date,
-        #                             employee_id = employee.id,
-        #                             date=end_date,
-        #                             from_date=start_date,
-        #                             )
-                # employee_schedule_ids.append(employee_schedule_id.id)
-        # validated_data['employee_schedule_id'] = employee_schedule_id.id
         current_date = start_date
         employee_schedules = []
         while current_date <= end_date:
@@ -65,15 +52,13 @@ class HolidaySerializer(serializers.ModelSerializer):
                     employee_id=employee.id,
                     date=current_date,
                     from_date=current_date,
-                    # date=date
                 )
                 employee_schedules.append(employee_schedule)
-
             current_date += timedelta(days=1)
-
         # Use bulk_create to insert all EmployeeDailySchedule objects in a single query
         with transaction.atomic():
             EmployeDailySchedule.objects.bulk_create(employee_schedules)
         holiday = Holiday.objects.create(**validated_data)
+        
         return holiday
     
