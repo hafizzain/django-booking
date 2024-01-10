@@ -102,13 +102,13 @@ class HolidayApiView(APIView):
         user = request.user
         holiday_data = request.data.copy()
         holiday_data['user'] = user.id
-        
+        location = request.data.get('location', None)  #data deal with location
         if 'is_active' not in holiday_data:     #due to unknown clash 
             holiday_data['is_active'] = True
         # get employee_schedule list filter with location
         employee_schedule =list(EmployeDailySchedule.objects \
                             .select_related('user','business','employee','vacation') \
-                            .filter(employee__location=request.location) \
+                            .filter(employee__location=location) \
                             .values('id'), flat=True)
         holiday_data['employee_schedule'] = employee_schedule
         serializer = HolidaySerializer(data=holiday_data,
