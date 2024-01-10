@@ -1147,8 +1147,8 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         qs = EmployeDailySchedule.objects.filter(
             Q(employee=obj) &
             (Q(is_weekend=True) | Q(is_weekend=False)) &
-            Q(is_vacation=True, vacation__status='accepted')
-            ** query
+            Q(is_vacation=True, vacation__status='accepted'),
+            **query
         )
         return ScheduleSerializerOP(qs, many=True, context=self.context).data
 
