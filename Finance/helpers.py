@@ -20,7 +20,7 @@ def check_days(invoice_id, location):
         days_difference = (timezone.now() - instance.created_at).days
         return days_difference <= no_of_days
     except Exception as e:
-        return {'error': str(e)}
+        return f"An error occurred: {str(e)}, number_of_days: {no_of_days}, difference_of_days: {days_difference}"
     # except SaleInvoice.DoesNotExist:
     #     return False
 
