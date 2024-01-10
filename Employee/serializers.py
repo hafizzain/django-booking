@@ -1153,9 +1153,9 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
 
         is_vacation_qs = qs.filter(is_vacation=True)
 
-        if is_vacation_qs.exists():
-            # If there are vacations marked as 'accepted', use them
-            qs = is_vacation_qs.filter(vacation_status='accepted')
+        # if is_vacation_qs.exists():
+        #     # If there are vacations marked as 'accepted', use them
+        #     qs = is_vacation_qs.filter(vacation_status='accepted')
         else:
             # If there are no vacations or none with 'accepted' status, you may handle it here
             # For example, set qs to a default value or raise an exception
