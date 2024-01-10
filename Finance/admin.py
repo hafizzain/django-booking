@@ -22,7 +22,7 @@ class RefundAdmin(admin.ModelAdmin):
     
 @admin.register(AllowRefunds)
 class AllowRefundAdmin(admin.ModelAdmin):
-    list_display = ['id', 'number_of_days']
+    list_display = ['id','location', 'number_of_days']
     
 @admin.register(AllowRefundPermissionsEmployees)
 class AllowedRefundEmployeesAdmin(admin.ModelAdmin):
