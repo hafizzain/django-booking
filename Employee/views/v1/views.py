@@ -4758,11 +4758,11 @@ def get_absence(request):
         **queries
     ).order_by('-created_at')
     all_daily_schedules = EmployeDailySchedule.objects.filter(vacation_id=allvacations, is_leave=True)
-    allvacations = Vacation.objects \
+    all_vacations = Vacation.objects \
         .filter(vacation_employedailyschedules__in=all_daily_schedules) \
         .distinct().order_by('-created_at')
 
-    allvacations_count = allvacations.count()
+    allvacations_count = all_vacations.count()
 
     page_count = allvacations_count / 10
     if page_count > int(page_count):
