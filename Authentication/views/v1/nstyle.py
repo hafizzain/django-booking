@@ -706,7 +706,7 @@ def login(request):
                                                             })
             s_data = dict(serialized.data)
             if employee_location_id:
-                s_data['employee_location_id'] = employee_location_id
+                s_data['selected_location'] = employee_location_id
 
     else:
         serialized = UserLoginSerializer(user, context={'employee': False,
