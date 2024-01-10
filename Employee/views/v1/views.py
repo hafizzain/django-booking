@@ -5143,6 +5143,8 @@ def delete_all__workingschedule(request):
     weekends = EmployeDailySchedule.objects.all()
     if weekends:
         weekends = weekends.delete()
+        vacation = Vacation.objects.all()
+        vacation.delete()
         return Response({"msg": "Success fully deleted"})
     else:
         return Response({"msg": "all deleted"})
