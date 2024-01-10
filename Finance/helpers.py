@@ -24,7 +24,7 @@ def check_days(invoice_id, location):
         return False
     except SaleInvoice.DoesNotExist:
         # print(f"SaleInvoice not found for invoice_id: {invoice_id} and location: {location}")
-        return False
+        return "gh"
     # except SaleInvoice.DoesNotExist:
     #     return False
 
