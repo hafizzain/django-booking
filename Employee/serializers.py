@@ -1018,7 +1018,7 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
     class Meta:
         model = EmployeDailySchedule
         fields = ['id', 'is_leo_day', 'is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date',
-                  'day', 'end_time_shift', 'end_time', 'is_weekend','vacation_status',
+                  'day', 'end_time_shift', 'end_time', 'is_weekend', 'vacation_status',
                   'start_time']
 
 
@@ -1151,7 +1151,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         #                                              **query)
         #     # if not qs.exists():
         qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) | Q(is_weekend=False)), **query)
-        qs = qs.filter((Q(is_vacation=True) | Q(is_leo_day=True)))
+        qs = qs.filter((Q(is_vacation=True) & Q(vacation_status='accepted')) | Q(is_leo_day=True))
         # qs = qs.annotate(
         #     is_vacation_accepted=Case(
         #         When(is_vacation=True, vacation_status='accepted', then=Value(True)),
@@ -1166,9 +1166,9 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         #     # If there are vacations marked as 'accepted', use them
         #     qs = is_vacation_qs.filter(vacation_status='accepted')
         # else:
-            # If there are no vacations or none with 'accepted' status, you may handle it here
-            # For example, set qs to a default value or raise an exception
-            # qs = qs
+        # If there are no vacations or none with 'accepted' status, you may handle it here
+        # For example, set qs to a default value or raise an exception
+        # qs = qs
 
         # Now qs contains the filtered queryset based on your conditions
         # if not qs.exists():
