@@ -6,6 +6,18 @@ class HolidaySerializer(serializers.ModelSerializer):
     class Meta:
         model = Holiday
         fields = '__all__'
+        
+    
+    def validate(self, attrs):
+        start_date = attrs.get('start_date',None)
+        end_date = attrs.get('end_date',None)
+        start_date_check = Holiday.objects.filter(start_date=start_date).exists()
+        if start_date_check:
+            raise serializers.ValidationError({'msg':"Holiday already exist on selected date."})
+        holiday_check = Holiday.objects.filter(start_date__gte=start_date, end_date__lte=end_date).exists()
+        if holiday_check:
+            raise serializers.ValidationError({'msg':"Holiday already exist on selected date."})
+        return attrs
     
     def create(self, validated_data):
         employee_schedule_id = None

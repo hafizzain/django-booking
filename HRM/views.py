@@ -63,7 +63,7 @@ class HolidayApiView(APIView):
 
             if no_pagination:
                 serializer = HolidaySerializer(filtered_queryset, many=True,
-                                               context={'request': request})
+                                                context={'request': request})
                 data = {
                         "success": True,
                         "status_code" : 200,
@@ -78,7 +78,7 @@ class HolidayApiView(APIView):
                 paginator = self.pagination_class()
                 result_page = paginator.paginate_queryset(filtered_queryset, request)
                 serializer = HolidaySerializer(result_page, many=True,
-                                               context={'request': request})
+                                                context={'request': request})
                 data = {
                         'count': paginator.page.paginator.count,
                         'next': paginator.get_next_link(),
@@ -96,7 +96,6 @@ class HolidayApiView(APIView):
                     }
                 return Response(data, status=status.HTTP_200_OK)
     
-    @transaction.atomic
     def post(self, request): 
         user = request.user
         holiday_data = request.data.copy()
