@@ -120,14 +120,14 @@ class HolidayApiView(APIView):
         else:
             data = {
                 "success": False,
-                "status_code": 200,
+                "status_code": 400,
                 "response": {
                     "message": "Holiday not created",
                     "error_message": serializer.errors,
                     "data": None
                 }
             }
-            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data, status=status.HTTP_200_OK)
         
     @transaction.atomic
     def patch(self, request, pk):
