@@ -5141,10 +5141,11 @@ def update_absence(request):
 @permission_classes([AllowAny])
 def delete_all__workingschedule(request):
     weekends = EmployeDailySchedule.objects.all()
+    vacation = Vacation.objects.all()
+    vacation.delete()
     if weekends:
         weekends = weekends.delete()
-        vacation = Vacation.objects.all()
-        vacation.delete()
+
         return Response({"msg": "Success fully deleted"})
     else:
         return Response({"msg": "all deleted"})
