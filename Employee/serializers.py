@@ -1138,7 +1138,6 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         start_date = self.context.get('start_date', None)
         end_date = self.context.get('end_date', None)
         query = {}
-        query['is_leo_day'] = True
         if start_date:
             query['date__date__gte'] = start_date
         if end_date:
@@ -1151,7 +1150,8 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         #     qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) | Q(is_weekend=False)),
         #                                              **query)
         #     # if not qs.exists():
-        qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) |  Q(is_weekend=False)) & (Q(is_vacation=True) |  Q(vacation_status='accepted')), **query)
+        qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) | Q(is_weekend=False)), **query)
+        qs = qs.filter((Q(is_vacation=True) | Q(vacation_status=True)))
         # qs = qs.annotate(
         #     is_vacation_accepted=Case(
         #         When(is_vacation=True, vacation_status='accepted', then=Value(True)),
