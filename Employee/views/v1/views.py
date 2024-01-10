@@ -4409,7 +4409,7 @@ def create_workingschedule(request):
     is_off = request.data.get('is_off', None)
     leo_value = request.data.get('is_leo_day', None)
     week_end_employee = request.data.get('week_end_employee', [])
-    if is_vacation:
+    if is_vacation is None:
         if not all([business_id, employee]):
             return Response(
                 {
