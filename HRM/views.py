@@ -12,7 +12,6 @@ from rest_framework import filters
 
 from HRM.models import *
 from HRM.serializers import *
-from Employee.models import EmployeDailySchedule
 # Create your views here.
 
 class HolidayApiView(APIView):
@@ -98,21 +97,15 @@ class HolidayApiView(APIView):
                 return Response(data, status=status.HTTP_200_OK)
     
     @transaction.atomic
-    def post(self, request):
+    def post(self, request): 
         user = request.user
         holiday_data = request.data.copy()
         holiday_data['user'] = user.id
         
         if 'is_active' not in holiday_data:     #due to unknown clash 
             holiday_data['is_active'] = True
-        #get employee_schedule 
-        employee_schedule =list(EmployeDailySchedule.objects \
-                            .select_related('user','business','employee','vacation') \
-                            .filter(employee__location=request.location) \
-                            .values('id'), flat=True)
-        holiday_data['employee_schedule'] = employee_schedule
         serializer = HolidaySerializer(data=holiday_data,
-                                       context={'request': request})
+                                        context={'request': request})
         if serializer.is_valid():
             serializer.save()
             data = {
@@ -142,8 +135,8 @@ class HolidayApiView(APIView):
         holiday = get_object_or_404(Holiday, id=pk)
         request.data.get('user', None)
         serializer = HolidaySerializer(holiday,
-                                       data=request.data,
-                                       partial=True)
+                                        data=request.data,
+                                        partial=True)
         if serializer.is_valid():
             serializer.save()
             data = {

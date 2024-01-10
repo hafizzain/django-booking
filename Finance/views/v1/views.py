@@ -17,8 +17,7 @@ def check_permission_view(request):
     invoice_id = request.data.get('invoice_id')
     location = request.data.get('location')
     user = request.user.id
-    try:
-        if check_days(invoice_id, location) or check_permission(user, location):
+    if check_days(invoice_id, location):
             response_data = {
                             'success': True,
                             'status_code': 201,
@@ -29,18 +28,18 @@ def check_permission_view(request):
                             }
                         }
             return Response(response_data, status=status.HTTP_200_OK)
-        response_data = {
-                            'success': True,
-                            'status_code': 404,
-                            'response': {
-                                'message': 'Permission Deneid!',
-                                'error_message': None,
-                                'data': []
-                            }
+    response_data = {
+                        'success': True,
+                        'status_code': 404,
+                        'response': {
+                            'message': 'Permission Deneid!',
+                            'error_message': None,
+                            'data': []
                         }
-        return Response(response_data, status=status.HTTP_200_OK)
-    except Exception as e:
-        return Response({'erorr': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    }
+    return Response(response_data, status=status.HTTP_200_OK)
+    # except Exception as e:
+    #     return Response({'erorr': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 class RefundAPIView(APIView):
 

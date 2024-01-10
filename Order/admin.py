@@ -25,7 +25,7 @@ class ServiceOrderAdmin(admin.ModelAdmin):
         'price',
         'created_at',
     ]
-
+    search_fields = ('id')
     def location_name(self, order):
         if order.location:
             return order.location.address_name
@@ -64,12 +64,14 @@ class CheckoutAdmin(admin.ModelAdmin):
         'total_voucher_price',
         'total_membership_price',
     ]
+    search_fields = ('id')
 
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     ordering = ['-created_at']
     list_display = ['id', 'location', 'total_price', 'member', 'quantity', 'current_price', 'price', 'discount_price', 'discount_percentage']
+    search_fields = ('id')
 
     
 admin.site.register(CheckoutPayment)
