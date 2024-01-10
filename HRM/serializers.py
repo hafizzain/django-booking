@@ -64,8 +64,8 @@ class HolidaySerializer(serializers.ModelSerializer):
                     is_holiday=True,
                     employee_id=employee.id,
                     date=current_date,
-                    from_date=start_date,
-                    date=date
+                    from_date=current_date,
+                    # date=date
                 )
                 employee_schedules.append(employee_schedule)
 
