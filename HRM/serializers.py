@@ -40,15 +40,16 @@ class HolidaySerializer(serializers.ModelSerializer):
                                         
         current_date = start_date
         while current_date <= end_date:
-            employee_schedule_id = EmployeDailySchedule.objects \
-                        .create(is_holiday=True,
-                                start_time=start_date,
-                                end_time=end_date,
-                                employee_id__in = all_employees,
-                                date=end_date,
-                                from_date=start_date,
-                                )
-            employee_schedule_ids.append(employee_schedule_id.id)
+            for employee in all_employees:
+                employee_schedule_id = EmployeDailySchedule.objects \
+                            .create(is_holiday=True,
+                                    start_time=start_date,
+                                    end_time=end_date,
+                                    employee_id = employee.id,
+                                    date=end_date,
+                                    from_date=start_date,
+                                    )
+                employee_schedule_ids.append(employee_schedule_id.id)
         # validated_data['employee_schedule_id'] = employee_schedule_id.id
         holiday = Holiday.objects.create(**validated_data)
         for employee_schedule_id in employee_schedule_ids:
