@@ -19,25 +19,29 @@ def check_permission_view(request):
         location = request.data.get('location')
         user = request.user.id
         if check_days(invoice_id, location) or check_permission(user, location):
-                response_data = {
-                                'success': True,
-                                'status_code': 201,
-                                'response': {
-                                    'message': 'Permission granted!',
-                                    'error_message': None,
-                                    'data': []
-                                }
-                            }
-                return Response(response_data, status=status.HTTP_200_OK)
+            response_data = {
+                    'success': True,
+                    'status_code': 201,
+                    'response': {
+                        'message': 'Permission granted!',
+                        'error_message': None,
+                        'check_days_response': check_days(invoice_id, location),
+                        'check_permission': check_permission(user, location),
+                        'data': []
+                    }
+                }
+            return Response(response_data, status=status.HTTP_200_OK)
         response_data = {
-                            'success': True,
-                            'status_code': 404,
-                            'response': {
-                                'message': 'Permission Deneid!',
-                                'error_message': None,
-                                'data': []
-                            }
-                        }
+            'success': True,
+            'status_code': 404,
+            'response': {
+                'message': 'Permission Deneid!',
+                'error_message': None,
+                'check_days_response': check_days(invoice_id, location),
+                'check_permission': check_permission(user, location),
+                'data': []
+            }
+        }
         return Response(response_data, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'erorr': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
