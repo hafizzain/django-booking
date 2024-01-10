@@ -9,9 +9,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import filters
+
 from HRM.models import *
 from HRM.serializers import *
-
+from Employee.models import EmployeDailySchedule
 # Create your views here.
 
 class HolidayApiView(APIView):
@@ -104,6 +105,12 @@ class HolidayApiView(APIView):
         
         if 'is_active' not in holiday_data:     #due to unknown clash 
             holiday_data['is_active'] = True
+        #get employee_schedule 
+        employee_schedule =list(EmployeDailySchedule.objects \
+                            .select_related('user','business','employee','vacation') \
+                            .filter(employee__location=request.location) \
+                            .values('id'), flat=True)
+        holiday_data['employee_schedule'] = employee_schedule
         serializer = HolidaySerializer(data=holiday_data,
                                        context={'request': request})
         if serializer.is_valid():
