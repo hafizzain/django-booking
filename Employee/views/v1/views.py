@@ -4389,7 +4389,7 @@ def create_workingschedule(request):
     is_off = request.data.get('is_off', None)
     leo_value = request.data.get('is_leo_day', None)
     week_end_employee = request.data.get('week_end_employee', [])
-    if is_weekend is None:
+    if is_weekend is None and leo_value is None:
         if not all([business_id, employee]):
             return Response(
                 {
