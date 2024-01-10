@@ -700,7 +700,7 @@ def get_workingschedule(request):
         if end_date:
             query['employee_employedailyschedule__date__date__lte'] = end_date
 
-        all_employee = Employee.objects.filter(is_active=True, is_blocked=False, **query).order_by(
+        all_employee = Employee.objects.filter(is_active=True, **query).order_by(
             '-created_at')
         serialized = WorkingScheduleSerializer(all_employee, many=True, context={'request': request,
                                                                                  'start_date': start_date,
