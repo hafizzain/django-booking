@@ -4362,6 +4362,7 @@ def create_absence(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_workingschedule(request):
+    check_working_schedule=None
     user = request.user
     business_id = request.data.get('business', None)
 
