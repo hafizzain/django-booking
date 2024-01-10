@@ -1,5 +1,5 @@
 from django.contrib import admin
-from Finance.models import Refund, RefundProduct, RefundServices ,RefundCoupon
+from Finance.models import Refund, RefundProduct, RefundServices ,RefundCoupon, AllowRefundPermissionsEmployees, AllowRefunds
 
 @admin.register(RefundCoupon)
 class RefundCouponAdmin(admin.ModelAdmin):
@@ -18,3 +18,12 @@ class RefundServiceAdmin(admin.ModelAdmin):
 class RefundAdmin(admin.ModelAdmin):
     ordering = ['-created_at']
     list_display = ['id', 'user', 'refund_invoice_id', 'refund_type', 'total_refund_amount']
+    
+    
+@admin.register(AllowRefunds)
+class AllowRefundAdmin(admin.ModelAdmin):
+    list_display = ['id', 'number_of_days']
+    
+@admin.register(AllowRefundPermissionsEmployees)
+class AllowedRefundEmployeesAdmin(admin.ModelAdmin):
+    list_display = ['id']
