@@ -4510,8 +4510,8 @@ def create_workingschedule(request):
         working_schedule.from_date = from_date
         working_schedule.to_date = to_date
         working_schedule.note = note
-        working_schedule.is_vacation = True
-        working_schedule.vacation_status='pending'
+        # working_schedule.is_vacation = True
+        # working_schedule.vacation_status='pending'
         if is_leave is not None:
             working_schedule.is_leave = True
         else:
