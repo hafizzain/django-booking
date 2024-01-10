@@ -8,6 +8,7 @@ class HolidaySerializer(serializers.ModelSerializer):
         fields = '__all__'
     
     def create(self, validated_data):
+        employee_schedule_id = None
         start_date = validated_data['start_date']
         end_date = validated_data['end_date']
         # start_date = datetime.strptime(start_date, "%Y-%m-%d")
@@ -20,6 +21,6 @@ class HolidaySerializer(serializers.ModelSerializer):
                                 end_time=end_date,
                                 employee_id = employee.id,
                                 date=end_date)
-        return True
+        return employee_schedule_id
         
     
