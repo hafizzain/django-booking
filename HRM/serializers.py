@@ -49,7 +49,7 @@ class HolidaySerializer(serializers.ModelSerializer):
                                 )
             employee_schedule_ids.append(employee_schedule_id.id)
         # validated_data['employee_schedule_id'] = employee_schedule_id.id
-        holiday = Holiday.objects.create(**validated_data)
+        holiday = Holiday.objects.create(start_date=start_date ,end_date=end_date,location=location)
         for employee_schedule_id in employee_schedule_ids:
             holiday.employee_schedule_id=employee_schedule_ids
         return holiday
