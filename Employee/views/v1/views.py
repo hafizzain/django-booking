@@ -4470,22 +4470,7 @@ def create_workingschedule(request):
         working_schedule.from_date = from_date
         working_schedule.to_date = to_date
         working_schedule.note = note
-
-        if is_vacation is not None:
-            working_schedule.is_vacation = True
-        else:
-            working_schedule.is_vacation = False
-        if leo_value is not None:
-            working_schedule.is_leo_day = True
-            try:
-                is_leo_day_update = LeaveManagements.objects.get(employee_id=employee_id.id)
-                is_leo_day_update.leo_leave += 1
-                is_leo_day_update.save()
-            except:
-                is_leo_day_created = LeaveManagements.objects.create(employee_id=employee_id.id)
-                is_leo_day_created.leo_leave += 1
-                is_leo_day_created.save()
-
+        working_schedule.is_vacation = True
         if is_leave is not None:
             working_schedule.is_leave = True
         else:
@@ -4494,11 +4479,6 @@ def create_workingschedule(request):
             working_schedule.is_off = True
         else:
             working_schedule.is_off = False
-
-        # if is_absense is not None:
-        #     working_schedule.is_leave = True
-        # else:
-        #     working_schedule.is_leave = False
 
         working_schedule.save()
         serializers = ScheduleSerializer(working_schedule, context={'request': request})
