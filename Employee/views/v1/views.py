@@ -4757,6 +4757,10 @@ def get_absence(request):
         is_active=True,
         **queries
     ).order_by('-created_at')
+    all_daily_schedules = EmployeDailySchedule.objects.filter(vacation_id=allvacations, is_leave=True)
+    allvacations = Vacation.objects \
+        .filter(vacation_employedailyschedules__in=all_daily_schedules) \
+        .distinct().order_by('-created_at')
 
     allvacations_count = allvacations.count()
 
