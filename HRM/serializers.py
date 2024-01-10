@@ -21,6 +21,8 @@ class HolidaySerializer(serializers.ModelSerializer):
                                 end_time=end_date,
                                 employee_id = employee.id,
                                 date=end_date)
-        return employee_schedule_id
+        validated_data['employee_schedule_id'] = employee_schedule_id.id
+        holiday = Holiday.objects.create(**validated_data)
+        return holiday
         
     
