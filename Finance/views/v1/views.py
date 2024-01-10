@@ -154,8 +154,7 @@ class RefundAPIView(APIView):
                     return Response(response_data, status=status.HTTP_200_OK)
                 else:
                     # create invoice
-                    invoice = SaleInvoice.objects.get(id=refund_invoice_id) \
-                                .select_related('client', 'business', 'location', 'user', 'member')
+                    invoice = SaleInvoice.objects.get(id=refund_invoice_id)
                     try:
                         #create invoice
                         create_invoice = SaleInvoice.objects.create(
