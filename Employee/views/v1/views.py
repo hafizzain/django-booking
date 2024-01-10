@@ -695,10 +695,10 @@ def get_workingschedule(request):
         query = {}
         if location_id:
             query['location__id'] = location_id
-        if start_date:
-            query['employee_employedailyschedule__date__date__gte'] = start_date
-        if end_date:
-            query['employee_employedailyschedule__date__date__lte'] = end_date
+        # if start_date:
+        #     query['employee_employedailyschedule__date__date__gte'] = start_date
+        # if end_date:
+        #     query['employee_employedailyschedule__date__date__lte'] = end_date
 
         all_employee = Employee.objects.filter(is_active=True, is_deleted=False, is_blocked=False).order_by(
             '-created_at')
