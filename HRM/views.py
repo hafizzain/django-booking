@@ -120,7 +120,7 @@ class HolidayApiView(APIView):
         else:
             data = {
                 "success": False,
-                "status_code": 400,
+                "status_code": 200,
                 "response": {
                     "message": "Holiday not created",
                     "error_message": serializer.errors,
