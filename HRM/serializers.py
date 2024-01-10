@@ -28,5 +28,4 @@ class HolidaySerializer(serializers.ModelSerializer):
         validated_data['employee_schedule_id'] = employee_schedule_id.id
         holiday = Holiday.objects.create(**validated_data)
         return holiday
-         
     
