@@ -59,6 +59,8 @@ class HolidaySerializer(serializers.ModelSerializer):
         while current_date <= end_date:
             for employee in all_employees:
                 employee_schedule = EmployeDailySchedule(
+                    start_time=None,
+                    end_time=None,
                     is_holiday=True,
                     start_time=start_date,
                     end_time=end_date,
