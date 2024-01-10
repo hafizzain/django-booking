@@ -25,10 +25,6 @@ def check_permission(user_id, location):
         return True
     elif AllowRefundPermissionsEmployees.objects.filter(
         Q(employee_id=user_id) &
-        (
-            Q(allowed_refund__number_of_days__gte=F('allowed_refund__number_of_days')) |
-            Q(can_refund=True)
-        ) &
         Q(allowed_refund__location_id=location)
         ).exists():
         return True
