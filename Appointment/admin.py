@@ -14,6 +14,7 @@ admin.site.register(AppointmentNotes)
 class AppointmentCheckoutAdmin(admin.ModelAdmin):
     ordering = ['-created_at']
     list_display = ['id', 'business_address', 'is_promotion', 'created_at', 'total_price']
+    search_fields = ('id')
 
 
 
@@ -33,7 +34,7 @@ class AppointmentAdmin(admin.ModelAdmin):
         'discount_price',
         'discount_percentage'
     ]
-
+    search_fields = ('id')
 @admin.register(AppointmentService)
 class AppointmentServiceAdmin(admin.ModelAdmin):
     ordering = ['-created_at']
