@@ -13,11 +13,18 @@ def short_uuid(uuid):
 
 
 def check_days(invoice_id, location):
-    # try:
-        no_of_days = AllowRefunds.objects.get(location= location).number_of_days
+    try:
+        # print(f"Checking for location: {location}")
+        no_of_days = AllowRefunds.objects.get(location_id=location).number_of_days
         instance = SaleInvoice.objects.get(id=invoice_id, location_id=location)
         days_difference = (timezone.now() - instance.created_at).days
         return days_difference <= no_of_days
+    except AllowRefunds.DoesNotExist:
+        # print(f"AllowRefunds not found for location: {location}")
+        return False
+    except SaleInvoice.DoesNotExist:
+        # print(f"SaleInvoice not found for invoice_id: {invoice_id} and location: {location}")
+        return False
     # except SaleInvoice.DoesNotExist:
     #     return False
 
