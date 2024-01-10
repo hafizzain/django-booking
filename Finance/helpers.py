@@ -13,13 +13,13 @@ def short_uuid(uuid):
 
 
 def check_days(invoice_id, location):
-    try:
+    # try:
         no_of_days = AllowRefunds.objects.get(location_id= location).number_of_days
         instance = SaleInvoice.objects.get(id=invoice_id, location=location)
         days_difference = (timezone.now() - instance.created_at).days
         return days_difference <= no_of_days
-    except SaleInvoice.DoesNotExist:
-        return False
+    # except SaleInvoice.DoesNotExist:
+    #     return False
 
 def check_permission(user_id, location):
     if Tenant.objects.filter(user_id = user_id).exists():
