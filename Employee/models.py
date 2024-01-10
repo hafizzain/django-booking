@@ -438,6 +438,7 @@ class Vacation(models.Model):
 
 
 class VacationDetails(models.Model):
+
     vacation = models.ForeignKey(Vacation, on_delete=models.CASCADE, null=True, related_name='vacation_detail')
     # business = models.ForeignKey(Business, on_delete=models.CASCADE, null=True, related_name='business_vacation')
     # employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_vacation')
@@ -469,6 +470,9 @@ class EmployeDailySchedule(models.Model):
                                  related_name='vacation_employedailyschedules')
     start_time = models.TimeField(null=True, blank=True)
     end_time = models.TimeField(null=True, blank=True)
+
+    is_display = models.BooleanField(default=False)
+    vacation_status = models.TextField(null=True)
 
     start_time_shift = models.TimeField(null=True, blank=True)  # =>>  Will be terminated
     end_time_shift = models.TimeField(null=True, blank=True)  # =>>   Will be terminated

@@ -456,7 +456,6 @@ class EmployeeNameSerializer(serializers.ModelSerializer):
                 return obj.image
         return None
 
-
     def get_leave_data(self, obj):
 
         try:
@@ -1007,10 +1006,10 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
                 query &= Q(start_date__gte=start_date)
             if end_date:
                 query &= Q(end_date__lte=end_date)
-            
+
             holidays = Holiday.objects.select_related('user', 'business', 'location') \
                 .filter(query)
-                
+
             return len(holidays) > 0  # Return True if there is any holiday
         except Exception as err:
             error = str(err)
@@ -1121,6 +1120,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     schedule = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     leave_data = serializers.SerializerMethodField(read_only=True)
+
     # false_scedule =  serializers.SerializerMethodField(read_only=True)
 
     def get_leave_data(self, obj):
@@ -1135,15 +1135,21 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
             return None
 
     def get_schedule(self, obj):
-        start_date = self.context.get('start_date',None)
-        end_date = self.context.get('end_date',None)
+        start_date = self.context.get('start_date', None)
+        end_date = self.context.get('end_date', None)
         query = {}
         if start_date:
             query['date__date__gte'] = start_date
         if end_date:
             query['date__date__lte'] = end_date
-        qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) | Q(is_weekend=False)) ,**query)
+        # qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) | Q(is_weekend=False)) ,**query)
         # qs = EmployeDailySchedule.objects.filter(employee=obj ,**query)
+        qs = EmployeDailySchedule.objects.filter(
+            Q(employee=obj) &
+            (Q(is_weekend=True) | Q(is_weekend=False)) &
+            Q(is_vacation=True, vacation__status='accepted')
+            ** query
+        )
         return ScheduleSerializerOP(qs, many=True, context=self.context).data
 
     # def get_false_scedule(self, obj):
@@ -1783,7 +1789,7 @@ class EmployeeInfoSerializer(serializers.ModelSerializer):
 class GiftCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = GiftCards
-        fields = ['name','gift_card_value','retail_price','expire_date','discount_to_show']
+        fields = ['name', 'gift_card_value', 'retail_price', 'expire_date', 'discount_to_show']
 
     def create(self, validated_data):
         return GiftCards.objects.create(**validated_data)
