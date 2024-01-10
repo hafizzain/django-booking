@@ -4,7 +4,7 @@ from Employee.models import Employee, EmployeDailySchedule
 
 class HolidaySerializer(serializers.ModelSerializer):
     class Meta:
-        model = Hol=iday
+        model = Holiday
         fields = '__all__'
         
     
