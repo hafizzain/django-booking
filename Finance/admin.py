@@ -17,7 +17,7 @@ class RefundServiceAdmin(admin.ModelAdmin):
 @admin.register(Refund)
 class RefundAdmin(admin.ModelAdmin):
     ordering = ['-created_at']
-    list_display = ['id', 'user', 'refund_invoice_id', 'refund_type', 'total_refund_amount']
+    list_display = ['id', 'user', 'refund_invoice_id', 'business','refund_type', 'total_refund_amount']
     
     
 @admin.register(AllowRefunds)
