@@ -1,4 +1,4 @@
-from Tenants.models import Tenant
+from Authentication.models import User
 from django.db.models import Q,F
 from Finance.models import AllowRefundPermissionsEmployees, AllowRefunds
 from Invoices.models import SaleInvoice
@@ -19,11 +19,9 @@ def check_days(invoice_id, location):
         return days_difference <= no_of_days
     except Exception as e:
         return f"An error occurred: {str(e)}"
-    # except SaleInvoice.DoesNotExist:
-    #     return False
 
 def check_permission(user_id, location):
-    if Tenant.objects.filter(user_id = user_id).exists():
+    if User.objects.filter(user_id = user_id, is_admin = True).exists():
         return True
     elif AllowRefundPermissionsEmployees.objects.filter(
         Q(employee_id=user_id) &

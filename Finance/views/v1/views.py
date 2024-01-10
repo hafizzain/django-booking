@@ -30,6 +30,7 @@ def check_permission_view(request):
                         'data': []
                     }
                 }
+            
             return Response(response_data, status=status.HTTP_200_OK)
         response_data = {
             'success': True,
