@@ -21,7 +21,7 @@ def check_days(invoice_id, location):
         return f"An error occurred: {str(e)}"
 
 def check_permission(user_id, location):
-    if User.objects.get(id = user_id, is_admin = True).exists():
+    if User.objects.get(id = user_id, is_admin = True):
         return True
     elif AllowRefundPermissionsEmployees.objects.filter(
         Q(employee_id=user_id) &
