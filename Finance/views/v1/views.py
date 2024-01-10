@@ -14,32 +14,33 @@ from Client.serializers import SaleInvoiceSerializer
 
 @api_view(['GET'])
 def check_permission_view(request):
-    invoice_id = request.data.get('invoice_id')
-    location = request.data.get('location')
-    user = request.user.id
-    if check_days(invoice_id, location) == True:
-            response_data = {
+    try:
+        invoice_id = request.data.get('invoice_id')
+        location = request.data.get('location')
+        user = request.user.id
+        if check_days(invoice_id, location):
+                response_data = {
+                                'success': True,
+                                'status_code': 201,
+                                'response': {
+                                    'message': 'Permission granted!',
+                                    'error_message': None,
+                                    'data': []
+                                }
+                            }
+                return Response(response_data, status=status.HTTP_200_OK)
+        response_data = {
                             'success': True,
-                            'status_code': 201,
+                            'status_code': 404,
                             'response': {
-                                'message': 'Permission granted!',
+                                'message': 'Permission Deneid!',
                                 'error_message': None,
                                 'data': []
                             }
                         }
-            return Response(response_data, status=status.HTTP_200_OK)
-    response_data = {
-                        'success': True,
-                        'status_code': 404,
-                        'response': {
-                            'message': 'Permission Deneid!',
-                            'error_message': None,
-                            'data': []
-                        }
-                    }
-    return Response(response_data, status=status.HTTP_200_OK)
-    # except Exception as e:
-    #     return Response({'erorr': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(response_data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'erorr': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 class RefundAPIView(APIView):
 
