@@ -99,6 +99,8 @@ class HolidayApiView(APIView):
     
     @transaction.atomic
     def post(self, request):
+        start_date = request.data.get('start_date', None)
+        end_date = request.data.get('end_date', None)
         user = request.user
         holiday_data = request.data.copy()
         holiday_data['user'] = user.id
@@ -106,11 +108,12 @@ class HolidayApiView(APIView):
         if 'is_active' not in holiday_data:     #due to unknown clash 
             holiday_data['is_active'] = True
         # get employee_schedule list filter with location
-        employee_schedule =list(EmployeDailySchedule.objects \
-                            .select_related('user','business','employee','vacation') \
-                            .filter(employee__location=location) \
-                            .values_list('id'), flat=True)
-        holiday_data['employee_schedule'] = employee_schedule
+        employee_schedule_id =EmployeDailySchedule.objects \
+                            .create(is_holiday=True,
+                                    start_time=start_date,
+                                    end_time=end_date,
+                                    date=end_date )
+        holiday_data['employee_schedule'] = employee_schedule_id
         serializer = HolidaySerializer(data=holiday_data,
                                        context={'request': request})
         if serializer.is_valid():
