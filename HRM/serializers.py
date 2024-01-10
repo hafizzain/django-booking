@@ -51,6 +51,6 @@ class HolidaySerializer(serializers.ModelSerializer):
         # validated_data['employee_schedule_id'] = employee_schedule_id.id
         holiday = Holiday.objects.create(**validated_data)
         for employee_schedule_id in employee_schedule_ids:
-            holiday.update(employee_schedule_id=employee_schedule_ids)
+            holiday.employee_schedule_id=employee_schedule_ids
         return holiday
     
