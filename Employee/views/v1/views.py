@@ -4759,7 +4759,7 @@ def get_absence(request):
     ).order_by('-created_at')
 
     all_daily_schedules = EmployeDailySchedule.objects \
-        .filter(vacation__in=allvacations, is_vacation=True)
+        .filter(vacation__in=allvacations, holiday_type='Absence')
     # Extract the distinct Vacation instances from the related EmployeDailySchedule instances
     related_vacations = Vacation.objects \
         .filter(vacation_employedailyschedules__in=all_daily_schedules) \
@@ -4794,7 +4794,7 @@ def get_absence(request):
             status=status.HTTP_200_OK
         )
     else:
-        serialized = NewAbsenceSerializer(allvacations, many=True, context={'request': request})
+        serialized = NewAbsenceSerializer(related_vacations, many=True, context={'request': request})
         return Response(
             {
                 'status': 200,
