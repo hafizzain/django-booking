@@ -41,6 +41,17 @@ class SaleInvoice(models.Model):
         ('Other', 'Other'),
         
     ]
+    
+    CHECKOUT_TYPE = [
+        ('sale','Sale'),
+        ('appointment', 'Appointment')
+    ]
+    
+    INVOICE_TYPE = [
+        ('refund', 'Refund'),
+        ('order','Order'),
+    ]
+    
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
@@ -72,7 +83,13 @@ class SaleInvoice(models.Model):
     service = models.CharField(max_length=2000, default='', null=True, blank=True)
     member = models.CharField(max_length=2000, default='', null=True, blank=True)
     business_address = models.CharField(max_length=2000, default='', null=True, blank=True)
-
+    
+    # types of checkout and invoices
+    
+    invoice_type = models.CharField(choices = INVOICE_TYPE, max_length=50 , default = '', null=True, blank=True )
+    checkout_type = models.CharField(choices = CHECKOUT_TYPE, max_length=50 , default = '', null=True, blank=True )
+    
+    
     gst = models.FloatField(default=0, null=True, blank=True)
     gst_price = models.FloatField(default=0, null=True, blank=True)
     
