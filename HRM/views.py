@@ -166,6 +166,8 @@ class HolidayApiView(APIView):
         holiday.delete()
         holiday_schedule = EmployeDailySchedule.objects.filter(is_holiday=True)
         holiday_schedule.delete()
+        holidays = Holiday.objects.all()
+        holidays.delete()
         data = {
                 "success": True,
                 "status_code" : 200,
