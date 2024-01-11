@@ -30,7 +30,7 @@ def check_permission_view(request):
                         'message': 'Permission granted!',
                         'error_message': None,
                         'check_days_response': check_days(invoice_id, location),
-                        'check_permission': check_permission(user, location),
+                        'check_permission': check_permission(user, location, invoice_id),
                         'data': []
                     }
                 }
@@ -43,7 +43,7 @@ def check_permission_view(request):
                 'message': 'Permission Deneid!',
                 'error_message': None,
                 'check_days_response': check_days(invoice_id, location),
-                'check_permission': check_permission(user, location),
+                'check_permission': check_permission(user, location, invoice_id),
                 'data': []
             }
         }
