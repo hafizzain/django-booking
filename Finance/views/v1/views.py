@@ -166,8 +166,7 @@ class RefundAPIView(APIView):
                     
                     # create invoice
                     invoice = SaleInvoice.objects.get(id=refund_invoice_id)
-                    client_email = Client.objects.get(id=client) \
-                                    .values_list('email', flat=True)
+                    client_email = Client.objects.get(id=client).email
                     try:
                         #create invoice
                         create_invoice = SaleInvoice.objects.create(
