@@ -20,8 +20,8 @@ def check_days(invoice_id, location):
     except Exception as e:
         return f"An error occurred: {str(e)}"
 
-def check_permission(user_id, location):
-    if User.objects.get(id = user_id, is_admin = True).exists():
+def check_permission(user_id, location, invoice_id):
+    if User.objects.get(id = user_id, is_admin = True) and SaleInvoice.objects.get(id=invoice_id):
         return True
     elif AllowRefundPermissionsEmployees.objects.filter(
         Q(employee_id=user_id) &
@@ -29,4 +29,4 @@ def check_permission(user_id, location):
         ).exists():
         return True
     else:
-        return False
+        return False 
