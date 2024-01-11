@@ -4529,7 +4529,7 @@ def create_workingschedule(request):
         working_schedule.end_time = end_time
         working_schedule.start_time_shift = start_time_shift
         working_schedule.end_time_shift = end_time_shift
-        working_schedule.from_date = from_date
+        working_schedule.from_date = date
         working_schedule.to_date = to_date
         working_schedule.note = note
         working_schedule.is_vacation = False
@@ -4605,7 +4605,7 @@ def create_workingschedule(request):
                 end_time=end_time,
                 start_time_shift=start_time_shift,
                 end_time_shift=end_time_shift,
-                from_date=date,
+                from_date=from_date,
                 to_date=to_date,
                 note=note,
             )
