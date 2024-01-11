@@ -5242,6 +5242,7 @@ def update_workingschedule(request):
         )
         check_working_schedule.start_time = start_time
         check_working_schedule.end_time = end_time
+        check_working_schedule.is_weekend = end_time
         check_working_schedule.save()
         # check_working_schedule.update(start_time=start_time,end_time=end_time , is_weekend=False ,is_vacation=False)
         working_schedule = EmployeDailySchedule.objects.get(
