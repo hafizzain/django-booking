@@ -1006,7 +1006,7 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             if start_date:
                 query &= Q(start_date__gte=start_date)
             if end_date:
-                query &= Q(end_date__lte=end_date)
+                query &= (Q(end_date__lte=end_date) | Q(end_date__isnull=True))
             holidays = Holiday.objects.select_related('user', 'business', 'location') \
                 .filter(query)
 
