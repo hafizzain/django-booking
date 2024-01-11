@@ -3915,7 +3915,7 @@ def create_vacation_emp(request):
                 }
             },
 
-            status=status.HTTP_404_NOT_FOUND
+            status=200
         )
 
     if not all([business_id, employee]):
