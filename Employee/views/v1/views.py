@@ -5230,11 +5230,39 @@ def update_workingschedule(request):
     schedule_ids = request.data.get('schedule_ids', [])
     date = request.data.get('date', None)
     from_date = request.data.get('from_date', None)
-    leo_value = request.data.get('is_leo_day', None)
     is_weekend = request.data.get('is_weekend', None)
     leo_value = request.data.get('is_leo_day', None)
-    is_working_schedule = request.data.get('is_working_schedule', None)
-
+    start_time = request.data.get('start_time',None)
+    end_time = request.data.get('end_time',None)
+    # is_working_schedule = request.data.get('is_working_schedule', None)
+    if leo_value is not None:
+        check_working_schedule = EmployeDailySchedule.objects.filter(
+            business_id=business_id,
+            employee_id=employee,
+            date=date,
+            is_leo_day = True
+        )
+        check_working_schedule.update(start_time=start_time,end_time=end_time)
+        working_schedule = EmployeDailySchedule.objects.get(
+            business_id=business_id,
+            employee_id=employee,
+            date=date,
+            is_leo_day=True
+        )
+        serializers = ScheduleSerializer(working_schedule, context={'request': request})
+        return Response(
+            {
+                'status': True,
+                'status_code': 201,
+                'response': {
+                    'message': 'Working Schedule Created Successfully2!',
+                    'error_message': None,
+                    'schedule': serializers.data,
+                    'leo_value': leo_value
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
     if is_weekend is None:
         if schedule_id is None:
             return Response(
@@ -5323,7 +5351,7 @@ def update_workingschedule(request):
                 'status': True,
                 'status_code': 200,
                 'response': {
-                    'message': 'Weekend UPDATED successfully across employees!',
+                    'message': 'Weekend update successfully across employees!',
                     'error_message': None,
                     'schedule': serializers.data,
                     'date': date
