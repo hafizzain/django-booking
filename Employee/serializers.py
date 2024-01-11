@@ -1003,12 +1003,14 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             end_date = self.context.get('end_date', None)
             location_id = self.context.get('location_id', None)
             query = Q(location_id=location_id)
-            if start_date:
-                query &= Q(start_date__gte=start_date)
-            if end_date:
-                query &= (Q(end_date__lte=end_date) | Q(end_date__isnull=True))
+            # if start_date:
+            #     start_date=start_date
+            #     # query &= Q(start_date__gte=start_date)
+            # if end_date is None:
+            #     end_date=end_date
+                # query &= (Q(end_date__lte=end_date) | Q(end_date__isnull=True))
             holidays = Holiday.objects.select_related('user', 'business', 'location') \
-                .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True))& Q(start_date__gte=start_date))
+                .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
 
             return len(holidays) > 0  # Return True if there is any holiday
         except:
@@ -1017,7 +1019,7 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
     class Meta:
         model = EmployeDailySchedule
         fields = ['id', 'is_leo_day', 'is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date',
-                  'day', 'end_time_shift', 'end_time', 'is_weekend', 'vacation_status','note',
+                  'day', 'end_time_shift', 'end_time', 'is_weekend', 'vacation_status', 'note',
                   'start_time']
 
 
@@ -1150,7 +1152,8 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         #                                              **query)
         #     # if not qs.exists():
         qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) | Q(is_weekend=False)), **query)
-        qs = qs.filter((Q(is_vacation=True) & Q(vacation_status='accepted')) | Q(is_leo_day=True) | Q(is_working_schedule=True) | Q(is_weekend=True) | Q(is_weekend=False))
+        qs = qs.filter((Q(is_vacation=True) & Q(vacation_status='accepted')) | Q(is_leo_day=True) | Q(
+            is_working_schedule=True) | Q(is_weekend=True) | Q(is_weekend=False))
         # qs = qs.annotate(
         #     is_vacation_accepted=Case(
         #         When(is_vacation=True, vacation_status='accepted', then=Value(True)),
