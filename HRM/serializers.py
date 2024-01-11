@@ -42,9 +42,9 @@ class HolidaySerializer(serializers.ModelSerializer):
         try:
             # pass
             if start_date  and end_date:
-                pass
-                # from_date = datetime.strptime(start_date, "%Y-%m-%d")
-                # to_date = datetime.strptime(end_date, "%Y-%m-%d")
+                # pass
+                from_date = start_date
+                to_date = end_date
                 # diff = to_date - from_date
                 # days = int(diff.days)
                 # for i in range(days + 1):
