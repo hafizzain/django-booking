@@ -61,6 +61,7 @@ class HolidaySerializer(serializers.ModelSerializer):
                     employee_id=employee.id,
                     date=current_date,
                     from_date=current_date,
+                    note='holiday note'
                 )
                 employee_schedules.append(employee_schedule)
             current_date += timedelta(days=1)
