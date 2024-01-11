@@ -3893,9 +3893,10 @@ def create_vacation_emp(request):
     is_leave = request.data.get('is_leave', None)
     is_off = request.data.get('is_off', None)
     vacation_type = request.data.get('vacation_type', None)
+    is_working_schedule = request.data.get('is_working_schedule', None)
     value = 0
     difference_days = 0
-    
+
     working_sch = None
     check_leo_day = EmployeDailySchedule.objects.filter(
         employee=employee,
@@ -4406,9 +4407,9 @@ def create_workingschedule(request):
     is_leave = request.data.get('is_leave', None)
     is_off = request.data.get('is_off', None)
     leo_value = request.data.get('is_leo_day', None)
-    is_working_schedule = request.data.get('is_working_schedule',None)
+    is_working_schedule = request.data.get('is_working_schedule', None)
     week_end_employee = request.data.get('week_end_employee', [])
-    if is_weekend is None and leo_value is None:
+    if is_working_schedule is not None:
         if not all([business_id, employee]):
             return Response(
                 {
@@ -4480,7 +4481,6 @@ def create_workingschedule(request):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-
         record_count = check_working_schedule.count()
         if record_count > max_records:
             return Response(
@@ -4509,8 +4509,9 @@ def create_workingschedule(request):
         working_schedule.from_date = from_date
         working_schedule.to_date = to_date
         working_schedule.note = note
-        working_schedule.is_vacation = True
-        working_schedule.vacation_status='pending'
+        working_schedule.is_vacation = False
+        working_schedule.vacation_status = None
+        working_schedule.is_working_schedule = True
         if is_leave is not None:
             working_schedule.is_leave = True
         else:
@@ -4695,7 +4696,7 @@ def create_workingschedule(request):
         working_schedule.note = note
         working_schedule.is_leo_day = True
         working_schedule.is_vacation = False
-        working_schedule.vacation_status=None
+        working_schedule.vacation_status = None
         working_schedule.save()
         try:
             is_leo_day_update = LeaveManagements.objects.get(employee_id=employee_id.id)
@@ -4716,7 +4717,7 @@ def create_workingschedule(request):
                     'message': 'Working Schedule Created Successfully2!',
                     'error_message': None,
                     'schedule': serializers.data,
-                    'leo_value':leo_value
+                    'leo_value': leo_value
                 }
             },
             status=status.HTTP_201_CREATED
