@@ -226,6 +226,7 @@ def get_user(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
+    user_data = {}
 
     if not user.is_active:
         return Response(
@@ -282,6 +283,9 @@ def get_user(request):
     if str(employee) == 'true':
         try:
             emp = Employee.objects.get(email = str(user.email))
+            employee_locations = emp.location.all()
+            if len(employee_locations) > 0:
+                user_data['selected_location'] = employee_locations[0].id
             serialized = EmployeSerializer(emp, context={'request' : request, }) #context={'request' : request, })
             response_data = serialized.data
             
@@ -312,6 +316,7 @@ def get_user(request):
                     'message' : 'Authenticated',
                     'data' : serialized.data,
                     'permissions' : permisson,
+                    **user_data,
                 }
             },
             status=status.HTTP_200_OK
