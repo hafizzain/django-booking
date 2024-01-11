@@ -33,6 +33,7 @@ class HolidaySerializer(serializers.ModelSerializer):
         return attrs
     
     def create(self, validated_data):
+        condition=None
         start_date = validated_data['start_date']
         end_date = validated_data['end_date']
         location = validated_data['location']
@@ -44,8 +45,10 @@ class HolidaySerializer(serializers.ModelSerializer):
         current_date = start_date
         employee_schedules = []
         if end_date is None:
-            end_date = datetime.now().date()
-        while current_date.date() <= end_date:
+            condition = end_date = datetime.now().date()
+        else:
+            condition = current_date<= end_date
+        while condition<= end_date:
             for employee in all_employees:
                 employee_schedule_to_del = EmployeDailySchedule.objects.filter(
                     employee_id=employee.id,
