@@ -108,6 +108,8 @@ class HolidayApiView(APIView):
                                         context={'request': request})
         if serializer.is_valid():
             serializer.save()
+            result = EmployeDailySchedule.objects.filter(is_holiday=True)
+            s = EmployeDailyScheduleResponse(result , many=True).data
             data = {
                 "success": True,
                 "status_code": 201,
@@ -115,6 +117,7 @@ class HolidayApiView(APIView):
                     "message": "Holiday created successfully",
                     "error_message": None,
                     "data": serializer.data,
+                    "all_created":s
                 }
             }
             return Response(data, status=status.HTTP_200_OK)
