@@ -5234,20 +5234,15 @@ def update_workingschedule(request):
     leo_value = request.data.get('is_leo_day', None)
     start_time = request.data.get('start_time',None)
     end_time = request.data.get('end_time',None)
+    schedule_id = request.data.get('schedule_id',None)
     # is_working_schedule = request.data.get('is_working_schedule', None)
     if leo_value is not None:
         check_working_schedule = EmployeDailySchedule.objects.filter(
-            business_id=business_id,
-            employee_id=employee,
-            date=date,
-            is_leo_day = True
+            id=schedule_id
         )
         check_working_schedule.update(start_time=start_time,end_time=end_time , is_weekend=False ,is_vacation=False)
         working_schedule = EmployeDailySchedule.objects.get(
-            business_id=business_id,
-            employee_id=employee,
-            date=date,
-            is_leo_day=True
+         id =schedule_id
         )
         serializers = ScheduleSerializer(working_schedule, context={'request': request})
         return Response(
