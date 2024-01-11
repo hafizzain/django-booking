@@ -2320,6 +2320,10 @@ def new_create_sale_order(request):
         location=business_address,
         client_type=client_type,
         payment_type=payment_type,
+        
+        # Added new fields
+        invoice_type = 'order',
+        checkout_type = 'sale',
 
         total_voucher_price=voucher_total_price,
         total_service_price=service_total_price,

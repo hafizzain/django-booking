@@ -2034,6 +2034,12 @@ def create_checkout(request):
         appointment=appointment,
         appointment_service=f'{service_appointment.id}',
         payment_type=payment_method,
+        
+        # Added new fields
+
+        invoice_type = 'order',
+        checkout_type = 'appointment',
+        
         service=f'{service.id}' if service else '',
         member=f'{member.id}' if member else '',
         business_address=f'{business_address.id}',

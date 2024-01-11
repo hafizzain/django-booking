@@ -120,6 +120,8 @@ class RefundAPIView(APIView):
         payment_type = request.data.get('payment_type')
         client_type = request.data.get('client_type')
         client = request.data.get('client')
+        invoice_type = request.data.get('invoice_type')
+        checkout_type = request.data.get('checkout_type')
         
         try:
             user = request.user
@@ -172,6 +174,9 @@ class RefundAPIView(APIView):
                             member=invoice.member,
                             client_type=client_type,
                             payment_type=payment_type,
+                            
+                            invoice_type = 'refund',
+                            checkout_type = checkout_type,
 
                             total_voucher_price=invoice.total_voucher_price,
                             total_service_price=invoice.total_service_price,

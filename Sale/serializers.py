@@ -2345,7 +2345,7 @@ class SaleOrders_CheckoutSerializerOP(serializers.ModelSerializer):
 
     def get_invoice(self, obj):
         try:
-            invoice = SaleInvoice.objects.filter(checkout__icontains=obj) 
+            invoice = SaleInvoice.objects.get(checkout__icontains=obj) 
             serializer = SaleInvoiceSerializerOP(invoice, context=self.context)
             return serializer.data
         except Exception as e:
@@ -2390,7 +2390,7 @@ class SaleInvoiceSerializerOP(serializers.ModelSerializer):
 
     class Meta:
         model = SaleInvoice
-        fields = ['id', 'file']
+        fields = ['id', 'file','invoice_type','checkout_type'] # Added new fields checkout type and t
 
 
 class Couponresponseappointment(serializers.ModelSerializer):
