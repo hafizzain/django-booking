@@ -137,6 +137,7 @@ class HolidaySerializer(serializers.ModelSerializer):
         #                 is_vacation=False,
         #                 is_weekend=False
         #             )
+        tr:
         holiday = Holiday.objects.create(**validated_data)
 
         return holiday
