@@ -687,6 +687,7 @@ def single_employee_schedule(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_workingschedule(request):
+    s=None
     employee_ids_in_schedule = None
     is_weekend = request.query_params.get('is_weekend', None)
     start_date = request.query_params.get('start_date', None)
@@ -714,7 +715,7 @@ def get_workingschedule(request):
             {
                 'start_date': start_date, 'end_date': end_date,
                 'status': 200,
-                's':s ,
+                's': s,
                 'status_code': '200',
                 'response': {
                     'message': 'All Employee',
@@ -4020,7 +4021,7 @@ def create_vacation_emp(request):
         diff = to_date - from_date
         days = int(diff.days)
     except:
-        days =0
+        days = 0
 
     available_value = int(value)
     if days > available_value:
@@ -4114,7 +4115,7 @@ def create_vacation_emp(request):
         return Response(
             {
                 'status': False,
-                'status_code':500,
+                'status_code': 500,
                 'response': {
                     'message': 'Internal Server Error',
                     'error_message': str(err),
@@ -5232,9 +5233,9 @@ def update_workingschedule(request):
     from_date = request.data.get('from_date', None)
     is_weekend = request.data.get('is_weekend', None)
     leo_value = request.data.get('is_leo_day', None)
-    start_time = request.data.get('start_time',None)
-    end_time = request.data.get('end_time',None)
-    schedule_id = request.data.get('schedule_id',None)
+    start_time = request.data.get('start_time', None)
+    end_time = request.data.get('end_time', None)
+    schedule_id = request.data.get('schedule_id', None)
     # is_working_schedule = request.data.get('is_working_schedule', None)
     if leo_value is not None:
         check_working_schedule = EmployeDailySchedule.objects.get(
@@ -5248,7 +5249,7 @@ def update_workingschedule(request):
         check_working_schedule.save()
         # check_working_schedule.update(start_time=start_time,end_time=end_time , is_weekend=False ,is_vacation=False)
         working_schedule = EmployeDailySchedule.objects.get(
-         id =schedule_id
+            id=schedule_id
         )
         serializers = ScheduleSerializer(working_schedule, context={'request': request})
         return Response(
