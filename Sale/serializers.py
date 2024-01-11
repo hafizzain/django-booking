@@ -2512,7 +2512,7 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
 
     def get_invoice(self, obj):
         try:
-            invoice = SaleInvoice.objects.get(checkout__icontains=obj)
+            invoice = SaleInvoice.objects.filter(checkout__icontains=obj)
             serializer = SaleInvoiceSerializerOP(invoice, context=self.context)
             return serializer.data
         except Exception as e:
