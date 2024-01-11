@@ -40,7 +40,8 @@ class HolidaySerializer(serializers.ModelSerializer):
             .prefetch_related('location') \
             .filter(location=location)
         try:
-            if start_date is not None and end_date is not None:
+            pass
+            # if start_date is not None and end_date is not None:
                 # from_date = datetime.strptime(start_date, "%Y-%m-%d")
                 # to_date = datetime.strptime(end_date, "%Y-%m-%d")
                 # diff = to_date - from_date
