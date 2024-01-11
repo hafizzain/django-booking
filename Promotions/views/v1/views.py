@@ -6905,6 +6905,8 @@ def get_coupon(request):
             'response': {
                 'message': 'Coupon redeemed successfully!',
                 'error_message': None,
+                'usage_limit':coupon.usage_limit,
+                'user_limit': coupon.user_limit,
                 'coupon': serializer.data,
                 'coupon.amount_spent':coupon.amount_spent,
                 'total_price':total_price

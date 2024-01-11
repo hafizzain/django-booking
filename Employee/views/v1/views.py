@@ -4073,7 +4073,6 @@ def create_vacation_emp(request):
         for i in range(days + 1):
             current_date = from_date + timedelta(days=i)
             working_sch = EmployeDailySchedule.objects.filter(employee=employee_id, date=current_date).first()
-
             if working_sch:
                 working_sch.is_vacation = True
                 empl_vacation.save()
