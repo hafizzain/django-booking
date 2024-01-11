@@ -5237,10 +5237,13 @@ def update_workingschedule(request):
     schedule_id = request.data.get('schedule_id',None)
     # is_working_schedule = request.data.get('is_working_schedule', None)
     if leo_value is not None:
-        check_working_schedule = EmployeDailySchedule.objects.filter(
+        check_working_schedule = EmployeDailySchedule.objects.get(
             id=schedule_id
         )
-        check_working_schedule.update(start_time=start_time,end_time=end_time , is_weekend=False ,is_vacation=False)
+        check_working_schedule.start_time = start_time
+        check_working_schedule.end_time = end_time
+        check_working_schedule.save()
+        # check_working_schedule.update(start_time=start_time,end_time=end_time , is_weekend=False ,is_vacation=False)
         working_schedule = EmployeDailySchedule.objects.get(
          id =schedule_id
         )
@@ -5248,9 +5251,9 @@ def update_workingschedule(request):
         return Response(
             {
                 'status': True,
-                'status_code': 201,
+                'status_code': 200,
                 'response': {
-                    'message': 'Working Schedule Created Successfully2!',
+                    'message': 'Working Schedule updated Successfully2!',
                     'error_message': None,
                     'schedule': serializers.data,
                     'leo_value': leo_value
