@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from HRM.models import *
 from Employee.models import Employee, EmployeDailySchedule
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from django.db import transaction
 
 
@@ -43,6 +43,8 @@ class HolidaySerializer(serializers.ModelSerializer):
                                         
         current_date = start_date
         employee_schedules = []
+        if end_date is None:
+            end_date = datetime.now().date()
         while current_date <= end_date:
             for employee in all_employees:
                 employee_schedule_to_del = EmployeDailySchedule.objects.filter(
