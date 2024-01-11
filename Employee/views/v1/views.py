@@ -3907,8 +3907,8 @@ def create_vacation_emp(request):
         return Response(
             {
                 'status': False,
-                'status_code': 404,
-                'status_code_text': '404',
+                'status_code': 400,
+                'status_code_text': '400',
                 'response': {
                     'message': f'Cannot create vacation on leo day.',
                     'error_message': None,
