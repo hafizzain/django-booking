@@ -45,6 +45,8 @@ class HolidaySerializer(serializers.ModelSerializer):
         employee_schedules = []
         if end_date is None:
             end_date = datetime.now().date()
+        if end_date is not  None:
+            end_date = datetime.now().date()
         while current_date.date() <= end_date:
             for employee in all_employees:
                 employee_schedule_to_del = EmployeDailySchedule.objects.filter(
