@@ -3906,7 +3906,7 @@ def create_vacation_emp(request):
     if check_leo_day:
         return Response(
             {
-                'status': False,
+                'status': 400,
                 'status_code': 400,
                 'status_code_text': '400',
                 'response': {
