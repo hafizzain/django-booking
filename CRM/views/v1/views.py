@@ -372,7 +372,7 @@ class CampaignsAPIView(APIView):
             serializer.save()
 
             new_campaign = serializer.instance
-            send_campaign_email(new_campaign=new_campaign)
+            send_campaign_email(new_campaign=new_campaign) # send email in threads
             data = {
                 "success": True,
                 "status_code": 201,

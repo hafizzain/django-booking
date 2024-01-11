@@ -3,9 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from django.db.models import Q
-from django.core.mail import send_mail
-from django.conf import settings
-
+from Utility.Campaign import send_refund_email
 
 from Finance.models import Refund, RefundCoupon, AllowRefunds,AllowRefundPermissionsEmployees
 from Finance.serializers import RefundSerializer, CouponSerializer, AllowRefundsSerializer
@@ -160,8 +158,6 @@ class RefundAPIView(APIView):
                     }
                     return Response(response_data, status=status.HTTP_200_OK)
                 else:
-                    subject = 'Refund Invoice Mail'
-                    message = 'Your Product Refund Successfully'
                     user = request.user
                     
                     # create invoice
@@ -187,13 +183,8 @@ class RefundAPIView(APIView):
                             checkout=invoice.checkout,
                         )
                         create_invoice.save()
-                        send_mail(
-                            subject,
-                            message,
-                            settings.EMAIL_HOST_USER,
-                            [client_email],
-                            fail_silently=False,
-                        )
+                        #send email to client running on thread
+                        send_refund_email(client_email=client_email) 
                     except Exception as e:
                         return Response({'Error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     response_data = {
