@@ -131,6 +131,36 @@ class RefundAPIView(APIView):
                 data=request.data, context={'request': request})
             if serializer.is_valid():
                 refund_instance = serializer.save()
+                #      create invoice
+                try:    
+                    invoice = SaleInvoice.objects.get(id=refund_invoice_id)
+                    client_email = Client.objects.get(id=client).email
+                    create_invoice = SaleInvoice.objects.create(
+                        user=user,
+                        client=invoice.client,
+                        location=invoice.location,
+                        member=invoice.member,
+                        client_type=client_type,
+                        payment_type=payment_type,
+                        
+                        invoice_type = 'refund',
+                        checkout_type = checkout_type,
+
+                        total_voucher_price=invoice.total_voucher_price,
+                        total_service_price=invoice.total_service_price,
+                        total_product_price=-refund_price,
+
+                        service_commission_type=invoice.service_commission_type,
+                        product_commission_type=invoice.product_commission_type,
+                        voucher_commission_type=invoice.voucher_commission_type,
+                        checkout=invoice.checkout,
+                    )
+                    create_invoice.save()
+                    #send email to client running on thread
+                    send_refund_email(client_email=client_email) 
+                except Exception as e:
+                        return Response({'Error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
                 if expiry_date:
                     coupon_data = {
                         'user': request.user.id,
@@ -150,48 +180,17 @@ class RefundAPIView(APIView):
                         'success': True,
                         'status_code': 201,
                         'response': {
-                            'message': 'Record created successfully',
+                            'message': 'Refund created successfully',
                             'error_message': None,
                             'data': {
                                 'refund': RefundSerializer(serializer.instance).data,
                                 'coupon': CouponSerializer(coupon_serializer.instance).data,
+                                'invoice': SaleInvoiceSerializer(create_invoice).data
                             }
                         }
                     }
                     return Response(response_data, status=status.HTTP_200_OK)
                 else:
-                    user = request.user
-                    
-                    # create invoice
-                    invoice = SaleInvoice.objects.get(id=refund_invoice_id)
-                    client_email = Client.objects.get(id=client).email
-                    try:
-                        #create invoice
-                        create_invoice = SaleInvoice.objects.create(
-                            user=user,
-                            client=invoice.client,
-                            location=invoice.location,
-                            member=invoice.member,
-                            client_type=client_type,
-                            payment_type=payment_type,
-                            
-                            invoice_type = 'refund',
-                            checkout_type = checkout_type,
-
-                            total_voucher_price=invoice.total_voucher_price,
-                            total_service_price=invoice.total_service_price,
-                            total_product_price=-refund_price,
-
-                            service_commission_type=invoice.service_commission_type,
-                            product_commission_type=invoice.product_commission_type,
-                            voucher_commission_type=invoice.voucher_commission_type,
-                            checkout=invoice.checkout,
-                        )
-                        create_invoice.save()
-                        #send email to client running on thread
-                        send_refund_email(client_email=client_email) 
-                    except Exception as e:
-                        return Response({'Error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     response_data = {
                         'success': True,
                         'status_code': 201,
@@ -200,7 +199,6 @@ class RefundAPIView(APIView):
                             'error_message': None,
                             'data': {
                                 'refund': RefundSerializer(serializer.instance).data,
-                                # 'coupon': CouponSerializer(coupon_serializer.instance).data,
                                 'invoice': SaleInvoiceSerializer(create_invoice).data, 
                             }
                         }
