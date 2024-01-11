@@ -3,12 +3,16 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from django.db.models import Q
+from django.core.mail import send_mail
+from django.conf import settings
+
 
 from Finance.models import Refund, RefundCoupon, AllowRefunds,AllowRefundPermissionsEmployees
 from Finance.serializers import RefundSerializer, CouponSerializer, AllowRefundsSerializer
 from Finance.helpers import short_uuid, check_permission, check_days
 from Invoices.models import SaleInvoice
 from Client.serializers import SaleInvoiceSerializer
+from Client.models import Client
 
 
 
@@ -18,7 +22,7 @@ def check_permission_view(request):
         invoice_id = request.query_params.get('invoice_id')
         location = request.query_params.get('location')
         user = request.user.id
-        if check_days(invoice_id, location) or check_permission(user, location):
+        if check_days(invoice_id, location) or check_permission(user, location, invoice_id):
             response_data = {
                     'success': True,
                     'status_code': 201,
@@ -26,7 +30,7 @@ def check_permission_view(request):
                         'message': 'Permission granted!',
                         'error_message': None,
                         'check_days_response': check_days(invoice_id, location),
-                        'check_permission': check_permission(user, location),
+                        'check_permission': check_permission(user, location, invoice_id),
                         'data': []
                     }
                 }
@@ -39,7 +43,7 @@ def check_permission_view(request):
                 'message': 'Permission Deneid!',
                 'error_message': None,
                 'check_days_response': check_days(invoice_id, location),
-                'check_permission': check_permission(user, location),
+                'check_permission': check_permission(user, location, invoice_id),
                 'data': []
             }
         }
@@ -115,6 +119,10 @@ class RefundAPIView(APIView):
     def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
         refund_invoice_id = request.data.get('refund_invoice_id')
         refund_price = request.data.get('total_refund_amount')
+        payment_type = request.data.get('payment_type')
+        client_type = request.data.get('client_type')
+        client = request.data.get('client')
+        
         try:
             user = request.user
             request.data['user'] = user.id
@@ -123,11 +131,10 @@ class RefundAPIView(APIView):
                 data=request.data, context={'request': request})
             if serializer.is_valid():
                 refund_instance = serializer.save()
-                client_id = request.data.get('client')
                 if expiry_date:
                     coupon_data = {
                         'user': request.user.id,
-                        'client': client_id,
+                        'client': client,
                         'refund_coupon_code': f"REFUND_{short_uuid(refund_instance.id)}",
                         'amount': refund_instance.total_refund_amount,
                         'expiry_date': expiry_date,
@@ -153,18 +160,23 @@ class RefundAPIView(APIView):
                     }
                     return Response(response_data, status=status.HTTP_200_OK)
                 else:
+                    subject = 'Refund Invoice Mail'
+                    message = 'Your Product Refund Successfully'
+                    user = request.user
+                    
                     # create invoice
-                    invoice = SaleInvoice.objects.get(id=refund_invoice_id) \
-                                .select_related('client', 'business', 'location', 'user', 'member')
+                    invoice = SaleInvoice.objects.get(id=refund_invoice_id)
+                    client_email = Client.objects.get(id=client) \
+                                    .values_list('email', flat=True)
                     try:
                         #create invoice
                         create_invoice = SaleInvoice.objects.create(
-                            user=user.id,
+                            user=user,
                             client=invoice.client,
                             location=invoice.location,
                             member=invoice.member,
-                            client_type=invoice.client_type,
-                            payment_type=invoice.payment_type,
+                            client_type=client_type,
+                            payment_type=payment_type,
 
                             total_voucher_price=invoice.total_voucher_price,
                             total_service_price=invoice.total_service_price,
@@ -176,6 +188,13 @@ class RefundAPIView(APIView):
                             checkout=invoice.checkout,
                         )
                         create_invoice.save()
+                        send_mail(
+                            subject,
+                            message,
+                            settings.EMAIL_HOST_USER,
+                            [client_email],
+                            fail_silently=False,
+                        )
                     except Exception as e:
                         return Response({'Error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     response_data = {

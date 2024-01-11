@@ -1,4 +1,5 @@
 from dataclasses import fields
+from django.db.models import Case, When, Value, BooleanField
 from django.db.models import Q
 from genericpath import exists
 from pyexpat import model
@@ -1006,7 +1007,6 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
                 query &= Q(start_date__gte=start_date)
             if end_date:
                 query &= Q(end_date__lte=end_date)
-
             holidays = Holiday.objects.select_related('user', 'business', 'location') \
                 .filter(query)
 
@@ -1017,7 +1017,7 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
     class Meta:
         model = EmployeDailySchedule
         fields = ['id', 'is_leo_day', 'is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date',
-                  'day', 'end_time_shift', 'end_time', 'is_weekend',
+                  'day', 'end_time_shift', 'end_time', 'is_weekend', 'vacation_status','note',
                   'start_time']
 
 
@@ -1141,10 +1141,39 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
             query['date__date__gte'] = start_date
         if end_date:
             query['date__date__lte'] = end_date
-        qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) | Q(is_weekend=False)) ,**query)
-        is_vacation_qs = qs.filter(is_vacation=True)
-        if is_vacation_qs:
-            qs = is_vacation_qs.filter(vacation_status='accepted')
+        # qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) | Q(is_weekend=False)) ,**query)
+        # is_vacation_qs = qs.filter(is_vacation=True)
+        # if is_vacation_qs.exists():
+        #     qs = is_vacation_qs.filter(vacation_status='accepted')
+        # else:
+        #     qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) | Q(is_weekend=False)),
+        #                                              **query)
+        #     # if not qs.exists():
+        qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) | Q(is_weekend=False)), **query)
+        qs = qs.filter((Q(is_vacation=True) & Q(vacation_status='accepted')) | Q(is_leo_day=True) | Q(is_working_schedule=True) | Q(is_weekend=True) | Q(is_weekend=False))
+        # qs = qs.annotate(
+        #     is_vacation_accepted=Case(
+        #         When(is_vacation=True, vacation_status='accepted', then=Value(True)),
+        #         default=Value(False),
+        #         output_field=BooleanField()
+        #     )
+        # ).filter(is_vacation_accepted=True)
+        #
+        # is_vacation_qs = qs.filter(is_vacation=True)
+
+        # if is_vacation_qs.exists():
+        #     # If there are vacations marked as 'accepted', use them
+        #     qs = is_vacation_qs.filter(vacation_status='accepted')
+        # else:
+        # If there are no vacations or none with 'accepted' status, you may handle it here
+        # For example, set qs to a default value or raise an exception
+        # qs = qs
+
+        # Now qs contains the filtered queryset based on your conditions
+        # if not qs.exists():
+        # Your code here
+
+        #     qs = is_vacation_qs.filter(vacation_status='pending')
         # qs = EmployeDailySchedule.objects.filter(employee=obj ,**query)
         # qs = EmployeDailySchedule.objects.filter(
         #     Q(employee=obj) &
