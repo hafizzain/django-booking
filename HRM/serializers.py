@@ -56,6 +56,18 @@ class HolidaySerializer(serializers.ModelSerializer):
                 )
                 if employee_schedule_to_del:
                     employee_schedule_to_del.delete()
+                    EmployeDailySchedule.objects.create(
+                        start_time=None,
+                        end_time=None,
+                        is_holiday=True,
+                        employee_id=employee.id,
+                        date=current_date,
+                        from_date=current_date,
+                        note='arbabs note',
+                        is_vacation=False,
+                        is_weekend=False,
+                        is_working_schedule=False
+                    )
                     # employee_schedule_to_del.update(start_time=None,
                     #                                 end_time=None,
                     #                                 is_holiday=True,
