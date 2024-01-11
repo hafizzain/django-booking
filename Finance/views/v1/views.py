@@ -3,12 +3,16 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from django.db.models import Q
+from django.core.mail import send_mail
+from django.conf import settings
+
 
 from Finance.models import Refund, RefundCoupon, AllowRefunds,AllowRefundPermissionsEmployees
 from Finance.serializers import RefundSerializer, CouponSerializer, AllowRefundsSerializer
 from Finance.helpers import short_uuid, check_permission, check_days
 from Invoices.models import SaleInvoice
 from Client.serializers import SaleInvoiceSerializer
+from Client.models import Client
 
 
 
@@ -153,10 +157,13 @@ class RefundAPIView(APIView):
                     }
                     return Response(response_data, status=status.HTTP_200_OK)
                 else:
+                    subject = 'Refund Invoice Mail'
+                    message = 'Your Product Refund Successfully'
                     user = request.user
                     
                     # create invoice
                     invoice = SaleInvoice.objects.get(id=refund_invoice_id)
+                    client_email = Client.objects.get(id=client_id).email
                     try:
                         #create invoice
                         create_invoice = SaleInvoice.objects.create(
@@ -176,7 +183,14 @@ class RefundAPIView(APIView):
                             voucher_commission_type=invoice.voucher_commission_type,
                             checkout=invoice.checkout,
                         )
-                        create_invoice.save() 
+                        create_invoice.save()
+                        send_mail(
+                            subject,
+                            message,
+                            settings.EMAIL_HOST_USER,
+                            ['arbabsabir336@gmail.com'],
+                            fail_silently=False,
+                        )
                     except Exception as e:
                         return Response({'Error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     response_data = {

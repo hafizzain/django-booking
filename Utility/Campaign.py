@@ -1,7 +1,7 @@
 from threading import Thread
 from django.core.mail import send_mail
 from django.conf import settings
-  
+
     
 def run_campaign(message=None, subject=None, client_email_list=None, campaign_type=None):
     
