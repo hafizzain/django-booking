@@ -4108,66 +4108,17 @@ def create_vacation_emp(request):
                 working_schedule.is_off = is_off if is_off is not None else False
                 working_schedule.save()
     except Exception as err:
-    return Response(
-        {
-            'status': False,
-            'status_code': StatusCodes.INTERNAL_SERVER_ERROR_500,
-            'response': {
-                'message': 'Internal Server Error',
-                'error_message': str(err),
-            }
-        },
-        status=status.HTTP_500_INTERNAL_SERVER_ERROR
-    )
-    # for i, value in enumerate(range(days + 1)):
-    #     if i == 0:
-    #         from_date = from_date
-    #     else:
-    #         from_date = from_date + timedelta(days=1)
-    #     try:
-    #         working_sch = EmployeDailySchedule.objects.get(
-    #             employee=employee_id,
-    #             date=from_date
-    #         )
-    #     except Exception as err:
-    #         pass
-    #     if working_sch is not None:
-    #         working_sch.is_vacation = True
-    #         working_sch.vacation = empl_vacation
-    #         working_sch.from_date = from_date
-    #         working_sch.save()
-    #     else:
-    #         working_schedule = EmployeDailySchedule.objects.create(
-    #             user=user,
-    #             business=business,
-    #             employee=employee_id,
-    #             day=day,
-    #             start_time=start_time,
-    #             end_time=end_time,
-    #             start_time_shift=start_time_shift,
-    #             end_time_shift=end_time_shift,
-    #             date=from_date,
-    #             from_date=from_date,
-    #             to_date=to_date,
-    #             note=note,
-    #             vacation_status='pending'
-    #         )
-    #         if is_vacation is not None:
-    #             working_schedule.is_vacation = True
-    #             empl_vacation.save()
-    #             working_schedule.vacation = empl_vacation
-    #         else:
-    #             working_schedule.is_vacation = False
-    #
-    #         if is_leave is not None:
-    #             working_schedule.is_leave = True
-    #         else:
-    #             working_schedule.is_leave = False
-    #         if is_off is not None:
-    #             working_schedule.is_off = True
-    #         else:
-    #             working_schedule.is_off = False
-    #         working_schedule.save()
+        return Response(
+            {
+                'status': False,
+                'status_code':500,
+                'response': {
+                    'message': 'Internal Server Error',
+                    'error_message': str(err),
+                }
+            },
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
     all_employe = EmployeDailySchedule.objects.select_related('business').order_by('created_at')
     serialized = ScheduleSerializer(all_employe, many=True, context={'request': request})
 
