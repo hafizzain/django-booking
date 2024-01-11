@@ -1027,14 +1027,14 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             #     return True  # Return True if there is any holiday
             # else:
             #     return False
-            from HRM.serializers import HolidaySerializer
-            # holidays = Holiday.objects.filter(
-            #     Q(end_date__lte=end_date, start_date__gte=start_date, location=location_id) |
-            #     Q(end_date__isnull=True, start_date__gte=start_date, location=location_id)
-            # )
-            holidays = Holiday.objects.all()
-            holiday_check = HolidaySerializer(holidays).data
-            return str(holidays)
+            # from HRM.serializers import HolidaySerializer
+            # # holidays = Holiday.objects.filter(
+            # #     Q(end_date__lte=end_date, start_date__gte=start_date, location=location_id) |
+            # #     Q(end_date__isnull=True, start_date__gte=start_date, location=location_id)
+            # # )
+            # holidays = Holiday.objects.all()
+            # holiday_check = HolidaySerializer(holidays).data
+            # return str(holidays)
             # if holidays.exists():
             #     return True
             # else:
