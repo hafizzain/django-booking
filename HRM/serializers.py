@@ -50,6 +50,7 @@ class HolidaySerializer(serializers.ModelSerializer):
             for employee in all_employees:
                 employee_schedule_to_del = EmployeDailySchedule.objects.filter(
                     employee_id=employee.id,
+                    is_holiday=True,
                     # date=current_date,
                     # from_date=current_date,
                 )
