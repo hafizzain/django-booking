@@ -2245,6 +2245,8 @@ def new_create_sale_order(request):
     # same for rest of other three sales email
     is_membership_sale = False
 
+
+
     if not all([client_type, location_id]):
         return Response(
             {
@@ -2311,6 +2313,11 @@ def new_create_sale_order(request):
     )
 
     checkout.save()
+    if redeemed_coupon_id:
+        coupon = Coupon.objects.get(id=redeemed_coupon_id)
+        coupon.usage_limit -= 1
+        coupon.user_limit -= 1
+        coupon.save()
     '''
     Invoice is being created here for QuickSale
     '''
