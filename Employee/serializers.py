@@ -1202,9 +1202,9 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         #                                              **query)
         #     # if not qs.exists():
         # qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) | Q(is_weekend=False)), **query)
-        qs = EmployeDailySchedule.filter((Q(is_vacation=True) & Q(vacation_status='accepted')) | Q(is_leo_day=True) | Q(
-            is_working_schedule=True) | Q(is_weekend=True) | Q(is_weekend=False))
-        qs = qs.filter(employee=obj)
+        # qs = EmployeDailySchedule.filter((Q(is_vacation=True) & Q(vacation_status='accepted')) | Q(is_leo_day=True) | Q(
+        #     is_working_schedule=True) | Q(is_weekend=True) | Q(is_weekend=False))
+        # qs = qs.filter(employee=obj)
         # # qs = qs.annotate(
         #     is_vacation_accepted=Case(
         #         When(is_vacation=True, vacation_status='accepted', then=Value(True)),
@@ -1235,6 +1235,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         #     Q(is_vacation=True, vacation_status='accepted'),
         #     **query
         # )
+        qs = EmployeDailySchedule.objects.filter(employee=obj)
         return ScheduleSerializerOP(qs, many=True, context=self.context).data
 
     # def get_false_scedule(self, obj):
