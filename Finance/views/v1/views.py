@@ -188,7 +188,7 @@ class RefundAPIView(APIView):
                             subject,
                             message,
                             settings.EMAIL_HOST_USER,
-                            ['Arbabsabir336@gmail.com'],
+                            ['arbabsabir336@gmail.com'],
                             fail_silently=False,
                         )
                     except Exception as e:
