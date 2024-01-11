@@ -52,7 +52,7 @@ class HolidaySerializer(serializers.ModelSerializer):
                     employee_id=employee.id,
                     is_holiday=True,
                     # date=current_date,
-                    # from_date=current_date,
+                    # from_date=current_date,/
                 )
                 if employee_schedule_to_del:
                     employee_schedule_to_del.update(start_time=None,
