@@ -4605,7 +4605,7 @@ def create_workingschedule(request):
                 end_time=end_time,
                 start_time_shift=start_time_shift,
                 end_time_shift=end_time_shift,
-                from_date=from_date,
+                from_date=date,
                 to_date=to_date,
                 note=note,
             )
@@ -5232,6 +5232,9 @@ def update_workingschedule(request):
     from_date = request.data.get('from_date', None)
     leo_value = request.data.get('is_leo_day', None)
     is_weekend = request.data.get('is_weekend', None)
+    leo_value = request.data.get('is_leo_day', None)
+    is_working_schedule = request.data.get('is_working_schedule', None)
+
     if is_weekend is None:
         if schedule_id is None:
             return Response(
