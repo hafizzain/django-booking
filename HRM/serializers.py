@@ -24,15 +24,15 @@ class HolidaySerializer(serializers.ModelSerializer):
 
         # Check if there is any holiday overlapping with the date range
         if start_date is not None and end_date is not None:
-            holiday_check = Holiday.objects.filter(start_date__lte=end_date, end_date__gte=start_date, location=location).exists()
+            holiday_check = Holiday.objects.filter(start_date__lte=end_date,
+                                                    end_date__gte=start_date,
+                                                    location=location).exists()
             if holiday_check:
                 raise serializers.ValidationError({'message': "Holiday already set for this date range."})
 
         return attrs
     
     def create(self, validated_data):
-        employee_schedule_ids = []
-        employee_schedule_id = None
         start_date = validated_data['start_date']
         end_date = validated_data['end_date']
         location = validated_data['location']
@@ -41,19 +41,6 @@ class HolidaySerializer(serializers.ModelSerializer):
                         .prefetch_related('location') \
                         .filter(location=location)
                                         
-        # current_date = start_date
-        # while start_date <= end_date:
-        #     for employee in all_employees:
-        #         employee_schedule_id = EmployeDailySchedule.objects \
-        #                     .create(is_holiday=True,
-        #                             start_time=start_date,
-        #                             end_time=end_date,
-        #                             employee_id = employee.id,
-        #                             date=end_date,
-        #                             from_date=start_date,
-        #                             )
-                # employee_schedule_ids.append(employee_schedule_id.id)
-        # validated_data['employee_schedule_id'] = employee_schedule_id.id
         current_date = start_date
         employee_schedules = []
         while current_date <= end_date:
@@ -65,15 +52,13 @@ class HolidaySerializer(serializers.ModelSerializer):
                     employee_id=employee.id,
                     date=current_date,
                     from_date=current_date,
-                    # date=date
                 )
                 employee_schedules.append(employee_schedule)
-
             current_date += timedelta(days=1)
-
         # Use bulk_create to insert all EmployeeDailySchedule objects in a single query
         with transaction.atomic():
             EmployeDailySchedule.objects.bulk_create(employee_schedules)
         holiday = Holiday.objects.create(**validated_data)
+        
         return holiday
     
