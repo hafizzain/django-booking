@@ -5242,7 +5242,7 @@ def update_workingschedule(request):
             date=date,
             is_leo_day = True
         )
-        check_working_schedule.update(start_time=start_time,end_time=end_time)
+        check_working_schedule.update(start_time=start_time,end_time=end_time , is_weekend=False ,is_vacation=False)
         working_schedule = EmployeDailySchedule.objects.get(
             business_id=business_id,
             employee_id=employee,
