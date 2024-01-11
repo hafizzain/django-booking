@@ -61,7 +61,8 @@ class HolidaySerializer(serializers.ModelSerializer):
                                                     date=current_date,
                                                     from_date=current_date,
                                                     note='arbabs note',
-                                                    is_vacation=False)
+                                                    is_vacation=False,
+                                                    is_weekend=False)
                 else:
                     employee_schedule = EmployeDailySchedule(
                         start_time=None,
