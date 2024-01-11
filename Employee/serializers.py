@@ -1034,7 +1034,7 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             # )
             holidays = Holiday.objects.all()
             holiday_check = HolidaySerializer(holidays).data
-            return holiday_check
+            return str(holidays)
             # if holidays.exists():
             #     return True
             # else:
