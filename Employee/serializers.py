@@ -1007,7 +1007,6 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
                 query &= Q(start_date__gte=start_date)
             if end_date:
                 query &= Q(end_date__lte=end_date)
-
             holidays = Holiday.objects.select_related('user', 'business', 'location') \
                 .filter(query)
 
@@ -1018,7 +1017,7 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
     class Meta:
         model = EmployeDailySchedule
         fields = ['id', 'is_leo_day', 'is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date',
-                  'day', 'end_time_shift', 'end_time', 'is_weekend', 'vacation_status',
+                  'day', 'end_time_shift', 'end_time', 'is_weekend', 'vacation_status','note',
                   'start_time']
 
 
