@@ -22,7 +22,7 @@ def check_permission_view(request):
         invoice_id = request.query_params.get('invoice_id')
         location = request.query_params.get('location')
         user = request.user.id
-        if check_days(invoice_id, location) or check_permission(user, location):
+        if check_days(invoice_id, location) or check_permission(user, location, invoice_id):
             response_data = {
                     'success': True,
                     'status_code': 201,
