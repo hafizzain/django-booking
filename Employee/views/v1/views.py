@@ -5259,7 +5259,7 @@ def update_workingschedule(request):
                     'leo_value': leo_value
                 }
             },
-            status=status.HTTP_201_CREATED
+            status=200
         )
     if is_weekend is None:
         if schedule_id is None:
