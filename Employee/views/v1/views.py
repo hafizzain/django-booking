@@ -4001,7 +4001,7 @@ def create_vacation_emp(request):
                     'status': 400,
                     'status_code': '400',
                     'response': {
-                        'message': 'Annual leave requests available after {required_months}'.format(
+                        'message': 'Annual leave requests available after {required_months} months'.format(
                             required_months=required_months),
                         'error_message': None,
                     }
