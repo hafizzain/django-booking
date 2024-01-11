@@ -8,5 +8,6 @@ class SaleInvoiceAdmin(admin.ModelAdmin):
     list_display = [
         'id',
         'file',
+        'checkout',
         'created_at'
     ]
