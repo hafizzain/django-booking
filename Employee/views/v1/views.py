@@ -4011,9 +4011,13 @@ def create_vacation_emp(request):
     if vacation_type == 'casual':
         value = employee_leave_management_obj.casual_leave
     from_date = datetime.strptime(from_date, "%Y-%m-%d")
-    to_date = datetime.strptime(to_date, "%Y-%m-%d")
-    diff = to_date - from_date
-    days = int(diff.days)
+    try:
+        to_date = datetime.strptime(to_date, "%Y-%m-%d")
+        diff = to_date - from_date
+        days = int(diff.days)
+    except:
+        days =0
+
     available_value = int(value)
     if days > available_value:
         return Response(
