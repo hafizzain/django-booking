@@ -108,6 +108,9 @@ class HolidaySerializer(serializers.ModelSerializer):
             #             working_schedule.is_off = is_off if is_off is not None else False
             #             working_schedule.save()
 
+        except:
+            pass
+
         # for employee in all_employees:
         #             EmployeDailySchedule.objects.create(
         #                 start_time=None,
