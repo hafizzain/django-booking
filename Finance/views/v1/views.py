@@ -121,6 +121,7 @@ class RefundAPIView(APIView):
         refund_price = request.data.get('total_refund_amount')
         payment_type = request.data.get('payment_type')
         client_type = request.data.get('client_type')
+        client = request.data.get('client')
         
         try:
             user = request.user
@@ -130,11 +131,10 @@ class RefundAPIView(APIView):
                 data=request.data, context={'request': request})
             if serializer.is_valid():
                 refund_instance = serializer.save()
-                client_id = request.data.get('client')
                 if expiry_date:
                     coupon_data = {
                         'user': request.user.id,
-                        'client': client_id,
+                        'client': client,
                         'refund_coupon_code': f"REFUND_{short_uuid(refund_instance.id)}",
                         'amount': refund_instance.total_refund_amount,
                         'expiry_date': expiry_date,
@@ -166,7 +166,8 @@ class RefundAPIView(APIView):
                     
                     # create invoice
                     invoice = SaleInvoice.objects.get(id=refund_invoice_id)
-                
+                    client_email = Client.objects.get(id=client) \
+                                    .value_list('email', flat=True)
                     try:
                         #create invoice
                         create_invoice = SaleInvoice.objects.create(
@@ -191,7 +192,7 @@ class RefundAPIView(APIView):
                             subject,
                             message,
                             settings.EMAIL_HOST_USER,
-                            ['arbabsabir336@gmail.com'],
+                            [client_email],
                             fail_silently=False,
                         )
                     except Exception as e:
