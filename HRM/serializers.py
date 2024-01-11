@@ -55,15 +55,16 @@ class HolidaySerializer(serializers.ModelSerializer):
                     # from_date=current_date,/
                 )
                 if employee_schedule_to_del:
-                    employee_schedule_to_del.update(start_time=None,
-                                                    end_time=None,
-                                                    is_holiday=True,
-                                                    employee_id=employee.id,
-                                                    date=current_date,
-                                                    from_date=current_date,
-                                                    note='arbabs note',
-                                                    is_vacation=False,
-                                                    is_weekend=False)
+                    employee_schedule_to_del.delete()
+                    # employee_schedule_to_del.update(start_time=None,
+                    #                                 end_time=None,
+                    #                                 is_holiday=True,
+                    #                                 employee_id=employee.id,
+                    #                                 date=current_date,
+                    #                                 from_date=current_date,
+                    #                                 note='arbabs note',
+                    #                                 is_vacation=False,
+                    #                                 is_weekend=False)
                 else:
                     employee_schedule = EmployeDailySchedule(
                         start_time=None,
