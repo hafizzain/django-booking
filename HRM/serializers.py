@@ -41,9 +41,9 @@ class HolidaySerializer(serializers.ModelSerializer):
             .filter(location=location)
         try:
             if start_date is not None and end_date is not None:
-                from_date = datetime.strptime(start_date, "%Y-%m-%d")
-                to_date = datetime.strptime(end_date, "%Y-%m-%d")
-                diff = to_date - from_date
+                # from_date = datetime.strptime(start_date, "%Y-%m-%d")
+                # to_date = datetime.strptime(end_date, "%Y-%m-%d")
+                # diff = to_date - from_date
                 # days = int(diff.days)
                 # for i in range(days + 1):
                 #     current_date = from_date + timedelta(days=i)
