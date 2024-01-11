@@ -2273,7 +2273,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     def get_invoice(self, obj):
         try:
             invoice = SaleInvoice.objects.filter(checkout__icontains=obj)
-            serializer = SaleInvoiceSerializer(invoice, context=self.context)
+            serializer = SaleInvoiceSerializer(invoice, many=True, context=self.context)
             return serializer.data
         except Exception as e:
             return str(e)
@@ -2471,7 +2471,7 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
     def get_invoice(self, obj):
         try:
             invoice = SaleInvoice.objects.filter(checkout__icontains=obj)
-            serializer = SaleInvoiceSerializer(invoice, context=self.context)
+            serializer = SaleInvoiceSerializer(invoice,many=True,context=self.context)
             return serializer.data
         except Exception as e:
             return str(e)
