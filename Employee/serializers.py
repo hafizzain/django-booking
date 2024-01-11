@@ -1018,7 +1018,7 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
 
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'is_leo_day', 'is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date',
+        fields = ['id', 'is_leo_day', 'is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date','is_working_schedule',
                   'day', 'end_time_shift', 'end_time', 'is_weekend', 'vacation_status', 'note',
                   'start_time']
 
