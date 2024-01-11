@@ -6785,7 +6785,7 @@ def get_coupon(request):
                     'status': False,
                     'status_code': 400,
                     'response': {
-                        'message': 'This coupon code is not available',
+                        'message': 'This coupon code is not available on this location',
                         'error_message': None,
                         # 'current_day': current_day
 
