@@ -10,6 +10,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import filters
 
+from Employee.serializers import EmployeDailyScheduleResponse
 from HRM.models import *
 from HRM.serializers import *
 # Create your views here.
@@ -107,13 +108,16 @@ class HolidayApiView(APIView):
                                         context={'request': request})
         if serializer.is_valid():
             serializer.save()
+            result = EmployeDailySchedule.objects.filter(is_holiday=True)
+            s = EmployeDailyScheduleResponse(result , many=True).data
             data = {
                 "success": True,
                 "status_code": 201,
                 "response": {
                     "message": "Holiday created successfully",
                     "error_message": None,
-                    "data": serializer.data
+                    "data": serializer.data,
+                    "all_created":s
                 }
             }
             return Response(data, status=status.HTTP_200_OK)

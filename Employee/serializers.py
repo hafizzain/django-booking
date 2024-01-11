@@ -1895,3 +1895,10 @@ class GiftCardSerializerResponse(serializers.ModelSerializer):
     class Meta:
         model = GiftCards
         fields = "__all__"
+
+
+class EmployeDailyScheduleResponse(serializers.ModelSerializer):
+
+    class Meta:
+        model = EmployeDailySchedule
+        fields = "__all__"
