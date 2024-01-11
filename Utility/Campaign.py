@@ -31,13 +31,30 @@ def send_campaign_email(new_campaign=None):
                             )
     if new_campaign.is_appnotifaction():
         campaign_type = "AppNotification"
-         
+
     if new_campaign.is_both():
         campaign_type = "Both"
     
     thread = Thread(target=run_campaign, args=[], kwargs={'message' : message,
-                                                      'subject' : subject,
-                                                      'client_email_list' : client_email_list,
-                                                      'campaign_type' : campaign_type})
+                                                    'subject' : subject,
+                                                    'client_email_list' : client_email_list,
+                                                    'campaign_type' : campaign_type})
     thread.start()
     
+def send_refund_email(client_email):
+    subject = 'Refund Invoice Mail'
+    message = 'Your Product Refund Successfully'
+    client_email = client_email
+    
+    def send_email_in_thread():
+        send_mail(
+            subject,
+            message,
+            settings.EMAIL_HOST_USER,
+            [client_email],
+            fail_silently=False,
+        )
+
+    # Create a thread and start it
+    email_thread = Thread(target=send_email_in_thread)
+    email_thread.start()
