@@ -30,7 +30,8 @@ from Employee.serializers import (EmployeSerializer, EmployeInformationsSerializ
                                   NewVacationSerializer,
                                   NewAbsenceSerializer, singleEmployeeSerializerOP, Payroll_WorkingScheduleSerializerOP,
                                   WeekendManagementSerializer, LeaveManagementSerializer, ScheduleSerializerOP,
-                                  ScheduleSerializerResponse, GiftCardSerializer, GiftCardSerializerResponse
+                                  ScheduleSerializerResponse, GiftCardSerializer, GiftCardSerializerResponse,
+                                  EmployeDailyScheduleResponse
                                   )
 from Employee.optimized_serializers import OptimizedEmployeeSerializerDashboard
 from django.db import connection, transaction
@@ -707,10 +708,13 @@ def get_workingschedule(request):
                                                                                  'start_date': start_date,
                                                                                  'end_date': end_date,
                                                                                  'location_id': location_id})
+        result = EmployeDailySchedule.objects.filter(is_holiday=True)
+        s = EmployeDailyScheduleResponse(result, many=True).data
         return Response(
             {
                 'start_date': start_date, 'end_date': end_date,
                 'status': 200,
+                's':s ,
                 'status_code': '200',
                 'response': {
                     'message': 'All Employee',
@@ -4672,7 +4676,7 @@ def create_workingschedule(request):
                     'status': False,
                     'status_code': StatusCodes.INVALID_EMPLOYEE_4025,
                     'response': {
-                        'message': 'Employee not found',
+                        'message': 'Employee Fnot found',
                         'error_message': str(err),
                     }
                 },
