@@ -1020,14 +1020,23 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             #     return True  # Return True if there is any holiday
             # else:
             #     return False
-            holidays = Holiday.objects.select_related('user', 'business', 'location') \
-                .filter(
-                Q(end_date__lte=end_date) & Q(start_date__gte=start_date)).filter(
-                location=location_id)
-            if holidays:
-                return True  # Return True if there is any holiday
+            # holidays = Holiday.objects.filter(
+            #     Q(end_date__lte=end_date) & Q(start_date__gte=start_date)).filter(
+            #     location=location_id)
+            # if holidays:
+            #     return True  # Return True if there is any holiday
+            # else:
+            #     return False
+            holidays = Holiday.objects.filter(
+                Q(end_date__lte=end_date, start_date__gte=start_date, location=location_id) |
+                Q(end_date__isnull=True, start_date__gte=start_date, location=location_id)
+            )
+
+            if holidays.exists():
+                return True
             else:
                 return False
+
             # # query = Q(location_id=location_id)
             # if start_date is None and end_date is None:
             #     start_date=start_date
