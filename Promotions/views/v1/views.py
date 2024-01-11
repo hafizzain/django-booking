@@ -6758,6 +6758,7 @@ def get_coupon(request):
     client_type = request.query_params.get('client_type', None)
     client_id = request.query_params.get('client_id', None)
     total_price = request.query_params.get('totalPriceWithoutTax',None)
+    location = request.query_params.get('location',None)
     try:
         coupon = Coupon.objects.get(code=coupon_code)
     except:
@@ -6801,6 +6802,25 @@ def get_coupon(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    if location is not None:
+        location_exists = coupon.locations.filter(id=location)
+        if location_exists.exists():
+            pass
+        else:
+            return Response(
+                {
+                    'status': False,
+                    'status_code': 400,
+                    'response': {
+                        'message': 'This coupon code is not available',
+                        'error_message': None,
+                        # 'current_day': current_day
+
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
     if total_price is not None:
         if coupon.coupon_type_value == '3':
             total_price = float(total_price)
