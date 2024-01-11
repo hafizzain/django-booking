@@ -1013,8 +1013,32 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             #         .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
             # holidays = False
             holidays = Holiday.objects.select_related('user', 'business', 'location') \
-                .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date)).filter(location=location_id)
-            return len(holidays) > 0  # Return True if there is any holiday
+                .filter(
+                (Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date)).filter(
+                location=location_id)
+            if holidays:
+                return True  # Return True if there is any holiday
+            else:
+                return False
+            # query = Q(location_id=location_id)
+            # if start_date is None and end_date is None:
+            #     start_date=start_date
+            #     # query &= Q(start_date__gte=start_date)
+            # if start_date is not None:
+            #     end_date=end_date
+            #     # query &= (Q(end_date__lte=end_date) | Q(end_date__isnull=True))
+            #     holidays = Holiday.objects.select_related('user', 'business', 'location') \
+            #         .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
+            # holidays = False
+            # holidays = Holiday.objects.select_related('user', 'business', 'location') \
+            #     .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
+            # holidays = holidays.filter(location_id=location_id)
+            # if holidays:
+            #     return True
+            # else:
+            #     return False
+            # #
+            # return len(holidays) > 0  # Return True if there is any holiday
         except:
             return False
 
