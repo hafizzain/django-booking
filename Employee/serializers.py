@@ -1032,23 +1032,28 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             # else:
             #     return Falsedate__date__gte
             # from HRM.serializers import HolidaySerializer end_date__date__lte=end_date,
-            holidays = Holiday.objects.filter(
-                start_date__date__gte=start_date
-            )
-            holidays = holidays.first()
-            end_date = holidays.end_date
-            return end_date is None
-            # if end_date is None:
+            # holidays = Holiday.objects.filter(
+            #     start_date__date__gte=start_date
+            # )
+            # holidays = Holiday.objects.filter(
+            #     start_date__date__gte=start_date
+            # )
+            # holidays = holidays.first()
+            # end_date = holidays.end_date
+            # if end_date is None
+            # # if end_date is None:
             #     holiday = Holiday.objects.filter(
-            #         start_date__date__gte=start_date ,end_date__date__gte=end_date
+            #         start_date__date__gte=start_date ,end_date=None
             #     )
+            #     holiday = holiday.start_date = start_date
+                if holiday
             #     if holiday.exists():
             #         return True
             #     else:
             #         return False
-            # holidays = holidays.filter(end_date__date__lte=end_date)
-            # holidays = Holiday.objects.all()
-            # s = HolidaysSerializer(holidays , many=True).data
+            holidays = holidays.filter(end_date__date__lte=end_date)
+            holidays = Holiday.objects.all()
+            s = HolidaysSerializer(holidays , many=True).data
             # return  s
             # else:
             #     return False
@@ -1070,15 +1075,16 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             #     holidays = Holiday.objects.select_related('user', 'business', 'location') \
             #         .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
             # holidays = False
-            # holidays = Holiday.objects.select_related('user', 'business', 'location') \
-            #     .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
-            # holidays = holidays.filter(location_id=location_id)
-            # if holidays:
-            #     return True
-            # else:
-            #     return False
-            # #
-            # return len(holidays) > 0  # Return True if there is any holiday
+            holidays = Holiday.objects.select_related('user', 'business', 'location') \
+                .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
+            holidays = holidays.filter(location_id=location_id)
+            if holidays:
+                return len(holidays) > 0
+                # return True
+            else:
+                return False
+            #
+              # Return True if there is any holiday
         except Exception as ex:
             return str(ex)
 
