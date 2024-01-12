@@ -1079,6 +1079,8 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             # holidays = False
             # holidays = Holiday.objects.select_related('user', 'business', 'location') \
             #     .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
+            start_date = datetime.strptime(start_date, "%Y-%m-%d")
+            end_date = datetime.strptime(end_date, "%Y-%m-%d")
             holidays = Holiday.objects.filter(
                 start_date__date__gte=start_date,
                 end_date__date__lte=end_date  # Corrected the field name
