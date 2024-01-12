@@ -1291,7 +1291,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         #     Q(is_vacation=True, vacation_status='accepted'),
         #     **query
         # )
-        qs = EmployeDailySchedule.objects.filter(is_vacation=True, vacation_status='accepted')
+        qs = EmployeDailySchedule.objects.filter(employee=obj)
         return ScheduleSerializerOP(qs, many=True, context=self.context).data
 
     # def get_false_scedule(self, obj):
