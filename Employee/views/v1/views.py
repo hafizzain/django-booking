@@ -12,6 +12,7 @@ from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee,
                              VacationDetails, GiftCard, GiftCards
                              )
 from Employee.services import annual_vacation_check, check_available_vacation_type
+from HRM.models import Holiday
 from Tenants.models import EmployeeTenantDetail, Tenant
 from django_tenants.utils import tenant_context
 from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSIONS_MODEL_FIELDS
@@ -694,6 +695,7 @@ def get_workingschedule(request):
     end_date = request.query_params.get('end_date', None)
     location_id = request.query_params.get('location_id', None)
     # is_vacation = request.query_params.get('is_vacation',None)
+
     if is_weekend is None:
         query = {}
         if location_id:
@@ -743,6 +745,18 @@ def get_workingschedule(request):
             },
             status=status.HTTP_200_OK
         )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def del_all_avaliable(request):
+    vacations = Vacation.objects.all()
+    sceduales = EmployeDailySchedule.objects.all()
+    holiday = Holiday.objects.all()
+    vacations.delete()
+    sceduales.delete()
+    holiday.delete()
+    return Response({"msg":"del all"})
 
 
 @api_view(['GET'])
