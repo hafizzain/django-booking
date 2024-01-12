@@ -15,8 +15,8 @@ class Holiday(CommonField):
     created_at = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=200)
     note = models.TextField(null=True, blank=True, max_length=200)
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField(blank=True, null=True)
+    start_date = models.DateField()
+    end_date = models.DateField(blank=True, null=True)
     
     REQUIRED_FIELDS = ['name', 'start_date']
     
