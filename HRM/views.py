@@ -147,7 +147,7 @@ class HolidayApiView(APIView):
                     "response" : {
                         "message" : "Holiday updated successfully",
                         "error_message" : None,
-                        "data" : serializer.data
+                        # "data" : serializer.data
                     }
                 }
             return Response(data, status=status.HTTP_200_OK)
