@@ -387,10 +387,10 @@ class AppointmentCheckout(models.Model):
         ('ApplePay', 'Apple Pay')
     ]
     
-    REFUND_STATUS = [
-        ('refund','Refund'),
-        ('cancel','Cancel')
-    ]
+    # REFUND_STATUS = [
+    #     ('refund','Refund'),
+    #     ('cancel','Cancel')
+    # ]
     
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True, blank=True , related_name='appointment_checkout')
@@ -409,8 +409,8 @@ class AppointmentCheckout(models.Model):
     
     # Added new fields for managing refunds Parent, child relation (original_checkout, refunded_checkout)
     
-    is_refund = models.BooleanField(choices = REFUND_STATUS, default='', null=True, blank=True)
-    previous_appointment_checkout = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='previous_appointment_checkout')
+    # is_refund = models.BooleanField(choices = REFUND_STATUS, default='', null=True, blank=True)
+    # previous_appointment_checkout = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='previous_appointment_checkout')
     
     tip = models.FloatField(default=0, null=True, blank=True) # this field is not in use
     gst = models.FloatField(default=0, null=True, blank=True)
