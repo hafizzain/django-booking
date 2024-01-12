@@ -203,11 +203,10 @@ class HolidaySerializer(serializers.ModelSerializer):
             .filter(location=location)
         try:
             if start_date is not None and end_date is None:
-                pass
-                # from_date = start_date
-                # to_date = from_date
-                # diff = to_date - from_date
-                # days = int(diff.days)
+                from_date = start_date
+                to_date = from_date
+                diff = to_date - from_date
+                days = int(diff.days)
                 # for i in range(days + 1):
                 #     if i == 0:
                 #         current_date = from_date
