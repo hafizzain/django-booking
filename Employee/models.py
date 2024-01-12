@@ -458,6 +458,7 @@ class EmployeDailySchedule(models.Model):
         ('Saturday', 'Saturday'),
         ('Sunday', 'Sunday'),
     ]
+
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     title = models.TextField(default='Weekend', null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='user_employedailyschedule')
@@ -491,6 +492,7 @@ class EmployeDailySchedule(models.Model):
     is_holiday = models.BooleanField(default=False)
     is_schedule = models.BooleanField(default=False)
     is_working_schedule = models.BooleanField(default=False)
+    is_holiday_due_to_update = models.BooleanField(default=False)
 
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=now)
