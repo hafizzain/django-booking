@@ -1,4 +1,6 @@
-from django.shortcuts import render 
+import json
+
+from django.shortcuts import render
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
@@ -142,6 +144,7 @@ class HolidayApiView(APIView):
         if serializer.is_valid():
             serializer.save()
             holiday = Holiday.objects.get(id=pk)
+            holiday = json.loads(holiday.id)
             data = {
                     "holiday":holiday,
                     "success": True,
