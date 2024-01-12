@@ -710,12 +710,12 @@ def get_workingschedule(request):
                                                                                  'end_date': end_date,
                                                                                  'location_id': location_id})
         result = EmployeDailySchedule.objects.filter(is_holiday=True)
-        s = EmployeDailyScheduleResponse(result, many=True).data
+        # s = EmployeDailyScheduleResponse(result, many=True).data
         return Response(
             {
                 'start_date': start_date, 'end_date': end_date,
                 'status': 200,
-                's': s,
+                # 's': s,
                 'status_code': '200',
                 'response': {
                     'message': 'All Employee',
