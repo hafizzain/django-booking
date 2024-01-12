@@ -15,7 +15,7 @@ class HolidaySerializer(serializers.ModelSerializer):
         end_date = attrs.get('end_date', None)
         location = attrs.get('location', None)
         id = attrs.get('pk', None)
-        
+
         if id is None:
             if start_date is not None:
                 # Check if a holiday already exists for the start_date
@@ -191,6 +191,8 @@ class HolidaySerializer(serializers.ModelSerializer):
 
 
     def update(self, instance,validated_data):
+        holiday_start_date = instance.start_date
+        holiday_end_date = instance.end_date
         start_date = validated_data['start_date']
         end_date = validated_data['end_date']
         location = validated_data['location']
@@ -212,15 +214,16 @@ class HolidaySerializer(serializers.ModelSerializer):
                     for emp in all_employees:
                         working_sch = EmployeDailySchedule.objects.filter(employee_id=emp.id,is_holiday=True)
                         if working_sch:
-                            # working_sch.is_vacation = False
+                            working_sch.is_vacation = False
+                            working_sch.is_weekend = False
+                            working_sch.is_holiday = False
+                            working_sch.date = current_date
+                            working_sch.from_date = current_date
                             # working_sch.is_weekend = False
-                            # working_sch.is_holiday = False
-                            # working_sch.date = current_date
-                            # working_sch.from_date = current_date
-                            # # working_sch.is_weekend = False
-                            # working_sch.is_vacation = False
-                            # working_sch.is_working_schedule = False
-                            working_sch.delete()
+                            working_sch.is_vacation = False
+                            working_sch.is_working_schedule = False
+                            working_sch.save()
+                        else:
                             EmployeDailySchedule.objects.create(
                                 employee_id=emp.id,
                                 date=current_date,
@@ -245,7 +248,7 @@ class HolidaySerializer(serializers.ModelSerializer):
                     else:
                         current_date = from_date + timedelta(days=i)
                     for emp in all_employees:
-                        working_sch = EmployeDailySchedule.objects.filter(employee_id=emp.id, date=current_date).first()
+                        working_sch = EmployeDailySchedule.objects.filter(employee_id=emp.id, to_date=holiday_end_date , from_date=holiday_start_date).first()
                         if working_sch:
                             working_sch.is_vacation = False
                             working_sch.is_weekend=False
