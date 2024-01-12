@@ -1091,7 +1091,7 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
                     return 'asdasd'
                 else:
                     return 'ASDSAODSAJDS'
-                  )
+
                 # return len(holidays) > 0
                 # return True
             else:
