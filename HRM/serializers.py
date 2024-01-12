@@ -193,8 +193,11 @@ class HolidaySerializer(serializers.ModelSerializer):
     def update(self, instance,validated_data):
         holiday_start_date = instance.start_date
         holiday_end_date = instance.end_date
-        start_date = validated_data.get('start_date',None)
-        end_date = validated_data.get('end_date',None)
+        start_date = validated_data['start_date']
+        try:
+            end_date = validated_data['end_date']
+        except:
+            end_date = None
         location = validated_data['location']
         all_employees = Employee.objects \
             .select_related('user', 'business', 'country', 'state', 'city') \
