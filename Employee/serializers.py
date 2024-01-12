@@ -1064,8 +1064,8 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             #     return False
             # #
             # return len(holidays) > 0  # Return True if there is any holiday
-        except:
-            return False
+        except Exception as ex:
+            return str(ex)
 
     class Meta:
         model = EmployeDailySchedule
