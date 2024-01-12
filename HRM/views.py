@@ -150,6 +150,7 @@ class HolidayApiView(APIView):
             holiday.start_date=start_date
             holiday.end_date=end_date
             holiday.name=name
+            holiday.note = note
             holiday.save()
             holiday = str(holiday.id)
             data = {
