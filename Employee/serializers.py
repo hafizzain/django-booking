@@ -1082,7 +1082,16 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
                 end_date__date__lte=end_date  # Corrected the field name
             )
             if holidays.exists():
-                return True
+                holidays = holidays.first()
+                if holidays.end_date = None:
+                    holidays_check = Holiday.objects.filter(
+                        start_date__date__gte=start_date,
+                        end_date__date__lte=start_date  # Corrected the field name
+                    )
+                    if holidays_check:
+                        return True
+                    else:
+                        return False
                 # return True
             else:
                 return False
