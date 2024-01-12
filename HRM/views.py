@@ -40,7 +40,7 @@ class HolidayApiView(APIView):
             s = VacationDetailsSerializer(all_vacation , many=True).data
 
             data = {
-                    "s":s
+                    "s":s,
                     "success": True,
                     "status_code" : 200,
                     "response" : {
