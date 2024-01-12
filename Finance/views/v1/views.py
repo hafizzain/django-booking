@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from django.db.models import Q
 from Utility.Campaign import send_refund_email
 
-from Finance.models import Refund, RefundCoupon, AllowRefunds,AllowRefundPermissionsEmployees
+from Finance.models import Refund, RefundCoupon, AllowRefunds,AllowRefundPermissionsEmployees, RefundProduct, RefundServices
 from Finance.serializers import RefundSerializer, CouponSerializer, AllowRefundsSerializer
 from Finance.helpers import short_uuid, check_permission, check_days
 from Invoices.models import SaleInvoice
@@ -86,31 +86,40 @@ class RefundAPIView(APIView):
     POST REQUEST FOR THE REFUND
     Payload formate:
             {
-            "business": "fb06734e-5f9b-4bab-bc43-c803d3c5a5db",
-            "user": 2,
-            "location": "d956e922-089f-4d61-8079-fe9ed76ec053",
-            "refunded_products": [
-            {
-            "product": "6c7ffa6a-278a-4973-a609-7b7f0d86ac21",
-            "refunded_quantity": 1,
-            "refunded_amount": 100.00,
-            "in_stock": true
-            },
-            {
-            "product": "1f67cf1f-c63b-42f3-bb38-4226da4a20fa",
-            "refunded_quantity": 1,
-            "refunded_amount": 100.00
-            }
-            ],
-            "refunded_services": [
-            {
-            "service": "d47cdbda-5965-4e06-9168-b3284d38c25f",
-            "refunded_amount": 100.00
-            }
-            ],
-            "refund_type": "credit_refund",
-            "expiry_date": "2023-12-30",
-            "total_refund_amount": 100
+                "business": "c2ee68e4-e30a-43c5-ba55-b09aca4f50b7",
+                "refund_invoice_id": "83d777d8-7790-4cc8-adf2-5ac2042407f9",
+                "client": "26bd481e-613a-4f55-89ac-b09c5f003b5d",
+                "location": "73f662bd-9720-4af7-bcef-6aec2888d1de",
+                "client_type": "In_Saloon",
+                "payment_type": "Cash",
+                "service_commission_type": "",
+                "product_commission_type": "",
+                "voucher_commission_type": "",
+                "checkout": "0e60c8f2-7064-4307-aa8d-cdb674bebf52",
+                "checkout_type": "sale",
+                "refunded_products": [
+                    {
+                    "product": "1014d168-b507-4b2b-bc40-ccdb72baaefa",
+                    "refunded_quantity": 1,
+                    "refunded_amount": 185
+                    },
+
+                    {
+                    "product": "3a540536-cc09-4b04-a542-3f288a5b925e",
+                    "refunded_quantity": 2,
+                    "refunded_amount": 666
+                    },
+                    {
+                    "product": "49e6607a-849c-498b-b5f2-0b7e7f625faf",
+                    "refunded_amount": 200,
+                    "refunded_quantity": 2
+                    }
+                ],
+                "refunded_services": [],
+                "refund_type": "credit_refund",
+                "expiry_date": "2024-01-05",
+                "total_refund_amount": 1051
+                
             }
 
 
@@ -135,47 +144,47 @@ class RefundAPIView(APIView):
                 refund_instance = serializer.save()
                 
                 # refunded_products_ids = list(refundprodcts.objects.filter().values_list('id', flat=True))
-                refunded_products_ids = []
-                refunded_services_ids = []
+                refunded_products_ids = list(RefundProduct.objects.filter().values('id', flat=True))
+                refunded_services_ids = list(RefundServices.objects.filter().values('id', flat=True))
 
                 #      create invoice
                 try:    
-                    invoice = SaleInvoice.objects.get(id=refund_invoice_id)
+                    invoice = SaleInvoice.objects.get(id=refund_invoice_id) 
                     
-                    checkout_instance = invoice.checkout_instance
+                    checkout_instance = invoice.checkout_instance 
 
-                    newCheckoutInstance = checkout_instance
-                    newCheckoutInstance.pk = None
-                    newCheckoutInstance.save()
+                    newCheckoutInstance = checkout_instance  
+                    newCheckoutInstance.pk = None 
+                    newCheckoutInstance.save() 
 
-                    if self.checkout_type == 'appointment':
-                        newAppointment = checkout_instance.appointment
-                        newAppointment.pk = None
-                        newAppointment.save()
-                        order_items = AppointmentService.objects.get_active_appointment_services(appointment = checkout_instance.appointment)
+                    if self.checkout_type == 'appointment': 
+                        newAppointment = checkout_instance.appointment 
+                        newAppointment.pk = None 
+                        newAppointment.save() 
+                        order_items = AppointmentService.objects.get_active_appointment_services(appointment = checkout_instance.appointment) 
 
-                        order_items.update(
-                            pk = None, 
-                            appointment = newAppointment,
-                        )
+                        order_items.update( 
+                            pk = None,  
+                            appointment = newAppointment, 
+                        ) 
                         # or you can do it in loop
-                    else:
-                        product_orders = ProductOrder.objects.filter(checkout=checkout_instance, id__in = refunded_products_ids)
-                        product_orders.update(pk = None, checkout=newCheckoutInstance)
+                    else: 
+                        product_orders = ProductOrder.objects.filter(checkout=checkout_instance, id__in = refunded_products_ids) 
+                        product_orders.update(pk = None, checkout=newCheckoutInstance) 
 
-                        service_orders = ServiceOrder.objects.filter(checkout=checkout_instance, id__in = refunded_services_ids)
-                        service_orders.update(pk = None, checkout=newCheckoutInstance)
+                        service_orders = ServiceOrder.objects.filter(checkout=checkout_instance, id__in = refunded_services_ids) 
+                        service_orders.update(pk = None, checkout=newCheckoutInstance) 
 
-                    newInvoice = invoice
-                    newInvoice.pk = None
-                    newInvoice.invoice_type = 'refund',
-                    newInvoice.total_product_price = -refund_price,
-                    newInvoice.checkout = str(newCheckoutInstance.id),
-                    newInvoice.save()
+                    newInvoice = invoice 
+                    newInvoice.pk = None 
+                    newInvoice.invoice_type = 'refund', 
+                    newInvoice.total_product_price = -refund_price, 
+                    newInvoice.checkout = str(newCheckoutInstance.id), 
+                    newInvoice.save() 
 
-                    client_email = Client.objects.get(id=client).email
+                    client_email = Client.objects.get(id=client).email 
                     #send email to client running on thread
-                    send_refund_email(client_email=client_email) 
+                    send_refund_email(client_email=client_email)  
                 except Exception as e:
                         return Response({'Error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
@@ -203,7 +212,7 @@ class RefundAPIView(APIView):
                             'data': {
                                 'refund': RefundSerializer(serializer.instance).data,
                                 'coupon': CouponSerializer(coupon_serializer.instance).data,
-                                'invoice': SaleInvoiceSerializer(create_invoice).data
+                                'invoice': SaleInvoiceSerializer(newInvoice).data
                             }
                         }
                     }
@@ -217,7 +226,7 @@ class RefundAPIView(APIView):
                             'error_message': None,
                             'data': {
                                 'refund': RefundSerializer(serializer.instance).data,
-                                'invoice': SaleInvoiceSerializer(create_invoice).data, 
+                                'invoice': SaleInvoiceSerializer(newInvoice).data, 
                             }
                         }
                     }
