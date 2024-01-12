@@ -4723,15 +4723,8 @@ def create_workingschedule(request):
         working_schedule.is_vacation = False
         working_schedule.vacation_status = None
         working_schedule.is_working_schedule = True
-        if is_leave is not None:
-            working_schedule.is_leave = True
-        else:
-            working_schedule.is_leave = False
-        if is_off is not None:
-            working_schedule.is_off = True
-        else:
-            working_schedule.is_off = False
-
+        working_schedule.is_holiday = False
+        working_schedule.is_weekend = False
         working_schedule.save()
         serializers = ScheduleSerializer(working_schedule, context={'request': request})
 
