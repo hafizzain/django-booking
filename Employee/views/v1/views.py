@@ -12,6 +12,7 @@ from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee,
                              VacationDetails, GiftCard, GiftCards
                              )
 from Employee.services import annual_vacation_check, check_available_vacation_type
+from HRM.models import Holiday
 from Tenants.models import EmployeeTenantDetail, Tenant
 from django_tenants.utils import tenant_context
 from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSIONS_MODEL_FIELDS
@@ -694,6 +695,7 @@ def get_workingschedule(request):
     end_date = request.query_params.get('end_date', None)
     location_id = request.query_params.get('location_id', None)
     # is_vacation = request.query_params.get('is_vacation',None)
+
     if is_weekend is None:
         query = {}
         if location_id:
@@ -743,6 +745,18 @@ def get_workingschedule(request):
             },
             status=status.HTTP_200_OK
         )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def del_all_avaliable(request):
+    vacations = Vacation.objects.all()
+    sceduales = EmployeDailySchedule.objects.all()
+    holiday = Holiday.objects.all()
+    vacations.delete()
+    sceduales.delete()
+    holiday.delete()
+    return Response({"msg":"del all"})
 
 
 @api_view(['GET'])
@@ -4467,22 +4481,30 @@ def create_workingschedule(request):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            working_schedule = EmployeDailySchedule.objects.create(
-                user=user,
-                business=business,
-                employee=employee,
-                date=date,
-                is_weekend=True,
-                is_vacation=False,
-                day=day,
-                start_time=start_time,
-                end_time=end_time,
-                start_time_shift=start_time_shift,
-                end_time_shift=end_time_shift,
-                from_date=from_date,
-                to_date=to_date,
-                note=note,
-            )
+            working_sch = EmployeDailySchedule.objects.filter(employee_id=employee, date=date).first()
+            if working_sch:
+                working_sch.is_weekend = True
+                working_sch.save()
+                schedule_ids.append(working_sch.id)
+
+            else:
+                workings = EmployeDailySchedule.objects.create(
+                    user=user,
+                    business=business,
+                    employee=employee,
+                    date=date,
+                    is_weekend=True,
+                    is_vacation=False,
+                    day=day,
+                    start_time=start_time,
+                    end_time=end_time,
+                    start_time_shift=start_time_shift,
+                    end_time_shift=end_time_shift,
+                    from_date=from_date,
+                    to_date=to_date,
+                    note=note,
+                )
+                schedule_ids.append(workings.id)
             # working_schedule.day = day
             # working_schedule.start_time = start_time
             # working_schedule.end_time = end_time
@@ -4492,7 +4514,7 @@ def create_workingschedule(request):
             # working_schedule.to_date = to_date
             # working_schedule.note = note
             # working_schedule.save()
-            schedule_ids.append(working_schedule.id)
+
 
         working_schedule = EmployeDailySchedule.objects.filter(
             id__in=schedule_ids

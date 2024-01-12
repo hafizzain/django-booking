@@ -94,6 +94,8 @@ urlpatterns = [
     # Working Schecule for Employee
     path('create_workingschedule/', views.create_workingschedule),
     path('get_workingschedule/', views.get_workingschedule),
+    path('delete_all_data/', views.get_workingschedule),
+    path('del_all_avaliable',views.del_all_avaliable),
     path('delete_workingschedule/', views.delete_workingschedule),
     path('update_workingschedule/', views.update_workingschedule),
     path('delete_all__workingschedule/', views.delete_all__workingschedule),

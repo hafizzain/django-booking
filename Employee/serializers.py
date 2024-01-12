@@ -1001,13 +1001,41 @@ class HolidaysSerializer(serializers.ModelSerializer):
 
 
 class ScheduleSerializerOP(serializers.ModelSerializer):
-    is_holiday = serializers.SerializerMethodField(read_only=True)
+    is_holidays = serializers.SerializerMethodField(read_only=True)
 
-    def get_is_holiday(self, obj):
-        try:
-            start_date = self.context.get('start_date', None)
-            end_date = self.context.get('end_date', None)
-            location_id = self.context.get('location_id', None)
+    def get_is_holidays(self, obj):
+        pass
+        # try:
+        #     start_date = self.context.get('start_date', None)
+        #     end_date = self.context.get('end_date', None)
+        #     location_id = self.context.get('location_id', None)
+        #     holidays = Holiday.objects.filter(
+        #         location_id=location_id,
+        #         start_date__gte=start_date,
+        #         end_date__lte=end_date # Corrected the field name
+        #     )
+        #
+        #     if holidays.exists():
+        #         # return True
+        #         arbab = Holiday.objects.filter(
+        #             start_date__date__gte=start_date,
+        #             end_date__date__lte=end_date)
+        #         arbab = arbab.first()
+        #         if arbab.end_date is None:
+        #             check = Holiday.objects.filter(
+        #                 start_date__date__gte=start_date,
+        #                 end_date__date__lte=end_date)
+        #             if check.exists():
+        #                 return True
+        #             else:
+        #                 return False
+        #         else:
+        #             return True
+        #
+        #         # return len(holidays) > 0
+        #         # return True
+        #     else:
+        #         return False
             # query = Q(location_id=location_id)
             # if start_date is None and end_date is None:
             #     start_date=start_date
@@ -1079,41 +1107,17 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             # holidays = False
             # holidays = Holiday.objects.select_related('user', 'business', 'location') \
             #     .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
-            start_date = datetime.strptime(start_date, "%Y-%m-%d")
-            end_date = datetime.strptime(end_date, "%Y-%m-%d")
-            holidays = Holiday.objects.filter(
-                start_date__date__gte=start_date,
-                end_date__date__lte=end_date  # Corrected the field name
-            )
-            if holidays.exists():
-                # return True
-                arbab = Holiday.objects.filter(
-                    start_date__date__gte=start_date,
-                    end_date__date__lte=end_date)
-                arbab = arbab.first()
-                if arbab.end_date is None:
-                    check = Holiday.objects.filter(
-                        start_date__date__gte=start_date,
-                        end_date__date__lte=end_date)
-                    if check.exists():
-                        return True
-                    else:
-                        return False
-                else:
-                    return True
+            # start_date = datetime.strptime(start_date, "%Y-%m-%d")
+            # end_date = datetime.strptime(end_date, "%Y-%m-%d")
 
-                # return len(holidays) > 0
-                # return True
-            else:
-                return 'sad'
             #
             # Return True if there is any holiday
-        except Exception as ex:
-            return str(ex)
+        # except Exception as ex:
+        #     return str(ex)
 
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'is_leo_day', 'is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date',
+        fields = ['id', 'is_leo_day','is_holidays', 'is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date',
                   'is_working_schedule',
                   'day', 'end_time_shift', 'end_time', 'is_weekend', 'vacation_status', 'note',
                   'start_time']
