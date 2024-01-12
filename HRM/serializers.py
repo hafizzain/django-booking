@@ -262,16 +262,17 @@ class HolidaySerializer(serializers.ModelSerializer):
                                 is_working_schedule=False,
                                 is_vacation=False
                             )
-                            # working_sch.update(employee_id=emp.id,
-                            #     is_holiday_due_to_update=True,
-                            #     date=current_date,
-                            #     from_date=current_date,
-                            #     to_date=to_date,
-                            #     vacation_status=None,
-                            #     is_weekend = False,
-                            #     is_holiday=True,
-                            #     is_working_schedule=False,
-                            #     is_vacation=False)
+                        else:
+                            working_sch.update(employee_id=emp.id,
+                                is_holiday_due_to_update=True,
+                                date=current_date,
+                                from_date=current_date,
+                                to_date=to_date,
+                                vacation_status=None,
+                                is_weekend = False,
+                                is_holiday=True,
+                                is_working_schedule=False,
+                                is_vacation=False)
                             # working_sch.date = current_date
                             # working_sch.from_date = current_date
                             # working_sch.is_weekend=False
