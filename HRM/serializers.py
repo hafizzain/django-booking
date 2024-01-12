@@ -203,22 +203,23 @@ class HolidaySerializer(serializers.ModelSerializer):
             .filter(location=location)
         try:
             if start_date is not None and end_date is None:
-                from_date = start_date
-                to_date = from_date
-                diff = to_date - from_date
-                days = int(diff.days)
-                for i in range(days + 1):
-                    if i == 0:
-                        current_date = from_date
-                    else:
-                        current_date = from_date + timedelta(days=i)
-                    for emp in all_employees:
-                        working_sch = EmployeDailySchedule.objects.filter(employee_id=emp.id,
-                                                                          from_date__gte=holiday_start_date,
-                                                                          end_date=None,
-                                                                          is_holiday=True)
-                        if working_sch:
-                            working_sch.delete()
+                pass
+                # from_date = start_date
+                # to_date = from_date
+                # diff = to_date - from_date
+                # days = int(diff.days)
+                # for i in range(days + 1):
+                #     if i == 0:
+                #         current_date = from_date
+                #     else:
+                #         current_date = from_date + timedelta(days=i)
+                #     for emp in all_employees:
+                #         working_sch = EmployeDailySchedule.objects.filter(employee_id=emp.id,
+                #                                                           from_date__gte=holiday_start_date,
+                #                                                           end_date=None,
+                #                                                           is_holiday=True)
+                #         if working_sch:
+                #             working_sch.delete()
                         # EmployeDailySchedule.objects.create(
                         #     employee_id=emp.id,
                         #     date=current_date,
