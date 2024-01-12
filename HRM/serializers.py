@@ -257,7 +257,7 @@ class HolidaySerializer(serializers.ModelSerializer):
                                 to_date=to_date,
                                 vacation_status=None,
                                 is_weekend = False,
-                                is_holiday=False,
+                                is_holiday=True,
                                 is_working_schedule=False,
                                 is_vacation=False)
                             # working_sch.date = current_date
