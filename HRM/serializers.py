@@ -248,7 +248,7 @@ class HolidaySerializer(serializers.ModelSerializer):
                     else:
                         current_date = from_date + timedelta(days=i)
                     for emp in all_employees:
-                        working_sch = EmployeDailySchedule.objects.filter(employee_id=emp.id, to_date=holiday_end_date , from_date=holiday_start_date).first()
+                        # working_sch = EmployeDailySchedule.objects.filter(employee_id=emp.id, to_date=holiday_end_date , from_date=holiday_start_date).first()
                         # if working_sch:
                         #     working_sch.is_vacation = False
                         #     working_sch.is_weekend=False
@@ -260,17 +260,17 @@ class HolidaySerializer(serializers.ModelSerializer):
                         #     working_sch.is_working_schedule=False
                         #     working_sch.save()
                         # else:
-                        #      EmployeDailySchedule.objects.create(
-                        #         employee_id=emp.id,
-                        #         date=current_date,
-                        #         from_date=current_date,
-                        #         to_date=to_date,
-                        #         vacation_status=None,
-                        #         is_weekend = False,
-                        #         is_holiday=True,
-                        #         is_working_schedule=False,
-                        #         is_vacation=False
-                        #     )
+                             EmployeDailySchedule.objects.create(
+                                employee_id=emp.id,
+                                date=current_date,
+                                from_date=current_date,
+                                to_date=to_date,
+                                vacation_status=None,
+                                is_weekend = False,
+                                is_holiday=True,
+                                is_working_schedule=False,
+                                is_vacation=False
+                            )
 
         except Exception as ex:
             ex=str(ex)
