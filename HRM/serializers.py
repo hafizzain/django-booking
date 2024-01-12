@@ -215,21 +215,21 @@ class HolidaySerializer(serializers.ModelSerializer):
                     for emp in all_employees:
                         working_sch = EmployeDailySchedule.objects.filter(employee_id=emp.id,
                                                                           from_date__gte=holiday_start_date,
-                                                                          # end_date=None,
+                                                                          end_date__isnull=True,
                                                                           is_holiday=True)
-                #         if working_sch:
-                #             working_sch.delete()
-                        # EmployeDailySchedule.objects.create(
-                        #     employee_id=emp.id,
-                        #     date=current_date,
-                        #     from_date=current_date,
-                        #     to_date=to_date,
-                        #     vacation_status=None,
-                        #     is_weekend=False,
-                        #     is_holiday=True,
-                        #     is_working_schedule=False,
-                        #     is_vacation=False
-                        # )
+                        if working_sch:
+                            working_sch.delete()
+                        EmployeDailySchedule.objects.create(
+                            employee_id=emp.id,
+                            date=current_date,
+                            from_date=current_date,
+                            to_date=to_date,
+                            vacation_status=None,
+                            is_weekend=False,
+                            is_holiday=True,
+                            is_working_schedule=False,
+                            is_vacation=False
+                        )
                         # if working_sch:
                         #     working_sch.is_vacation = False
                         #     working_sch.is_weekend = False
