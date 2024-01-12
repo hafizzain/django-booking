@@ -103,10 +103,10 @@ class Checkout(models.Model):
         
     ]
     
-    # REFUND_STATUS = [
-    #     ('refund','Refund'),
-    #     ('cancel','Cancel')
-    # ]
+    REFUND_STATUS = [
+        ('refund','Refund'),
+        ('cancel','Cancel')
+    ]
     
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_checkout_order', null=True, blank=True)
@@ -122,8 +122,8 @@ class Checkout(models.Model):
     
     # Added new fields for managing refunds Parent, child relation (original_checkout, refunded_checkout)
     
-    # is_refund = models.BooleanField(choices = REFUND_STATUS, default='', null=True, blank=True)
-    # previous_sale_checkout = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='refunded_sale_checkout')
+    is_refund = models.BooleanField(choices = REFUND_STATUS,max_length =50, default='', null=True, blank=True)
+    previous_sale_checkout = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='refunded_sale_checkout')
     
 
     tax_applied = models.FloatField(default=0, verbose_name='Tax Applied in Percentage')
@@ -230,10 +230,10 @@ class Order(models.Model):
         
     ]
     
-    # REFUND_STATUS = [
-    #     ('refund','Refund'),
-    #     ('cancel','Cancel')
-    # ]
+    REFUND_STATUS = [
+        ('refund','Refund'),
+        ('cancel','Cancel')
+    ]
     
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True,)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_sale_order', null=True, blank=True)
@@ -263,8 +263,9 @@ class Order(models.Model):
     sold_quantity = models.PositiveBigIntegerField(default = 0)
     
     # Need to add refund
-    # is_refund = models.BooleanField(choices = REFUND_STATUS, default='', null=True, blank=True)
-    # previous_order = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='refunded_orders')
+    
+    is_refund = models.CharField(choices = REFUND_STATUS,max_length = 50, default='', null=True, blank=True)
+    previous_order_refunded = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='order_refunded')
     
     
     discount_percentage = models.FloatField(default=None, null=True, blank=True)
