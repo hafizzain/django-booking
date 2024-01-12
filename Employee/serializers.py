@@ -1292,13 +1292,14 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         #     **query
         # )
         qs = EmployeDailySchedule.objects.filter(employee=obj)
-        qs = qs.annotate(
-            is_vacation_accepted=Case(
-                When(is_vacation=True, vacation_status='accepted', then=Value(True)),
-                default=Value(False),
-                output_field=BooleanField()
-            )
-        ).filter(is_vacation_accepted=True)
+        qs = qs.exclude(vacation_status='pending')
+        # qs = qs.annotate(
+        #     is_vacation_accepted=Case(
+        #         When(is_vacation=True, vacation_status='accepted', then=Value(True)),
+        #         default=Value(False),
+        #         output_field=BooleanField()
+        #     )
+        # ).filter(is_vacation_accepted=True)
         return ScheduleSerializerOP(qs, many=True, context=self.context).data
 
     # def get_false_scedule(self, obj):
