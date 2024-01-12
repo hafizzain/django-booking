@@ -212,11 +212,11 @@ class HolidaySerializer(serializers.ModelSerializer):
                         current_date = from_date
                     else:
                         current_date = from_date + timedelta(days=i)
-                    # for emp in all_employees:
-                    #     working_sch = EmployeDailySchedule.objects.filter(employee_id=emp.id,
-                    #                                                       from_date__gte=holiday_start_date,
-                    #                                                       end_date=None,
-                    #                                                       is_holiday=True)
+                    for emp in all_employees:
+                        working_sch = EmployeDailySchedule.objects.filter(employee_id=emp.id,
+                                                                          from_date__gte=holiday_start_date,
+                                                                          end_date=None,
+                                                                          is_holiday=True)
                 #         if working_sch:
                 #             working_sch.delete()
                         # EmployeDailySchedule.objects.create(
