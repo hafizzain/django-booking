@@ -141,7 +141,9 @@ class HolidayApiView(APIView):
                                         partial=True)
         if serializer.is_valid():
             serializer.save()
+            holiday = Holiday.objects.get(id=pk)
             data = {
+                    "holiday":holiday,
                     "success": True,
                     "status_code" : 201,
                     "response" : {
