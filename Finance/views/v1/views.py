@@ -13,6 +13,8 @@ from Client.serializers import SaleInvoiceSerializer
 from Client.models import Client
 
 
+from Appointment.models import AppointmentCheckout, AppointmentService
+from Order.models import Checkout, ProductOrder, ServiceOrder
 
 @api_view(['GET'])
 def check_permission_view(request):
@@ -121,7 +123,7 @@ class RefundAPIView(APIView):
         client_type = request.data.get('client_type')
         client = request.data.get('client')
         invoice_type = request.data.get('invoice_type')
-        checkout_type = request.data.get('checkout_type')
+        checkout_type = request.data.get('checkout_type') # appointment or sale
         
         try:
             user = request.user
@@ -131,31 +133,47 @@ class RefundAPIView(APIView):
                 data=request.data, context={'request': request})
             if serializer.is_valid():
                 refund_instance = serializer.save()
+                
+                # refunded_products_ids = list(refundprodcts.objects.filter().values_list('id', flat=True))
+                refunded_products_ids = []
+                refunded_services_ids = []
+
                 #      create invoice
                 try:    
                     invoice = SaleInvoice.objects.get(id=refund_invoice_id)
+                    
+                    checkout_instance = invoice.checkout_instance
+
+                    newCheckoutInstance = checkout_instance
+                    newCheckoutInstance.pk = None
+                    newCheckoutInstance.save()
+
+                    if self.checkout_type == 'appointment':
+                        newAppointment = checkout_instance.appointment
+                        newAppointment.pk = None
+                        newAppointment.save()
+                        order_items = AppointmentService.objects.get_active_appointment_services(appointment = checkout_instance.appointment)
+
+                        order_items.update(
+                            pk = None, 
+                            appointment = newAppointment,
+                        )
+                        # or you can do it in loop
+                    else:
+                        product_orders = ProductOrder.objects.filter(checkout=checkout_instance, id__in = refunded_products_ids)
+                        product_orders.update(pk = None, checkout=newCheckoutInstance)
+
+                        service_orders = ServiceOrder.objects.filter(checkout=checkout_instance, id__in = refunded_services_ids)
+                        service_orders.update(pk = None, checkout=newCheckoutInstance)
+
+                    newInvoice = invoice
+                    newInvoice.pk = None
+                    newInvoice.invoice_type = 'refund',
+                    newInvoice.total_product_price = -refund_price,
+                    newInvoice.checkout = str(newCheckoutInstance.id),
+                    newInvoice.save()
+
                     client_email = Client.objects.get(id=client).email
-                    create_invoice = SaleInvoice.objects.create(
-                        user=user,
-                        client=invoice.client,
-                        location=invoice.location,
-                        member=invoice.member,
-                        client_type=client_type,
-                        payment_type=payment_type,
-                        
-                        invoice_type = 'refund',
-                        checkout_type = checkout_type,
-
-                        total_voucher_price=invoice.total_voucher_price,
-                        total_service_price=invoice.total_service_price,
-                        total_product_price=-refund_price,
-
-                        service_commission_type=invoice.service_commission_type,
-                        product_commission_type=invoice.product_commission_type,
-                        voucher_commission_type=invoice.voucher_commission_type,
-                        checkout=invoice.checkout,
-                    )
-                    create_invoice.save()
                     #send email to client running on thread
                     send_refund_email(client_email=client_email) 
                 except Exception as e:

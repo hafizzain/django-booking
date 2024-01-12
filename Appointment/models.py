@@ -201,6 +201,20 @@ class Appointment(models.Model):
     def __str__(self):
         return str(self.id)
 
+
+class AppointmentServiceCustomManager(models.QuerySet):
+
+    
+    def get_active_appointment_services(self, *args, **kwargs):
+        return self.filter(
+            status__in = [
+                choices.AppointmentServiceStatus.BOOKED,
+                choices.AppointmentServiceStatus.FINISHED,
+                choices.AppointmentServiceStatus.STARTED,
+            ],
+            **kwargs
+        )
+
     
 class AppointmentService(models.Model):
     
@@ -270,6 +284,8 @@ class AppointmentService(models.Model):
 
     client_tag = models.CharField(max_length=50, default='')
     client_type = models.CharField(max_length=50, default='')
+
+    objects = AppointmentServiceCustomManager.as_manager()
 
 
     def get_final_price(self):

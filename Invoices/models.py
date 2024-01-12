@@ -105,6 +105,16 @@ class SaleInvoice(models.Model):
     def __str__(self):
         return str(self.id)
     
+
+    @property
+    def checkout_instance(self,):
+        if self.checkout_type == 'appointment':
+            checkout_instance = AppointmentCheckout.objects.get(id=self.checkout)
+        else:
+            checkout_instance = Checkout.objects.get(id=self.checkout)
+        
+        return checkout_instance
+    
     @property
     def short_id(self):
         uuid = f'{self.id}'
