@@ -1037,7 +1037,7 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             )
             holidays = holidays.first()
             end_date = holidays.end_date
-            return end_date
+            return end_date is None
             # if end_date is None:
             #     holiday = Holiday.objects.filter(
             #         start_date__date__gte=start_date ,end_date__date__gte=end_date
