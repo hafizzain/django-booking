@@ -1082,9 +1082,9 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             start_date = datetime.strptime(start_date, "%Y-%m-%d")
             end_date = datetime.strptime(end_date, "%Y-%m-%d")
             holidays = Holiday.objects.filter(
-                # location_id=location_id,
-                start_date__gte=start_date,
-                end_date__lte=end_date  # Corrected the field name
+                location_id=location_id,
+                start_date=start_date,
+                end_date=end_date  # Corrected the field name
             )
             if holidays.exists():
                 # return True
