@@ -998,6 +998,8 @@ class HolidaysSerializer(serializers.ModelSerializer):
     class Meta:
         model = Holiday
         fields = "__all__"
+
+
 class ScheduleSerializerOP(serializers.ModelSerializer):
     is_holiday = serializers.SerializerMethodField(read_only=True)
 
@@ -1083,12 +1085,18 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             )
             if holidays.exists():
                 # return True
-                arbab= Holiday.objects.filter(
-                start_date__date__gte=start_date,
-                end_date__date__lte=end_date)
+                arbab = Holiday.objects.filter(
+                    start_date__date__gte=start_date,
+                    end_date__date__lte=end_date)
                 arbab = arbab.first()
                 if arbab.end_date is None:
-                    return 'asdasd'
+                    check = Holiday.objects.filter(
+                        start_date__date__gte=start_date,
+                        end_date__date__lte=end_date)
+                    if check.exists():
+                        return True
+                    else:
+                        return False
                 else:
                     return True
 
@@ -1097,13 +1105,14 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             else:
                 return False
             #
-              # Return True if there is any holiday
+            # Return True if there is any holiday
         except Exception as ex:
             return str(ex)
 
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'is_leo_day', 'is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date','is_working_schedule',
+        fields = ['id', 'is_leo_day', 'is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date',
+                  'is_working_schedule',
                   'day', 'end_time_shift', 'end_time', 'is_weekend', 'vacation_status', 'note',
                   'start_time']
 
@@ -1935,7 +1944,6 @@ class GiftCardSerializerResponse(serializers.ModelSerializer):
 
 
 class EmployeDailyScheduleResponse(serializers.ModelSerializer):
-
     class Meta:
         model = EmployeDailySchedule
         fields = "__all__"

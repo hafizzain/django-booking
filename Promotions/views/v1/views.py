@@ -6778,8 +6778,6 @@ def get_coupon(request):
     if location is not None:
         location_exists = coupon.locations.filter(id=location)
         if location_exists.exists():
-            pass
-        else:
             return Response(
                 {
                     'status': False,
@@ -6793,6 +6791,7 @@ def get_coupon(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+
     if coupon.usage_limit <=0:
         return Response(
             {
