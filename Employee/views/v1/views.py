@@ -4705,7 +4705,6 @@ def create_workingschedule(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-
         working_schedule, created = EmployeDailySchedule.objects.get_or_create(
             user=user,
             business=business,
