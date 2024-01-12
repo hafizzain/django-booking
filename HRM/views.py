@@ -10,6 +10,8 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import filters
 
+from Employee.models import Vacation
+from Employee.serializers import EmployeDailyScheduleResponse, VacationDetailsSerializer
 from HRM.models import *
 from HRM.serializers import *
 # Create your views here.
@@ -34,7 +36,11 @@ class HolidayApiView(APIView):
         if pk is not None:
             holiday = get_object_or_404(Holiday, id=pk)
             serializer = HolidaySerializer(holiday)
+            all_vacation = Holiday.objects.all()
+            s = VacationDetailsSerializer(all_vacation , many=True).data
+
             data = {
+                    "s":s,
                     "success": True,
                     "status_code" : 200,
                     "response" : {
@@ -108,13 +114,16 @@ class HolidayApiView(APIView):
                                         context={'request': request})
         if serializer.is_valid():
             serializer.save()
+            result = EmployeDailySchedule.objects.filter(is_holiday=True)
+            s = EmployeDailyScheduleResponse(result , many=True).data
             data = {
                 "success": True,
                 "status_code": 201,
                 "response": {
                     "message": "Holiday created successfully",
                     "error_message": None,
-                    "data": serializer.data
+                    "data": serializer.data,
+                    "all_created":s
                 }
             }
             return Response(data, status=status.HTTP_200_OK)
@@ -165,7 +174,7 @@ class HolidayApiView(APIView):
     def delete(self, request, pk):
         holiday = get_object_or_404(Holiday, id=pk)
         holiday.delete()
-        holiday_schedule = EmployeDailySchedule.objects.filter(is_holiday=True)
+        holiday_schedule = EmployeDailySchedule.objects.all()
         holiday_schedule.delete()
         holidays = Holiday.objects.all()
         holidays.delete()

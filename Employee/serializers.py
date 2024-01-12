@@ -994,6 +994,12 @@ class ScheduleSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class HolidaysSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Holiday
+        fields = "__all__"
+
+
 class ScheduleSerializerOP(serializers.ModelSerializer):
     is_holiday = serializers.SerializerMethodField(read_only=True)
 
@@ -1012,15 +1018,56 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             #     holidays = Holiday.objects.select_related('user', 'business', 'location') \
             #         .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
             # holidays = False
-            holidays = Holiday.objects.select_related('user', 'business', 'location') \
-                .filter(
-                (Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date)).filter(
-                location=location_id)
-            if holidays:
-                return True  # Return True if there is any holiday
-            else:
-                return False
-            # query = Q(location_id=location_id)
+            # holidays = Holiday.objects.select_related('user', 'business', 'location') \
+            #     .filter(
+            #     (Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date)).filter(
+            #     location=location_id)
+            # if holidays:
+            #     return True  # Return True if there is any holiday
+            # else:
+            #     return False
+            # holidays = Holiday.objects.filter(
+            #     Q(end_date__lte=end_date) & Q(start_date__gte=start_date)).filter(
+            #     location=location_id)
+            # if holidays:
+            #     return True  # Return True if there is any holiday
+            # else:
+            #     return Falsedate__date__gte
+            # from HRM.serializers import HolidaySerializer end_date__date__lte=end_date,
+            # holidays = Holiday.objects.filter(
+            #     start_date__date__gte=start_date
+            # )
+            # holidays = Holiday.objects.filter(
+            #     start_date__date__gte=start_date
+            # )
+            # holidays = holidays.first()
+            # end_date = holidays.end_date
+            # if end_date is None
+            # # if end_date is None:
+            #     holiday = Holiday.objects.filter(
+            #         start_date__date__gte=start_date ,end_date=None
+            #     )
+            #     holiday = holiday.start_date = start_date
+            #     if holiday
+            #     if holiday.exists():
+            #         return True
+            #     else:
+            #         return False
+            # holidays = holidays.filter(end_date__date__lte=end_date)
+            # holidays = Holiday.objects.all()
+            # s = HolidaysSerializer(holidays , many=True).data
+            # return  s
+            # else:
+            #     return False
+            # holidays = Holiday.objects.all()
+            # holiday_check = HolidaySerializer(holidays).data
+            # return str(holidays)
+            # if holidays.exists():
+            #     return True
+            # else:
+            #     return False
+
+            # # query = Q(location_id=location_id)
             # if start_date is None and end_date is None:
             #     start_date=start_date
             #     # query &= Q(start_date__gte=start_date)
@@ -1032,19 +1079,42 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             # holidays = False
             # holidays = Holiday.objects.select_related('user', 'business', 'location') \
             #     .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
-            # holidays = holidays.filter(location_id=location_id)
-            # if holidays:
-            #     return True
-            # else:
-            #     return False
-            # #
-            # return len(holidays) > 0  # Return True if there is any holiday
-        except:
-            return False
+            start_date = datetime.strptime(start_date, "%Y-%m-%d")
+            end_date = datetime.strptime(end_date, "%Y-%m-%d")
+            holidays = Holiday.objects.filter(
+                start_date__date__gte=start_date,
+                end_date__date__lte=end_date  # Corrected the field name
+            )
+            if holidays.exists():
+                # return True
+                arbab = Holiday.objects.filter(
+                    start_date__date__gte=start_date,
+                    end_date__date__lte=end_date)
+                arbab = arbab.first()
+                if arbab.end_date is None:
+                    check = Holiday.objects.filter(
+                        start_date__date__gte=start_date,
+                        end_date__date__lte=end_date)
+                    if check.exists():
+                        return True
+                    else:
+                        return False
+                else:
+                    return True
+
+                # return len(holidays) > 0
+                # return True
+            else:
+                return 'sad'
+            #
+            # Return True if there is any holiday
+        except Exception as ex:
+            return str(ex)
 
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'is_leo_day', 'is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date','is_working_schedule',
+        fields = ['id', 'is_leo_day', 'is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date',
+                  'is_working_schedule',
                   'day', 'end_time_shift', 'end_time', 'is_weekend', 'vacation_status', 'note',
                   'start_time']
 
@@ -1177,10 +1247,11 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         #     qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) | Q(is_weekend=False)),
         #                                              **query)
         #     # if not qs.exists():
-        qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) | Q(is_weekend=False)), **query)
-        qs = qs.filter((Q(is_vacation=True) & Q(vacation_status='accepted')) | Q(is_leo_day=True) | Q(
-            is_working_schedule=True) | Q(is_weekend=True) | Q(is_weekend=False))
-        # qs = qs.annotate(
+        # qs = EmployeDailySchedule.objects.filter(Q(employee=obj) & (Q(is_weekend=True) | Q(is_weekend=False)), **query)
+        # qs = EmployeDailySchedule.filter((Q(is_vacation=True) & Q(vacation_status='accepted')) | Q(is_leo_day=True) | Q(
+        #     is_working_schedule=True) | Q(is_weekend=True) | Q(is_weekend=False))
+        # qs = qs.filter(employee=obj)
+        # # qs = qs.annotate(
         #     is_vacation_accepted=Case(
         #         When(is_vacation=True, vacation_status='accepted', then=Value(True)),
         #         default=Value(False),
@@ -1210,6 +1281,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         #     Q(is_vacation=True, vacation_status='accepted'),
         #     **query
         # )
+        qs = EmployeDailySchedule.objects.filter(employee=obj)
         return ScheduleSerializerOP(qs, many=True, context=self.context).data
 
     # def get_false_scedule(self, obj):
@@ -1870,4 +1942,10 @@ class GiftCardSerializer(serializers.ModelSerializer):
 class GiftCardSerializerResponse(serializers.ModelSerializer):
     class Meta:
         model = GiftCards
+        fields = "__all__"
+
+
+class EmployeDailyScheduleResponse(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeDailySchedule
         fields = "__all__"
