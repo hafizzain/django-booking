@@ -10,7 +10,8 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import filters
 
-from Employee.serializers import EmployeDailyScheduleResponse
+from Employee.models import Vacation
+from Employee.serializers import EmployeDailyScheduleResponse, VacationDetailsSerializer
 from HRM.models import *
 from HRM.serializers import *
 # Create your views here.
@@ -35,7 +36,11 @@ class HolidayApiView(APIView):
         if pk is not None:
             holiday = get_object_or_404(Holiday, id=pk)
             serializer = HolidaySerializer(holiday)
+            all_vacation = Vacation.objects.all()
+            s = VacationDetailsSerializer(all_vacation , many=True).data
+
             data = {
+                    "s":s
                     "success": True,
                     "status_code" : 200,
                     "response" : {
