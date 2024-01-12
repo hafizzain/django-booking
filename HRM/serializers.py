@@ -189,7 +189,7 @@ class HolidaySerializer(serializers.ModelSerializer):
         return holiday
 
 
-    def update(self, validated_data):
+    def update(self, instance,validated_data):
         start_date = validated_data['start_date']
         end_date = validated_data['end_date']
         location = validated_data['location']
