@@ -36,7 +36,7 @@ class HolidayApiView(APIView):
         if pk is not None:
             holiday = get_object_or_404(Holiday, id=pk)
             serializer = HolidaySerializer(holiday)
-            all_vacation = Vacation.objects.all()
+            all_vacation = Holiday.objects.all()
             s = VacationDetailsSerializer(all_vacation , many=True).data
 
             data = {
