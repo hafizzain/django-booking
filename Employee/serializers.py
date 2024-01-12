@@ -1004,37 +1004,38 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
     is_holidays = serializers.SerializerMethodField(read_only=True)
 
     def get_is_holidays(self, obj):
-        try:
-            start_date = self.context.get('start_date', None)
-            end_date = self.context.get('end_date', None)
-            location_id = self.context.get('location_id', None)
-            holidays = Holiday.objects.filter(
-                location_id=location_id,
-                start_date__gte=start_date,
-                end_date__lte=end_date # Corrected the field name
-            )
-
-            if holidays.exists():
-                # return True
-                arbab = Holiday.objects.filter(
-                    start_date__date__gte=start_date,
-                    end_date__date__lte=end_date)
-                arbab = arbab.first()
-                if arbab.end_date is None:
-                    check = Holiday.objects.filter(
-                        start_date__date__gte=start_date,
-                        end_date__date__lte=end_date)
-                    if check.exists():
-                        return '111111'
-                    else:
-                        return 'sadsaddsad'
-                else:
-                    return 'saddsfsdf'
-
-                # return len(holidays) > 0
-                # return True
-            else:
-                return False
+        pass
+        # try:
+        #     start_date = self.context.get('start_date', None)
+        #     end_date = self.context.get('end_date', None)
+        #     location_id = self.context.get('location_id', None)
+        #     holidays = Holiday.objects.filter(
+        #         location_id=location_id,
+        #         start_date__gte=start_date,
+        #         end_date__lte=end_date # Corrected the field name
+        #     )
+        #
+        #     if holidays.exists():
+        #         # return True
+        #         arbab = Holiday.objects.filter(
+        #             start_date__date__gte=start_date,
+        #             end_date__date__lte=end_date)
+        #         arbab = arbab.first()
+        #         if arbab.end_date is None:
+        #             check = Holiday.objects.filter(
+        #                 start_date__date__gte=start_date,
+        #                 end_date__date__lte=end_date)
+        #             if check.exists():
+        #                 return True
+        #             else:
+        #                 return False
+        #         else:
+        #             return True
+        #
+        #         # return len(holidays) > 0
+        #         # return True
+        #     else:
+        #         return False
             # query = Q(location_id=location_id)
             # if start_date is None and end_date is None:
             #     start_date=start_date
