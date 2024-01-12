@@ -1035,7 +1035,7 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             holidays = Holiday.objects.filter(
                 start_date__date__gte=start_date
             )
-            if holidays.exits():
+            if holidays.exists():
                 return True
             else:
                 return False
