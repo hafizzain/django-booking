@@ -251,17 +251,17 @@ class HolidaySerializer(serializers.ModelSerializer):
                         working_sch = EmployeDailySchedule.objects.filter(employee_id=emp.id, to_date__lte=holiday_end_date , from_date__gte=holiday_start_date,is_holiday=True)
                         if working_sch:
                             working_sch.delete()
-                            # EmployeDailySchedule.objects.create(
-                            #     employee_id=emp.id,
-                            #     date=current_date,
-                            #     from_date=current_date,
-                            #     to_date=to_date,
-                            #     vacation_status=None,
-                            #     is_weekend=False,
-                            #     is_holiday=True,
-                            #     is_working_schedule=False,
-                            #     is_vacation=False
-                            # )
+                            EmployeDailySchedule.objects.create(
+                                employee_id=emp.id,
+                                date=current_date,
+                                from_date=current_date,
+                                to_date=to_date,
+                                vacation_status=None,
+                                is_weekend=False,
+                                is_holiday=True,
+                                is_working_schedule=False,
+                                is_vacation=False
+                            )
                             # working_sch.update(employee_id=emp.id,
                             #     is_holiday_due_to_update=True,
                             #     date=current_date,
