@@ -1084,17 +1084,17 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             if holidays.exists():
                 arbab= Holiday.objects.filter(
                 start_date__date__gte=start_date,
-                end_date__date__lte=end_date  # Corrected the field name
-            )
+                end_date__date__lte=end_date)
                 arbab = arbab.first()
                 if arbab.end_date is None:
                     return 'asdasd'
                 else:
                     return 'ASDSAODSAJDS'
-                return len(holidays) > 0
+
+                # return len(holidays) > 0
                 # return True
             else:
-                return False
+                return 'asdsadsahdsoufsa'
             #
               # Return True if there is any holiday
         except Exception as ex:
