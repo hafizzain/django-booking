@@ -16,20 +16,20 @@ class HolidaySerializer(serializers.ModelSerializer):
         location = attrs.get('location', None)
         id = attrs.get('pk', None)
 
-        # if id is None:
-        #     if start_date is not None:
-        #         # Check if a holiday already exists for the start_date
-        #         start_date_check = Holiday.objects.filter(start_date=start_date, location=location).exists()
-        #         if start_date_check:
-        #             raise serializers.ValidationError({'message': "Holiday already set for this date."})
+        if id is None:
+            if start_date is not None:
+                # Check if a holiday already exists for the start_date
+                start_date_check = Holiday.objects.filter(start_date=start_date, location=location).exists()
+                if start_date_check:
+                    raise serializers.ValidationError({'message': "Holiday already set for this date."})
 
-            # Check if there is any holiday overlapping with the date range
-            # if start_date is not None and end_date is not None:
-            #     holiday_check = Holiday.objects.filter(start_date=start_date,
-            #                                         end_date=end_date,
-            #                                         location=location).exists()
-            #     if holiday_check:
-            #         raise serializers.ValidationError({'message': "Holiday already set for this date range."})
+            Check if there is any holiday overlapping with the date range
+            if start_date is not None and end_date is not None:
+                holiday_check = Holiday.objects.filter(start_date=start_date,
+                                                    end_date=end_date,
+                                                    location=location).exists()
+                if holiday_check:
+                    raise serializers.ValidationError({'message': "Holiday already set for this date range."})
         return attrs
 
     def create(self, validated_data):
