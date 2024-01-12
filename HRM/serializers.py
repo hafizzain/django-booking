@@ -25,8 +25,8 @@ class HolidaySerializer(serializers.ModelSerializer):
 
             # Check if there is any holiday overlapping with the date range
             if start_date is not None and end_date is not None:
-                holiday_check = Holiday.objects.filter(start_date__lte=end_date,
-                                                    end_date__gte=start_date,
+                holiday_check = Holiday.objects.filter(start_date=start_date,
+                                                    end_date=end_date,
                                                     location=location).exists()
                 if holiday_check:
                     raise serializers.ValidationError({'message': "Holiday already set for this date range."})
@@ -214,7 +214,7 @@ class HolidaySerializer(serializers.ModelSerializer):
                         if working_sch:
                             working_sch.is_vacation = False
                             working_sch.is_weekend = False
-                            working_sch.is_holiday = True
+                            working_sch.is_holiday = False
                             working_sch.date = current_date
                             working_sch.from_date = current_date
                             # working_sch.is_weekend = False
