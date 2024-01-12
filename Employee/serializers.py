@@ -1090,12 +1090,12 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
                 if arbab.end_date is None:
                     return 'asdasd'
                 else:
-                    return 'ASDSAODSAJDS'
+                    return True
 
                 # return len(holidays) > 0
                 # return True
             else:
-                return 'asdasasda'
+                return False
             #
               # Return True if there is any holiday
         except Exception as ex:
