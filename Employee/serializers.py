@@ -1037,7 +1037,7 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             # )
             # holidays = holidays.filter(end_date__date__lte=end_date)
             holidays = Holiday.objects.all()
-            s = HolidaysSerializer(holidays , many=False).data
+            s = HolidaysSerializer(holidays , many=True).data
             return  s
             # else:
             #     return False
