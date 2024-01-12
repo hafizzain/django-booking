@@ -144,6 +144,9 @@ class HolidayApiView(APIView):
         if serializer.is_valid():
             serializer.save()
             holiday = Holiday.objects.get(id=pk)
+            holiday.start_date=start_date
+            holiday.end_date=end_date
+            holiday.save()
             holiday = str(holiday.id)
             data = {
                     "holiday":holiday,

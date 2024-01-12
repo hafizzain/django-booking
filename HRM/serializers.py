@@ -273,8 +273,9 @@ class HolidaySerializer(serializers.ModelSerializer):
             ex=str(ex)
             raise serializers.ValidationError(ex)
         try:
-            id = self.context.get('pk')
-            holiday = Holiday.objects.filter(id=id).update(start_date=start_date ,end_date=end_date)
+            pass
+            # id = self.context.get('pk')
+            # holiday = Holiday.objects.filter(id=id).update(start_date=start_date ,end_date=end_date)
             # holiday = Holiday.objects.get(id=id)
         except Exception as e:
             e=str(e)
