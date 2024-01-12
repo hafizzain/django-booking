@@ -174,7 +174,7 @@ class HolidayApiView(APIView):
                         "data" : None
                     }
                 }
-            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data, status=status.HTTP_200_OK)
         
     @transaction.atomic   
     def delete(self, request, pk):
