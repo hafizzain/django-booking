@@ -994,6 +994,10 @@ class ScheduleSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class HolidaysSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Holiday
+        fields = "__all__"
 class ScheduleSerializerOP(serializers.ModelSerializer):
     is_holiday = serializers.SerializerMethodField(read_only=True)
 
@@ -1033,7 +1037,7 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             # )
             # holidays = holidays.filter(end_date__date__lte=end_date)
             holidays = Holiday.objects.all()
-            s = HolidaySerializer(holidays , many=False).data
+            s = HolidaysSerializer(holidays , many=False).data
             return  s
             # else:
             #     return False
