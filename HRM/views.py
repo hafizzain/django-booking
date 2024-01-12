@@ -45,8 +45,8 @@ class HolidayApiView(APIView):
                 }
             return Response(data, status=status.HTTP_200_OK)
         else:
-            query = Q()
-            if location:
+            # query = Q()
+            # if location:
                 query &= Q(location=location)
                 
             if name:
