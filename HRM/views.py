@@ -144,7 +144,7 @@ class HolidayApiView(APIView):
         if serializer.is_valid():
             serializer.save()
             holiday = Holiday.objects.get(id=pk)
-            holiday = json.loads(holiday.id)
+            holiday = str(holiday.id)
             data = {
                     "holiday":holiday,
                     "success": True,
