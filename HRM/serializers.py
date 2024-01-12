@@ -48,13 +48,12 @@ class HolidaySerializer(serializers.ModelSerializer):
                 diff = to_date - from_date
                 days = int(diff.days)
                 for i in range(days + 1):
-                    current_date= from_date
-                    # if i== 0:
-                    #     current_date = from_date
-                    # else:
-                    #     current_date = from_date + timedelta(days=i)
+                    if  i ==0:
+                        current_date = from_date
+                    else:
+                        current_date = from_date + timedelta(days=i)
                     for emp in all_employees:
-                        working_sch = EmployeDailySchedule.objects.filter(employee_id=emp.id, date=from_date).first()
+                        working_sch = EmployeDailySchedule.objects.filter(employee_id=emp.id, date=current_date).first()
                         if working_sch:
                             working_sch.is_vacation = False
                             working_sch.is_weekend=False
