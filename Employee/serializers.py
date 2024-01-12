@@ -1010,8 +1010,8 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             location_id = self.context.get('location_id', None)
             holidays = Holiday.objects.filter(
                 # location_id=location_id,
-                start_date=start_date,
-                end_date=end_date # Corrected the field name
+                start_date__gte=start_date,
+                end_date__lte=end_date # Corrected the field name
             )
 
             if holidays.exists():
