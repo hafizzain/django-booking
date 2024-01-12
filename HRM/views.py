@@ -47,7 +47,7 @@ class HolidayApiView(APIView):
         else:
             # query = Q()
             # if location:
-                query &= Q(location=location)
+            query &= Q(location=location)
                 
             if name:
                 query &= Q(name__icontains=name)
