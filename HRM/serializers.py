@@ -25,16 +25,16 @@ class HolidaySerializer(serializers.ModelSerializer):
 
             if start_date is not None and end_date is not None:
                 holiday_check = Holiday.objects.filter(start_date=start_date,
-                                                    end_date=end_date,
-                                                    location=location).exists()
+                                                       end_date=end_date,
+                                                       location=location).exists()
                 if holiday_check:
                     raise serializers.ValidationError({'message': "Holiday already set for this date range."})
         return attrs
 
     def create(self, validated_data):
 
-        start_date = validated_data.get('start_date',None)
-        end_date = validated_data.get('end_date',None)
+        start_date = validated_data.get('start_date', None)
+        end_date = validated_data.get('end_date', None)
         location = validated_data['location']
         all_employees = Employee.objects \
             .select_related('user', 'business', 'country', 'state', 'city') \
@@ -76,14 +76,14 @@ class HolidaySerializer(serializers.ModelSerializer):
                                 is_vacation=False
                             )
             # pass
-            if start_date  and end_date:
+            if start_date and end_date:
                 # pass
                 from_date = start_date
                 to_date = end_date
                 diff = to_date - from_date
                 days = int(diff.days)
                 for i in range(days + 1):
-                    if  i ==0:
+                    if i == 0:
                         current_date = from_date
                     else:
                         current_date = from_date + timedelta(days=i)
@@ -91,27 +91,26 @@ class HolidaySerializer(serializers.ModelSerializer):
                         working_sch = EmployeDailySchedule.objects.filter(employee_id=emp.id, date=current_date).first()
                         if working_sch:
                             working_sch.is_vacation = False
-                            working_sch.is_weekend=False
-                            working_sch.is_holiday=True
+                            working_sch.is_weekend = False
+                            working_sch.is_holiday = True
                             working_sch.date = current_date
                             working_sch.from_date = current_date
-                            working_sch.is_weekend=False
-                            working_sch.is_vacation=False
-                            working_sch.is_working_schedule=False
+                            working_sch.is_weekend = False
+                            working_sch.is_vacation = False
+                            working_sch.is_working_schedule = False
                             working_sch.save()
                         else:
-                             EmployeDailySchedule.objects.create(
+                            EmployeDailySchedule.objects.create(
                                 employee_id=emp.id,
                                 date=current_date,
                                 from_date=current_date,
                                 to_date=to_date,
                                 vacation_status=None,
-                                is_weekend = False,
+                                is_weekend=False,
                                 is_holiday=True,
                                 is_working_schedule=False,
                                 is_vacation=False
                             )
-
 
             # if start_date is not None:
             #     days = 1
@@ -153,7 +152,7 @@ class HolidaySerializer(serializers.ModelSerializer):
             #             working_schedule.save()
 
         except Exception as ex:
-            ex=str(ex)
+            ex = str(ex)
             raise serializers.ValidationError(ex)
 
         # for employee in all_employees:
@@ -183,14 +182,13 @@ class HolidaySerializer(serializers.ModelSerializer):
         #                 is_weekend=False
         #             )
         try:
-         holiday = Holiday.objects.create(**validated_data)
+            holiday = Holiday.objects.create(**validated_data)
         except Exception as e:
-            e=str(e)
+            e = str(e)
             raise serializers.ValidationError(e)
         return holiday
 
-
-    def update(self, instance,validated_data):
+    def update(self, instance, validated_data):
         holiday_start_date = instance.start_date
         holiday_end_date = instance.end_date
         start_date = validated_data['start_date']
@@ -204,54 +202,21 @@ class HolidaySerializer(serializers.ModelSerializer):
             .prefetch_related('location') \
             .filter(location=location)
         try:
-            # if start_date is not None and end_date is None:
-            #     from_date = start_date
-            #     to_date = from_date
-            #     diff = to_date - from_date
-            #     days = int(diff.days)
-            #     for i in range(days + 1):
-            #         if i == 0:
-            #             current_date = from_date
-            #         else:
-            #             current_date = from_date + timedelta(days=i)
-            #         for emp in all_employees:
-            #             working_sch = EmployeDailySchedule.objects.filter(employee_id=emp.id,is_holiday=True)
-            #             if working_sch:
-            #                 working_sch.is_vacation = False
-            #                 working_sch.is_weekend = False
-            #                 working_sch.is_holiday = False
-            #                 working_sch.date = current_date
-            #                 working_sch.from_date = current_date
-            #                 # working_sch.is_weekend = False
-            #                 working_sch.is_vacation = False
-            #                 working_sch.is_working_schedule = False
-            #                 working_sch.save()
-            #             else:
-            #                 EmployeDailySchedule.objects.create(
-            #                     employee_id=emp.id,
-            #                     date=current_date,
-            #                     from_date=current_date,
-            #                     to_date=to_date,
-            #                     vacation_status=None,
-            #                     is_weekend=False,
-            #                     is_holiday=True,
-            #                     is_working_schedule=False,
-            #                     is_vacation=False
-            #                 )
-            # pass
-            if start_date  and end_date:
-                # pass
+            if start_date is not None and end_date is None:
                 from_date = start_date
-                to_date = end_date
+                to_date = from_date
                 diff = to_date - from_date
                 days = int(diff.days)
                 for i in range(days + 1):
-                    if  i ==0:
+                    if i == 0:
                         current_date = from_date
                     else:
                         current_date = from_date + timedelta(days=i)
                     for emp in all_employees:
-                        working_sch = EmployeDailySchedule.objects.filter(employee_id=emp.id, to_date__lte=holiday_end_date , from_date__gte=holiday_start_date,is_holiday=True)
+                        working_sch = EmployeDailySchedule.objects.filter(employee_id=emp.id,
+                                                                          from_date__gte=holiday_start_date,
+                                                                          end_date=None,
+                                                                          is_holiday=True)
                         if working_sch:
                             working_sch.delete()
                         EmployeDailySchedule.objects.create(
@@ -265,27 +230,78 @@ class HolidaySerializer(serializers.ModelSerializer):
                             is_working_schedule=False,
                             is_vacation=False
                         )
-                            # working_sch.date = current_date
-                            # working_sch.from_date = current_date
-                            # working_sch.is_weekend=False
-                            # working_sch.is_vacation=False
-                            # working_sch.is_working_schedule=False
-                            # working_sch.save()
+                        # if working_sch:
+                        #     working_sch.is_vacation = False
+                        #     working_sch.is_weekend = False
+                        #     working_sch.is_holiday = False
+                        #     working_sch.date = current_date
+                        #     working_sch.from_date = current_date
+                        #     # working_sch.is_weekend = False
+                        #     working_sch.is_vacation = False
+                        #     working_sch.is_working_schedule = False
+                        #     working_sch.save()
                         # else:
-                            #  EmployeDailySchedule.objects.create(
-                            #     employee_id=emp.id,
-                            #     date=current_date,
-                            #     from_date=current_date,
-                            #     to_date=to_date,
-                            #     vacation_status=None,
-                            #     is_weekend = False,
-                            #     is_holiday=True,
-                            #     is_working_schedule=False,
-                            #     is_vacation=False
-                            # )
+                        #     EmployeDailySchedule.objects.create(
+                        #         employee_id=emp.id,
+                        #         date=current_date,
+                        #         from_date=current_date,
+                        #         to_date=to_date,
+                        #         vacation_status=None,
+                        #         is_weekend=False,
+                        #         is_holiday=True,
+                        #         is_working_schedule=False,
+                        #         is_vacation=False
+                        #     )
+            if start_date and end_date:
+                # pass
+                from_date = start_date
+                to_date = end_date
+                diff = to_date - from_date
+                days = int(diff.days)
+                for i in range(days + 1):
+                    if i == 0:
+                        current_date = from_date
+                    else:
+                        current_date = from_date + timedelta(days=i)
+                    for emp in all_employees:
+                        working_sch = EmployeDailySchedule.objects.filter(employee_id=emp.id,
+                                                                          to_date__lte=holiday_end_date,
+                                                                          from_date__gte=holiday_start_date,
+                                                                          is_holiday=True)
+                        if working_sch:
+                            working_sch.delete()
+                        EmployeDailySchedule.objects.create(
+                            employee_id=emp.id,
+                            date=current_date,
+                            from_date=current_date,
+                            to_date=to_date,
+                            vacation_status=None,
+                            is_weekend=False,
+                            is_holiday=True,
+                            is_working_schedule=False,
+                            is_vacation=False
+                        )
+                        # working_sch.date = current_date
+                        # working_sch.from_date = current_date
+                        # working_sch.is_weekend=False
+                        # working_sch.is_vacation=False
+                        # working_sch.is_working_schedule=False
+                        # working_sch.save()
+                        # else:
+                        #  EmployeDailySchedule.objects.create(
+                        #     employee_id=emp.id,
+                        #     date=current_date,
+                        #     from_date=current_date,
+                        #     to_date=to_date,
+                        #     vacation_status=None,
+                        #     is_weekend = False,
+                        #     is_holiday=True,
+                        #     is_working_schedule=False,
+                        #     is_vacation=False
+                        # )
 
         except Exception as ex:
-            ex=str(ex)
+            ex = str(ex)
             raise serializers.ValidationError(ex)
         try:
             pass
@@ -293,6 +309,6 @@ class HolidaySerializer(serializers.ModelSerializer):
             # holiday = Holiday.objects.filter(id=id).update(start_date=start_date ,end_date=end_date)
             # holiday = Holiday.objects.get(id=id)
         except Exception as e:
-            e=str(e)
+            e = str(e)
             raise serializers.ValidationError(e)
         return True
