@@ -4486,6 +4486,7 @@ def create_workingschedule(request):
                 working_sch.is_weekend = True
                 working_sch.save()
                 schedule_ids.append(working_sch.id)
+
             else:
                 workings = EmployeDailySchedule.objects.create(
                     user=user,
