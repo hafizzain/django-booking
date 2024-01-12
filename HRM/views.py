@@ -139,7 +139,6 @@ class HolidayApiView(APIView):
         start_date = request.data.get("start_date",None)
         end_date = request.data.get('end_date',None)
         name  = request.data.get('name',None)
-        note = request.data.get('note',None)
         instance = get_object_or_404(Holiday, id=pk)
         request.data.get('user', None)
         serializer = HolidaySerializer(instance=instance,context={'id':pk},
@@ -151,7 +150,6 @@ class HolidayApiView(APIView):
             holiday.start_date=start_date
             holiday.end_date=end_date
             holiday.name=name
-            holiday.note = note
             holiday.save()
             holiday = str(holiday.id)
             data = {
