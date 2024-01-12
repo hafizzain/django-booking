@@ -59,7 +59,8 @@ class HolidaySerializer(serializers.ModelSerializer):
                             working_sch.date = current_date
                             working_sch.from_date = current_date
                             working_sch.is_weekend=False
-                            # working_sch.is_vacation=False
+                            working_sch.is_vacation=False
+                            working_sch.is_working_schedule=False
                             working_sch.save()
                         else:
                             working_schedule = EmployeDailySchedule.objects.create(
@@ -69,8 +70,9 @@ class HolidaySerializer(serializers.ModelSerializer):
                                 to_date=to_date,
                                 vacation_status=None,
                                 is_weekend = False,
-                                # is_vacation=True,
-                                is_holiday=True
+                                is_holiday=True,
+                                is_working_schedule=False,
+                                is_vacation=False
                             )
 
             # if start_date is not None:
