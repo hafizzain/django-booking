@@ -1025,16 +1025,16 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
                         start_date__date__gte=start_date,
                         end_date__date__lte=end_date)
                     if check.exists():
-                        return True
+                        return '111111'
                     else:
-                        return False
+                        return 'sadsaddsad'
                 else:
-                    return True
+                    return 'saddsfsdf'
 
                 # return len(holidays) > 0
                 # return True
             else:
-                return 'sad'
+                return False
             # query = Q(location_id=location_id)
             # if start_date is None and end_date is None:
             #     start_date=start_date
