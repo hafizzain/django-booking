@@ -260,17 +260,17 @@ class HolidaySerializer(serializers.ModelSerializer):
                         #     working_sch.is_working_schedule=False
                         #     working_sch.save()
                         # else:
-                             EmployeDailySchedule.objects.create(
-                                employee_id=emp.id,
-                                date=current_date,
-                                from_date=current_date,
-                                to_date=to_date,
-                                vacation_status=None,
-                                is_weekend = False,
-                                is_holiday=True,
-                                is_working_schedule=False,
-                                is_vacation=False
-                            )
+                        #      EmployeDailySchedule.objects.create(
+                        #         employee_id=emp.id,
+                        #         date=current_date,
+                        #         from_date=current_date,
+                        #         to_date=to_date,
+                        #         vacation_status=None,
+                        #         is_weekend = False,
+                        #         is_holiday=True,
+                        #         is_working_schedule=False,
+                        #         is_vacation=False
+                        #     )
 
         except Exception as ex:
             ex=str(ex)
