@@ -1075,9 +1075,9 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             #     holidays = Holiday.objects.select_related('user', 'business', 'location') \
             #         .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
             # holidays = False
-            holidays = Holiday.objects.select_related('user', 'business', 'location') \
-                .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
-            holidays = holidays.filter(location_id=location_id)
+            # holidays = Holiday.objects.select_related('user', 'business', 'location') \
+            #     .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
+            holidays = Holiday.objects.filter((Q(start_date_date__gte=start_date) , Q(end_date_date__lte=end_date)))
             if holidays:
                 return len(holidays) > 0
                 # return True
