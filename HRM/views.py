@@ -155,7 +155,7 @@ class HolidayApiView(APIView):
             data = {
                     "holiday":holiday,
                     "success": True,
-                    "status_code" : 201,
+                    "status_code" : 200,
                     "response" : {
                         "message" : "Holiday updated successfully",
                         "error_message" : None,
