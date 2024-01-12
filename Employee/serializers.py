@@ -918,7 +918,7 @@ class CommissionSerializer(serializers.ModelSerializer):
         model = CommissionSchemeSetting
         # fields = '__all__'
         exclude = ('sale_price_before_discount', 'created_at', 'from_value', 'to_value', 'percentage', 'user',
-                   'sale_price_including_tax', 'service_price_before_membership_discount')
+                    'sale_price_including_tax', 'service_price_before_membership_discount')
 
 
 class VacationSerializer(serializers.ModelSerializer):
