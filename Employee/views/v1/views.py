@@ -4481,22 +4481,29 @@ def create_workingschedule(request):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            working_schedule = EmployeDailySchedule.objects.create(
-                user=user,
-                business=business,
-                employee=employee,
-                date=date,
-                is_weekend=True,
-                is_vacation=False,
-                day=day,
-                start_time=start_time,
-                end_time=end_time,
-                start_time_shift=start_time_shift,
-                end_time_shift=end_time_shift,
-                from_date=from_date,
-                to_date=to_date,
-                note=note,
-            )
+            working_sch = EmployeDailySchedule.objects.filter(employee_id=employee, date=date).first()
+            if working_sch:
+                working_sch.is_weekend = True
+                working_sch.save()
+                schedule_ids.append(working_sch.id)
+            else:
+                workings = EmployeDailySchedule.objects.create(
+                    user=user,
+                    business=business,
+                    employee=employee,
+                    date=date,
+                    is_weekend=True,
+                    is_vacation=False,
+                    day=day,
+                    start_time=start_time,
+                    end_time=end_time,
+                    start_time_shift=start_time_shift,
+                    end_time_shift=end_time_shift,
+                    from_date=from_date,
+                    to_date=to_date,
+                    note=note,
+                )
+                schedule_ids.append(workings.id)
             # working_schedule.day = day
             # working_schedule.start_time = start_time
             # working_schedule.end_time = end_time
@@ -4506,7 +4513,7 @@ def create_workingschedule(request):
             # working_schedule.to_date = to_date
             # working_schedule.note = note
             # working_schedule.save()
-            schedule_ids.append(working_schedule.id)
+
 
         working_schedule = EmployeDailySchedule.objects.filter(
             id__in=schedule_ids
