@@ -1086,6 +1086,7 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
                 start_date__gte='2024-01-08',
                 end_date__lte='2024-01-14'  # Corrected the field name
             )
+
             if holidays.exists():
                 # return True
                 arbab = Holiday.objects.filter(
