@@ -1103,7 +1103,7 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
                 # return len(holidays) > 0
                 # return True
             else:
-                return False
+                return 'sad'
             #
             # Return True if there is any holiday
         except Exception as ex:
