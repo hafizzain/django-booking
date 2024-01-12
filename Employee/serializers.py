@@ -1079,12 +1079,12 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
             # holidays = False
             # holidays = Holiday.objects.select_related('user', 'business', 'location') \
             #     .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
-            start_date = datetime.strptime(start_date, "%Y-%m-%d")
-            end_date = datetime.strptime(end_date, "%Y-%m-%d")
+            # start_date = datetime.strptime(start_date, "%Y-%m-%d")
+            # end_date = datetime.strptime(end_date, "%Y-%m-%d")
             holidays = Holiday.objects.filter(
-                location_id=location_id,
-                start_date=start_date,
-                end_date=end_date  # Corrected the field name
+                # location_id=location_id,
+                start_date__gte='2024-01-08',
+                end_date__lte='2024-01-14'  # Corrected the field name
             )
             if holidays.exists():
                 # return True
