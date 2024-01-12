@@ -247,7 +247,7 @@ class HolidaySerializer(serializers.ModelSerializer):
                     for emp in all_employees:
                         working_sch = EmployeDailySchedule.objects.filter(employee_id=emp.id, date=current_date ,is_holiday=True).first()
                         if working_sch:
-                                working_sch.delete()
+                             working_sch.delete()
                              EmployeDailySchedule.objects.create(
                                 employee_id=emp.id,
                                 date=current_date,
