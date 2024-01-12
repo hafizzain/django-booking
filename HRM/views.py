@@ -136,8 +136,9 @@ class HolidayApiView(APIView):
         
     @transaction.atomic
     def patch(self, request, pk):
-        start_date = request.data.get("start_date")
-        end_date = request.data.get('end_date')
+        start_date = request.data.get("start_date",None)
+        end_date = request.data.get('end_date',None)
+        name  = request.data.get('name',None)
         instance = get_object_or_404(Holiday, id=pk)
         request.data.get('user', None)
         serializer = HolidaySerializer(instance=instance,context={'id':pk},
@@ -148,6 +149,7 @@ class HolidayApiView(APIView):
             holiday = Holiday.objects.get(id=pk)
             holiday.start_date=start_date
             holiday.end_date=end_date
+            holiday.name=name
             holiday.save()
             holiday = str(holiday.id)
             data = {
