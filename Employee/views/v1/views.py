@@ -4037,7 +4037,6 @@ def create_vacation_emp(request):
         days = int(diff.days)
     except:
         days = 0
-
     available_value = int(value)
     if days > available_value:
         return Response(
@@ -4052,17 +4051,9 @@ def create_vacation_emp(request):
             },
             status=status.HTTP_200_OK
         )
-
-    # check_available_vacation_type(vacation_type=vacation_type, employee=employee, from_date=from_date, to_date=to_date)
     annual_vacation_check(vacation_type=vacation_type, employee=employee_id)
     if not to_date:
         to_date = from_date
-
-    # from_date = datetime.strptime(from_date, "%Y-%m-%d")
-    # to_date = datetime.strptime(to_date, "%Y-%m-%d")
-    # diff = to_date - from_date
-    # working_sch = None
-    # days = int(diff.days)
     is_vacation_exist = Vacation.objects.filter(
         business=business,
         employee=employee_id,
@@ -4098,7 +4089,6 @@ def create_vacation_emp(request):
                 working_sch = EmployeDailySchedule.objects.filter(employee=employee_id, date=current_date).first()
                 if working_sch:
                     working_sch.is_vacation = True
-                    empl_vacation.save()
                     working_sch.vacation = empl_vacation
                     working_sch.from_date = current_date
                     working_sch.save()
@@ -4116,25 +4106,27 @@ def create_vacation_emp(request):
                         from_date=current_date,
                         to_date=to_date,
                         note=note,
-                        vacation_status='pending'
+                        vacation_status='pending',
+                        is_vacation=True
                     )
 
-                    if is_vacation is not None:
-                        working_schedule.is_vacation = True
-                        empl_vacation.save()
-                        working_schedule.vacation = empl_vacation
-                    else:
-                        working_schedule.is_vacation = False
-
-                    working_schedule.is_leave = is_leave if is_leave is not None else False
-                    working_schedule.is_off = is_off if is_off is not None else False
-                    working_schedule.save()
+                    # if is_vacation is not None:
+                    #     working_schedule.is_vacation = True
+                    #     empl_vacation.save()
+                    #     working_schedule.vacation = empl_vacation
+                    # else:
+                    #     working_schedule.is_vacation = False
+                    #
+                    # working_schedule.is_leave = is_leave if is_leave is not None else False
+                    # working_schedule.is_off = is_off if is_off is not None else False
+                    # working_schedule.save()
 
             thread = threading.Thread(target=process_schedule,
                                       args=(employee_id, from_date, to_date, user, business, day,
                                             start_time, end_time, start_time_shift, end_time_shift,
                                             note, is_vacation, is_leave, is_off, empl_vacation))
             thread.start()
+            thread.join()
     except Exception as err:
         return Response(
             {
