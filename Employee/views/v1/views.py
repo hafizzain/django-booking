@@ -4051,7 +4051,7 @@ def create_vacation_emp(request):
             },
             status=status.HTTP_200_OK
         )
-    annual_vacation_check(vacation_type=vacation_type, employee=employee_id)
+    # annual_vacation_check(vacation_type=vacation_type, employee=employee_id)
     if not to_date:
         to_date = from_date
     is_vacation_exist = Vacation.objects.filter(
