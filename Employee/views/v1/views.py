@@ -4084,6 +4084,7 @@ def create_vacation_emp(request):
         def process_schedule(employee_id, from_date, to_date, user, business, day, start_time, end_time,
                              start_time_shift,
                              end_time_shift, note, is_vacation, is_leave, is_off, empl_vacation):
+            schedule_instances = []
             for i in range(days + 1):
                 current_date = from_date + timedelta(days=i)
                 working_sch = EmployeDailySchedule.objects.filter(employee=employee_id, date=current_date).first()
@@ -4093,7 +4094,7 @@ def create_vacation_emp(request):
                     working_sch.from_date = current_date
                     working_sch.save()
                 else:
-                    working_schedule = EmployeDailySchedule.objects.create(
+                    schedule_instance = EmployeDailySchedule(
                         user=user,
                         business=business,
                         employee=employee_id,
@@ -4109,6 +4110,27 @@ def create_vacation_emp(request):
                         vacation_status='pending',
                         is_vacation=True
                     )
+                    schedule_instances.append(schedule_instance)
+
+                    # Use bulk_create to insert all instances at once
+                with transaction.atomic():
+                    EmployeDailySchedule.objects.bulk_create(schedule_instances)
+                    # working_schedule = EmployeDailySchedule.objects.create(
+                    #     user=user,
+                    #     business=business,
+                    #     employee=employee_id,
+                    #     day=day,
+                    #     start_time=start_time,
+                    #     end_time=end_time,
+                    #     start_time_shift=start_time_shift,
+                    #     end_time_shift=end_time_shift,
+                    #     date=current_date,
+                    #     from_date=current_date,
+                    #     to_date=to_date,
+                    #     note=note,
+                    #     vacation_status='pending',
+                    #     is_vacation=True
+                    # )
 
                     # if is_vacation is not None:
                     #     working_schedule.is_vacation = True
