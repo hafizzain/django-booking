@@ -686,6 +686,20 @@ class GiftCard(models.Model):
 
 
 class GiftCards(models.Model):
+    VALIDITY_DAY = [
+        ('7 Days', '7 Days'),
+        ('14 Days', '14 Days'),
+        ('1 Month', '1 Months'),
+        ('2 Months', '2 Months'),
+        ('3 Months', '3 Months'),
+        ('4 Months', '4 Months'),
+        ('6 Months', '6 Months'),
+        ('8 Months', '8 Months'),
+        ('1 Years', '1 Years'),
+        ('18 Months', '18 Months'),
+        ('2 Years', '2 Years'),
+        ('5 Years', '5 Years'),
+    ]
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     name = models.TextField(null=True, blank=True)
     title = models.TextField(null=True, blank=True)
@@ -697,3 +711,7 @@ class GiftCards(models.Model):
     code = models.TextField(null=True, blank=True)
     discount_to_show = models.TextField(null=True)
     currency = models.TextField(null=True)
+    valid_till = models.CharField(choices=VALIDITY_DAY, default='7 Days', null=True, blank=True,
+                                 verbose_name='No of Days/Month', max_length=100)
+    location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True,
+                                 related_name='locations_taxs')

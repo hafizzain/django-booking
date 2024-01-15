@@ -6562,20 +6562,6 @@ def create_coupon(request):
     if len(store_restriction) > 0:
         store_restriction = json.loads(store_restriction)
         coupon.locations.set(store_restriction)
-    # except Exception as ex:
-    #     error = str(ex)
-    #     return Response(
-    #         {
-    #             'status': False,
-    #             'status_code': 400,
-    #             'response': {
-    #                 'message': 'Something went wrong',
-    #                 'error_message': error,
-    #             }
-    #         },
-    #         status=status.HTTP_400_BAD_REQUEST
-    #     )
-
     serializer = CouponSerializer(coupon, context={'request': request})
     return Response(
         {
