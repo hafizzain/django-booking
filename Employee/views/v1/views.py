@@ -4037,6 +4037,7 @@ def create_vacation_emp(request):
         vacation_type=vacation_type,
     )
     try:
+        pass
         # def process_schedule(employee_id, from_date, to_date, user, business_id, day, start_time, end_time,
         #                      start_time_shift,
         #                      end_time_shift, note, is_vacation, is_leave, is_off, empl_vacation):
