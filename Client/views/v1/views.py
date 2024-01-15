@@ -1841,18 +1841,13 @@ def create_memberships(request):
     user = request.user
     business = request.data.get('business', None)
     name = request.data.get('name', None)
-    
     description = request.data.get('description', None)
     terms_condition = request.data.get('term_condition', None)
-    
     color = request.data.get('color', None)
-    
     services = request.data.get('services', None)
     products = request.data.get('products',None)
-    
     #membership_type = request.data.get('membership_type',None)
     #total_number = request.data.get('total_number',None)
-    
     #percentage = request.data.get('session', None)
     valid_for = request.data.get('valid_for', None)
     #validity = request.data.get('validity', None)
