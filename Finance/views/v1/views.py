@@ -171,10 +171,20 @@ class RefundAPIView(APIView):
                         # or you can do it in loop
                     else: 
                         product_orders = ProductOrder.objects.filter(checkout=checkout_instance, id__in = refunded_products_ids) 
-                        product_orders.update(pk = None, checkout=newCheckoutInstance) 
-
+                        # product_orders.update(pk = None, checkout=newCheckoutInstance) 
+                        
+                        for order in product_orders:
+                            order.pk = None
+                            order.checkout = newCheckoutInstance
+                            order.save()
+                            
                         service_orders = ServiceOrder.objects.filter(checkout=checkout_instance, id__in = refunded_services_ids) 
-                        service_orders.update(pk = None, checkout=newCheckoutInstance) 
+                        # service_orders.update(pk = None, checkout=newCheckoutInstance) 
+                        for order in service_orders:
+                            order.pk = None
+                            order.checkout = newCheckoutInstance
+                            order.save()
+                        
 
                     newInvoice = invoice 
                     newInvoice.pk = None 
