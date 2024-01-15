@@ -3918,44 +3918,44 @@ def create_vacation_emp(request):
     difference_days = 0
     working_sch = None
 
-    check_leo_day = EmployeDailySchedule.objects.filter(
-        employee=employee,
-        date=from_date,
-        is_leo_day=True
-    )
-    check_weekend = EmployeDailySchedule.objects.filter(
-        employee=employee,
-        date=from_date,
-        is_weekend=True
-    )
-    if check_weekend:
-        return Response(
-            {
-                'status': 400,
-                'status_code': 400,
-                'status_code_text': '400',
-                'response': {
-                    'message': f'Cannot create vacation on weekend.',
-                    'error_message': None,
-                }
-            },
-
-            status=200
-        )
-    if check_leo_day:
-        return Response(
-            {
-                'status': 400,
-                'status_code': 400,
-                'status_code_text': '400',
-                'response': {
-                    'message': f'Cannot create vacation on leo day.',
-                    'error_message': None,
-                }
-            },
-
-            status=200
-        )
+    # check_leo_day = EmployeDailySchedule.objects.filter(
+    #     employee=employee,
+    #     date=from_date,
+    #     is_leo_day=True
+    # )
+    # check_weekend = EmployeDailySchedule.objects.filter(
+    #     employee=employee,
+    #     date=from_date,
+    #     is_weekend=True
+    # )
+    # if check_weekend:
+    #     return Response(
+    #         {
+    #             'status': 400,
+    #             'status_code': 400,
+    #             'status_code_text': '400',
+    #             'response': {
+    #                 'message': f'Cannot create vacation on weekend.',
+    #                 'error_message': None,
+    #             }
+    #         },
+    #
+    #         status=200
+    #     )
+    # if check_leo_day:
+    #     return Response(
+    #         {
+    #             'status': 400,
+    #             'status_code': 400,
+    #             'status_code_text': '400',
+    #             'response': {
+    #                 'message': f'Cannot create vacation on leo day.',
+    #                 'error_message': None,
+    #             }
+    #         },
+    #
+    #         status=200
+    #     )
     employee_leave_management_obj = LeaveManagements.objects.get(employee_id=employee)
     employee_id = Employee.objects.get(id=employee, is_deleted=False)
     if vacation_type == 'medical':
@@ -4009,23 +4009,23 @@ def create_vacation_emp(request):
     # annual_vacation_check(vacation_type=vacation_type, employee=employee_id)
     if not to_date:
         to_date = from_date
-    is_vacation_exist = Vacation.objects.filter(
-        business_id=business_id,
-        employee=employee_id,
-        from_date=from_date,
-    ).first()
-    if is_vacation_exist:
-        return Response(
-            {
-                'status': 400,
-                'status_code': '400',
-                'response': {
-                    'message': 'Employee Vacation Already Exist',
-                    'error_message': None,
-                }
-            },
-            status=status.HTTP_200_OK
-        )
+    # is_vacation_exist = Vacation.objects.filter(
+    #     business_id=business_id,
+    #     employee=employee_id,
+    #     from_date=from_date,
+    # ).first()
+    # if is_vacation_exist:
+    #     return Response(
+    #         {
+    #             'status': 400,
+    #             'status_code': '400',
+    #             'response': {
+    #                 'message': 'Employee Vacation Already Exist',
+    #                 'error_message': None,
+    #             }
+    #         },
+    #         status=status.HTTP_200_OK
+    #     )
     empl_vacation = Vacation.objects.create(
         business_id=business_id,
         employee=employee_id,
