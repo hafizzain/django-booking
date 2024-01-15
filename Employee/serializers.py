@@ -1939,7 +1939,7 @@ class EmployeeInfoSerializer(serializers.ModelSerializer):
 class GiftCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = GiftCards
-        fields = ['name', 'gift_card_value', 'retail_price', 'expire_date', 'discount_to_show']
+        fields = ['name', 'gift_card_value', 'retail_price', 'expire_date', 'discount_to_show','start_date','end_date']
 
     def create(self, validated_data):
         return GiftCards.objects.create(**validated_data)
