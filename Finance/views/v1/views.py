@@ -188,9 +188,9 @@ class RefundAPIView(APIView):
 
                     newInvoice = invoice 
                     newInvoice.pk = None 
-                    newInvoice.invoice_type = 'refund', 
-                    newInvoice.total_product_price = -refund_price, 
-                    newInvoice.checkout = str(newCheckoutInstance.id), 
+                    newInvoice.invoice_type = 'refund'
+                    newInvoice.total_product_price = float(-refund_price)
+                    newInvoice.checkout = str(newCheckoutInstance.id) 
                     newInvoice.save() 
 
                     client_email = Client.objects.get(id=client).email 
