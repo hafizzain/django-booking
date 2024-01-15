@@ -186,7 +186,7 @@ class RefundAPIView(APIView):
                     #send email to client running on thread
                     send_refund_email(client_email=client_email)  
                 except Exception as e:
-                        return Response({'Error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                        return Response({'Error': str(e), 'error':'Second Try'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
                 if expiry_date:
                     coupon_data = {
@@ -202,7 +202,7 @@ class RefundAPIView(APIView):
                         coupon_serializer.is_valid(raise_exception=True)
                         coupon_serializer.save()
                     except Exception as e:
-                        return Response({'Error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                        return Response({'Error': str(e),'error': 'Third Try'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     response_data = {
                         'success': True,
                         'status_code': 201,
@@ -243,7 +243,7 @@ class RefundAPIView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             # return Response({'data': request.data} , status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": str(e), 'error':'First Try'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class RefundedCoupons(APIView):
     '''Getting coupons with the refund Data'''
