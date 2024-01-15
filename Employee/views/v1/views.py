@@ -3918,114 +3918,114 @@ def create_vacation_emp(request):
     difference_days = 0
     working_sch = None
 
-    # check_leo_day = EmployeDailySchedule.objects.filter(
-    #     employee=employee,
-    #     date=from_date,
-    #     is_leo_day=True
-    # )
-    # check_weekend = EmployeDailySchedule.objects.filter(
-    #     employee=employee,
-    #     date=from_date,
-    #     is_weekend=True
-    # )
-    # if check_weekend:
-    #     return Response(
-    #         {
-    #             'status': 400,
-    #             'status_code': 400,
-    #             'status_code_text': '400',
-    #             'response': {
-    #                 'message': f'Cannot create vacation on weekend.',
-    #                 'error_message': None,
-    #             }
-    #         },
-    #
-    #         status=200
-    #     )
-    # if check_leo_day:
-    #     return Response(
-    #         {
-    #             'status': 400,
-    #             'status_code': 400,
-    #             'status_code_text': '400',
-    #             'response': {
-    #                 'message': f'Cannot create vacation on leo day.',
-    #                 'error_message': None,
-    #             }
-    #         },
-    #
-    #         status=200
-    #     )
-    # employee_leave_management_obj = LeaveManagements.objects.get(employee_id=employee)
-    # employee_id = Employee.objects.get(id=employee, is_deleted=False)
-    # if vacation_type == 'medical':
-    #     value = employee_leave_management_obj.medical_leave
-    # if vacation_type == 'annual':
-    #     value = employee_leave_management_obj.annual_leave
-    #     now = datetime.now()
-    #     created_at = employee_id.created_at
-    #     required_months = employee_leave_management_obj.number_of_months
-    #     required_months = int(required_months)
-    #     months_difference = (now.year - created_at.year) * 12 + now.month - created_at.month
-    #     months_difference = int(months_difference)
-    #     if required_months > months_difference:
-    #         return Response(
-    #             {
-    #                 'status': 400,
-    #                 'status_code': '400',
-    #                 'response': {
-    #                     'message': 'Annual leave requests available after {required_months} months'.format(
-    #                         required_months=required_months),
-    #                     'error_message': None,
-    #                 }
-    #             },
-    #             status=status.HTTP_200_OK
-    #         )
-    # if vacation_type == 'casual':
-    #     value = employee_leave_management_obj.casual_leave
-    # if vacation_type == 'leo_day':
-    #     value = employee_leave_management_obj.leo_leave
-    # from_date = datetime.strptime(from_date, "%Y-%m-%d")
-    # try:
-    #     to_date = datetime.strptime(to_date, "%Y-%m-%d")
-    #     diff = to_date - from_date
-    #     days = int(diff.days)
-    # except:
-    #     days = 0
-    # available_value = int(value)
-    # if days > available_value:
-    #     return Response(
-    #         {
-    #             'status': 400,
-    #             'status_code': '400',
-    #             'response': {
-    #                 'message': 'Exceeded {vacation_type} quota. Please adjust and retry.'.format(
-    #                     vacation_type=vacation_type),
-    #                 'error_message': None,
-    #             }
-    #         },
-    #         status=status.HTTP_200_OK
-    #     )
-    # annual_vacation_check(vacation_type=vacation_type, employee=employee_id)
-    # if not to_date:
-    #     to_date = from_date
-    # is_vacation_exist = Vacation.objects.filter(
-    #     business_id=business_id,
-    #     employee=employee_id,
-    #     from_date=from_date,
-    # ).first()
-    # if is_vacation_exist:
-    #     return Response(
-    #         {
-    #             'status': 400,
-    #             'status_code': '400',
-    #             'response': {
-    #                 'message': 'Employee Vacation Already Exist',
-    #                 'error_message': None,
-    #             }
-    #         },
-    #         status=status.HTTP_200_OK
-    #     )
+    check_leo_day = EmployeDailySchedule.objects.filter(
+        employee=employee,
+        date=from_date,
+        is_leo_day=True
+    )
+    check_weekend = EmployeDailySchedule.objects.filter(
+        employee=employee,
+        date=from_date,
+        is_weekend=True
+    )
+    if check_weekend:
+        return Response(
+            {
+                'status': 400,
+                'status_code': 400,
+                'status_code_text': '400',
+                'response': {
+                    'message': f'Cannot create vacation on weekend.',
+                    'error_message': None,
+                }
+            },
+
+            status=200
+        )
+    if check_leo_day:
+        return Response(
+            {
+                'status': 400,
+                'status_code': 400,
+                'status_code_text': '400',
+                'response': {
+                    'message': f'Cannot create vacation on leo day.',
+                    'error_message': None,
+                }
+            },
+
+            status=200
+        )
+    employee_leave_management_obj = LeaveManagements.objects.get(employee_id=employee)
+    employee_id = Employee.objects.get(id=employee, is_deleted=False)
+    if vacation_type == 'medical':
+        value = employee_leave_management_obj.medical_leave
+    if vacation_type == 'annual':
+        value = employee_leave_management_obj.annual_leave
+        now = datetime.now()
+        created_at = employee_id.created_at
+        required_months = employee_leave_management_obj.number_of_months
+        required_months = int(required_months)
+        months_difference = (now.year - created_at.year) * 12 + now.month - created_at.month
+        months_difference = int(months_difference)
+        if required_months > months_difference:
+            return Response(
+                {
+                    'status': 400,
+                    'status_code': '400',
+                    'response': {
+                        'message': 'Annual leave requests available after {required_months} months'.format(
+                            required_months=required_months),
+                        'error_message': None,
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+    if vacation_type == 'casual':
+        value = employee_leave_management_obj.casual_leave
+    if vacation_type == 'leo_day':
+        value = employee_leave_management_obj.leo_leave
+    from_date = datetime.strptime(from_date, "%Y-%m-%d")
+    try:
+        to_date = datetime.strptime(to_date, "%Y-%m-%d")
+        diff = to_date - from_date
+        days = int(diff.days)
+    except:
+        days = 0
+    available_value = int(value)
+    if days > available_value:
+        return Response(
+            {
+                'status': 400,
+                'status_code': '400',
+                'response': {
+                    'message': 'Exceeded {vacation_type} quota. Please adjust and retry.'.format(
+                        vacation_type=vacation_type),
+                    'error_message': None,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    annual_vacation_check(vacation_type=vacation_type, employee=employee_id)
+    if not to_date:
+        to_date = from_date
+    is_vacation_exist = Vacation.objects.filter(
+        business_id=business_id,
+        employee=employee_id,
+        from_date=from_date,
+    ).first()
+    if is_vacation_exist:
+        return Response(
+            {
+                'status': 400,
+                'status_code': '400',
+                'response': {
+                    'message': 'Employee Vacation Already Exist',
+                    'error_message': None,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
 
     empl_vacation = Vacation.objects.create(
         business_id=business_id,
@@ -4037,42 +4037,41 @@ def create_vacation_emp(request):
         vacation_type=vacation_type,
     )
     try:
-        pass
-        # def process_schedule(employee_id, from_date, to_date, user, business_id, day, start_time, end_time,
-        #                      start_time_shift,
-        #                      end_time_shift, note, is_vacation, is_leave, is_off, empl_vacation):
-        #     schedule_instances = []
-        #     for i in range(days + 1):
-        #         current_date = from_date + timedelta(days=i)
-        #         try:
-        #             working_sch = EmployeDailySchedule.objects.get(employee=employee_id, date=current_date)
-        #             if working_sch:
-        #                 working_sch.is_vacation = True
-        #                 working_sch.vacation = empl_vacation
-        #                 working_sch.from_date = current_date
-        #                 working_sch.save()
-        #         except:
-        #             schedule_instance = EmployeDailySchedule(
-        #                 user=user,
-        #                 business=business_id,
-        #                 employee=employee_id,
-        #                 day=day,
-        #                 start_time=start_time,
-        #                 end_time=end_time,
-        #                 start_time_shift=start_time_shift,
-        #                 end_time_shift=end_time_shift,
-        #                 date=current_date,
-        #                 from_date=current_date,
-        #                 to_date=to_date,
-        #                 note=note,
-        #                 vacation_status='pending',
-        #                 is_vacation=True
-        #             )
-        #             schedule_instances.append(schedule_instance)
-        #
-        #             # Use bulk_create to insert all instances at once
-        #         with transaction.atomic():
-        #             EmployeDailySchedule.objects.bulk_create(schedule_instances)
+        def process_schedule(employee_id, from_date, to_date, user, business_id, day, start_time, end_time,
+                             start_time_shift,
+                             end_time_shift, note, is_vacation, is_leave, is_off, empl_vacation):
+            schedule_instances = []
+            for i in range(days + 1):
+                current_date = from_date + timedelta(days=i)
+                try:
+                    working_sch = EmployeDailySchedule.objects.get(employee=employee_id, date=current_date)
+                    if working_sch:
+                        working_sch.is_vacation = True
+                        working_sch.vacation = empl_vacation
+                        working_sch.from_date = current_date
+                        working_sch.save()
+                except:
+                    schedule_instance = EmployeDailySchedule(
+                        user=user,
+                        business=business_id,
+                        employee=employee_id,
+                        day=day,
+                        start_time=start_time,
+                        end_time=end_time,
+                        start_time_shift=start_time_shift,
+                        end_time_shift=end_time_shift,
+                        date=current_date,
+                        from_date=current_date,
+                        to_date=to_date,
+                        note=note,
+                        vacation_status='pending',
+                        is_vacation=True
+                    )
+                    schedule_instances.append(schedule_instance)
+
+                    # Use bulk_create to insert all instances at once
+                with transaction.atomic():
+                    EmployeDailySchedule.objects.bulk_create(schedule_instances)
                     # working_schedule = EmployeDailySchedule.objects.create(
                     #     user=user,
                     #     business=business,
@@ -4101,12 +4100,12 @@ def create_vacation_emp(request):
                     # working_schedule.is_off = is_off if is_off is not None else False
                     # working_schedule.save()
 
-        # thread = threading.Thread(target=process_schedule,
-        #                           args=(employee_id, from_date, to_date, user, business_id, day,
-        #                                 start_time, end_time, start_time_shift, end_time_shift,
-        #                                 note, is_vacation, is_leave, is_off, empl_vacation))
-        # thread.start()
-        # thread.join()
+        thread = threading.Thread(target=process_schedule,
+                                  args=(employee_id, from_date, to_date, user, business_id, day,
+                                        start_time, end_time, start_time_shift, end_time_shift,
+                                        note, is_vacation, is_leave, is_off, empl_vacation))
+        thread.start()
+        thread.join()
     except Exception as err:
         return Response(
             {
