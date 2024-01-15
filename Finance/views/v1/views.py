@@ -144,8 +144,9 @@ class RefundAPIView(APIView):
                 refund_instance = serializer.save()
                 
                 # refunded_products_ids = list(refundprodcts.objects.filter().values_list('id', flat=True))
-                refunded_products_ids = list(RefundProduct.objects.filter().values('id', flat=True))
-                refunded_services_ids = list(RefundServices.objects.filter().values('id', flat=True))
+                refunded_products_ids = refund_instance.refunded_products.values_list('id', flat=True)
+                refunded_services_ids = refund_instance.refunded_services.values_list('id', flat=True)
+                # return Response({'refund product list': refunded_products_ids, 'refund service list': refunded_services_ids})
 
                 #      create invoice
                 try:    
@@ -157,7 +158,7 @@ class RefundAPIView(APIView):
                     newCheckoutInstance.pk = None 
                     newCheckoutInstance.save() 
 
-                    if self.checkout_type == 'appointment': 
+                    if checkout_type == 'appointment': 
                         newAppointment = checkout_instance.appointment 
                         newAppointment.pk = None 
                         newAppointment.save() 
@@ -170,23 +171,33 @@ class RefundAPIView(APIView):
                         # or you can do it in loop
                     else: 
                         product_orders = ProductOrder.objects.filter(checkout=checkout_instance, id__in = refunded_products_ids) 
-                        product_orders.update(pk = None, checkout=newCheckoutInstance) 
-
+                        # product_orders.update(pk = None, checkout=newCheckoutInstance) 
+                        
+                        for order in product_orders:
+                            order.pk = None
+                            order.checkout = newCheckoutInstance
+                            order.save()
+                            
                         service_orders = ServiceOrder.objects.filter(checkout=checkout_instance, id__in = refunded_services_ids) 
-                        service_orders.update(pk = None, checkout=newCheckoutInstance) 
+                        # service_orders.update(pk = None, checkout=newCheckoutInstance) 
+                        for order in service_orders:
+                            order.pk = None
+                            order.checkout = newCheckoutInstance
+                            order.save()
+                        
 
                     newInvoice = invoice 
                     newInvoice.pk = None 
-                    newInvoice.invoice_type = 'refund', 
-                    newInvoice.total_product_price = -refund_price, 
-                    newInvoice.checkout = str(newCheckoutInstance.id), 
+                    newInvoice.invoice_type = 'refund'
+                    newInvoice.total_product_price = float(-refund_price)
+                    newInvoice.checkout = str(newCheckoutInstance.id) 
                     newInvoice.save() 
 
                     client_email = Client.objects.get(id=client).email 
                     #send email to client running on thread
                     send_refund_email(client_email=client_email)  
                 except Exception as e:
-                        return Response({'Error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                        return Response({'Error': str(e), 'error':'Second Try'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
                 if expiry_date:
                     coupon_data = {
@@ -202,7 +213,7 @@ class RefundAPIView(APIView):
                         coupon_serializer.is_valid(raise_exception=True)
                         coupon_serializer.save()
                     except Exception as e:
-                        return Response({'Error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                        return Response({'Error': str(e),'error': 'Third Try'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     response_data = {
                         'success': True,
                         'status_code': 201,
@@ -243,7 +254,7 @@ class RefundAPIView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             # return Response({'data': request.data} , status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": str(e), 'error':'First Try'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class RefundedCoupons(APIView):
     '''Getting coupons with the refund Data'''
