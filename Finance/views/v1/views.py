@@ -146,50 +146,48 @@ class RefundAPIView(APIView):
                 # refunded_products_ids = list(refundprodcts.objects.filter().values_list('id', flat=True))
                 refunded_products_ids = list(RefundProduct.objects.filter().values('id', flat=True))
                 refunded_services_ids = list(RefundServices.objects.filter().values('id', flat=True))
-                return Response({'msg': 'serilizer is valid', 'Rfunded Products ids': refunded_products_ids, 'Refunded Services Ids': refunded_services_ids})
 
                 #      create invoice
-                # try:    
-                #     invoice = SaleInvoice.objects.get(id=refund_invoice_id) 
+                try:    
+                    invoice = SaleInvoice.objects.get(id=refund_invoice_id) 
                     
-                #     checkout_instance = invoice.checkout_instance 
+                    checkout_instance = invoice.checkout_instance 
 
-                #     newCheckoutInstance = checkout_instance  
-                #     newCheckoutInstance.pk = None 
-                #     newCheckoutInstance.save() 
+                    newCheckoutInstance = checkout_instance  
+                    newCheckoutInstance.pk = None 
+                    newCheckoutInstance.save() 
 
-                #     if checkout_type == 'appointment': 
-                        
-                #         # newAppointment = checkout_instance.appointment
-                #         # newAppointment.pk = None 
-                #         # newAppointment.save() 
-                #         order_items = AppointmentService.objects.get_active_appointment_services(appointment = checkout_instance.appointment)
+                    if checkout_type == 'appointment': 
+                        newAppointment = checkout_instance.appointment 
+                        newAppointment.pk = None 
+                        newAppointment.save() 
+                        order_items = AppointmentService.objects.get_active_appointment_services(appointment = checkout_instance.appointment) 
 
-                #         order_items.update( 
-                #             pk = None,  
-                #             appointment = newAppointment, 
-                #         ) 
-                #         # or you can do it in loop
-                #     else: 
-                #         product_orders = ProductOrder.objects.filter(checkout=checkout_instance, id__in = refunded_products_ids) 
-                #         product_orders.update(pk = None, checkout=newCheckoutInstance) 
+                        order_items.update( 
+                            pk = None,  
+                            appointment = newAppointment, 
+                        ) 
+                        # or you can do it in loop
+                    else: 
+                        product_orders = ProductOrder.objects.filter(checkout=checkout_instance, id__in = refunded_products_ids) 
+                        product_orders.update(pk = None, checkout=newCheckoutInstance) 
 
-                #         service_orders = ServiceOrder.objects.filter(checkout=checkout_instance, id__in = refunded_services_ids) 
-                #         service_orders.update(pk = None, checkout=newCheckoutInstance) 
+                        service_orders = ServiceOrder.objects.filter(checkout=checkout_instance, id__in = refunded_services_ids) 
+                        service_orders.update(pk = None, checkout=newCheckoutInstance) 
 
-                #     newInvoice = invoice 
-                #     newInvoice.pk = None 
-                #     newInvoice.payment_type = payment_type
-                #     newInvoice.invoice_type = 'refund', 
-                #     newInvoice.total_product_price = -refund_price, 
-                #     newInvoice.checkout = str(newCheckoutInstance.id), 
-                #     newInvoice.save() 
+                    newInvoice = invoice 
+                    newInvoice.pk = None 
+                    newInvoice.payment_type = payment_type
+                    newInvoice.invoice_type = 'refund', 
+                    newInvoice.total_product_price = -refund_price, 
+                    newInvoice.checkout = str(newCheckoutInstance.id), 
+                    newInvoice.save() 
 
-                #     client_email = Client.objects.get(id=client).email 
-                #     #send email to client running on thread
-                #     send_refund_email(client_email=client_email)  
-                # except Exception as e:
-                #         return Response({'Error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    client_email = Client.objects.get(id=client).email 
+                    #send email to client running on thread
+                    send_refund_email(client_email=client_email)  
+                except Exception as e:
+                        return Response({'Error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
                 if expiry_date:
                     coupon_data = {
@@ -215,7 +213,7 @@ class RefundAPIView(APIView):
                             'data': {
                                 'refund': RefundSerializer(serializer.instance).data,
                                 'coupon': CouponSerializer(coupon_serializer.instance).data,
-                                'invoice': SaleInvoiceSerializer(newInvoice).data
+                                # 'invoice': SaleInvoiceSerializer(newInvoice).data
                             }
                         }
                     }
@@ -229,7 +227,7 @@ class RefundAPIView(APIView):
                             'error_message': None,
                             'data': {
                                 'refund': RefundSerializer(serializer.instance).data,
-                                'invoice': SaleInvoiceSerializer(newInvoice).data, 
+                                # 'invoice': SaleInvoiceSerializer(newInvoice).data, 
                             }
                         }
                     }
