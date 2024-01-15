@@ -689,7 +689,7 @@ def single_employee_schedule(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_workingschedule(request):
-    s=None
+    s = None
     employee_ids_in_schedule = None
     is_weekend = request.query_params.get('is_weekend', None)
     start_date = request.query_params.get('start_date', None)
@@ -757,7 +757,7 @@ def del_all_avaliable(request):
     vacations.delete()
     sceduales.delete()
     holiday.delete()
-    return Response({"msg":"del all"})
+    return Response({"msg": "del all"})
 
 
 @api_view(['GET'])
@@ -4493,7 +4493,6 @@ def create_workingschedule(request):
             # working_schedule.to_date = to_date
             # working_schedule.note = note
             # working_schedule.save()
-
 
         working_schedule = EmployeDailySchedule.objects.filter(
             id__in=schedule_ids

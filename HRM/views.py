@@ -32,7 +32,7 @@ class HolidayApiView(APIView):
         end_date = self.request.query_params.get('end_date', None)
         no_pagination = request.GET.get('no_pagination', None)
         location = request.GET.get('location', None)  #data deal with location
-        
+
         if pk is not None:
             holiday = get_object_or_404(Holiday, id=pk)
             serializer = HolidaySerializer(holiday)
@@ -139,6 +139,7 @@ class HolidayApiView(APIView):
         start_date = request.data.get("start_date",None)
         end_date = request.data.get('end_date',None)
         name  = request.data.get('name',None)
+        note = request.GET.get('note', None)
         instance = get_object_or_404(Holiday, id=pk)
         request.data.get('user', None)
         serializer = HolidaySerializer(instance=instance,context={'id':pk},
