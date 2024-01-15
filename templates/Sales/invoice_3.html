@@ -257,18 +257,12 @@
                   <p>{{redeemed_points}}</p>
                 </div>
               {% endif %}
-
-              {% if coupon_data %}
+              {% if coupon_data.is_coupon_redeemed == 'true' %}
                   <div class="flex items-center justify-between text-primary text-sm font-bold">
                     <div>
-                      {% if coupon_data.is_coupon_redeemed == 'true' %}
                         <p>Coupon redeemed</p>
-                        <p>Price: {{ coupon_data.coupon_discounted_price }} {{ currency_code }}</p>
-                      {% else %}
-                        <p></p>
-                      {% endif %}
                     </div>
-
+                    <p>{{ coupon_data.coupon_discounted_price }} {{ currency_code }}</p>
                   </div>
               {% endif %}
 
