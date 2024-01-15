@@ -259,6 +259,15 @@
                 </div>
               {% endif %}
 
+              {% if coupon_data %}
+                <div class="flex items-center justify-between text-primary text-sm font-bold">
+                  <div>
+                    <p>Coupon Information</p>
+                  </div>
+                  <p>{{coupon_data}}</p>
+                </div>
+              {% endif %}
+
               <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
                   <p>{{ business_address.primary_translation.subtotal}}</p>

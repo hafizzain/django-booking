@@ -261,6 +261,7 @@ class SaleInvoice(models.Model):
                     'location':self.location.address_name,
                     'business_address':self.location,
                     'redeemed_points':self.get_client_loyalty_points(),
+                    'coupon_data':self.get_checkout_coupon_data(),
                     **tax_details,
                     **checkout_redeem_data,
                 }
@@ -300,6 +301,26 @@ class SaleInvoice(models.Model):
             data['voucher_redeem_percentage'] = checkout.voucher_redeem_percentage
 
         return data
+
+    def get_checkout_coupon_data(self):
+
+        data = dict()
+        try:
+            checkout = Checkout.objects.get(
+                id=self.checkout
+            )
+            if checkout:
+                data['is_coupon_redeemed'] = checkout.is_coupon_redeemed
+                data['coupon_discounted_price'] = checkout.coupon_discounted_price
+            return data
+        except:
+            checkout = AppointmentCheckout.objects.get(
+                id=self.checkout
+            )
+            if checkout:
+                data['is_coupon_redeemed'] = checkout.is_coupon_redeemed
+                data['coupon_discounted_price'] = checkout.coupon_discounted_price
+            return data
     
     def get_client_loyalty_points(self):
         if self.client:
