@@ -3956,56 +3956,56 @@ def create_vacation_emp(request):
     #
     #         status=200
     #     )
-    employee_leave_management_obj = LeaveManagements.objects.get(employee_id=employee)
-    employee_id = Employee.objects.get(id=employee, is_deleted=False)
-    if vacation_type == 'medical':
-        value = employee_leave_management_obj.medical_leave
-    if vacation_type == 'annual':
-        value = employee_leave_management_obj.annual_leave
-        now = datetime.now()
-        created_at = employee_id.created_at
-        required_months = employee_leave_management_obj.number_of_months
-        required_months = int(required_months)
-        months_difference = (now.year - created_at.year) * 12 + now.month - created_at.month
-        months_difference = int(months_difference)
-        if required_months > months_difference:
-            return Response(
-                {
-                    'status': 400,
-                    'status_code': '400',
-                    'response': {
-                        'message': 'Annual leave requests available after {required_months} months'.format(
-                            required_months=required_months),
-                        'error_message': None,
-                    }
-                },
-                status=status.HTTP_200_OK
-            )
-    if vacation_type == 'casual':
-        value = employee_leave_management_obj.casual_leave
-    if vacation_type == 'leo_day':
-        value = employee_leave_management_obj.leo_leave
-    from_date = datetime.strptime(from_date, "%Y-%m-%d")
-    try:
-        to_date = datetime.strptime(to_date, "%Y-%m-%d")
-        diff = to_date - from_date
-        days = int(diff.days)
-    except:
-        days = 0
-    available_value = int(value)
-    if days > available_value:
-        return Response(
-            {
-                'status': 400,
-                'status_code': '400',
-                'response': {
-                    'message': 'Exceeded {vacation_type} quota. Please adjust and retry.'.format(
-                        vacation_type=vacation_type),
-                    'error_message': None,
-                }
-            },
-            status=status.HTTP_200_OK
-        )
+    # employee_leave_management_obj = LeaveManagements.objects.get(employee_id=employee)
+    # employee_id = Employee.objects.get(id=employee, is_deleted=False)
+    # if vacation_type == 'medical':
+    #     value = employee_leave_management_obj.medical_leave
+    # if vacation_type == 'annual':
+    #     value = employee_leave_management_obj.annual_leave
+    #     now = datetime.now()
+    #     created_at = employee_id.created_at
+    #     required_months = employee_leave_management_obj.number_of_months
+    #     required_months = int(required_months)
+    #     months_difference = (now.year - created_at.year) * 12 + now.month - created_at.month
+    #     months_difference = int(months_difference)
+    #     if required_months > months_difference:
+    #         return Response(
+    #             {
+    #                 'status': 400,
+    #                 'status_code': '400',
+    #                 'response': {
+    #                     'message': 'Annual leave requests available after {required_months} months'.format(
+    #                         required_months=required_months),
+    #                     'error_message': None,
+    #                 }
+    #             },
+    #             status=status.HTTP_200_OK
+    #         )
+    # if vacation_type == 'casual':
+    #     value = employee_leave_management_obj.casual_leave
+    # if vacation_type == 'leo_day':
+    #     value = employee_leave_management_obj.leo_leave
+    # from_date = datetime.strptime(from_date, "%Y-%m-%d")
+    # try:
+    #     to_date = datetime.strptime(to_date, "%Y-%m-%d")
+    #     diff = to_date - from_date
+    #     days = int(diff.days)
+    # except:
+    #     days = 0
+    # available_value = int(value)
+    # if days > available_value:
+    #     return Response(
+    #         {
+    #             'status': 400,
+    #             'status_code': '400',
+    #             'response': {
+    #                 'message': 'Exceeded {vacation_type} quota. Please adjust and retry.'.format(
+    #                     vacation_type=vacation_type),
+    #                 'error_message': None,
+    #             }
+    #         },
+    #         status=status.HTTP_200_OK
+    #     )
     # annual_vacation_check(vacation_type=vacation_type, employee=employee_id)
     if not to_date:
         to_date = from_date
