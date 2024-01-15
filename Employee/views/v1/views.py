@@ -4029,7 +4029,7 @@ def create_vacation_emp(request):
 
     empl_vacation = Vacation.objects.create(
         business_id=business_id,
-        employee=employee,
+        employee_id=employee,
         from_date=from_date,
         to_date=to_date,
         note=note,
@@ -4037,41 +4037,41 @@ def create_vacation_emp(request):
         vacation_type=vacation_type,
     )
     try:
-        def process_schedule(employee_id, from_date, to_date, user, business_id, day, start_time, end_time,
-                             start_time_shift,
-                             end_time_shift, note, is_vacation, is_leave, is_off, empl_vacation):
-            schedule_instances = []
-            for i in range(days + 1):
-                current_date = from_date + timedelta(days=i)
-                try:
-                    working_sch = EmployeDailySchedule.objects.get(employee=employee_id, date=current_date)
-                    if working_sch:
-                        working_sch.is_vacation = True
-                        working_sch.vacation = empl_vacation
-                        working_sch.from_date = current_date
-                        working_sch.save()
-                except:
-                    schedule_instance = EmployeDailySchedule(
-                        user=user,
-                        business=business_id,
-                        employee=employee_id,
-                        day=day,
-                        start_time=start_time,
-                        end_time=end_time,
-                        start_time_shift=start_time_shift,
-                        end_time_shift=end_time_shift,
-                        date=current_date,
-                        from_date=current_date,
-                        to_date=to_date,
-                        note=note,
-                        vacation_status='pending',
-                        is_vacation=True
-                    )
-                    schedule_instances.append(schedule_instance)
-
-                    # Use bulk_create to insert all instances at once
-                with transaction.atomic():
-                    EmployeDailySchedule.objects.bulk_create(schedule_instances)
+        # def process_schedule(employee_id, from_date, to_date, user, business_id, day, start_time, end_time,
+        #                      start_time_shift,
+        #                      end_time_shift, note, is_vacation, is_leave, is_off, empl_vacation):
+        #     schedule_instances = []
+        #     for i in range(days + 1):
+        #         current_date = from_date + timedelta(days=i)
+        #         try:
+        #             working_sch = EmployeDailySchedule.objects.get(employee=employee_id, date=current_date)
+        #             if working_sch:
+        #                 working_sch.is_vacation = True
+        #                 working_sch.vacation = empl_vacation
+        #                 working_sch.from_date = current_date
+        #                 working_sch.save()
+        #         except:
+        #             schedule_instance = EmployeDailySchedule(
+        #                 user=user,
+        #                 business=business_id,
+        #                 employee=employee_id,
+        #                 day=day,
+        #                 start_time=start_time,
+        #                 end_time=end_time,
+        #                 start_time_shift=start_time_shift,
+        #                 end_time_shift=end_time_shift,
+        #                 date=current_date,
+        #                 from_date=current_date,
+        #                 to_date=to_date,
+        #                 note=note,
+        #                 vacation_status='pending',
+        #                 is_vacation=True
+        #             )
+        #             schedule_instances.append(schedule_instance)
+        #
+        #             # Use bulk_create to insert all instances at once
+        #         with transaction.atomic():
+        #             EmployeDailySchedule.objects.bulk_create(schedule_instances)
                     # working_schedule = EmployeDailySchedule.objects.create(
                     #     user=user,
                     #     business=business,
