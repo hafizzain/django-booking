@@ -3916,8 +3916,8 @@ def create_vacation_emp(request):
     is_working_schedule = request.data.get('is_working_schedule', None)
     value = 0
     difference_days = 0
-
     working_sch = None
+
     check_leo_day = EmployeDailySchedule.objects.filter(
         employee=employee,
         date=from_date,
@@ -3956,61 +3956,14 @@ def create_vacation_emp(request):
 
             status=200
         )
-
-    if not all([business_id, employee]):
-        return Response(
-            {
-                'status': False,
-                'status_code': StatusCodes.MISSING_FIELDS_4001,
-                'status_code_text': 'MISSING_FIELDS_4001',
-                'response': {
-                    'message': 'Invalid Data!',
-                    'error_message': 'All fields are required.',
-                    'fields': [
-                        'business',
-                        'employee'
-                    ]
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    try:
-        business = Business.objects.get(id=business_id)
-    except Exception as err:
-        return Response(
-            {
-                'status': False,
-                'status_code': StatusCodes.BUSINESS_NOT_FOUND_4015,
-                'response': {
-                    'message': 'Business not found',
-                    'error_message': str(err),
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    try:
-        employee_id = Employee.objects.get(id=employee, is_deleted=False)
-    except Exception as err:
-        return Response(
-            {
-                'status': False,
-                'status_code': StatusCodes.INVALID_EMPLOYEE_4025,
-                'response': {
-                    'message': 'Employee not found',
-                    'error_message': str(err),
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    employee_leave_management_obj = LeaveManagements.objects.get(employee_id=employee_id.id)
+    employee_leave_management_obj = LeaveManagements.objects.get(employee_id=employee)
+    employee_id = Employee.objects.get(id=employee, is_deleted=False)
     if vacation_type == 'medical':
         value = employee_leave_management_obj.medical_leave
     if vacation_type == 'annual':
         value = employee_leave_management_obj.annual_leave
         now = datetime.now()
-        employee_id = Employee.objects.get(id=employee, is_deleted=False)
         created_at = employee_id.created_at
-        employee_leave_management_obj = LeaveManagements.objects.get(employee_id=employee)
         required_months = employee_leave_management_obj.number_of_months
         required_months = int(required_months)
         months_difference = (now.year - created_at.year) * 12 + now.month - created_at.month
@@ -4055,7 +4008,7 @@ def create_vacation_emp(request):
     if not to_date:
         to_date = from_date
     is_vacation_exist = Vacation.objects.filter(
-        business=business,
+        business=business_id,
         employee=employee_id,
         from_date=from_date,
     ).first()
@@ -4072,7 +4025,7 @@ def create_vacation_emp(request):
             status=status.HTTP_200_OK
         )
     empl_vacation = Vacation.objects.create(
-        business=business,
+        business=business_id,
         employee=employee_id,
         from_date=from_date,
         to_date=to_date,
@@ -4143,12 +4096,12 @@ def create_vacation_emp(request):
                     # working_schedule.is_off = is_off if is_off is not None else False
                     # working_schedule.save()
 
-            thread = threading.Thread(target=process_schedule,
-                                      args=(employee_id, from_date, to_date, user, business, day,
-                                            start_time, end_time, start_time_shift, end_time_shift,
-                                            note, is_vacation, is_leave, is_off, empl_vacation))
-            thread.start()
-            thread.join()
+        thread = threading.Thread(target=process_schedule,
+                                  args=(employee_id, from_date, to_date, user, business, day,
+                                        start_time, end_time, start_time_shift, end_time_shift,
+                                        note, is_vacation, is_leave, is_off, empl_vacation))
+        thread.start()
+        thread.join()
     except Exception as err:
         return Response(
             {
