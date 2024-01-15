@@ -3896,7 +3896,7 @@ def update_vacation(request):
 
 @transaction.atomic
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def create_vacation_emp(request):
     user = request.user
     business_id = request.data.get('business', None)
@@ -4007,8 +4007,8 @@ def create_vacation_emp(request):
     #         status=status.HTTP_200_OK
     #     )
     # annual_vacation_check(vacation_type=vacation_type, employee=employee_id)
-    if not to_date:
-        to_date = from_date
+    # if not to_date:
+    #     to_date = from_date
     # is_vacation_exist = Vacation.objects.filter(
     #     business_id=business_id,
     #     employee=employee_id,
