@@ -144,8 +144,8 @@ class RefundAPIView(APIView):
                 refund_instance = serializer.save()
                 
                 # refunded_products_ids = list(refundprodcts.objects.filter().values_list('id', flat=True))
-                refunded_products_ids = list(RefundProduct.objects.filter().values('id', flat=True))
-                refunded_services_ids = list(RefundServices.objects.filter().values('id', flat=True))
+                refunded_products_ids = list(refund_instance.refunded_products.values_list('id', flat=True))
+                refunded_services_ids = list(refund_instance.refunded_services.values_list('id', flat=True))
 
                 #      create invoice
                 try:    
