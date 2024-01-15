@@ -243,6 +243,7 @@ class SaleInvoice(models.Model):
                 tips_total = sum([t['tip'] for t in order_tips])
 
                 checkout_redeem_data = self.get_checkout_redeemed_data()
+                coupon_data = self.get_checkout_coupon_data()
 
                 context = {
                     'client': self.client,
@@ -261,7 +262,7 @@ class SaleInvoice(models.Model):
                     'location':self.location.address_name,
                     'business_address':self.location,
                     'redeemed_points':self.get_client_loyalty_points(),
-                    'coupon_data':self.get_checkout_coupon_data(),
+                    **coupon_data,
                     **tax_details,
                     **checkout_redeem_data,
                 }
