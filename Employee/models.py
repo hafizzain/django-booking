@@ -692,5 +692,7 @@ class GiftCards(models.Model):
     gift_card_value = models.FloatField(default=0, null=True)
     retail_price = models.FloatField(default=0, null=True)
     expire_date = models.DateField(auto_now_add=now, null=True)
+    start_date = models.DateField(null=True)
+    end_date = models.DateField(null=True)
     code = models.TextField(null=True, blank=True)
     discount_to_show = models.TextField(null=True)

@@ -6623,7 +6623,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         if serializer.is_valid(raise_exception=True):
             instance = serializer.save()
             gift_card = GiftCardSerializer(instance, many=False).data
-            return Response({"msg": "Gift card added successfully"}, status=status.HTTP_200_OK)
+            return Response({"msg": "Gift card added successfully","gift_card":gift_card}, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
         id = self.query_params.get('id', None)
