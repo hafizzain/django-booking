@@ -4043,13 +4043,14 @@ def create_vacation_emp(request):
             schedule_instances = []
             for i in range(days + 1):
                 current_date = from_date + timedelta(days=i)
-                working_sch = EmployeDailySchedule.objects.filter(employee=employee_id, date=current_date).first()
-                if working_sch:
-                    working_sch.is_vacation = True
-                    working_sch.vacation = empl_vacation
-                    working_sch.from_date = current_date
-                    working_sch.save()
-                else:
+                try:
+                    working_sch = EmployeDailySchedule.objects.get(employee=employee_id, date=current_date)
+                    if working_sch:
+                        working_sch.is_vacation = True
+                        working_sch.vacation = empl_vacation
+                        working_sch.from_date = current_date
+                        working_sch.save()
+                except:
                     schedule_instance = EmployeDailySchedule(
                         user=user,
                         business=business_id,
