@@ -6513,7 +6513,8 @@ def create_coupon(request):
         fixedAmount = json.loads(fixedAmount)
     if len(location) > 0:
         location = json.loads(location)
-        coupon.business.set(location)
+        coupon.locations.set(location)
+        # coupon.business.set(location)
     if len(service_group_brand) > 0:
         service_group_brand = json.loads(service_group_brand)
         for item in service_group_brand:
@@ -6561,7 +6562,7 @@ def create_coupon(request):
             CouponBlockDays.objects.create(day=day, coupon_id=coupon.id)
     if len(store_restriction) > 0:
         store_restriction = json.loads(store_restriction)
-        coupon.locations.set(store_restriction)
+        coupon.business.set(store_restriction)
     serializer = CouponSerializer(coupon, context={'request': request})
     return Response(
         {
