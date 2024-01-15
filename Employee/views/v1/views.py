@@ -4034,7 +4034,7 @@ def create_vacation_emp(request):
         vacation_type=vacation_type,
     )
     try:
-        def process_schedule(employee_id, from_date, to_date, user, business, day, start_time, end_time,
+        def process_schedule(employee_id, from_date, to_date, user, business_id, day, start_time, end_time,
                              start_time_shift,
                              end_time_shift, note, is_vacation, is_leave, is_off, empl_vacation):
             schedule_instances = []
@@ -4049,7 +4049,7 @@ def create_vacation_emp(request):
                 else:
                     schedule_instance = EmployeDailySchedule(
                         user=user,
-                        business=business,
+                        business=business_id,
                         employee=employee_id,
                         day=day,
                         start_time=start_time,
@@ -4097,7 +4097,7 @@ def create_vacation_emp(request):
                     # working_schedule.save()
 
         thread = threading.Thread(target=process_schedule,
-                                  args=(employee_id, from_date, to_date, user, business, day,
+                                  args=(employee_id, from_date, to_date, user, business_id, day,
                                         start_time, end_time, start_time_shift, end_time_shift,
                                         note, is_vacation, is_leave, is_off, empl_vacation))
         thread.start()
