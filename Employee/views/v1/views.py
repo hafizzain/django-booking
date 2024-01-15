@@ -3983,6 +3983,8 @@ def create_vacation_emp(request):
             )
     if vacation_type == 'casual':
         value = employee_leave_management_obj.casual_leave
+    if vacation_type == 'leo_day':
+        value = employee_leave_management_obj.leo_leave
     from_date = datetime.strptime(from_date, "%Y-%m-%d")
     try:
         to_date = datetime.strptime(to_date, "%Y-%m-%d")
