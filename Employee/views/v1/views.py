@@ -4008,7 +4008,7 @@ def create_vacation_emp(request):
     if not to_date:
         to_date = from_date
     is_vacation_exist = Vacation.objects.filter(
-        business=business_id,
+        business_id=business_id,
         employee=employee_id,
         from_date=from_date,
     ).first()
@@ -4025,7 +4025,7 @@ def create_vacation_emp(request):
             status=status.HTTP_200_OK
         )
     empl_vacation = Vacation.objects.create(
-        business=business_id,
+        business_id=business_id,
         employee=employee_id,
         from_date=from_date,
         to_date=to_date,
