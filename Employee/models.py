@@ -696,3 +696,4 @@ class GiftCards(models.Model):
     end_date = models.DateField(null=True)
     code = models.TextField(null=True, blank=True)
     discount_to_show = models.TextField(null=True)
+    currency = models.TextField(null=True)
