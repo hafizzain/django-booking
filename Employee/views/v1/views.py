@@ -4029,7 +4029,7 @@ def create_vacation_emp(request):
 
     empl_vacation = Vacation.objects.create(
         business_id=business_id,
-        employee=employee_id,
+        employee=employee,
         from_date=from_date,
         to_date=to_date,
         note=note,
