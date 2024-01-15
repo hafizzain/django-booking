@@ -263,6 +263,7 @@
                   <div class="flex items-center justify-between text-primary text-sm font-bold">
                     <div>
                       <p>Coupon Information</p>
+
                       {% if coupon_data.is_coupon_redeemed == 'true' %}
                         <p>Redeemed: Yes</p>
                         <p>Discounted Price: ${{ coupon_data.coupon_discounted_price }}</p>
@@ -270,6 +271,7 @@
                         <p>Redeemed: No</p>
                       {% endif %}
                     </div>
+
                   </div>
               {% endif %}
 
