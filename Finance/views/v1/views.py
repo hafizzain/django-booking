@@ -146,7 +146,7 @@ class RefundAPIView(APIView):
                 # refunded_products_ids = list(refundprodcts.objects.filter().values_list('id', flat=True))
                 refunded_products_ids = list(refund_instance.refunded_products.values_list('id', flat=True))
                 refunded_services_ids = list(refund_instance.refunded_services.values_list('id', flat=True))
-                return Response({'refund product list': refunded_products_ids, 'refund service list': refunded_services_ids})
+                # return Response({'refund product list': refunded_products_ids, 'refund service list': refunded_services_ids})
 
                 #      create invoice
                 try:    
