@@ -4100,12 +4100,12 @@ def create_vacation_emp(request):
                     # working_schedule.is_off = is_off if is_off is not None else False
                     # working_schedule.save()
 
-        thread = threading.Thread(target=process_schedule,
-                                  args=(employee_id, from_date, to_date, user, business_id, day,
-                                        start_time, end_time, start_time_shift, end_time_shift,
-                                        note, is_vacation, is_leave, is_off, empl_vacation))
-        thread.start()
-        thread.join()
+        # thread = threading.Thread(target=process_schedule,
+        #                           args=(employee_id, from_date, to_date, user, business_id, day,
+        #                                 start_time, end_time, start_time_shift, end_time_shift,
+        #                                 note, is_vacation, is_leave, is_off, empl_vacation))
+        # thread.start()
+        # thread.join()
     except Exception as err:
         return Response(
             {
