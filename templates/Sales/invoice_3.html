@@ -263,7 +263,7 @@
                   <div class="flex items-center justify-between text-primary text-sm font-bold">
                     <div>
                       {% if coupon_data.is_coupon_redeemed == 'true' %}
-                        <p>Price: ${{ coupon_data.coupon_discounted_price }}</p>
+                        <p>Price: ${{ coupon_data.coupon_discounted_price }} {{ currency_code }}</p>
                       {% else %}
                         <p></p>
                       {% endif %}
