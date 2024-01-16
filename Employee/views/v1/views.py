@@ -6874,7 +6874,7 @@ def create_weekend(request):
 class GiftCardViewSet(viewsets.ModelViewSet):
     queryset = GiftCards.objects.all()
     serializer_class = GiftCardSerializerResponse
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
         title = request.data.get('title', None)
