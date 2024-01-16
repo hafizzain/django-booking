@@ -6912,12 +6912,27 @@ class GiftCardViewSet(viewsets.ModelViewSet):
                 "success": True,
                 "status_code": 200,
                 "response": {
-                    "message": "Segment get Successfully",
+                    "message": "giftcard get successfully",
                     "error_message": None,
                     "data": serializer.data
                 }
             }
             return Response(data, status=status.HTTP_200_OK)
+
+
+    def get(self ,request,*args , **kwargs):
+        query_set = GiftCards.objects.all()
+        serializer = GiftCardSerializerResponse(query_set , many=True).data
+        data = {
+            "success": True,
+            "status_code": 200,
+            "response": {
+                "message": "gift card get successfully",
+                "error_message": None,
+                "data": serializer.data
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
         id = self.query_params.get('id', None)
