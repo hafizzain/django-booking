@@ -152,6 +152,8 @@ class RefundAPIView(APIView):
                 try:    
                     invoice = SaleInvoice.objects.get(id=refund_invoice_id) 
                     checkout_instance = invoice.checkout_instance 
+                    checkout_instance.is_refund = 'refund'
+                    checkout_instance.save() 
                     newCheckoutInstance = checkout_instance  
                     newCheckoutInstance.pk = None 
                     newCheckoutInstance.is_refund = 'refund'
@@ -172,6 +174,8 @@ class RefundAPIView(APIView):
                             order.pk = None
                             order.is_refund = 'refund'
                             order.total_price = -RefundServices.objects.get(service__id = order.id).refunded_amount
+                            order.tip = 0
+                            # order.tax_amount = 0
                             order.appointment = newAppointment
                             order.save()
                             
@@ -184,6 +188,8 @@ class RefundAPIView(APIView):
                             order.pk = None
                             order.checkout = newCheckoutInstance
                             order.quantity = -RefundProduct.objects.get(product__id = order.id).refunded_quantity
+                            order.tip = 0
+                            # order.tax_amount = 0
                             order.is_refund = 'refund'
                             order.price = RefundProduct.objects.get(product__id = order.id).refunded_amount 
                             order.save()
