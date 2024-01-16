@@ -157,8 +157,6 @@ class RefundAPIView(APIView):
                     newCheckoutInstance.is_refund = 'refund'
                     newCheckoutInstance.save()
                     newCheckoutInstance.previous_checkout = checkout_instance
-                    # if newCheckoutInstance.previous_checkout:
-                    #     newCheckoutInstance.previous_checkout.save()
                     newCheckoutInstance.save()
 
                     
@@ -173,7 +171,7 @@ class RefundAPIView(APIView):
                         for order in order_items:
                             order.pk = None
                             order.is_refund = 'refund'
-                            order.total_price = RefundServices.objects.get(service__id = order.id).refunded_amount
+                            order.total_price = -RefundServices.objects.get(service__id = order.id).refunded_amount
                             order.appointment = newAppointment
                             order.save()
                             
@@ -185,7 +183,7 @@ class RefundAPIView(APIView):
                         for order in product_orders:
                             order.pk = None
                             order.checkout = newCheckoutInstance
-                            order.quantity = RefundProduct.objects.get(product__id = order.id).refunded_quantity
+                            order.quantity = -RefundProduct.objects.get(product__id = order.id).refunded_quantity
                             order.is_refund = 'refund'
                             order.price = RefundProduct.objects.get(product__id = order.id).refunded_amount 
                             order.save()
@@ -196,7 +194,7 @@ class RefundAPIView(APIView):
                             order.pk = None
                             order.checkout = newCheckoutInstance
                             order.is_refund = 'refund'
-                            order.price = RefundServices.objects.get(service__id = order.id).refunded_amount
+                            order.price = -RefundServices.objects.get(service__id = order.id).refunded_amount
                             order.save()
                         
                      
