@@ -6881,7 +6881,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         title = request.data.get('title', None)
         validity = request.data.get('validity', None)
         code = request.data.get('code', None)
-        data_json = request.data.get('data_json', [])
+        data_json = request.data.get('currency_gift_card_price', [])
         description = request.data.get('description', None)
         custom_card = request.data.get('custom_card', None)
         discount_to_show = request.data.get('discount_to_show',None)
