@@ -1,5 +1,3 @@
-import json
-
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -14,6 +12,7 @@ from Invoices.models import SaleInvoice
 from Client.serializers import SaleInvoiceSerializer
 from Client.models import Client
 
+from Appointment.serializers import AppointmentCheckout
 
 from Appointment.models import AppointmentCheckout, AppointmentService
 from Order.models import Checkout, ProductOrder, ServiceOrder
@@ -160,7 +159,7 @@ class RefundAPIView(APIView):
                     newCheckoutInstance.pk = None 
                     newCheckoutInstance.save() 
                     
-                    return Response({'Previous checkout Instance': json.dumps(checkout_instance), 'New Checkout Instance': json.dumps(newCheckoutInstance)})
+                    return Response({'Previous checkout Instance': AppointmentCheckout(checkout_instance).data, 'New Checkout Instance': AppointmentCheckout(newCheckoutInstance).data})
 
                     if checkout_type == 'appointment': 
                         # newAppointment = checkout_instance.appointment 
