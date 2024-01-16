@@ -6891,7 +6891,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             data_json = json.loads(data_json)
             if len(data_json) > 0:
                 for data in data_json:
-                    GiftDetail.objects.create(price=data['price'], retail_price=data['retail_price'], gift_card=card)
+                    GiftDetail.objects.create(currency = data['currency'],price=data['price'], retail_price=data['retail_price'], gift_card=card)
             return Response({"msg": "Gift card added successfully"}, status=status.HTTP_200_OK)
         else:
             card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,
@@ -6923,3 +6923,4 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         else:
             return Response({"msg": "Unable to delete the card. Please provide a valid ID"},
                             status=status.HTTP_400_BAD_REQUEST)
+

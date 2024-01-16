@@ -729,6 +729,7 @@ class GiftDetail(models.Model):
     retail_price = models.FloatField(default=0, null=True)
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)
+    currency = models.TextField(null=True)
 
 
 class GiftDetails(models.Model):
