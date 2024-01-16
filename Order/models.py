@@ -123,7 +123,7 @@ class Checkout(models.Model):
     # Added new fields for managing refunds Parent, child relation (original_checkout, refunded_checkout)
     
     is_refund = models.BooleanField(choices = REFUND_STATUS,max_length =50, default='', null=True, blank=True)
-    previous_sale_checkout = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='refunded_sale_checkout')
+    previous_checkout = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='refunded_sale_checkout')
     
 
     tax_applied = models.FloatField(default=0, verbose_name='Tax Applied in Percentage')
@@ -265,7 +265,7 @@ class Order(models.Model):
     # Need to add refund
     
     is_refund = models.CharField(choices = REFUND_STATUS,max_length = 50, default='', null=True, blank=True)
-    previous_order_refunded = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='order_refunded')
+    # previous_order_refunded = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='order_refunded')
     
     
     discount_percentage = models.FloatField(default=None, null=True, blank=True)
