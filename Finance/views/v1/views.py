@@ -159,7 +159,7 @@ class RefundAPIView(APIView):
                     newCheckoutInstance.pk = None 
                     newCheckoutInstance.save() 
                     
-                    return Response({'Previous checkout Instance': AppointmentCheckout(checkout_instance.appointment), 'New Checkout Instance': AppointmentCheckout(newCheckoutInstance.appointment)})
+                    return Response({'Previous checkout Instance': checkout_instance.appointment, 'New Checkout Instance': newCheckoutInstance.appointment})
 
                     if checkout_type == 'appointment': 
                         # newAppointment = checkout_instance.appointment 
