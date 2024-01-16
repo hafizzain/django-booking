@@ -12,7 +12,6 @@ from Invoices.models import SaleInvoice
 from Client.serializers import SaleInvoiceSerializer
 from Client.models import Client
 
-from Appointment.serializers import CheckoutSerializer, AppointmentServiceSeriailzer
 
 from Appointment.models import AppointmentCheckout, AppointmentService
 from Order.models import Checkout, ProductOrder, ServiceOrder
@@ -152,15 +151,11 @@ class RefundAPIView(APIView):
                 #      create invoice
                 try:    
                     invoice = SaleInvoice.objects.get(id=refund_invoice_id) 
-                    checkout_instance = invoice.checkout_instance
-                    
-                    
+                    checkout_instance = invoice.checkout_instance 
 
                     newCheckoutInstance = checkout_instance  
                     newCheckoutInstance.pk = None 
                     newCheckoutInstance.save() 
-                    
-                    # return Response({'Previous checkout Instance': CheckoutSerializer(checkout_instance).data, 'New Checkout Instance': CheckoutSerializer(newCheckoutInstance).data,'Appointment Service':AppointmentServiceSeriailzer(checkout_instance.appointment_service), 'Refund Services':refunded_services_ids})
 
                     if checkout_type == 'appointment': 
                         newAppointment = checkout_instance.appointment 
@@ -170,7 +165,6 @@ class RefundAPIView(APIView):
                         
                         order_items = AppointmentService.objects.get_active_appointment_services(appointment = checkout_instance.appointment, id__in =refunded_services_ids) 
 
-                        # return Response({'Appointment Order items': order_items})
                         for order in order_items:
                             order.pk = None
                             order.is_refund = 'refund'
@@ -179,7 +173,7 @@ class RefundAPIView(APIView):
                             order.previous_app_service_refunded = order.id
                             order.save()
                             
-                        or you can do it in loop
+                        # or you can do it in loop
                     else: 
                         product_orders = ProductOrder.objects.filter(checkout=checkout_instance, id__in = refunded_products_ids) 
                         # product_orders.update(pk = None, checkout=newCheckoutInstance) 
@@ -272,7 +266,7 @@ class RefundAPIView(APIView):
                 }
             }
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            return Response({'data': request.data} , status=status.HTTP_200_OK)
+            # return Response({'data': request.data} , status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e), 'error':'First Try'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
