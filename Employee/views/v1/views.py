@@ -4426,7 +4426,7 @@ def update_vacation_status(request):
                         },
                         status=status.HTTP_200_OK
                     )
-                leave_managements.casual_leave -= 1
+                leave_managements.casual_leave -= total_days_to_detect
                 leave_managements.save()
             if vacation_type == 'annual':
                 if leave_managements.annual_leave == 0:
@@ -4442,7 +4442,7 @@ def update_vacation_status(request):
                         },
                         status=status.HTTP_200_OK
                     )
-                leave_managements.annual_leave -= 1
+                leave_managements.annual_leave -= total_days_to_detect
                 leave_managements.save()
             if vacation_type == 'medical':
                 if leave_managements.medical_leave == 0:
@@ -4458,7 +4458,7 @@ def update_vacation_status(request):
                         },
                         status=status.HTTP_200_OK
                     )
-                leave_managements.medical_leave -= 1
+                leave_managements.medical_leave -= total_days_to_detect
                 leave_managements.save()
             if vacation_type == 'leo_day':
                 if leave_managements.leo_leave == 0:
@@ -4474,7 +4474,7 @@ def update_vacation_status(request):
                         },
                         status=status.HTTP_200_OK
                     )
-                leave_managements.leo_leave -= 1
+                leave_managements.leo_leave -= total_days_to_detect
                 leave_managements.save()
             vacations = Vacation.objects.filter(id=vacation_id)
             vacations.update(vacation_status='accepted')
@@ -4748,15 +4748,6 @@ def create_workingschedule(request):
                     note=note,
                 )
                 schedule_ids.append(workings.id)
-            # working_schedule.day = day
-            # working_schedule.start_time = start_time
-            # working_schedule.end_time = end_time
-            # working_schedule.start_time_shift = start_time_shift
-            # working_schedule.end_time_shift = end_time_shift
-            # working_schedule.from_date = from_date
-            # working_schedule.to_date = to_date
-            # working_schedule.note = note
-            # working_schedule.save()
 
         working_schedule = EmployeDailySchedule.objects.filter(
             id__in=schedule_ids
