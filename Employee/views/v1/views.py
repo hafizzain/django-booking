@@ -4410,6 +4410,8 @@ def update_vacation_status(request):
         vacation_status = request.data.get('vacation_status', None)
         vacation_type = request.data.get('vacation_type', None)
         total_days_to_detect = request.data.get('total_days_to_detect', None)
+        if total_days_to_detect is not None:
+            total_days_to_detect = int(total_days_to_detect)
         if vacation_status == 'accepted':
             leave_managements = LeaveManagements.objects.get(employee_id=employee)
             if vacation_type == 'casual':
