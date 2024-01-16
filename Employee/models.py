@@ -6,7 +6,7 @@ from django.utils.timezone import now
 
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
-from Utility.models import Country, State, City, CommonField
+from Utility.models import Country, State, City, CommonField, Currency
 from Service.models import Service
 from NStyle.choices import EmployeeDailyInsightChoices
 
@@ -730,6 +730,7 @@ class GiftDetail(models.Model):
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)
     currency = models.TextField(null=True)
+    currencies = models.ForeignKey(Currency , on_delete=models.CASCADE , null=True)
 
 
 class GiftDetails(models.Model):
