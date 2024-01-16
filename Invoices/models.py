@@ -44,7 +44,8 @@ class SaleInvoice(models.Model):
     
     CHECKOUT_TYPE = [
         ('sale','Sale'),
-        ('appointment', 'Appointment')
+        ('appointment', 'Appointment'),
+        ('refund','refund')
     ]
     
     INVOICE_TYPE = [
@@ -105,9 +106,11 @@ class SaleInvoice(models.Model):
     def __str__(self):
         return str(self.id)
     
-
     @property
     def checkout_instance(self,):
+        '''
+        getting the checkout instance of the checkout based on the checkout_type from the invoice model
+        '''
         if self.checkout_type == 'appointment':
             checkout_instance = AppointmentCheckout.objects.get(id=self.checkout)
         else:
