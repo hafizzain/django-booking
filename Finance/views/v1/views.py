@@ -133,6 +133,7 @@ class RefundAPIView(APIView):
         client = request.data.get('client')
         invoice_type = request.data.get('invoice_type')
         checkout_type = request.data.get('checkout_type') # appointment or sale
+        checkout = request.data.get('checkout')
         
         try:
             user = request.user
@@ -147,11 +148,9 @@ class RefundAPIView(APIView):
                 refunded_products_ids = refund_instance.refunded_products.values_list('id', flat=True)
                 refunded_services_ids = refund_instance.refunded_services.values_list('id', flat=True)
                 # return Response({'refund product list': refunded_products_ids, 'refund service list': refunded_services_ids})
-
                 #      create invoice
                 try:    
                     invoice = SaleInvoice.objects.get(id=refund_invoice_id) 
-                    
                     checkout_instance = invoice.checkout_instance 
 
                     newCheckoutInstance = checkout_instance  
@@ -161,13 +160,19 @@ class RefundAPIView(APIView):
                     if checkout_type == 'appointment': 
                         newAppointment = checkout_instance.appointment 
                         newAppointment.pk = None 
+                        newAppointment.previous_appointment_refund_checkout = checkout
                         newAppointment.save() 
-                        order_items = AppointmentService.objects.get_active_appointment_services(appointment = checkout_instance.appointment) 
+                        
+                        order_items = AppointmentService.objects.get_active_appointment_services(appointment = checkout_instance.appointment, id__in =refunded_services_ids) 
 
-                        order_items.update( 
-                            pk = None,  
-                            appointment = newAppointment, 
-                        ) 
+                        for order in order_items:
+                            order.pk = None
+                            order.is_refund = 'refund'
+                            order.previous_app_service_refunded = order.id
+                            order.total_price = lambda refund_price : RefundServices.objects.get(service = order.id).refunded_amount
+                            order.previous_app_service_refunded = order.id
+                            order.save()
+                            
                         # or you can do it in loop
                     else: 
                         product_orders = ProductOrder.objects.filter(checkout=checkout_instance, id__in = refunded_products_ids) 
@@ -176,6 +181,10 @@ class RefundAPIView(APIView):
                         for order in product_orders:
                             order.pk = None
                             order.checkout = newCheckoutInstance
+                            order.quantity = lambda refund_qty : RefundProduct.objects.get(product = order.id).refunded_quantity
+                            order.previous_order_refunded = order.id
+                            order.is_refund = 'refund'
+                            order.price = lambda refund_price : RefundProduct.objects.get(product = order.id).refunded_amount 
                             order.save()
                             
                         service_orders = ServiceOrder.objects.filter(checkout=checkout_instance, id__in = refunded_services_ids) 
@@ -183,6 +192,9 @@ class RefundAPIView(APIView):
                         for order in service_orders:
                             order.pk = None
                             order.checkout = newCheckoutInstance
+                            order.previous_order_refunded = order.id
+                            order.is_refund = 'refund'
+                            order.price = lambda refund_price : RefundServices.objects.get(service = order.id).refunded_amount
                             order.save()
                         
 
@@ -191,6 +203,8 @@ class RefundAPIView(APIView):
                     newInvoice.invoice_type = 'refund'
                     newInvoice.total_product_price = float(-refund_price)
                     newInvoice.checkout = str(newCheckoutInstance.id) 
+                    newInvoice.checkout_type = 'refund'
+                    newInvoice.payment_type = payment_type
                     newInvoice.save() 
 
                     client_email = Client.objects.get(id=client).email 

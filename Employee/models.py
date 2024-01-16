@@ -438,7 +438,6 @@ class Vacation(models.Model):
 
 
 class VacationDetails(models.Model):
-
     vacation = models.ForeignKey(Vacation, on_delete=models.CASCADE, null=True, related_name='vacation_detail')
     # business = models.ForeignKey(Business, on_delete=models.CASCADE, null=True, related_name='business_vacation')
     # employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_vacation')
@@ -712,6 +711,17 @@ class GiftCards(models.Model):
     discount_to_show = models.TextField(null=True)
     currency = models.TextField(null=True)
     valid_till = models.CharField(choices=VALIDITY_DAY, default='7 Days', null=True, blank=True,
-                                 verbose_name='No of Days/Month', max_length=100)
+                                  verbose_name='No of Days/Month', max_length=100)
+    description = models.TextField(null=True)
     location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True,
                                  related_name='gift_card_location')
+    created_at = models.DateTimeField(auto_now_add=now, null=True)
+    updated_at = models.DateTimeField(null=True, blank=True)
+
+
+class GiftDetails(models.Model):
+    gift_card = models.ForeignKey(GiftCards, on_delete=models.CASCADE, null=True)
+    price = models.FloatField(default=0,null=True)
+    retail_price = models.FloatField(default=0,null=True)
+    created_at = models.DateTimeField(auto_now_add=now, null=True)
+    updated_at = models.DateTimeField(null=True, blank=True)

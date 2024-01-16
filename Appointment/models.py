@@ -231,6 +231,11 @@ class AppointmentService(models.Model):
         ('Voucher', 'Voucher'),
         ('Membership', 'Membership')
     ]
+    
+    REFUND_STATUS = [
+        ('refund','Refund'),
+        ('cancel','Cancel')
+    ]
 
     
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
@@ -250,6 +255,11 @@ class AppointmentService(models.Model):
     
     client_can_book = models.CharField(max_length=100, default='', null=True, blank=True)
     slot_availible_for_online = models.CharField(max_length=100, default='', null=True, blank=True,)
+    
+    # Need to add refund
+    is_refund = models.CharField(choices = REFUND_STATUS,max_length = 50, default='', null=True, blank=True)
+    previous_app_service_refunded = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='app_service_refunded')
+    
     
     # still using appointment_status in some places but status should be used now
     appointment_status = models.CharField(choices=BOOKED_CHOICES, max_length=100, default='Appointment Booked')
