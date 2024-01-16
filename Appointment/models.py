@@ -257,8 +257,8 @@ class AppointmentService(models.Model):
     slot_availible_for_online = models.CharField(max_length=100, default='', null=True, blank=True,)
     
     # Need to add refund
-    is_refund = models.CharField(choices = REFUND_STATUS,max_length = 50, default='', null=True, blank=True)
-    previous_app_service_refunded = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='app_service_refunded')
+    # is_refund = models.CharField(choices = REFUND_STATUS,max_length = 50, default='', null=True, blank=True)
+    # previous_app_service_refunded = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='app_service_refunded')
     
     
     # still using appointment_status in some places but status should be used now
@@ -420,7 +420,7 @@ class AppointmentCheckout(models.Model):
     # Added new fields for managing refunds Parent, child relation (original_checkout, refunded_checkout)
     
     is_refund = models.CharField(choices = REFUND_STATUS, max_length = 50 ,default='', null=True, blank=True)
-    previous_appointment_refund_checkout = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='refund_checkout')
+    previous_checkout = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='refund_checkout')
     
     tip = models.FloatField(default=0, null=True, blank=True) # this field is not in use
     gst = models.FloatField(default=0, null=True, blank=True)
