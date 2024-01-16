@@ -1483,7 +1483,6 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
                 total_hours = 0
                 for schedule in employee_schedules:
                     total_hours += schedule.total_hours
-
                 total_earning += (total_hours * salary)
 
             return total_earning

@@ -717,11 +717,23 @@ class GiftCards(models.Model):
                                  related_name='gift_card_location')
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)
+    custom_card = models.TextField(null=True)
+    price = models.FloatField(default=0, null=True)
+    retail_price = models.FloatField(default=0, null=True)
+
+
+class GiftDetail(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    gift_card = models.ForeignKey(GiftCards, on_delete=models.CASCADE, null=True)
+    price = models.FloatField(default=0, null=True)
+    retail_price = models.FloatField(default=0, null=True)
+    created_at = models.DateTimeField(auto_now_add=now, null=True)
+    updated_at = models.DateTimeField(null=True, blank=True)
 
 
 class GiftDetails(models.Model):
     gift_card = models.ForeignKey(GiftCards, on_delete=models.CASCADE, null=True)
-    price = models.FloatField(default=0,null=True)
-    retail_price = models.FloatField(default=0,null=True)
+    price = models.FloatField(default=0, null=True)
+    retail_price = models.FloatField(default=0, null=True)
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)

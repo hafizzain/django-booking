@@ -10,7 +10,7 @@ from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee,
 , EmployeeMarketingPermission, EmployeeSelectedService, SallarySlipPayrol, StaffGroup
 , StaffGroupModulePermission, Attendance
 , Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation, LeaveManagements, WeekManagement,
-                             VacationDetails, GiftCard, GiftCards
+                             VacationDetails, GiftCard, GiftCards, GiftDetails, GiftDetail
                              )
 from Employee.services import annual_vacation_check, check_available_vacation_type
 from HRM.models import Holiday
@@ -4271,6 +4271,8 @@ def create_vacation_emp(request):
             )
     if vacation_type == 'casual':
         value = employee_leave_management_obj.casual_leave
+    if vacation_type == 'leo_day':
+        value = employee_leave_management_obj.leo_leave
     from_date = datetime.strptime(from_date, "%Y-%m-%d")
     try:
         to_date = datetime.strptime(to_date, "%Y-%m-%d")
@@ -4278,7 +4280,6 @@ def create_vacation_emp(request):
         days = int(diff.days)
     except:
         days = 0
-
     available_value = int(value)
     if days > available_value:
         return Response(
@@ -4408,6 +4409,7 @@ def update_vacation_status(request):
         vacation_id = request.data.get('vacation_id', None)
         vacation_status = request.data.get('vacation_status', None)
         vacation_type = request.data.get('vacation_type', None)
+        total_days_to_detect = request.data.get('total_days_to_detect', None)
         if vacation_status == 'accepted':
             leave_managements = LeaveManagements.objects.get(employee_id=employee)
             if vacation_type == 'casual':
@@ -4474,7 +4476,6 @@ def update_vacation_status(request):
                     )
                 leave_managements.leo_leave -= 1
                 leave_managements.save()
-
             vacations = Vacation.objects.filter(id=vacation_id)
             vacations.update(vacation_status='accepted')
             EmployeDailySchedule.objects.filter(vacation_id=vacation_id).update(is_display=True,
@@ -6887,11 +6888,23 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         code = request.data.get('code', None)
         data_json = request.data.get('data_json', [])
         description = request.data.get('description', None)
-        data_json = json.loads(data_json)
-        if data_json:
-            pass
-        GiftCards.objects.create(title=title, validity=validity, code=code, description=description)
-        return Response({"msg": "Gift card added successfully"}, status=status.HTTP_200_OK)
+        custom_card = request.data.get('custom_card', None)
+        discount_to_show = request.data.get('discount_to_show',None)
+        price = request.data.get('price', None)
+        retail_price = request.data.get('retail_price', None)
+        if custom_card is None:
+            card = GiftCards.objects.create(title=title, validity=validity, code=code, description=description,discount_to_show=discount_to_show,
+                                            custom_card=None)
+            data_json = json.loads(data_json)
+            if len(data_json) > 0:
+                for data in data_json:
+                    GiftDetail.objects.create(price=data['price'], retail_price=data['retail_price'], gift_card=card)
+            return Response({"msg": "Gift card added successfully"}, status=status.HTTP_200_OK)
+        else:
+            card = GiftCards.objects.create(title=title, validity=validity, code=code, description=description,
+                                            custom_card='avaliable',
+                                            price=price, retail_price=retail_price)
+            return Response({"msg": "Gift card added successfully"}, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
         id = self.query_params.get('id', None)
