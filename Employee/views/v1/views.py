@@ -6881,7 +6881,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         title = request.data.get('title', None)
         validity = request.data.get('validity', None)
         code = request.data.get('code', None)
-        data_json = request.data.get('currency_gift_card_price', [])
+        currency_gift_card_price = request.data.get('currency_gift_card_price', [])
         description = request.data.get('description', None)
         custom_card = request.data.get('custom_card', None)
         discount_to_show = request.data.get('discount_to_show',None)
@@ -6890,9 +6890,9 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         if custom_card is None:
             card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,discount_to_show=discount_to_show,
                                             custom_card=None)
-            data_json = json.loads(data_json)
-            if len(data_json) > 0:
-                for data in data_json:
+            currency_gift_card_price = json.loads(currency_gift_card_price)
+            if len(currency_gift_card_price) > 0:
+                for data in currency_gift_card_price:
                     GiftDetail.objects.create(currencies_id = data['currency'],price=data['price'], retail_price=data['retail_price'], gift_card=card)
             return Response({"msg": "Gift card added successfully"}, status=status.HTTP_200_OK)
         else:
