@@ -148,7 +148,6 @@ class RefundAPIView(APIView):
                 refunded_products_ids = refund_instance.refunded_products.values_list('id', flat=True)
                 refunded_services_ids = refund_instance.refunded_services.values_list('id', flat=True)
                 # return Response({'refund product list': refunded_products_ids, 'refund service list': refunded_services_ids})
-
                 #      create invoice
                 try:    
                     invoice = SaleInvoice.objects.get(id=refund_invoice_id) 
@@ -166,107 +165,108 @@ class RefundAPIView(APIView):
                         
                         order_items = AppointmentService.objects.get_active_appointment_services(appointment = checkout_instance.appointment, id__in =refunded_services_ids) 
 
-                        for order in order_items:
-                            order.pk = None
-                            order.is_refund = 'refund'
-                            order.previous_app_service_refunded = order.id
-                            order.total_price = lambda refund_price : RefundServices.objects.get(service = order.id).refunded_amount
-                            order.previous_app_service_refunded = order.id
-                            order.save()
+                        return Response({'Appointment Order items': order_items})
+                        # for order in order_items:
+                        #     order.pk = None
+                        #     order.is_refund = 'refund'
+                        #     order.previous_app_service_refunded = order.id
+                        #     order.total_price = lambda refund_price : RefundServices.objects.get(service = order.id).refunded_amount
+                        #     order.previous_app_service_refunded = order.id
+                        #     order.save()
                             
                         # or you can do it in loop
-                    else: 
-                        product_orders = ProductOrder.objects.filter(checkout=checkout_instance, id__in = refunded_products_ids) 
-                        # product_orders.update(pk = None, checkout=newCheckoutInstance) 
+                #     else: 
+                #         product_orders = ProductOrder.objects.filter(checkout=checkout_instance, id__in = refunded_products_ids) 
+                #         # product_orders.update(pk = None, checkout=newCheckoutInstance) 
                         
-                        for order in product_orders:
-                            order.pk = None
-                            order.checkout = newCheckoutInstance
-                            order.quantity = lambda refund_qty : RefundProduct.objects.get(product = order.id).refunded_quantity
-                            order.previous_order_refunded = order.id
-                            order.is_refund = 'refund'
-                            order.price = lambda refund_price : RefundProduct.objects.get(product = order.id).refunded_amount 
-                            order.save()
+                #         for order in product_orders:
+                #             order.pk = None
+                #             order.checkout = newCheckoutInstance
+                #             order.quantity = lambda refund_qty : RefundProduct.objects.get(product = order.id).refunded_quantity
+                #             order.previous_order_refunded = order.id
+                #             order.is_refund = 'refund'
+                #             order.price = lambda refund_price : RefundProduct.objects.get(product = order.id).refunded_amount 
+                #             order.save()
                             
-                        service_orders = ServiceOrder.objects.filter(checkout=checkout_instance, id__in = refunded_services_ids) 
-                        # service_orders.update(pk = None, checkout=newCheckoutInstance) 
-                        for order in service_orders:
-                            order.pk = None
-                            order.checkout = newCheckoutInstance
-                            order.previous_order_refunded = order.id
-                            order.is_refund = 'refund'
-                            order.price = lambda refund_price : RefundServices.objects.get(service = order.id).refunded_amount
-                            order.save()
+                #         service_orders = ServiceOrder.objects.filter(checkout=checkout_instance, id__in = refunded_services_ids) 
+                #         # service_orders.update(pk = None, checkout=newCheckoutInstance) 
+                #         for order in service_orders:
+                #             order.pk = None
+                #             order.checkout = newCheckoutInstance
+                #             order.previous_order_refunded = order.id
+                #             order.is_refund = 'refund'
+                #             order.price = lambda refund_price : RefundServices.objects.get(service = order.id).refunded_amount
+                #             order.save()
                         
 
-                    newInvoice = invoice 
-                    newInvoice.pk = None 
-                    newInvoice.invoice_type = 'refund'
-                    newInvoice.total_product_price = float(-refund_price)
-                    newInvoice.checkout = str(newCheckoutInstance.id) 
-                    newInvoice.checkout_type = 'refund'
-                    newInvoice.payment_type = payment_type
-                    newInvoice.save() 
+                #     newInvoice = invoice 
+                #     newInvoice.pk = None 
+                #     newInvoice.invoice_type = 'refund'
+                #     newInvoice.total_product_price = float(-refund_price)
+                #     newInvoice.checkout = str(newCheckoutInstance.id) 
+                #     newInvoice.checkout_type = 'refund'
+                #     newInvoice.payment_type = payment_type
+                #     newInvoice.save() 
 
-                    client_email = Client.objects.get(id=client).email 
-                    #send email to client running on thread
-                    send_refund_email(client_email=client_email)  
+                #     client_email = Client.objects.get(id=client).email 
+                #     #send email to client running on thread
+                #     send_refund_email(client_email=client_email)  
                 except Exception as e:
                         return Response({'Error': str(e), 'error':'Second Try'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
-                if expiry_date:
-                    coupon_data = {
-                        'user': request.user.id,
-                        'client': client,
-                        'refund_coupon_code': f"REFUND_{short_uuid(refund_instance.id)}",
-                        'amount': refund_instance.total_refund_amount,
-                        'expiry_date': expiry_date,
-                        'related_refund': refund_instance.id,
-                    }
-                    try:
-                        coupon_serializer = CouponSerializer(data=coupon_data)
-                        coupon_serializer.is_valid(raise_exception=True)
-                        coupon_serializer.save()
-                    except Exception as e:
-                        return Response({'Error': str(e),'error': 'Third Try'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-                    response_data = {
-                        'success': True,
-                        'status_code': 201,
-                        'response': {
-                            'message': 'Refund created successfully',
-                            'error_message': None,
-                            'data': {
-                                'refund': RefundSerializer(serializer.instance).data,
-                                'coupon': CouponSerializer(coupon_serializer.instance).data,
-                                'invoice': SaleInvoiceSerializer(newInvoice).data
-                            }
-                        }
-                    }
-                    return Response(response_data, status=status.HTTP_200_OK)
-                else:
-                    response_data = {
-                        'success': True,
-                        'status_code': 201,
-                        'response': {
-                            'message': 'Refund created successfully',
-                            'error_message': None,
-                            'data': {
-                                'refund': RefundSerializer(serializer.instance).data,
-                                'invoice': SaleInvoiceSerializer(newInvoice).data, 
-                            }
-                        }
-                    }
-                return Response(response_data, status=status.HTTP_200_OK)
-            response_data = {
-                'success': False,
-                'status_code': 400,
-                'response': {
-                    'message': 'Refund not Created!',
-                    'error_message': serializer.errors,
-                    'data': None
-                }
-            }
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            #     if expiry_date:
+            #         coupon_data = {
+            #             'user': request.user.id,
+            #             'client': client,
+            #             'refund_coupon_code': f"REFUND_{short_uuid(refund_instance.id)}",
+            #             'amount': refund_instance.total_refund_amount,
+            #             'expiry_date': expiry_date,
+            #             'related_refund': refund_instance.id,
+            #         }
+            #         try:
+            #             coupon_serializer = CouponSerializer(data=coupon_data)
+            #             coupon_serializer.is_valid(raise_exception=True)
+            #             coupon_serializer.save()
+            #         except Exception as e:
+            #             return Response({'Error': str(e),'error': 'Third Try'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            #         response_data = {
+            #             'success': True,
+            #             'status_code': 201,
+            #             'response': {
+            #                 'message': 'Refund created successfully',
+            #                 'error_message': None,
+            #                 'data': {
+            #                     'refund': RefundSerializer(serializer.instance).data,
+            #                     'coupon': CouponSerializer(coupon_serializer.instance).data,
+            #                     'invoice': SaleInvoiceSerializer(newInvoice).data
+            #                 }
+            #             }
+            #         }
+            #         return Response(response_data, status=status.HTTP_200_OK)
+            #     else:
+            #         response_data = {
+            #             'success': True,
+            #             'status_code': 201,
+            #             'response': {
+            #                 'message': 'Refund created successfully',
+            #                 'error_message': None,
+            #                 'data': {
+            #                     'refund': RefundSerializer(serializer.instance).data,
+            #                     'invoice': SaleInvoiceSerializer(newInvoice).data, 
+            #                 }
+            #             }
+            #         }
+            #     return Response(response_data, status=status.HTTP_200_OK)
+            # response_data = {
+            #     'success': False,
+            #     'status_code': 400,
+            #     'response': {
+            #         'message': 'Refund not Created!',
+            #         'error_message': serializer.errors,
+            #         'data': None
+            #     }
+            # }
+            # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             # return Response({'data': request.data} , status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e), 'error':'First Try'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
