@@ -1418,7 +1418,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         if leo_day is None:
             employee_schedules = EmployeDailySchedule.objects.filter(
                 employee=obj,
-                is_leave=False,
+                # is_leave=False,
                 date__range=(month_start_date, month_end_date)
             ).order_by('-date')
             hours = 0
@@ -1459,7 +1459,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
             ).order_by('-date')
         else:
             employee_schedules = EmployeDailySchedule.objects.filter(
-                is_leave=False,
+                # is_leave=False,
                 employee=obj,
                 date__range=(month_start_date, month_end_date)
             ).order_by('-date')
