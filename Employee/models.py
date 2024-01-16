@@ -714,4 +714,4 @@ class GiftCards(models.Model):
     valid_till = models.CharField(choices=VALIDITY_DAY, default='7 Days', null=True, blank=True,
                                  verbose_name='No of Days/Month', max_length=100)
     location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True,
-                                 related_name='locations_taxs')
+                                 related_name='gift_card_location')
