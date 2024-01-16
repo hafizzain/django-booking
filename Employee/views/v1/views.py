@@ -6886,7 +6886,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         price = request.data.get('price', None)
         retail_price = request.data.get('retail_price', None)
         if custom_card is None:
-            card = GiftCards.objects.create(title=title, validity=validity, code=code, description=description,discount_to_show=discount_to_show,
+            card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,discount_to_show=discount_to_show,
                                             custom_card=None)
             data_json = json.loads(data_json)
             if len(data_json) > 0:
@@ -6894,7 +6894,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
                     GiftDetail.objects.create(price=data['price'], retail_price=data['retail_price'], gift_card=card)
             return Response({"msg": "Gift card added successfully"}, status=status.HTTP_200_OK)
         else:
-            card = GiftCards.objects.create(title=title, validity=validity, code=code, description=description,
+            card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,
                                             custom_card='avaliable',
                                             price=price, retail_price=retail_price)
             return Response({"msg": "Gift card added successfully"}, status=status.HTTP_200_OK)
