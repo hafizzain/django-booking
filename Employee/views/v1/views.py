@@ -6898,7 +6898,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
                 "success": True,
                 "status_code": 200,
                 "response": {
-                    "message": "Segment created Successfully",
+                    "message": "Gift card created Successfully",
                     "error_message": None,
                     # "data": serializer.data
                 }
