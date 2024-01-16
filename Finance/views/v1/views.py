@@ -12,7 +12,7 @@ from Invoices.models import SaleInvoice
 from Client.serializers import SaleInvoiceSerializer
 from Client.models import Client
 
-from Appointment.serializers import AppointmentCheckout
+from Appointment.serializers import CheckoutSerializer
 
 from Appointment.models import AppointmentCheckout, AppointmentService
 from Order.models import Checkout, ProductOrder, ServiceOrder
@@ -154,12 +154,13 @@ class RefundAPIView(APIView):
                     invoice = SaleInvoice.objects.get(id=refund_invoice_id) 
                     checkout_instance = invoice.checkout_instance
                     
+                    
 
                     newCheckoutInstance = checkout_instance  
                     newCheckoutInstance.pk = None 
                     newCheckoutInstance.save() 
                     
-                    return Response({'Previous checkout Instance': checkout_instance.appointment, 'New Checkout Instance': newCheckoutInstance.appointment})
+                    return Response({'Previous checkout Instance': CheckoutSerializer(checkout_instance).data, 'New Checkout Instance': CheckoutSerializer(newCheckoutInstance).data})
 
                     if checkout_type == 'appointment': 
                         # newAppointment = checkout_instance.appointment 
