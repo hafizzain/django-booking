@@ -148,7 +148,6 @@ class RefundAPIView(APIView):
                 refunded_products_ids = refund_instance.refunded_products.values_list('id', flat=True)
                 refunded_services_ids = refund_instance.refunded_services.values_list('id', flat=True)
                 # return Response({'refund product list': refunded_products_ids, 'refund service list': refunded_services_ids})
-
                 #      create invoice
                 try:    
                     invoice = SaleInvoice.objects.get(id=refund_invoice_id) 
@@ -159,10 +158,10 @@ class RefundAPIView(APIView):
                     newCheckoutInstance.save() 
 
                     if checkout_type == 'appointment': 
-                        # newAppointment = checkout_instance.appointment 
-                        # newAppointment.pk = None 
-                        # newAppointment.previous_appointment_refund_checkout = checkout
-                        # newAppointment.save() 
+                        newAppointment = checkout_instance.appointment 
+                        newAppointment.pk = None 
+                        newAppointment.previous_appointment_refund_checkout = checkout
+                        newAppointment.save() 
                         
                         order_items = AppointmentService.objects.get_active_appointment_services(appointment = checkout_instance.appointment, id__in =refunded_services_ids) 
 
