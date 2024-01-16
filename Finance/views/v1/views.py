@@ -1,3 +1,5 @@
+import json
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -158,7 +160,7 @@ class RefundAPIView(APIView):
                     newCheckoutInstance.pk = None 
                     newCheckoutInstance.save() 
                     
-                    return Response({'Previous checkout Instance': checkout_instance, 'New Checkout Instance': newCheckoutInstance})
+                    return Response({'Previous checkout Instance': json.dumps(checkout_instance), 'New Checkout Instance': json.dumps(newCheckoutInstance)})
 
                     if checkout_type == 'appointment': 
                         # newAppointment = checkout_instance.appointment 
