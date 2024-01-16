@@ -6894,12 +6894,30 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             if len(currency_gift_card_price) > 0:
                 for data in currency_gift_card_price:
                     GiftDetail.objects.create(currencies_id = data['currency'],price=data['price'], retail_price=data['retail_price'], gift_card=card)
-            return Response({"msg": "Gift card added successfully"}, status=status.HTTP_200_OK)
+            data = {
+                "success": True,
+                "status_code": 200,
+                "response": {
+                    "message": "Segment get Successfully",
+                    "error_message": None,
+                    # "data": serializer.data
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
         else:
             card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,
                                             custom_card='avaliable',
                                             price=price, retail_price=retail_price)
-            return Response({"msg": "Gift card added successfully"}, status=status.HTTP_200_OK)
+            data = {
+                "success": True,
+                "status_code": 200,
+                "response": {
+                    "message": "Segment get Successfully",
+                    "error_message": None,
+                    "data": serializer.data
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
         id = self.query_params.get('id', None)
