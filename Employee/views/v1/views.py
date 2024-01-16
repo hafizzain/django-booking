@@ -4135,7 +4135,6 @@ def update_vacation(request):
 #     )
 
 
-
 @transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -4397,7 +4396,6 @@ def create_vacation_emp(request):
         },
         status=status.HTTP_200_OK
     )
-
 
 
 @transaction.atomic
@@ -6884,11 +6882,16 @@ class GiftCardViewSet(viewsets.ModelViewSet):
     serializer_class = GiftCardSerializerResponse
 
     def create(self, request, *args, **kwargs):
-        serializer = GiftCardSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            instance = serializer.save()
-            gift_card = GiftCardSerializer(instance, many=False).data
-            return Response({"msg": "Gift card added successfully","data":gift_card}, status=status.HTTP_200_OK)
+        title = request.data.get('title', None)
+        validity = request.data.get('validity', None)
+        code = request.data.get('code', None)
+        data_json = request.data.get('data_json', [])
+        description = request.data.get('description', None)
+        data_json = json.loads(data_json)
+        if data_json:
+            pass
+        GiftCards.objects.create(title=title, validity=validity, code=code, description=description)
+        return Response({"msg": "Gift card added successfully"}, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
         id = self.query_params.get('id', None)
