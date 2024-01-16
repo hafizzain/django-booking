@@ -151,11 +151,14 @@ class RefundAPIView(APIView):
                 #      create invoice
                 try:    
                     invoice = SaleInvoice.objects.get(id=refund_invoice_id) 
-                    checkout_instance = invoice.checkout_instance 
+                    checkout_instance = invoice.checkout_instance
+                    
 
                     newCheckoutInstance = checkout_instance  
                     newCheckoutInstance.pk = None 
                     newCheckoutInstance.save() 
+                    
+                    return Response({'Previous checkout Instance': checkout_instance, 'New Checkout Instance': newCheckoutInstance})
 
                     if checkout_type == 'appointment': 
                         # newAppointment = checkout_instance.appointment 
