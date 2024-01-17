@@ -1,4 +1,6 @@
 import threading
+from rest_framework.decorators import action
+
 from datetime import datetime, timedelta, timezone
 import random
 import string
@@ -6945,7 +6947,8 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         }
         return Response(data, status=status.HTTP_200_OK)
 
-    def update(self, request, *args, **kwargs):
+    @action(detail=True, methods=['get'])
+    def update_gift_card(self, request, *args, **kwargs):
         code = request.data.get('code', None)
         code_check = GiftCards.objects.filter(code=code)
         if code_check:
