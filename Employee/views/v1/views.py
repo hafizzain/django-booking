@@ -6925,6 +6925,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,
                                             custom_card='avaliable',
                                             price=price, retail_price=retail_price)
+
             data = {
                 "success": True,
                 "status_code": 200,
@@ -7048,6 +7049,9 @@ def get_gift_card(request):
         }
         return Response(data, status=status.HTTP_200_OK)
 
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def get_detail_from_code(request):
     code = request.data.get('code', None)
     if code is not None:
