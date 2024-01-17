@@ -6947,7 +6947,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         }
         return Response(data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=False, methods=['PATCH'])
     def update_gift_card(self, request, *args, **kwargs):
         code = request.data.get('code', None)
         code_check = GiftCards.objects.filter(code=code)
