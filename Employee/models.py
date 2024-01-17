@@ -724,7 +724,7 @@ class GiftCards(models.Model):
 
 class GiftDetail(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-    gift_card = models.ForeignKey(GiftCards, on_delete=models.CASCADE, null=True)
+    gift_card = models.ForeignKey(GiftCards, on_delete=models.CASCADE, null=True,related_name='gift_card_details')
     price = models.FloatField(default=0, null=True)
     retail_price = models.FloatField(default=0, null=True)
     created_at = models.DateTimeField(auto_now_add=now, null=True)
