@@ -7019,10 +7019,13 @@ def update_gift_card(request):
         instance.save()
         if len(currency_gift_card_price) > 0:
             gift_details = GiftDetail.objects.filter(gift_card_id=id)
-            gift_details.delete()
+            # gift_details.delete()
             for data in currency_gift_card_price:
-                GiftDetail.objects.create(currencies_id = data['currencies'], price=data['price'],
-                                          retail_price=data['retail_price'], gift_card_id=id)
+                try:
+                    GiftDetail.objects.filter(id=data['id']).update(currencies_id = data['currencies'], price=data['price'],
+                                              retail_price=data['retail_price'], gift_card_id=id)
+                except:
+                    GiftDetail.objects.create(currencies_id = data['currencies'],price=data['price'], retail_price=data['retail_price'], gift_card=id)
         data = {
             "success": True,
             "status_code": 200,
