@@ -7021,7 +7021,7 @@ def update_gift_card(request):
             gift_details = GiftDetail.objects.filter(gift_card_id=id)
             gift_details.delete()
             for data in currency_gift_card_price:
-                GiftDetail.objects.create(currencies_id=data['currency'], price=data['price'],
+                GiftDetail.objects.create(currencies_id = data['currencies'], price=data['price'],
                                           retail_price=data['retail_price'], gift_card_id=id)
         data = {
             "success": True,
