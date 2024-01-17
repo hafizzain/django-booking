@@ -41,6 +41,18 @@ class SaleInvoice(models.Model):
         ('Other', 'Other'),
         
     ]
+    
+    CHECKOUT_TYPE = [
+        ('sale','Sale'),
+        ('appointment', 'Appointment'),
+        ('refund','refund')
+    ]
+    
+    INVOICE_TYPE = [
+        ('refund', 'Refund'),
+        ('order','Order'),
+    ]
+    
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
@@ -72,7 +84,13 @@ class SaleInvoice(models.Model):
     service = models.CharField(max_length=2000, default='', null=True, blank=True)
     member = models.CharField(max_length=2000, default='', null=True, blank=True)
     business_address = models.CharField(max_length=2000, default='', null=True, blank=True)
-
+    
+    # types of checkout and invoices
+    
+    invoice_type = models.CharField(choices = INVOICE_TYPE, max_length=50 , default = '', null=True, blank=True )
+    checkout_type = models.CharField(choices = CHECKOUT_TYPE, max_length=50 , default = '', null=True, blank=True )
+    
+    
     gst = models.FloatField(default=0, null=True, blank=True)
     gst_price = models.FloatField(default=0, null=True, blank=True)
     
@@ -87,6 +105,18 @@ class SaleInvoice(models.Model):
     
     def __str__(self):
         return str(self.id)
+    
+    @property
+    def checkout_instance(self,):
+        '''
+        getting the checkout instance of the checkout based on the checkout_type from the invoice model
+        '''
+        if self.checkout_type == 'appointment':
+            checkout_instance = AppointmentCheckout.objects.get(id=self.checkout)
+        else:
+            checkout_instance = Checkout.objects.get(id=self.checkout)
+        
+        return checkout_instance
     
     @property
     def short_id(self):
@@ -216,6 +246,7 @@ class SaleInvoice(models.Model):
                 tips_total = sum([t['tip'] for t in order_tips])
 
                 checkout_redeem_data = self.get_checkout_redeemed_data()
+                coupon_data = self.get_checkout_coupon_data()
 
                 context = {
                     'client': self.client,
@@ -234,6 +265,7 @@ class SaleInvoice(models.Model):
                     'location':self.location.address_name,
                     'business_address':self.location,
                     'redeemed_points':self.get_client_loyalty_points(),
+                    'coupon_data':coupon_data,
                     **tax_details,
                     **checkout_redeem_data,
                 }
@@ -273,6 +305,26 @@ class SaleInvoice(models.Model):
             data['voucher_redeem_percentage'] = checkout.voucher_redeem_percentage
 
         return data
+
+    def get_checkout_coupon_data(self):
+
+        data = dict()
+        try:
+            checkout = Checkout.objects.get(
+                id=self.checkout
+            )
+            if checkout:
+                data['is_coupon_redeemed'] = checkout.is_coupon_redeemed
+                data['coupon_discounted_price'] = checkout.coupon_discounted_price
+            return data
+        except:
+            checkout = AppointmentCheckout.objects.get(
+                id=self.checkout
+            )
+            if checkout:
+                data['is_coupon_redeemed'] = checkout.is_coupon_redeemed
+                data['coupon_discounted_price'] = checkout.coupon_discounted_price
+            return data
     
     def get_client_loyalty_points(self):
         if self.client:

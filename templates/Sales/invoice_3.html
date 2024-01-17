@@ -249,7 +249,6 @@
                 <p>{{ total_discount }} {{ currency_code }}</p>
               </div>
               {% endif %}
-
               {% if redeemed_points %}
                 <div class="flex items-center justify-between text-primary text-sm font-bold">
                   <div>
@@ -257,6 +256,14 @@
                   </div>
                   <p>{{redeemed_points}}</p>
                 </div>
+              {% endif %}
+              {% if coupon_data.is_coupon_redeemed == 'true' %}
+                  <div class="flex items-center justify-between text-primary text-sm font-bold">
+                    <div>
+                        <p>Coupon redeemed</p>
+                    </div>
+                    <p>{{ coupon_data.coupon_discounted_price }} {{ currency_code }}</p>
+                  </div>
               {% endif %}
 
               <div class="flex items-center justify-between text-primary text-sm font-bold">
@@ -376,36 +383,25 @@
             <hr class="border" />
             <div class="flex flex-col gap-1">
               <div>
-                <p class="font-semibold text-lg">Nstyle Policy</p>
+                <p class="font-semibold text-lg">{{business_address.address_name |default:"Nstyle Policy"}}</p>
                 <p class="text-left">
-                  At NStyle, we pride ourselves on the customer experience &amp;
-                  the standards we offer. Should you face an issue within 24hrs
-                  to 48hrs of your visit dependent on the service, we are happy
-                  to fix it for you. Please visit the NStyle website for the
-                  full terms and conditions. Return of purchased retail products
-                  is permitted within 7 days of purchase excluding any
-                  discounted or promotional retail items. A store credit will be
-                  offered for returned value. A cash refund will not be offered.
-                  Original receipt must be presented along with the unopened
-                  retail.
-                  <br />
-                  Service vouchers and packages are non-transferrable and
-                  non-refundable
+                  {{ business_address.privacy_policy|default:"We collect minimal personal information, like client details and transaction data, solely for the purpose of generating and managing invoices to ensure accurate billing for services provided. Your information is securely handled, and we do not share it with third parties unless required by law. You have the right to access and correct your data, and we prioritize its security against unauthorized access. Our policy may be updated, so please check periodically for the latest information. For any concerns or questions, feel free to contact us." }}
+                  <br/>
                 </p>
-                <p class="arabic font-semibold text-lg">
-                  طريقة الدفع او السداد
-                </p>
-                <p class="arabic text-right">
-                  في NStyle ، نفخر بأنفسنا على تجربة العملاء و المعايير التي
-                  نقدمها. هل يجب أن تواجه مشكلة في غضون 24 ساعة إلى 48 ساعة من
-                  زيارتك تعتمد على الخدمة ، يسعدنا إصلاحها لك. يرجى زيارة موقع
-                  NStyle الإلكتروني للاطلاع على الشروط والأحكام الكاملة. يُسمح
-                  بإرجاع منتجات التجزئة المشتراة في غضون 7 أيام من شراء باستثناء
-                  أي سلع بيع بالتجزئة مخفضة أو ترويجية. متجر سيتم تقديم الائتمان
-                  للقيمة المرتجعة. لن يتم استرداد نقدي تقدم. يجب تقديم الإيصال
-                  الأصلي مع الإيصال غير المفتوح بيع بالتجزئة. قسائم وحزم الخدمة
-                  غير قابلة للتحويل وغير قابلة للاسترداد
-                </p>
+<!--                <p class="arabic font-semibold text-lg">-->
+<!--                  طريقة الدفع او السداد-->
+<!--                </p>-->
+<!--                <p class="arabic text-right">-->
+<!--                  في NStyle ، نفخر بأنفسنا على تجربة العملاء و المعايير التي-->
+<!--                  نقدمها. هل يجب أن تواجه مشكلة في غضون 24 ساعة إلى 48 ساعة من-->
+<!--                  زيارتك تعتمد على الخدمة ، يسعدنا إصلاحها لك. يرجى زيارة موقع-->
+<!--                  NStyle الإلكتروني للاطلاع على الشروط والأحكام الكاملة. يُسمح-->
+<!--                  بإرجاع منتجات التجزئة المشتراة في غضون 7 أيام من شراء باستثناء-->
+<!--                  أي سلع بيع بالتجزئة مخفضة أو ترويجية. متجر سيتم تقديم الائتمان-->
+<!--                  للقيمة المرتجعة. لن يتم استرداد نقدي تقدم. يجب تقديم الإيصال-->
+<!--                  الأصلي مع الإيصال غير المفتوح بيع بالتجزئة. قسائم وحزم الخدمة-->
+<!--                  غير قابلة للتحويل وغير قابلة للاسترداد-->
+<!--                </p>-->
               </div>
             </div>
           </div>

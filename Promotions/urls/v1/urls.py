@@ -8,8 +8,15 @@ urlpatterns = [
     path('get_directorflat/', views.get_directorflat),
     path('delete_directorflat/', views.delete_directorflat),
     path('update_directorflat/', views.update_directorflat),
-
-    
+    path('create_couponsdiscount/', views.create_coupon),
+    path('delete_couponsdiscount/<str:id>/',views.delete_coupon),
+    path('delete_couponsdiscount/',views.delete_all_coupon),
+    path('update_couponsdiscount/',views.update_coupon),
+    path('get_coupon/',views.get_coupon),
+    # path('create_refund/', views.create_refund),
+    # path('update_refund/', views.update_refund),
+    # path('delete_refund/', views.delete_refund),
+    # path('get_refund/', views.get_refund),
     path('get_discount_and_promotions/', views.get_discount_and_promotions),
     
     #Specific Group Category

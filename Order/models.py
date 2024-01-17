@@ -6,7 +6,8 @@ from django.db.models.functions import Coalesce
 from Authentication.models import User
 from Business.models import BusinessAddress
 from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs
-from Promotions.models import PurchaseDiscount, SpendSomeAmount, FixedPriceService, MentionedNumberService, BundleFixed, RetailAndGetService
+from Promotions.models import PurchaseDiscount, SpendSomeAmount, FixedPriceService, MentionedNumberService, BundleFixed, \
+    RetailAndGetService, Coupon
 from django.utils.timezone import now
 from Employee.models import Employee
 from Product.models import Product, CurrencyRetailPrice
@@ -101,16 +102,29 @@ class Checkout(models.Model):
         ('Other', 'Other'),
         
     ]
+    
+    REFUND_STATUS = [
+        ('refund','Refund'),
+        ('cancel','Cancel')
+    ]
+    
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_checkout_order', null=True, blank=True)
-
+    coupon_discounted_price = models.FloatField(null=True)
+    coupon = models.ForeignKey(Coupon , on_delete=models.CASCADE , related_name='coupon_checkout',null=True)
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_checkout_orders', null=True, blank=True)
     location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, related_name='location_checkout_orders', null=True, blank=True)
     member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='member_checkout_orders', null=True)
     client_type = models.CharField(choices = CLIENT_TYPE, max_length=50 , default = '' )
     payment_type = models.CharField(choices = PAYMENT_TYPE, max_length=50 , default = '' )
-    
+    is_coupon_redeemed = models.TextField(null=True)
     tip = models.FloatField(default = 0) # Not in Use
+    
+    # Added new fields for managing refunds Parent, child relation (original_checkout, refunded_checkout)
+    
+    is_refund = models.BooleanField(choices = REFUND_STATUS,max_length =50, default='', null=True, blank=True)
+    previous_checkout = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='refunded_sale_checkout')
+    
 
     tax_applied = models.FloatField(default=0, verbose_name='Tax Applied in Percentage')
     tax_applied1 = models.FloatField(default=0, verbose_name='Second Tax Applied in Percentage')
@@ -215,7 +229,12 @@ class Order(models.Model):
         ('Other', 'Other'),
         
     ]
-
+    
+    REFUND_STATUS = [
+        ('refund','Refund'),
+        ('cancel','Cancel')
+    ]
+    
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True,)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_sale_order', null=True, blank=True)
     
@@ -242,6 +261,12 @@ class Order(models.Model):
     gst = models.FloatField(default = 0)
     total_price = models.DecimalField(default = 0 , max_digits=10, decimal_places=5)
     sold_quantity = models.PositiveBigIntegerField(default = 0)
+    
+    # Need to add refund
+    
+    is_refund = models.CharField(choices = REFUND_STATUS,max_length = 50, default='', null=True, blank=True)
+    # previous_order_refunded = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='order_refunded')
+    
     
     discount_percentage = models.FloatField(default=None, null=True, blank=True)
     discount_price = models.FloatField(default=None, null=True, blank=True)

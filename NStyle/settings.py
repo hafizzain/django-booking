@@ -31,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 CSRF_TRUSTED_ORIGINS=[
     # 'https://*.YOUR_DOMAIN.COM',
     'https://hashedsystems.com',
@@ -77,7 +77,9 @@ NSTYLE_APPS = [
     'MultiLanguage.apps.MultilanguageConfig',
     'SuperInsight.apps.SuperinsightConfig',
     'Notification.apps.NotificationConfig',
-    'Analytics.apps.AnalyticsConfig'
+    'Analytics.apps.AnalyticsConfig',
+    'Finance.apps.FinanceConfig',
+    'HRM.apps.HrmConfig',
 ]
 
 
@@ -88,15 +90,17 @@ SHARED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'django_tenants',
     'rest_framework',
     'rest_framework.authtoken',
     "corsheaders",
     'geoip2',
     'django_crontab',
+    'django_extensions',
     'debug_toolbar',
     'fcm_django',
+    'django_filters',
+    # 'django.db.migrations',
     
 
     'Tenants.apps.TenantsConfig',
@@ -127,31 +131,31 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "debug_toolbar.middleware.DebugToolbarMiddleware",
-    'Api.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Appointment.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Authentication.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Business.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Client.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'CRM.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Customer.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Dashboard.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Employee.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Invoices.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Notification.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Order.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Permissions.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Product.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Profile.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Promotions.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Reports.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Sale.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Service.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'SuperInsight.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Tenants.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Utility.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'MultiLanguage.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Help.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'Analytics.error_logging_middleware.ServerErrorLoggingMiddleware'
+    # 'Api.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Appointment.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Authentication.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Business.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Client.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'CRM.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Customer.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Dashboard.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Employee.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Invoices.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Notification.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Order.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Permissions.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Product.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Profile.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Promotions.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Reports.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Sale.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Service.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'SuperInsight.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Tenants.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Utility.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'MultiLanguage.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Help.error_logging_middleware.ServerErrorLoggingMiddleware',
+    # 'Analytics.error_logging_middleware.ServerErrorLoggingMiddleware'
     
 ]
 
@@ -206,7 +210,7 @@ DATABASES = {
         'HOST': env('DATABASE_HOST'),
         'PORT': env('DATABASE_PORT'),
         'CONN_MAX_AGE': None,
-        'ATOMIC_REQUESTS': True,  # Enable global transactions
+        # 'ATOMIC_REQUESTS': True,  # Enable global transactions
     }
 }
 
@@ -235,19 +239,33 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+DEFAULT_RENDERER_CLASSES = [
+    'Utility.customizations.renderers.CustomRenderer',
+]
+
+if DEBUG:
+    DEFAULT_RENDERER_CLASSES = DEFAULT_RENDERER_CLASSES + [
+    'rest_framework.renderers.BrowsableAPIRenderer',
+]
+
+
 REST_FRAMEWORK = {
 
-    'DEFAULT_RENDERER_CLASSES': [
-        'Utility.customizations.renderers.CustomRenderer',
-    ],
+    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES,
+
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 
     'DEFAULT_AUTHENTICATION_CLASSES' : [
-        'rest_framework.authentication.TokenAuthentication'
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication'
     ],
 
     'DEFAULT_PERMISSION_CLASSES' : [
         'rest_framework.permissions.IsAuthenticated'
     ],
+
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,  # Set your desired page size here
 
 }
 
@@ -378,7 +396,7 @@ FRONTEND_DOMAIN = env('FRONTEND_DOMAIN')
 
 
 # Set Atomic Requests Globally
-ATOMIC_REQUESTS = True
+# ATOMIC_REQUESTS = True
 try:
     from .local_settings import LIVE_SERVER_PATH
 except:

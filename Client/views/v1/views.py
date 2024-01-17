@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from threading import Thread
-
+from Appointment.models import Appointment, AppointmentCheckout
 from Order.models import VoucherOrder, Vouchers, MemberShipOrder, Membership
 from django.db.models.functions import Cast
 from Client.Constants.Add_Employe import add_client
@@ -32,6 +32,12 @@ from NStyle.Constants import StatusCodes
 from django.core.paginator import Paginator
 from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
 from django.db import transaction
+from Order.models import Checkout
+
+from Appointment import choices
+from Appointment.models import Appointment
+from Appointment.serializers import PaidUnpaidAppointmentSerializer
+
 
 
 @transaction.atomic
@@ -180,24 +186,74 @@ def get_client_dropdown(request):
     search_text = request.GET.get('search_text', None)
     # no_pagination = request.GET.get('no_pagination', None)
     page = request.GET.get('page', None)
-    is_searched = False
-
+    is_searched = False #for frontend purpose
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
+    gender = request.GET.get('gender', None)
+    number_visit = request.GET.get('number_visit', None)
+    min_spend_amount = request.GET.get('min_spend_amount', None)
+    max_spend_amount = request.GET.get('max_spend_amount', None)
+    min_check = request.GET.get('min_spend_amount', None) #for frontend purpose
+    max_check = request.GET.get('max_spend_amount', None) #for frontend purpose
     query = Q(is_deleted=False, is_blocked=False, is_active=True)
-
+    isFiltered = False #for frontend purpose
+    
+    
+    if start_date and end_date:
+        appoint_client_ids = list(AppointmentCheckout.objects\
+                    .filter(created_at__range=(start_date, end_date))\
+                    .values_list('appointment__client__id', flat=True))
+        
+        checkout_client_ids = list(Checkout.objects\
+                    .filter(created_at__range=(start_date, end_date))\
+                    .values_list('client__id', flat=True))
+        
+        # appoint_client_ids.extend(checkout_client_ids)
+        merged_client_ids_list = list(set(appoint_client_ids+checkout_client_ids))
+        query &= Q(id__in=merged_client_ids_list)
+        isFiltered = True 
+    
+        
+    if gender:
+        query &= Q(gender=gender)
+        isFiltered = True
+    
+    if number_visit:
+        query &= Q(total_visit=number_visit)
+        isFiltered = True
+        
+    if min_spend_amount or max_spend_amount:
+        if min_spend_amount is None:
+            min_spend_amount = 0
+        if max_spend_amount is None:
+            max_spend_amount = 10000000
+            
+        total_spend_amount = list(AppointmentCheckout.objects \
+                    .filter(total_price__range = (min_spend_amount, max_spend_amount)) \
+                    .values_list('appointment__client__id', flat=True))
+        query &= Q(id__in=total_spend_amount)
+        if min_check or max_check:
+            isFiltered = True
+        
     if search_text:
         query &= Q(full_name__icontains=search_text) | \
                  Q(mobile_number__icontains=search_text) | \
                  Q(email__icontains=search_text) | \
                  Q(client_id__icontains=search_text)        
         is_searched = True
+        isFiltered = True
         
-    all_client = Client.objects.filter(query).order_by('-created_at')
+    all_client = Client.objects \
+                    .count_total_visit(start_date, end_date) \
+                    .filter(query) \
+                    .order_by('-created_at')
     serialized = list(ClientDropdownSerializer(all_client, many=True,  context={'request' : request}).data)
 
     paginator = CustomPagination()
     paginator.page_size = 10 if page else 100000
     paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'clients', invoice_translations=None, current_page=page, is_searched=is_searched)
+    response = paginator.get_paginated_response(paginated_data, 'clients', invoice_translations=None,
+                                                current_page=page, is_searched=is_searched , is_filtered=isFiltered)
     return response
 
 
@@ -1785,18 +1841,13 @@ def create_memberships(request):
     user = request.user
     business = request.data.get('business', None)
     name = request.data.get('name', None)
-    
     description = request.data.get('description', None)
     terms_condition = request.data.get('term_condition', None)
-    
     color = request.data.get('color', None)
-    
     services = request.data.get('services', None)
     products = request.data.get('products',None)
-    
     #membership_type = request.data.get('membership_type',None)
     #total_number = request.data.get('total_number',None)
-    
     #percentage = request.data.get('session', None)
     valid_for = request.data.get('valid_for', None)
     #validity = request.data.get('validity', None)
@@ -1971,6 +2022,7 @@ def create_memberships(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_memberships(request):
+    location_id = request.GET.get('location_id')
     search_text = request.GET.get('search_text')
     all_memberships= Membership.objects \
                         .with_total_orders() \
@@ -1989,7 +2041,7 @@ def get_memberships(request):
     page_number = request.GET.get("page") 
     all_memberships = paginator.get_page(page_number)
 
-    serialized = MembershipSerializer(all_memberships, many=True)
+    serialized = MembershipSerializer(all_memberships, many=True, context={'request' : request, 'location_id' : location_id})
     return Response(
         {
             'status' : 200,
@@ -2961,7 +3013,7 @@ def update_loyalty(request):
             }
         },
         status=status.HTTP_200_OK
-        )
+    )
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -3338,6 +3390,3 @@ def check_client_existance(request):
         },
         status=status.HTTP_200_OK
     )
-
-# Select Related  => Single Object => (Inside FK + OTO Relaion)
-# prefetch related => Many to Many => (MTM + Outside FK)

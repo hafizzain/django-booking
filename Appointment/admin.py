@@ -14,12 +14,16 @@ admin.site.register(AppointmentNotes)
 class AppointmentCheckoutAdmin(admin.ModelAdmin):
     ordering = ['-created_at']
     list_display = ['id', 'business_address', 'is_promotion', 'created_at', 'total_price']
+    # search_fields = ('id')
 
 
 
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
     ordering = ['-created_at']
+    list_filter = [
+        'status'
+    ]
 
     list_display = [
         'id',
@@ -30,13 +34,15 @@ class AppointmentAdmin(admin.ModelAdmin):
         'discount_price',
         'discount_percentage'
     ]
-
+    # search_fields = ('id')
 @admin.register(AppointmentService)
 class AppointmentServiceAdmin(admin.ModelAdmin):
     ordering = ['-created_at']
     list_filter = [
         'business_address__address_name',
-        'created_at'
+        'created_at',
+        'is_blocked',
+        'status'
     ]
     list_display = [
         'id',

@@ -13,7 +13,7 @@ from Business.models import (BookingSetting, BusinessAddressMedia, BusinessType,
                              BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, 
                              ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, 
                              BusinessPaymentMethod, BusinessTax, BusinessVendor,BusinessOpeningHour,
-                             BusinessTaxSetting, BusinessPolicy, BusinessPrivacy
+                             BusinessTaxSetting, BusinessPolicy, BusinessPrivacy, RefundSetting
                         )
 from Authentication.serializers import UserSerializer
 from django.conf import settings
@@ -385,7 +385,8 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
             'is_publish',
             'description',
             'primary_translation',
-            'secondary_translation'
+            'secondary_translation',
+            'privacy_policy'
         ]
 class BusinessAddress_CustomerSerializer(serializers.ModelSerializer):
     #opening_hours= OpeningHoursSerializer(read_only=True)
@@ -594,6 +595,14 @@ class BusinessTaxSerializer(serializers.ModelSerializer):
         model = BusinessTax
         fields = ['id', 'name', 'parent_tax',
                   'tax_rate', 'location', 'tax_type', 'is_active']
+
+class BusinessTaxSerializerNew(serializers.ModelSerializer):
+    parent_tax = ParentBusinessTaxSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = BusinessTax
+        exclude = ('created_at','user')
+
 class BusinessVendorSerializer(serializers.ModelSerializer):
 
     country = CountrySerializer(read_only=True)
@@ -739,3 +748,9 @@ class BusinessPrivacySerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessPrivacy
         fields = '__all__'
+
+# class RefundSettingSerializer(serializers.ModelSerializer):
+
+#     class Meta:
+#         model = RefundSetting
+#         fields = '__all__'

@@ -2,15 +2,19 @@ from django.urls import path, include
 from Appointment.views.v1 import views
 
 urlpatterns = [
-    #Appointment
+    # Appointment
     path('create_appointment/', views.create_appointment),
     path('get_calendar_appointment/', views.get_calendar_appointment),
-    path('get_all_appointments/',views.get_all_appointments),
+    # path('get_all_appointments/',views.get_all_appointments),
+    path('get_all_appointments/',views.get_available_appointments),
     path('get_recent_ten_appointments/', views.get_recent_ten_appointments),
     path('get_all_appointments_no_pagination/',views.get_all_appointments_no_pagination),
     path('get_today_appointments/', views.get_today_appointments),
     path('get_single_appointments/', views.get_single_appointments),
     path('get_appointments_service/', views.get_appointments_service),
+
+    # new apis for latest requirements
+    path('appointment_service_status_update/', views.appointment_service_status_update),
     
 
     path('get_appointments_device/', views.get_appointments_device),
@@ -22,6 +26,7 @@ urlpatterns = [
     
     path('delete_appointment/', views.delete_appointment),
     path('update_appointment/', views.update_appointment),
+    path('cancel_appointment/', views.cancel_appointment),
     path('update_appointment_service/', views.update_appointment_service),
     #path('update_appointment_device/', views.update_appointment_device),
     
@@ -56,4 +61,13 @@ urlpatterns = [
 
     # Employee Inshights
     path('get_employee_insights/', views.get_employee_appointment_insights),
+
+    # new apis
+    path('paid_unpaid_appointments/', views.paid_unpaid_clients),
+
+    # missed opportunities
+    path('create_missed_opportunity/', views.create_missed_opportunity),
+    path('missed_opportunities/', views.MissedOpportunityListCreate.as_view(), name='list-create-missed-opportunities'),
+    path('missed_opportunities/<uuid:id>/', views.MissedOpportunityListCreate.as_view(), name='missed-opportunities-delete')
+
 ]

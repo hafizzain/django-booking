@@ -124,7 +124,7 @@ class CreatedAtAppointmentSerializer(serializers.ModelSerializer):
 class ClientDropdownSerializer(serializers.ModelSerializer):
 
     image = serializers.SerializerMethodField()
-
+    total_visit = serializers.IntegerField(read_only=True)
 
     def get_image(self, obj):
         if obj.image:
@@ -138,7 +138,7 @@ class ClientDropdownSerializer(serializers.ModelSerializer):
 
     class Meta:
         model  = Client
-        fields = ['id', 'full_name', 'email', 'client_id', 'image']
+        fields = ['id', 'full_name', 'email', 'client_id', 'image', 'total_visit']
 
 class ClientSerializer(serializers.ModelSerializer):
     country = CountrySerializer(read_only=True)
@@ -333,7 +333,6 @@ class MembershipSerializer(serializers.ModelSerializer):
     services = serializers.SerializerMethodField()
     currency_membership = serializers.SerializerMethodField()
     is_expired = serializers.SerializerMethodField(read_only=True)
-    total_orders = serializers.IntegerField()
     
     def get_products(self, obj):
         try:
@@ -351,8 +350,20 @@ class MembershipSerializer(serializers.ModelSerializer):
     
     
     def get_currency_membership(self, obj):
+        location_id = self.context.get('location_id', None)
+        query = {}
+        if location_id:
+            try:
+                location = BusinessAddress.objects.get(id = location_id)
+            except:
+                pass
+            else:
+                query['currency'] = location.currency
         try:
-            pro = CurrencyPriceMembership.objects.filter(membership = obj).distinct()
+            pro = CurrencyPriceMembership.objects.filter(
+                membership = obj,
+                **query,
+            ).distinct()
             return CurrencyPriceMembershipSerializers(pro, many= True).data
         except Exception as err:
             print(err)
@@ -363,14 +374,13 @@ class MembershipSerializer(serializers.ModelSerializer):
     class Meta:
         model = Membership
         fields = ['id', 'name', 'arabic_name', 'is_expired', 'valid_for','discount','description', 
-                  'term_condition','products', 'services', 'currency_membership', 'total_orders']
+                  'term_condition','products', 'services', 'currency_membership']
         read_only_fields = ['arabic_name', 'is_expired']
 
 class VoucherSerializer(serializers.ModelSerializer):
     # currency_voucher_prices = serializers.SerializerMethodField(read_only=True)
     currency_voucher = serializers.SerializerMethodField()
     voucher_count = serializers.SerializerMethodField()
-    total_orders = serializers.IntegerField()
 
     def get_currency_voucher(self, obj):
         try:
@@ -385,7 +395,7 @@ class VoucherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Vouchers
-        fields = ['id', 'name', 'arabic_name', 'user','business','voucher_type', 'total_orders',
+        fields = ['id', 'name', 'arabic_name', 'user','business','voucher_type',
                 'validity','sales','is_deleted','is_active','created_at','currency_voucher','discount_percentage', 'voucher_count']
         read_only_fields = ['arabic_name']
 

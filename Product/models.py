@@ -14,16 +14,16 @@ from Utility.models import Language
 
 class ProductManager(models.QuerySet):
 
-    def with_total_orders(self, location):
+    def with_total_orders_quantity(self, location):
         """
         Returns the total sale of a product by taking the sum of product of quantity * current_price
         or quantity * discount_price.
         """
 
-        order_filter = Q(location=location)
+        order_filter = Q(product_orders__location=location)
         return self.annotate(
-            total_orders = Coalesce(
-                Count('product_orders', filter=order_filter),
+            total_order_quantity = Coalesce(
+                Sum('product_orders__quantity', filter=order_filter),
                 0,
                 output_field=IntegerField()
             )
@@ -113,6 +113,7 @@ class ProductManager(models.QuerySet):
         )
 
     def with_stock_health(self, location):
+        #Deprecated method
         query = Q(product=OuterRef('pk'), is_deleted=False)
         if location:
             query &= Q(location=location)
@@ -317,6 +318,9 @@ class ProductStock(models.Model):
 
     alert_when_stock_becomes_lowest = models.BooleanField(default=None, null=True, blank=True)
     
+    is_refunded = models.BooleanField(default = False)
+    refund_quantity = models.PositiveIntegerField(default=0) # Added new field Refund Quantity
+    
     #turnover = models.CharField(default='Highest', choices=TURN_CHOICES, max_length=40)
 
     is_active = models.BooleanField(default=True)
@@ -416,6 +420,7 @@ class ProductOrderStockReport(models.Model):
         ('Purchase', 'Purchase'),
         ('Consumed', 'Consumed'),
         ('Sold', 'Sold'),
+        # ('Refund','Refund'), # Added extra Type Refund by Asad
         ('Transfer_to', 'Transfer_to'),
         ('Transfer_from', 'Transfer_From'),
         

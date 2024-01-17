@@ -6,10 +6,7 @@ from Tenants.models import Tenant
 
 
 class GlobalPermissionChoices(models.Model):
-    id = models.UUIDField(default=uuid4, editable=False, unique=True, primary_key=True)
-    
-    #employee = models.ForeignKey('Employee.Employee', on_delete=models.CASCADE, related_name='employee_global_permission')
-        
+    id = models.UUIDField(default=uuid4, editable=False, unique=True, primary_key=True)        
     text = models.CharField(max_length=1000, default='')
     slug = models.CharField(max_length=1000, default='')
     
@@ -190,4 +187,16 @@ class TurnOverProductRecord(models.Model):
     
     def __str__(self):
         return str(self.id)
+
+class CommonField(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    is_active = models.BooleanField(default=True)
+    is_blocked = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    objects = models.QuerySet.as_manager() 
     
+    class Meta:
+        abstract = True

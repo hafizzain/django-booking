@@ -189,3 +189,14 @@ class CategoryCommissionAdmin(admin.ModelAdmin):
             return f'{obj.commission.employee.full_name}'
         
         return '-------'
+
+# from django.db.migrations.recorder import MigrationRecorder
+# @admin.register(MigrationRecorder.Migration)
+# class MigrationRecorderAdmin(admin.ModelAdmin):
+
+#     search_fields = [
+#         'name'
+#     ]
+#     list_filter = [
+#         'name'
+#     ]

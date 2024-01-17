@@ -1,8 +1,9 @@
 from uuid import uuid4
+from datetime import datetime, timedelta
 from django.db import models
 from django.utils.timezone import now
 from django.db.models.functions import Coalesce
-from django.db.models import Count, IntegerField
+from django.db.models import Count, IntegerField, Q, Sum, F, ExpressionWrapper
 
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
@@ -10,6 +11,7 @@ from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Utility.models import Currency
 from googletrans import Translator
 from Utility.models import Language
+from Appointment import choices
 
 class ServiceManager(models.QuerySet):
 
@@ -20,6 +22,94 @@ class ServiceManager(models.QuerySet):
                 0,
                 output_field=IntegerField()
             )
+        )
+
+    def with_total_appointment_count(self, location=None, duration=None):
+        """
+        This function returns the Count of appointments (AppointmentService)
+        related to a particular service
+
+        Parameters:
+        - location (BusinessAddress)
+        - duration (int)
+        """
+        query = Q(serivce_appointments__status=choices.AppointmentServiceStatus.FINISHED)
+        if location:
+            query &= Q(serivce_appointments__business_address=location)
+        if duration:
+            today = datetime.today()
+            date = today - timedelta(days=duration)
+            query &= Q(serivce_appointments__created_at__gte=date)
+
+
+        return self.annotate(
+            appointment_count=Coalesce(
+                Count('serivce_appointments', filter=query, distinct=True),
+                0,
+                output_field=IntegerField()
+            )
+        )
+
+    def with_total_orders_quantity(self, location=None, duration=None):
+        """
+        This function returns the sum of sales quantity (ServiceOrder)
+        related to a particular service
+
+        Parameters:
+        - location (BusinessAddress)
+        - duration (int)
+        """
+        query = Q()
+        if location:
+            query &= Q(service_orders__location=location)
+        if duration:
+            today = datetime.today()
+            date = today - timedelta(days=duration)
+            query &= Q(service_orders__created_at__gte=date)
+
+        return self.annotate(
+            total_orders_quantity = Coalesce(
+                Sum('service_orders__quantity', filter=query, distinct=True),
+                0,
+                output_field=IntegerField()
+            )
+        )
+
+    def with_total_sale_count(self, location=None, duration=None):
+        """
+        This function returns the sum of appointments count (AppointmentService) and 
+        sales quantity (ServiceOrder) related to a particular service
+
+        Parameters:
+        - location (BusinessAddress)
+        - duration (int)
+        """
+        service_orders_filter = Q()
+        appointment_service_filter = Q(serivce_appointments__status=choices.AppointmentServiceStatus.FINISHED)
+        if location:
+            service_orders_filter &= Q(service_orders__location=location)
+            appointment_service_filter &= Q(serivce_appointments__business_address=location)
+        if duration:
+            today = datetime.today()
+            date = today - timedelta(days=duration)
+            service_orders_filter &= Q(service_orders__created_at__gte=date)
+            appointment_service_filter &= Q(serivce_appointments__created_at__gte=date)
+
+
+        return self.annotate(
+            appointment_count=Coalesce(
+                Count('serivce_appointments', filter=appointment_service_filter, distinct=True),
+                0,
+                output_field=IntegerField()
+            ),
+            total_orders_quantity = Coalesce(
+                Sum('service_orders__quantity', filter=service_orders_filter, distinct=True),
+                0,
+                output_field=IntegerField()
+            )
+        ).annotate(
+            total_count=ExpressionWrapper(F('appointment_count') + F('total_orders_quantity'),
+                                        output_field=IntegerField())
         )
 
 class Service(models.Model):
@@ -111,10 +201,14 @@ class Service(models.Model):
     updated_at = models.DateTimeField(null=True, blank=True)
     
     is_package = models.BooleanField(default=False)
-
+    image = models.ImageField(upload_to='service/service_images/', null=True, blank=True)
+    is_image_uploaded_s3 = models.BooleanField(default=False)
     objects = ServiceManager.as_manager()
 
     def save(self, *args, **kwargs):
+        if self.image:
+            self.is_image_uploaded_s3 = True
+            
         translator = Translator()
 
         arabic_text = translator.translate(f'{self.name}'.title(), dest='ar')
@@ -143,10 +237,16 @@ class ServiceGroup(models.Model):
     is_active = models.BooleanField(default=True)
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
-    
+    image = models.ImageField(upload_to='servicegroup/service_group_images/', null=True, blank=True)
+    is_image_uploaded_s3 = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.id)
+    
+    def save(self, *args, **kwargs):
+        if self.image:
+            self.is_image_uploaded_s3 = True
+        super(ServiceGroup, self).save(*args, **kwargs)
     
 class PriceService(models.Model):
     DURATION_CHOICES = [
