@@ -72,6 +72,7 @@ urlpatterns = [
 
     # Generate ID
     path('generate_id/', views.generate_id),
+    path('get_detail_from_code/',views.get_detail_from_code),
 
     # Vacations For Employee
     # path('create_vacation/', views.create_vacation),
