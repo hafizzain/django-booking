@@ -6935,16 +6935,33 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         return Response(data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
-        id = self.query_params.get('id', None)
-        if id is not None:
-            instance = GiftCards.objects.get(id=id)
-            serializer = GiftCardSerializer(instance=instance, data=request.data, partial=True)
-            if serializer.is_valid(raise_exception=True):
-                instance = serializer.save()
-                data = GiftCardSerializer(instance, many=False).data
-                return Response({"msg": "Gift card updated successfully"}, status=status.HTTP_200_OK)
-        else:
-            return Response({"msg": "Id is None"}, status=status.HTTP_400_BAD_REQUEST)
+        id = request.data.get('id', None)
+        instance = GiftCards.objects.get(id=id)
+        instance.title = request.data.get('title', None)
+        instance.validity = request.data.get('validity', None)
+        instance.code = request.data.get('code', None)
+        instance.currency_gift_card_price = request.data.get('currency_gift_card_price', [])
+        instance.description = request.data.get('description', None)
+        instance.price = request.data.get('price', None)
+        instance.retail_price = request.data.get('retail_price', None)
+        instance.term_condition = request.data.get('term_condition', None)
+        instance.save()
+        data = {
+            "success": True,
+            "status_code": 200,
+            "response": {
+                "message": "gift card updated successfully",
+                "error_message": None,
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)
+        # if id is not None:
+        #     serializer = GiftCardSerializer(instance=instance, data=request.data, partial=True)
+        #     if serializer.is_valid(raise_exception=True):
+        #         instance = serializer.save()
+        #         data = GiftCardSerializer(instance, many=False).data
+        # else:
+        #     return Response({"msg": "Id is None"}, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, *args, **kwargs):
         id = request.query_params.get('id', None)
