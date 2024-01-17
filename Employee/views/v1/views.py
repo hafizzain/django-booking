@@ -6888,7 +6888,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         price = request.data.get('price', None)
         retail_price = request.data.get('retail_price', None)
         term_condition = request.data.get('term_condition',None)
-        code_check = GiftCards.objects.filter(code=code)
+        code_check = GiftCards.objects.filter(code__contains=code)
         if code_check:
             data = {
                 "success": True,
