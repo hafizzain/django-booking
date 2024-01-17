@@ -1955,8 +1955,13 @@ class GiftCardSerializer(serializers.ModelSerializer):
 
         return instance
 
+class Currencyresponse(serializers.ModelSerializer):
+    class Meta:
+        model = Currency
+        fields = "__all__"
 
 class GiftCardSerializerResponse(serializers.ModelSerializer):
+    currency = Currencyresponse()
     class Meta:
         model = GiftCards
         fields = "__all__"
