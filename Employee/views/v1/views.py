@@ -7025,7 +7025,7 @@ def update_gift_card(request):
                     GiftDetail.objects.filter(id=data['id']).update(currencies_id = data['currencies'], price=data['price'],
                                               retail_price=data['retail_price'], gift_card_id=id)
                 except:
-                    GiftDetail.objects.create(currencies_id = data['currencies'],price=data['price'], retail_price=data['retail_price'], gift_card=id)
+                    GiftDetail.objects.create(currencies_id = data['currencies'],price=data['price'], retail_price=data['retail_price'], gift_card_id=id)
         data = {
             "success": True,
             "status_code": 200,
