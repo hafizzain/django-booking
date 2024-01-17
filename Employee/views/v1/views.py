@@ -7060,7 +7060,7 @@ def get_detail_from_code(request):
             "response": {
                 "message": "gift card get successfully",
                 "error_message": None,
-                "data": serializer.data
+                "data": serializer
             }
         }
         return Response(data, status=status.HTTP_200_OK)
