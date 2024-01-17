@@ -7034,3 +7034,22 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             }
             return Response(data, status=status.HTTP_404_NOT_FOUND)
 
+
+def get_detail_from_code(request):
+    code = request.data.get('code',None)
+    if code is not None:
+        query_set = GiftCards.objects.filter(code__contains=code)
+        serializer = GiftCardSerializerResponse(query_set, many=True).data
+        data = {
+            "success": True,
+            "status_code": 200,
+            "response": {
+                "message": "gift card getsds successfully",
+                "error_message": None,
+                "data": serializer.data
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+
