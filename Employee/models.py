@@ -699,6 +699,7 @@ class GiftCards(models.Model):
         ('2 Years', '2 Years'),
         ('5 Years', '5 Years'),
     ]
+    term_condition = models.TextField(null=True)
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     name = models.TextField(null=True, blank=True)
     title = models.TextField(null=True, blank=True)
@@ -724,13 +725,13 @@ class GiftCards(models.Model):
 
 class GiftDetail(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-    gift_card = models.ForeignKey(GiftCards, on_delete=models.CASCADE, null=True)
+    gift_card = models.ForeignKey(GiftCards, on_delete=models.CASCADE, null=True,related_name='gift_card_details')
     price = models.FloatField(default=0, null=True)
     retail_price = models.FloatField(default=0, null=True)
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)
     currency = models.TextField(null=True)
-    currencies = models.ForeignKey(Currency , on_delete=models.CASCADE , null=True)
+    currencies = models.ForeignKey(Currency , on_delete=models.CASCADE , null=True,related_name='gift_detail_currencies')
 
 
 class GiftDetails(models.Model):

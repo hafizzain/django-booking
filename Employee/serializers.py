@@ -25,7 +25,7 @@ from .models import (EmployeDailySchedule, Employee, EmployeeProfessionalInfo,
                      StaffGroup, StaffGroupModulePermission, Attendance
 , Payroll, CommissionSchemeSetting, Asset, AssetDocument,
                      EmployeeSelectedService, Vacation, CategoryCommission, LeaveManagements,
-                     WeekManagement, VacationDetails, GiftCards
+                     WeekManagement, VacationDetails, GiftCards, GiftDetail
                      )
 from Authentication.models import AccountType, User
 from django_tenants.utils import tenant_context
@@ -918,7 +918,7 @@ class CommissionSerializer(serializers.ModelSerializer):
         model = CommissionSchemeSetting
         # fields = '__all__'
         exclude = ('sale_price_before_discount', 'created_at', 'from_value', 'to_value', 'percentage', 'user',
-                    'sale_price_including_tax', 'service_price_before_membership_discount')
+                   'sale_price_including_tax', 'service_price_before_membership_discount')
 
 
 class VacationSerializer(serializers.ModelSerializer):
@@ -1036,88 +1036,88 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
         #         # return True
         #     else:
         #         return False
-            # query = Q(location_id=location_id)
-            # if start_date is None and end_date is None:
-            #     start_date=start_date
-            #     # query &= Q(start_date__gte=start_date)
-            # if start_date is not None:
-            #     end_date=end_date
-            #     # query &= (Q(end_date__lte=end_date) | Q(end_date__isnull=True))
-            #     holidays = Holiday.objects.select_related('user', 'business', 'location') \
-            #         .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
-            # holidays = False
-            # holidays = Holiday.objects.select_related('user', 'business', 'location') \
-            #     .filter(
-            #     (Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date)).filter(
-            #     location=location_id)
-            # if holidays:
-            #     return True  # Return True if there is any holiday
-            # else:
-            #     return False
-            # holidays = Holiday.objects.filter(
-            #     Q(end_date__lte=end_date) & Q(start_date__gte=start_date)).filter(
-            #     location=location_id)
-            # if holidays:
-            #     return True  # Return True if there is any holiday
-            # else:
-            #     return Falsedate__date__gte
-            # from HRM.serializers import HolidaySerializer end_date__date__lte=end_date,
-            # holidays = Holiday.objects.filter(
-            #     start_date__date__gte=start_date
-            # )
-            # holidays = Holiday.objects.filter(
-            #     start_date__date__gte=start_date
-            # )
-            # holidays = holidays.first()
-            # end_date = holidays.end_date
-            # if end_date is None
-            # # if end_date is None:
-            #     holiday = Holiday.objects.filter(
-            #         start_date__date__gte=start_date ,end_date=None
-            #     )
-            #     holiday = holiday.start_date = start_date
-            #     if holiday
-            #     if holiday.exists():
-            #         return True
-            #     else:
-            #         return False
-            # holidays = holidays.filter(end_date__date__lte=end_date)
-            # holidays = Holiday.objects.all()
-            # s = HolidaysSerializer(holidays , many=True).data
-            # return  s
-            # else:
-            #     return False
-            # holidays = Holiday.objects.all()
-            # holiday_check = HolidaySerializer(holidays).data
-            # return str(holidays)
-            # if holidays.exists():
-            #     return True
-            # else:
-            #     return False
+        # query = Q(location_id=location_id)
+        # if start_date is None and end_date is None:
+        #     start_date=start_date
+        #     # query &= Q(start_date__gte=start_date)
+        # if start_date is not None:
+        #     end_date=end_date
+        #     # query &= (Q(end_date__lte=end_date) | Q(end_date__isnull=True))
+        #     holidays = Holiday.objects.select_related('user', 'business', 'location') \
+        #         .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
+        # holidays = False
+        # holidays = Holiday.objects.select_related('user', 'business', 'location') \
+        #     .filter(
+        #     (Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date)).filter(
+        #     location=location_id)
+        # if holidays:
+        #     return True  # Return True if there is any holiday
+        # else:
+        #     return False
+        # holidays = Holiday.objects.filter(
+        #     Q(end_date__lte=end_date) & Q(start_date__gte=start_date)).filter(
+        #     location=location_id)
+        # if holidays:
+        #     return True  # Return True if there is any holiday
+        # else:
+        #     return Falsedate__date__gte
+        # from HRM.serializers import HolidaySerializer end_date__date__lte=end_date,
+        # holidays = Holiday.objects.filter(
+        #     start_date__date__gte=start_date
+        # )
+        # holidays = Holiday.objects.filter(
+        #     start_date__date__gte=start_date
+        # )
+        # holidays = holidays.first()
+        # end_date = holidays.end_date
+        # if end_date is None
+        # # if end_date is None:
+        #     holiday = Holiday.objects.filter(
+        #         start_date__date__gte=start_date ,end_date=None
+        #     )
+        #     holiday = holiday.start_date = start_date
+        #     if holiday
+        #     if holiday.exists():
+        #         return True
+        #     else:
+        #         return False
+        # holidays = holidays.filter(end_date__date__lte=end_date)
+        # holidays = Holiday.objects.all()
+        # s = HolidaysSerializer(holidays , many=True).data
+        # return  s
+        # else:
+        #     return False
+        # holidays = Holiday.objects.all()
+        # holiday_check = HolidaySerializer(holidays).data
+        # return str(holidays)
+        # if holidays.exists():
+        #     return True
+        # else:
+        #     return False
 
-            # # query = Q(location_id=location_id)
-            # if start_date is None and end_date is None:
-            #     start_date=start_date
-            #     # query &= Q(start_date__gte=start_date)
-            # if start_date is not None:
-            #     end_date=end_date
-            #     # query &= (Q(end_date__lte=end_date) | Q(end_date__isnull=True))
-            #     holidays = Holiday.objects.select_related('user', 'business', 'location') \
-            #         .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
-            # holidays = False
-            # holidays = Holiday.objects.select_related('user', 'business', 'location') \
-            #     .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
-            # start_date = datetime.strptime(start_date, "%Y-%m-%d")
-            # end_date = datetime.strptime(end_date, "%Y-%m-%d")
+        # # query = Q(location_id=location_id)
+        # if start_date is None and end_date is None:
+        #     start_date=start_date
+        #     # query &= Q(start_date__gte=start_date)
+        # if start_date is not None:
+        #     end_date=end_date
+        #     # query &= (Q(end_date__lte=end_date) | Q(end_date__isnull=True))
+        #     holidays = Holiday.objects.select_related('user', 'business', 'location') \
+        #         .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
+        # holidays = False
+        # holidays = Holiday.objects.select_related('user', 'business', 'location') \
+        #     .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
+        # start_date = datetime.strptime(start_date, "%Y-%m-%d")
+        # end_date = datetime.strptime(end_date, "%Y-%m-%d")
 
-            #
-            # Return True if there is any holiday
+        #
+        # Return True if there is any holiday
         # except Exception as ex:
         #     return str(ex)
 
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'is_leo_day','is_holidays', 'is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date',
+        fields = ['id', 'is_leo_day', 'is_holidays', 'is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date',
                   'is_working_schedule',
                   'day', 'end_time_shift', 'end_time', 'is_weekend', 'vacation_status', 'note',
                   'start_time']
@@ -1214,7 +1214,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'business', 'employee', 'day', 'vacation', 'start_time', 'end_time',
                   'start_time_shift', 'end_time_shift', 'from_date', 'to_date', 'total_hours', 'note',
                   'date', 'is_leave', 'is_off', 'is_vacation', 'is_active', 'created_at', 'updated_at',
-                  'total_hours_dummy', 'is_leo_day','is_holiday','is_working_schedule','is_weekend']
+                  'total_hours_dummy', 'is_leo_day', 'is_holiday', 'is_working_schedule', 'is_weekend']
 
 
 class WorkingScheduleSerializer(serializers.ModelSerializer):
@@ -1938,7 +1938,8 @@ class EmployeeInfoSerializer(serializers.ModelSerializer):
 class GiftCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = GiftCards
-        fields = ['name', 'gift_card_value', 'retail_price', 'expire_date', 'discount_to_show','start_date','end_date']
+        fields = ['name', 'gift_card_value', 'retail_price', 'expire_date', 'discount_to_show', 'start_date',
+                  'end_date']
 
     def create(self, validated_data):
         return GiftCards.objects.create(**validated_data)
@@ -1956,7 +1957,22 @@ class GiftCardSerializer(serializers.ModelSerializer):
         return instance
 
 
+class Currencyresponse(serializers.ModelSerializer):
+    class Meta:
+        model = Currency
+        fields = ['id','code']
+
+
+class GiftCardDetails(serializers.ModelSerializer):
+    # currencies = Currencyresponse()
+    class Meta:
+        model = GiftDetail
+        fields = "__all__"
+
+
 class GiftCardSerializerResponse(serializers.ModelSerializer):
+    gift_card_details = GiftCardDetails(many=True)
+
     class Meta:
         model = GiftCards
         fields = "__all__"
