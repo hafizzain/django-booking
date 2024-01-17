@@ -6905,7 +6905,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             # currency_gift_card_price = json.loads(currency_gift_card_price)
             if len(currency_gift_card_price) > 0:
                 for data in currency_gift_card_price:
-                    GiftDetail.objects.create(currencies_id = data['currency'],price=data['price'], retail_price=data['retail_price'], gift_card=card)
+                    GiftDetail.objects.create(currencies_id = data['currencies'],price=data['price'], retail_price=data['retail_price'], gift_card=card)
             data = {
                 "success": True,
                 "status_code": 200,
