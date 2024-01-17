@@ -7029,7 +7029,7 @@ def update_gift_card(request):
     # else:
     #     return Response({"msg": "Id is None"}, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['PATCH'])
+@api_view(['GET'])
 @permission_classes([AllowAny])
 def get_gift_card(request):
         query_set = GiftCards.objects.all()
