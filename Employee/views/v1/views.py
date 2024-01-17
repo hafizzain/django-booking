@@ -69,6 +69,7 @@ from Notification.notification_processor import NotificationProcessor
 
 from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
 from Sale.Constants.Custom_pag import CustomPagination
+from Utility.Campaign import send_refund_email
 
 
 @transaction.atomic
@@ -6925,6 +6926,10 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,
                                             custom_card='avaliable',
                                             price=price, retail_price=retail_price)
+            
+            #send mail in threads 
+            send_refund_email(client_email='example@gmail.com')
+            
             data = {
                 "success": True,
                 "status_code": 200,
