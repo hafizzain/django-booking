@@ -6888,6 +6888,17 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         price = request.data.get('price', None)
         retail_price = request.data.get('retail_price', None)
         term_condition = request.data.get('term_condition',None)
+        code_check = GiftCards.objects.filter(code=code)
+        if code_check:
+            data = {
+                "success": True,
+                "status_code": 400,
+                "response": {
+                    "message": "Code already exists",
+                    "error_message": None,
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
         if custom_card is None:
             card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,discount_to_show=discount_to_show,
                                             custom_card=None,term_condition=term_condition)
@@ -6935,7 +6946,20 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         return Response(data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
+        code = request.data.get('code', None)
+        code_check = GiftCards.objects.filter(code=code)
+        if code_check:
+            data = {
+                "success": True,
+                "status_code": 400,
+                "response": {
+                    "message": "Code already exists",
+                    "error_message": None,
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
         id = request.data.get('id', None)
+        currency_gift_card_price = request.data.get('currency_gift_card_price', [])
         instance = GiftCards.objects.get(id=id)
         instance.title = request.data.get('title', None)
         instance.validity = request.data.get('validity', None)
@@ -6946,6 +6970,12 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         instance.retail_price = request.data.get('retail_price', None)
         instance.term_condition = request.data.get('term_condition', None)
         instance.save()
+        if len(currency_gift_card_price) > 0:
+            gift_details = GiftDetail.objects.filter(gift_card_id=id)
+            gift_details.delete()
+            for data in currency_gift_card_price:
+                GiftDetail.objects.create(currencies_id=data['currency'], price=data['price'],
+                                          retail_price=data['retail_price'], gift_card_id=id)
         data = {
             "success": True,
             "status_code": 200,
