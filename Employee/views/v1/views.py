@@ -6952,10 +6952,38 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             giftcard = GiftCards.objects.filter(id=id)
             if giftcard.exists():
                 giftcard.delete()
-                return Response({"msg": f"Gift card with id {id} deleted successfully"}, status=status.HTTP_200_OK)
+                data = {
+                    "success": True,
+                    "status_code": 200,
+                    "response": {
+                        "message": "GiftCard deleted successfully",
+                        "error_message": None,
+                        # "data": serializer.data
+                    }
+                }
+                return Response(data, status=status.HTTP_200_OK)
+                # return Response({"msg": f"Gift card with id {id} deleted successfully"}, status=status.HTTP_200_OK)
             else:
-                return Response({"msg": f"Gift card with id {id} not found"}, status=status.HTTP_404_NOT_FOUND)
+                data = {
+                    "success": True,
+                    "status_code": 200,
+                    "response": {
+                        "message": {"msg": f"Gift card with id {id} not found"},
+                        "error_message": None,
+                        # "data": serializer.data
+                    }
+                }
+                return Response(data, status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response({"msg": "Unable to delete the card. Please provide a valid ID"},
-                            status=status.HTTP_400_BAD_REQUEST)
+            # return Response({"msg": "Unable to delete the card. Please provide a valid ID"},
+            #                 status=status.HTTP_400_BAD_REQUEST)
+            data = {
+                "success": True,
+                "status_code": 400,
+                "response": {
+                    "message": "Unable to delete the card. Please provide a valid ID",
+                    "error_message": None,
+                }
+            }
+            return Response(data, status=status.HTTP_404_NOT_FOUND)
 
