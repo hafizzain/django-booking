@@ -1965,6 +1965,7 @@ class Currencyresponse(serializers.ModelSerializer):
 
 class GiftCardDetails(serializers.ModelSerializer):
     # gift_detail_currencies = Currencyresponse()
+    currencies = Currencyresponse()
     class Meta:
         model = GiftDetail
         fields = "__all__"
