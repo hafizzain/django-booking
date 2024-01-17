@@ -699,6 +699,7 @@ class GiftCards(models.Model):
         ('2 Years', '2 Years'),
         ('5 Years', '5 Years'),
     ]
+    term_condition = models.TextField(null=True)
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     name = models.TextField(null=True, blank=True)
     title = models.TextField(null=True, blank=True)

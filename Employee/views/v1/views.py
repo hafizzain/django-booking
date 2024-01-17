@@ -6887,9 +6887,10 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         discount_to_show = request.data.get('discount_to_show',None)
         price = request.data.get('price', None)
         retail_price = request.data.get('retail_price', None)
+        term_condition = request.data.get('term_condition',None)
         if custom_card is None:
             card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,discount_to_show=discount_to_show,
-                                            custom_card=None)
+                                            custom_card=None,term_condition=term_condition)
             # currency_gift_card_price = json.loads(currency_gift_card_price)
             if len(currency_gift_card_price) > 0:
                 for data in currency_gift_card_price:
