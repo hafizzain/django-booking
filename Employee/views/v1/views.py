@@ -6919,7 +6919,6 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             }
             return Response(data, status=status.HTTP_200_OK)
 
-
     def get(self ,request,*args , **kwargs):
         query_set = GiftCards.objects.all()
         serializer = GiftCardSerializerResponse(query_set , many=True).data

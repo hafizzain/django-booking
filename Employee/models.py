@@ -730,7 +730,7 @@ class GiftDetail(models.Model):
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)
     currency = models.TextField(null=True)
-    currencies = models.ForeignKey(Currency , on_delete=models.CASCADE , null=True)
+    currencies = models.ForeignKey(Currency , on_delete=models.CASCADE , null=True,related_name='gift_detail_currencies')
 
 
 class GiftDetails(models.Model):
