@@ -6994,17 +6994,17 @@ class GiftCardViewSet(viewsets.ModelViewSet):
 @permission_classes([AllowAny])
 def update_gift_card(request):
         code = request.data.get('code', None)
-        code_check = GiftCards.objects.filter(code=code)
-        if code_check:
-            data = {
-                "success": True,
-                "status_code": 400,
-                "response": {
-                    "message": "Code already exists",
-                    "error_message": None,
-                }
-            }
-            return Response(data, status=status.HTTP_200_OK)
+        # code_check = GiftCards.objects.filter(code=code)
+        # if code_check:
+        #     data = {
+        #         "success": True,
+        #         "status_code": 400,
+        #         "response": {
+        #             "message": "Code already exists",
+        #             "error_message": None,
+        #         }
+        #     }
+        #     return Response(data, status=status.HTTP_200_OK)
         id = request.data.get('id', None)
         currency_gift_card_price = request.data.get('currency_gift_card_price', [])
         instance = GiftCards.objects.get(id=id)
