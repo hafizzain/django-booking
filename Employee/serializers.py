@@ -1964,13 +1964,14 @@ class Currencyresponse(serializers.ModelSerializer):
 
 
 class GiftCardDetails(serializers.ModelSerializer):
+    gift_detail_currencies = Currencyresponse(many=True)
     class Meta:
         model = GiftDetail
         fields = "__all__"
 
 
 class GiftCardSerializerResponse(serializers.ModelSerializer):
-    gift_detail_currencies = GiftCardDetails(many=True)
+    gift_card_details = GiftCardDetails(many=True)
 
     class Meta:
         model = GiftCards
