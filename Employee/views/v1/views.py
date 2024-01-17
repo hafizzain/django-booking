@@ -6938,9 +6938,9 @@ class GiftCardViewSet(viewsets.ModelViewSet):
 
     def get(self, request, *args, **kwargs):
         query_set = GiftCards.objects.all()
-        search_text = request.data.get('search_text', None)
+        search_text = request.query_params.get('search_text', None)
         if search_text:
-            query_set = query_set.filter(title__icontains=search_text)
+            query_set = query_set.filter(title=search_text)
         serializer = GiftCardSerializerResponse(query_set, many=True).data
         data = {
             "success": True,
