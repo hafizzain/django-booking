@@ -6876,6 +6876,7 @@ def create_weekend(request):
 class GiftCardViewSet(viewsets.ModelViewSet):
     queryset = GiftCards.objects.all()
     serializer_class = GiftCardSerializerResponse
+
     # permission_classes = [AllowAny]
     # authentication_classes = []
 
@@ -6886,10 +6887,10 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         currency_gift_card_price = request.data.get('currency_gift_card_price', [])
         description = request.data.get('description', None)
         custom_card = request.data.get('custom_card', None)
-        discount_to_show = request.data.get('discount_to_show',None)
+        discount_to_show = request.data.get('discount_to_show', None)
         price = request.data.get('price', None)
         retail_price = request.data.get('retail_price', None)
-        term_condition = request.data.get('term_condition',None)
+        term_condition = request.data.get('term_condition', None)
         code_check = GiftCards.objects.filter(code__contains=code)
         if code_check:
             data = {
@@ -6902,12 +6903,14 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             }
             return Response(data, status=status.HTTP_200_OK)
         if custom_card is None:
-            card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,discount_to_show=discount_to_show,
-                                            custom_card=None,term_condition=term_condition)
+            card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,
+                                            discount_to_show=discount_to_show,
+                                            custom_card=None, term_condition=term_condition)
             # currency_gift_card_price = json.loads(currency_gift_card_price)
             if len(currency_gift_card_price) > 0:
                 for data in currency_gift_card_price:
-                    GiftDetail.objects.create(currencies_id = data['currencies'],price=data['price'], retail_price=data['retail_price'], gift_card=card)
+                    GiftDetail.objects.create(currencies_id=data['currencies'], price=data['price'],
+                                              retail_price=data['retail_price'], gift_card=card)
             data = {
                 "success": True,
                 "status_code": 200,
@@ -6933,9 +6936,12 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             }
             return Response(data, status=status.HTTP_200_OK)
 
-    def get(self ,request,*args , **kwargs):
+    def get(self, request, *args, **kwargs):
         query_set = GiftCards.objects.all()
-        serializer = GiftCardSerializerResponse(query_set , many=True).data
+        search_text = request.data.get('search_text', None)
+        if search_text:
+            query_set = query_set.filter(title__icontains=search_text)
+        serializer = GiftCardSerializerResponse(query_set, many=True).data
         data = {
             "success": True,
             "status_code": 200,
@@ -6946,7 +6952,6 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             }
         }
         return Response(data, status=status.HTTP_200_OK)
-
 
     def delete(self, request, *args, **kwargs):
         id = request.query_params.get('id', None)
@@ -6993,57 +6998,56 @@ class GiftCardViewSet(viewsets.ModelViewSet):
 @api_view(['PATCH'])
 @permission_classes([AllowAny])
 def update_gift_card(request):
-        code = request.data.get('code', None)
-        # code_check = GiftCards.objects.filter(code=code)
-        # if code_check:
-        #     data = {
-        #         "success": True,
-        #         "status_code": 400,
-        #         "response": {
-        #             "message": "Code already exists",
-        #             "error_message": None,
-        #         }
-        #     }
-        #     return Response(data, status=status.HTTP_200_OK)
-        id = request.data.get('id', None)
-        currency_gift_card_price = request.data.get('currency_gift_card_price', [])
-        instance = GiftCards.objects.get(id=id)
-        instance.title = request.data.get('title', None)
-        instance.valid_till = request.data.get('valid_till', None)
-        instance.code = request.data.get('code', None)
-        instance.currency_gift_card_price = request.data.get('currency_gift_card_price', [])
-        instance.description = request.data.get('description', None)
-        instance.price = request.data.get('price', None)
-        instance.retail_price = request.data.get('retail_price', None)
-        instance.term_condition = request.data.get('term_condition', None)
-        instance.save()
-        if len(currency_gift_card_price) > 0:
-            gift_details = GiftDetail.objects.filter(gift_card_id=id)
-            gift_details.delete()
-            for data in currency_gift_card_price:
-                GiftDetail.objects.create(currencies_id = data['currencies'], price=data['price'],
-                                          retail_price=data['retail_price'], gift_card_id=id)
-        data = {
-            "success": True,
-            "status_code": 200,
-            "response": {
-                "message": "gift card updated successfully",
-                "error_message": None,
-            }
+    code = request.data.get('code', None)
+    # code_check = GiftCards.objects.filter(code=code)
+    # if code_check:
+    #     data = {
+    #         "success": True,
+    #         "status_code": 400,
+    #         "response": {
+    #             "message": "Code already exists",
+    #             "error_message": None,
+    #         }
+    #     }
+    #     return Response(data, status=status.HTTP_200_OK)
+    id = request.data.get('id', None)
+    currency_gift_card_price = request.data.get('currency_gift_card_price', [])
+    instance = GiftCards.objects.get(id=id)
+    instance.title = request.data.get('title', None)
+    instance.valid_till = request.data.get('valid_till', None)
+    instance.code = request.data.get('code', None)
+    instance.currency_gift_card_price = request.data.get('currency_gift_card_price', [])
+    instance.description = request.data.get('description', None)
+    instance.price = request.data.get('price', None)
+    instance.retail_price = request.data.get('retail_price', None)
+    instance.term_condition = request.data.get('term_condition', None)
+    instance.save()
+    if len(currency_gift_card_price) > 0:
+        gift_details = GiftDetail.objects.filter(gift_card_id=id)
+        gift_details.delete()
+        for data in currency_gift_card_price:
+            GiftDetail.objects.create(currencies_id=data['currencies'], price=data['price'],
+                                      retail_price=data['retail_price'], gift_card_id=id)
+    data = {
+        "success": True,
+        "status_code": 200,
+        "response": {
+            "message": "gift card updated successfully",
+            "error_message": None,
         }
-        return Response(data, status=status.HTTP_200_OK)
-        # if id is not None:
-        #     serializer = GiftCardSerializer(instance=instance, data=request.data, partial=True)
-        #     if serializer.is_valid(raise_exception=True):
-        #         instance = serializer.save()
-        #         data = GiftCardSerializer(instance, many=False).data
-        # else:
-        #     return Response({"msg": "Id is None"}, status=status.HTTP_400_BAD_REQUEST)
-
+    }
+    return Response(data, status=status.HTTP_200_OK)
+    # if id is not None:
+    #     serializer = GiftCardSerializer(instance=instance, data=request.data, partial=True)
+    #     if serializer.is_valid(raise_exception=True):
+    #         instance = serializer.save()
+    #         data = GiftCardSerializer(instance, many=False).data
+    # else:
+    #     return Response({"msg": "Id is None"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def get_detail_from_code(request):
-    code = request.data.get('code',None)
+    code = request.data.get('code', None)
     if code is not None:
         query_set = GiftCards.objects.filter(code__contains=code)
         serializer = GiftCardSerializerResponse(query_set, many=True).data
@@ -7057,6 +7061,3 @@ def get_detail_from_code(request):
             }
         }
         return Response(data, status=status.HTTP_200_OK)
-
-
-
