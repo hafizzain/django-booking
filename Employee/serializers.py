@@ -1214,7 +1214,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'business', 'employee', 'day', 'vacation', 'start_time', 'end_time',
                   'start_time_shift', 'end_time_shift', 'from_date', 'to_date', 'total_hours', 'note',
                   'date', 'is_leave', 'is_off', 'is_vacation', 'is_active', 'created_at', 'updated_at',
-                  'total_hours_dummy', 'is_leo_day']
+                  'total_hours_dummy', 'is_leo_day','is_holiday','is_working_schedule','is_weekend']
 
 
 class WorkingScheduleSerializer(serializers.ModelSerializer):
@@ -1418,7 +1418,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         if leo_day is None:
             employee_schedules = EmployeDailySchedule.objects.filter(
                 employee=obj,
-                is_leave=False,
+                # is_leave=False,
                 date__range=(month_start_date, month_end_date)
             ).order_by('-date')
             hours = 0
@@ -1459,7 +1459,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
             ).order_by('-date')
         else:
             employee_schedules = EmployeDailySchedule.objects.filter(
-                is_leave=False,
+                # is_leave=False,
                 employee=obj,
                 date__range=(month_start_date, month_end_date)
             ).order_by('-date')
@@ -1483,7 +1483,6 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
                 total_hours = 0
                 for schedule in employee_schedules:
                     total_hours += schedule.total_hours
-
                 total_earning += (total_hours * salary)
 
             return total_earning

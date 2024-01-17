@@ -6,7 +6,7 @@ from django.utils.timezone import now
 
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
-from Utility.models import Country, State, City, CommonField
+from Utility.models import Country, State, City, CommonField, Currency
 from Service.models import Service
 from NStyle.choices import EmployeeDailyInsightChoices
 
@@ -717,11 +717,25 @@ class GiftCards(models.Model):
                                  related_name='gift_card_location')
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)
+    custom_card = models.TextField(null=True)
+    price = models.FloatField(default=0, null=True)
+    retail_price = models.FloatField(default=0, null=True)
+
+
+class GiftDetail(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    gift_card = models.ForeignKey(GiftCards, on_delete=models.CASCADE, null=True)
+    price = models.FloatField(default=0, null=True)
+    retail_price = models.FloatField(default=0, null=True)
+    created_at = models.DateTimeField(auto_now_add=now, null=True)
+    updated_at = models.DateTimeField(null=True, blank=True)
+    currency = models.TextField(null=True)
+    currencies = models.ForeignKey(Currency , on_delete=models.CASCADE , null=True)
 
 
 class GiftDetails(models.Model):
     gift_card = models.ForeignKey(GiftCards, on_delete=models.CASCADE, null=True)
-    price = models.FloatField(default=0,null=True)
-    retail_price = models.FloatField(default=0,null=True)
+    price = models.FloatField(default=0, null=True)
+    retail_price = models.FloatField(default=0, null=True)
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)

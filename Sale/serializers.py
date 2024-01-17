@@ -2518,6 +2518,7 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
         except Exception as e:
             return str(e)
 
+    # Need to work on this to do cater subtotal to show on the frontend this is not showing for this.
     def get_subtotal(self, obj):
         try:
             if obj.coupon:

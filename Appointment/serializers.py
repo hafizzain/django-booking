@@ -468,7 +468,6 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                         'start_time': start_time,
                         'end_time': end_time,
                     })
-
         for exl_time in exluded_times:
             start_time = exl_time['start_time']
             end_time = exl_time['end_time']

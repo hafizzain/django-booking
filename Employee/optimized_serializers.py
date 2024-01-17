@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Employee
+from .models import Employee, GiftCards
 
 from Employee.Constants.total_sale import total_sale_employee
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
@@ -26,3 +26,9 @@ class OptimizedEmployeeSerializerDashboard(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields =['full_name', 'image', 'total_sale', 'employee_id']
+
+
+class GiftCardsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GiftCards
+        fields = "__all__"

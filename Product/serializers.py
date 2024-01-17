@@ -104,6 +104,13 @@ class CurrencyRetailPriceSerializer(serializers.ModelSerializer):
             return obj.currency.code
         except Exception as err:
             return str(err)
+
+    def get_currency(self, obj):
+
+        try:
+            return obj.currency.code
+        except Exception as err:
+            return str(err)
             
     class Meta:
         model = CurrencyRetailPrice
