@@ -14,7 +14,7 @@ urlpatterns = [
     path('get_employees/', views.get_Employees),
     path('get_employees_dropdown/', views.get_Employees_dropdown),
     path('get_employees_dashboard/', views.get_employees_dashboard),
-
+    path('update_gift_card/', views.update_gift_card),
     path('create_employee/', views.create_employee),
     path('delete_employee/', views.delete_employee),
     path('update_employee/', views.update_employee),
