@@ -12,6 +12,7 @@ urlpatterns = [
     path('get_single_employee/', views.get_single_employee),
     path('get_employees_mainpage/', views.get_employees_mainpage),
     path('get_employees/', views.get_Employees),
+    path('get_gift_card/',views.get_gift_card),
     path('get_employees_dropdown/', views.get_Employees_dropdown),
     path('get_employees_dashboard/', views.get_employees_dashboard),
     path('update_gift_card/', views.update_gift_card),

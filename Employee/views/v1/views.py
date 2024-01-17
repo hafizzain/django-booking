@@ -6936,23 +6936,6 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             }
             return Response(data, status=status.HTTP_200_OK)
 
-    def get(self, request, *args, **kwargs):
-        query_set = GiftCards.objects.all()
-        search_text = request.query_params.get('search_text', None)
-        if search_text:
-            return Response({"msg":"I am in "})
-            # query_set = GiftCards.objects.filter(title_i__contains=search_text)
-        serializer = GiftCardSerializerResponse(query_set, many=True).data
-        data = {
-            "success": True,
-            "status_code": 200,
-            "response": {
-                "message": "gift card get successfully",
-                "error_message": None,
-                "data": serializer.data
-            }
-        }
-        return Response(data, status=status.HTTP_200_OK)
 
     def delete(self, request, *args, **kwargs):
         id = request.query_params.get('id', None)
@@ -7046,6 +7029,24 @@ def update_gift_card(request):
     # else:
     #     return Response({"msg": "Id is None"}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['PATCH'])
+@permission_classes([AllowAny])
+def get_gift_card(request):
+        query_set = GiftCards.objects.all()
+        search_text = request.query_params.get('search_text', None)
+        if search_text:
+            query_set = GiftCards.objects.filter(title_i__contains=search_text)
+        serializer = GiftCardSerializerResponse(query_set, many=True).data
+        data = {
+            "success": True,
+            "status_code": 200,
+            "response": {
+                "message": "gift card get successfully",
+                "error_message": None,
+                "data": serializer.data
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)
 
 def get_detail_from_code(request):
     code = request.data.get('code', None)
