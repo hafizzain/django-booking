@@ -6879,7 +6879,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         title = request.data.get('title', None)
-        validity = request.data.get('validity', None)
+        validity = request.data.get('valid_till', None)
         code = request.data.get('code', None)
         currency_gift_card_price = request.data.get('currency_gift_card_price', [])
         description = request.data.get('description', None)
@@ -6962,7 +6962,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         currency_gift_card_price = request.data.get('currency_gift_card_price', [])
         instance = GiftCards.objects.get(id=id)
         instance.title = request.data.get('title', None)
-        instance.validity = request.data.get('validity', None)
+        instance.valid_till = request.data.get('valid_till', None)
         instance.code = request.data.get('code', None)
         instance.currency_gift_card_price = request.data.get('currency_gift_card_price', [])
         instance.description = request.data.get('description', None)
