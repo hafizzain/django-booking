@@ -6946,7 +6946,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             "success": True,
             "status_code": 200,
             "response": {
-                "message": "gift card getsds successfully",
+                "message": "gift card get successfully",
                 "error_message": None,
                 "data": serializer.data
             }
