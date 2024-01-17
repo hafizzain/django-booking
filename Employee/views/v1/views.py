@@ -7044,7 +7044,7 @@ def get_detail_from_code(request):
             "success": True,
             "status_code": 200,
             "response": {
-                "message": "gift card getsds successfully",
+                "message": "gift card get successfully",
                 "error_message": None,
                 "data": serializer.data
             }
