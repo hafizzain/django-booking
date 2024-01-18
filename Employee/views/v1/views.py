@@ -6643,10 +6643,14 @@ def get_weekend_management(request):
     try:
         id = request.query_params.get('id', False)
         month = request.query_params.get('month',None)
+        year = request.query_params.get('year',None)
         if id:
-            weekend = WeekManagement.objects.filter(id=id)
+            filters = Q(id=id)
+            if year:
+                filters &= Q(created_at__year=year)
             if month:
-                 weekend = weekend.filter(created_at__month=month)
+                filters &= Q(created_at__month=month)
+            weekend = WeekManagement.objects.filter(filters)
             weekend = WeekendManagementSerializer(weekend, many=True)
             return Response(
                 {
