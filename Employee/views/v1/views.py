@@ -4874,10 +4874,8 @@ def create_workingschedule(request):
             except :
                 leave_object = LeaveManagements.objects.create(employee_id=employee_id.id)
             if type_of_vacation == 'casual':
-                # return Response({"msg": "I am in casual"})
                 leave_object.casual_leave += 1
                 leave_object.save()
-                # return Response({"msg":leave_object.casual_leave})
             if type_of_sceduale == 'medical':
                 # return Response({"msg":"I am in medical"})
                 leave_object.medical_leave += 1
@@ -4886,6 +4884,18 @@ def create_workingschedule(request):
                 # return Response({"msg": "I am in annual"})
                 leave_object.annual_leave += 1
                 leave_object.save()
+            # except:
+            #     is_leo_day_created = LeaveManagements.objects.create(employee_id=employee_id.id)
+            #     is_leo_day_created.casual_leave += 1
+            #     is_leo_day_created.save()
+
+        if type_of_sceduale == 'weekend':
+            try:
+                leave_object = LeaveManagements.objects.get(employee_id=employee_id.id)
+            except :
+                leave_object = LeaveManagements.objects.create(employee_id=employee_id.id)
+            leave_object.leo_leave += 1
+            leave_object.save()
             # except:
             #     is_leo_day_created = LeaveManagements.objects.create(employee_id=employee_id.id)
             #     is_leo_day_created.casual_leave += 1
