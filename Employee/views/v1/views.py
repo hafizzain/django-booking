@@ -4699,6 +4699,7 @@ def create_workingschedule(request):
     is_leave = request.data.get('is_leave', None)
     is_off = request.data.get('is_off', None)
     leo_value = request.data.get('is_leo_day', None)
+    location_for_weekend = request.data.get('location_for_weekend', None)
     is_working_schedule = request.data.get('is_working_schedule', None)
     week_end_employee = request.data.get('week_end_employee', [])
     if is_weekend is not None and leo_value is None and is_working_schedule is None:
@@ -4738,11 +4739,14 @@ def create_workingschedule(request):
             working_sch = EmployeDailySchedule.objects.filter(employee_id=employee, date=date).first()
             if working_sch:
                 working_sch.is_weekend = True
+                working_sch.location_id= location_for_weekend
                 working_sch.save()
+
                 schedule_ids.append(working_sch.id)
 
             else:
                 workings = EmployeDailySchedule.objects.create(
+                    location_id=location_for_weekend,
                     user=user,
                     business=business,
                     employee=employee,
