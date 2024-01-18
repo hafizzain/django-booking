@@ -647,6 +647,7 @@ def create_appointment(request):
 
     all_members = []
     employee_users = []
+    service_appointments = []
     for appoinmnt in appointments:
         member = appoinmnt['member']
         service = appoinmnt['service']
@@ -816,6 +817,7 @@ def create_appointment(request):
         if business_address_id is not None:
             appointment_service.business_address = business_address
             appointment_service.save()
+            service_appointments.append(appointment_service.id)
 
         LogDetails.objects.create(
             log=appointment_logs,
@@ -898,6 +900,7 @@ def create_appointment(request):
                 'error_message': None,
                 'error': Errors,
                 'appointment_id':appointment.id,
+                'appointment_service_id': service_appointments[0]
                 'appointments': serialized.data,
             }
         },
