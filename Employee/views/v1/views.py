@@ -1343,7 +1343,7 @@ def update_employee(request):
     emp_email = request.data.get('email')
     can_refund = request.data.get('can_refund', False)
 
-    leave_data = request.data.get('leave_data', [])
+    leave_data = request.data.get('leave_data', None)
     lev_id = 0
 
     # emp = Employee.objects.get(id=id)
@@ -1387,36 +1387,36 @@ def update_employee(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    if len(leave_data) > 0:
-        leave_data = json.loads(leave_data)
-        leave_management = LeaveManagements.objects.filter(employee_id=id)
-        if leave_management:
-            leave_management.update(
-                operational_casual_leave=leave_data.get('operational_casual_leave', 0),
-                operational_annual_leave=leave_data.get('operational_annual_leave', 0),
-                operational_medical_leave=leave_data.get('operational_medical_leave', 0),
-                number_of_months=leave_data.get('number_of_months', 0),
-            )
-            leave_managements = LeaveManagements.objects.get(employee_id=id)
-            leave_managements.casual_leave += leave_managements.operational_casual_leave - leave_managements.casual_leave
-            leave_managements.medical_leave += leave_managements.operational_medical_leave - leave_managements.medical_leave
-            leave_managements.annual_leave += leave_managements.operational_annual_leave - leave_managements.annual_leave
-            leave_managements.save()
-            return Response({"msg": "casual leave", "data": leave_managements.casual_leave})
-
-
-        else:
-            leave_management = LeaveManagements.objects.create(
-                employee_id=employee.id,
-                number_of_months=leave_data.get('number_of_months', 0),
-                operational_casual_leave=leave_data.get('casual_leave', 0),
-                operational_medical_leave=leave_data.get('medical_leave', 0),
-                operational_annual_leave=leave_data.get('annual_leave', 0)
-            )
-            leave_management.casual_leave += leave_management.operational_casual_leave - leave_management.casual_leave
-            leave_management.medical_leave += leave_management.operational_medical_leave - leave_management.medical_leave
-            leave_management.annual_leave += leave_management.operational_annual_leave - leave_management.annual_leave
-            leave_management.save()
+    if leave_data:
+        return Response({"msg": "casual leave")
+        # leave_data = json.loads(leave_data)
+        # leave_management = LeaveManagements.objects.filter(employee_id=id)
+        # if leave_management:
+        #     leave_management.update(
+        #         operational_casual_leave=leave_data.get('operational_casual_leave', 0),
+        #         operational_annual_leave=leave_data.get('operational_annual_leave', 0),
+        #         operational_medical_leave=leave_data.get('operational_medical_leave', 0),
+        #         number_of_months=leave_data.get('number_of_months', 0),
+        #     )
+        #     leave_managements = LeaveManagements.objects.get(employee_id=id)
+        #     leave_managements.casual_leave += leave_managements.operational_casual_leave - leave_managements.casual_leave
+        #     leave_managements.medical_leave += leave_managements.operational_medical_leave - leave_managements.medical_leave
+        #     leave_managements.annual_leave += leave_managements.operational_annual_leave - leave_managements.annual_leave
+        #     leave_managements.save()
+        #
+        #
+        # else:
+        #     leave_management = LeaveManagements.objects.create(
+        #         employee_id=employee.id,
+        #         number_of_months=leave_data.get('number_of_months', 0),
+        #         operational_casual_leave=leave_data.get('casual_leave', 0),
+        #         operational_medical_leave=leave_data.get('medical_leave', 0),
+        #         operational_annual_leave=leave_data.get('annual_leave', 0)
+        #     )
+        #     leave_management.casual_leave += leave_management.operational_casual_leave - leave_management.casual_leave
+        #     leave_management.medical_leave += leave_management.operational_medical_leave - leave_management.medical_leave
+        #     leave_management.annual_leave += leave_management.operational_annual_leave - leave_management.annual_leave
+        #     leave_management.save()
 
     try:
         staff = StaffGroup.objects.get(employees=id)
