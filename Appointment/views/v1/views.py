@@ -900,7 +900,7 @@ def create_appointment(request):
                 'error_message': None,
                 'error': Errors,
                 'appointment_id':appointment.id,
-                'appointment_service_id': service_appointments[0]
+                'appointment_service_id': service_appointments[0],
                 'appointments': serialized.data,
             }
         },
