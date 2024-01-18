@@ -733,11 +733,6 @@ def get_workingschedule(request):
             status=status.HTTP_200_OK
         )
     else:
-        # filters = Q(is_weekend=True)
-        # if year:
-        #     filters &= Q(created_at__year=year)
-        # if month:
-        #     filters &= Q(created_at__month=month)
         employee_ids_in_schedule = EmployeDailySchedule.objects.filter(is_weekend=True,from_date__year=year,from_date__month=month,location_id=location_id)
         serialized = ScheduleSerializerResponse(employee_ids_in_schedule, many=True, context={'request': request,
                                                                                               'location_id': location_id})
@@ -4352,6 +4347,7 @@ def create_vacation_emp(request):
                 working_sch.save()
             else:
                 working_schedule = EmployeDailySchedule.objects.create(
+                    vacation= empl_vacation,
                     user=user,
                     business=business,
                     employee=employee_id,
@@ -4695,6 +4691,9 @@ def create_workingschedule(request):
     note = request.data.get('note', None)
     max_records = 2
     is_vacation = request.data.get('is_vacation', None)
+    type_of_sceduale = request.data.get('type', None)
+    type_of_vacation = request.data.get('type_of_vacation')
+    id_to_maintain = request.data.get('id_to_maintain',None)
     is_weekend = request.data.get('is_weekend', None)
     is_leave = request.data.get('is_leave', None)
     is_off = request.data.get('is_off', None)
@@ -4867,6 +4866,7 @@ def create_workingschedule(request):
         working_schedule.vacation_status = None
         working_schedule.save()
         try:
+            if type_of_sceduale == 'vacation':
             is_leo_day_update = LeaveManagements.objects.get(employee_id=employee_id.id)
             is_leo_day_update.leo_leave += 1
             is_leo_day_update.save()
