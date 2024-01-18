@@ -217,11 +217,10 @@ class AppointmentServiceCustomManager(models.QuerySet):
         sum_filter=Q(appointment__appointment_services__status__in=status_list)
         return self.annotate(
             subtotal=Coalesce(
-                Sum('appointment__appointment_services__price', filter=sum_filter),
+                Sum(F('appointment__appointment_services__price'), filter=sum_filter),
                 0.0,
                 output_field=FloatField()
             ),
-            
         )
         
     def get_active_appointment_services(self, *args, **kwargs):
