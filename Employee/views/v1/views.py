@@ -733,7 +733,8 @@ def get_workingschedule(request):
             status=status.HTTP_200_OK
         )
     else:
-        employee_ids_in_schedule = EmployeDailySchedule.objects.filter(is_weekend=True,from_date__year=year,from_date__month=month,location_id=location_id)
+        employee_ids_in_schedule = EmployeDailySchedule.objects.filter(is_weekend=True, from_date__year=year,
+                                                                       from_date__month=month, location_id=location_id)
         serialized = ScheduleSerializerResponse(employee_ids_in_schedule, many=True, context={'request': request,
                                                                                               'location_id': location_id})
 
@@ -4347,7 +4348,7 @@ def create_vacation_emp(request):
                 working_sch.save()
             else:
                 working_schedule = EmployeDailySchedule.objects.create(
-                    vacation= empl_vacation,
+                    vacation=empl_vacation,
                     user=user,
                     business=business,
                     employee=employee_id,
@@ -4409,96 +4410,123 @@ def create_vacation_emp(request):
 @permission_classes([AllowAny])
 def update_vacation_status(request):
     try:
+        type_of_sceduale = request.data.get('type', None)
+        type_of_vacation = request.data.get('type_of_vacation', None)
         business_id = request.data.get('business', None)
         employee = request.data.get('employee', None)
         vacation_id = request.data.get('vacation_id', None)
         vacation_status = request.data.get('vacation_status', None)
         vacation_type = request.data.get('vacation_type', None)
         total_days_to_detect = request.data.get('total_days_to_detect', None)
+        created_from_dashboard = request.data.get('created_from_dashboard', None)
         if total_days_to_detect is not None:
             total_days_to_detect = int(total_days_to_detect)
         if vacation_status == 'accepted':
-            leave_managements = LeaveManagements.objects.get(employee_id=employee)
-            if vacation_type == 'casual':
-                if leave_managements.casual_leave == 0:
-                    return Response(
-                        {
-                            'status': 200,
-                            'status_code': '200',
-                            'response': {
-                                'message': 'Cannot update the casual leaves',
-                                'error_message': None,
-                                'data': []
-                            }
-                        },
-                        status=status.HTTP_200_OK
-                    )
-                leave_managements.casual_leave -= total_days_to_detect
-                leave_managements.save()
-            if vacation_type == 'annual':
-                if leave_managements.annual_leave == 0:
-                    return Response(
-                        {
-                            'status': 200,
-                            'status_code': '200',
-                            'response': {
-                                'message': 'Cannot update the annual_leaves',
-                                'error_message': None,
-                                'data': []
-                            }
-                        },
-                        status=status.HTTP_200_OK
-                    )
-                leave_managements.annual_leave -= total_days_to_detect
-                leave_managements.save()
-            if vacation_type == 'medical':
-                if leave_managements.medical_leave == 0:
-                    return Response(
-                        {
-                            'status': 200,
-                            'status_code': '200',
-                            'response': {
-                                'message': 'Cannot update the annual_leaves',
-                                'error_message': None,
-                                'data': []
-                            }
-                        },
-                        status=status.HTTP_200_OK
-                    )
-                leave_managements.medical_leave -= total_days_to_detect
-                leave_managements.save()
-            if vacation_type == 'leo_day':
-                if leave_managements.leo_leave == 0:
-                    return Response(
-                        {
-                            'status': 200,
-                            'status_code': '200',
-                            'response': {
-                                'message': 'Cannot update the annual_leaves',
-                                'error_message': None,
-                                'data': []
-                            }
-                        },
-                        status=status.HTTP_200_OK
-                    )
-                leave_managements.leo_leave -= total_days_to_detect
-                leave_managements.save()
-            vacations = Vacation.objects.filter(id=vacation_id)
-            vacations.update(vacation_status='accepted')
-            EmployeDailySchedule.objects.filter(vacation_id=vacation_id).update(is_display=True,
-                                                                                vacation_status='accepted')
-            return Response(
-                {
-                    'status': 200,
-                    'status_code': '200',
-                    'response': {
-                        'message': 'Vacation updated successfully',
-                        'error_message': None,
-                        'data': []
-                    }
-                },
-                status=status.HTTP_200_OK
-            )
+            leave_object = LeaveManagements.objects.get(employee_id=employee)
+            if created_from_dashboard == 'true':
+                if type_of_vacation == 'casual':
+                    leave_object.casual_leave += 1
+                    leave_object.save()
+                if type_of_sceduale == 'medical':
+                    leave_object.medical_leave += 1
+                    leave_object.save()
+                if type_of_sceduale == 'annual':
+                    leave_object.annual_leave += 1
+                    leave_object.save()
+                return Response(
+                    {
+                        'status': 200,
+                        'status_code': '200',
+                        'response': {
+                            'message': 'Vacation updated successfully',
+                            'error_message': None,
+                            'data': []
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+            else:
+                leave_managements = LeaveManagements.objects.get(employee_id=employee)
+                if vacation_type == 'casual':
+                    if leave_managements.casual_leave == 0:
+                        return Response(
+                            {
+                                'status': 200,
+                                'status_code': '200',
+                                'response': {
+                                    'message': 'Cannot update the casual leaves',
+                                    'error_message': None,
+                                    'data': []
+                                }
+                            },
+                            status=status.HTTP_200_OK
+                        )
+                    leave_managements.casual_leave -= total_days_to_detect
+                    leave_managements.save()
+                if vacation_type == 'annual':
+                    if leave_managements.annual_leave == 0:
+                        return Response(
+                            {
+                                'status': 200,
+                                'status_code': '200',
+                                'response': {
+                                    'message': 'Cannot update the annual_leaves',
+                                    'error_message': None,
+                                    'data': []
+                                }
+                            },
+                            status=status.HTTP_200_OK
+                        )
+                    leave_managements.annual_leave -= total_days_to_detect
+                    leave_managements.save()
+                if vacation_type == 'medical':
+                    if leave_managements.medical_leave == 0:
+                        return Response(
+                            {
+                                'status': 200,
+                                'status_code': '200',
+                                'response': {
+                                    'message': 'Cannot update the annual_leaves',
+                                    'error_message': None,
+                                    'data': []
+                                }
+                            },
+                            status=status.HTTP_200_OK
+                        )
+                    leave_managements.medical_leave -= total_days_to_detect
+                    leave_managements.save()
+                if vacation_type == 'leo_day':
+                    if leave_managements.leo_leave == 0:
+                        return Response(
+                            {
+                                'status': 200,
+                                'status_code': '200',
+                                'response': {
+                                    'message': 'Cannot update the annual_leaves',
+                                    'error_message': None,
+                                    'data': []
+                                }
+                            },
+                            status=status.HTTP_200_OK
+                        )
+                    leave_managements.leo_leave -= total_days_to_detect
+                    leave_managements.save()
+                vacations = Vacation.objects.filter(id=vacation_id)
+                vacations.update(vacation_status='accepted')
+                EmployeDailySchedule.objects.filter(vacation_id=vacation_id).update(is_display=True,
+                                                                                    vacation_status='accepted')
+                return Response(
+                    {
+                        'status': 200,
+                        'status_code': '200',
+                        'response': {
+                            'message': 'Vacation updated successfully',
+                            'error_message': None,
+                            'data': []
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
         if vacation_status == 'declined':
             aval_vacations = Vacation.objects.filter(id=vacation_id)
             vacations = Vacation.objects.filter(id=vacation_id)
@@ -4692,8 +4720,8 @@ def create_workingschedule(request):
     max_records = 2
     is_vacation = request.data.get('is_vacation', None)
     type_of_sceduale = request.data.get('type', None)
-    type_of_vacation = request.data.get('type_of_vacation',None)
-    id_to_maintain = request.data.get('id_to_maintain',None)
+    type_of_vacation = request.data.get('type_of_vacation', None)
+    id_to_maintain = request.data.get('id_to_maintain', None)
     is_weekend = request.data.get('is_weekend', None)
     is_leave = request.data.get('is_leave', None)
     is_off = request.data.get('is_off', None)
@@ -4738,7 +4766,7 @@ def create_workingschedule(request):
             working_sch = EmployeDailySchedule.objects.filter(employee_id=employee, date=date).first()
             if working_sch:
                 working_sch.is_weekend = True
-                working_sch.location_id= location_for_weekend
+                working_sch.location_id = location_for_weekend
                 working_sch.save()
 
                 schedule_ids.append(working_sch.id)
@@ -4868,7 +4896,7 @@ def create_workingschedule(request):
         if type_of_sceduale == 'vacation':
             try:
                 leave_object = LeaveManagements.objects.get(employee_id=employee_id.id)
-            except :
+            except:
                 leave_object = LeaveManagements.objects.create(employee_id=employee_id.id)
                 if type_of_vacation == 'casual':
                     leave_object.casual_leave += 1
@@ -6957,7 +6985,6 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             }
             return Response(data, status=status.HTTP_200_OK)
 
-
     def delete(self, request, *args, **kwargs):
         id = request.query_params.get('id', None)
         if id is not None:
@@ -7050,24 +7077,26 @@ def update_gift_card(request):
     # else:
     #     return Response({"msg": "Id is None"}, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_gift_card(request):
-        query_set = GiftCards.objects.all()
-        search_text = request.query_params.get('search_text', None)
-        if search_text:
-            query_set = GiftCards.objects.filter(title_i__contains=search_text)
-        serializer = GiftCardSerializerResponse(query_set, many=True).data
-        data = {
-            "success": True,
-            "status_code": 200,
-            "response": {
-                "message": "gift card get successfully",
-                "error_message": None,
-                "results": serializer
-            }
+    query_set = GiftCards.objects.all()
+    search_text = request.query_params.get('search_text', None)
+    if search_text:
+        query_set = GiftCards.objects.filter(title_i__contains=search_text)
+    serializer = GiftCardSerializerResponse(query_set, many=True).data
+    data = {
+        "success": True,
+        "status_code": 200,
+        "response": {
+            "message": "gift card get successfully",
+            "error_message": None,
+            "results": serializer
         }
-        return Response(data, status=status.HTTP_200_OK)
+    }
+    return Response(data, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -7087,56 +7116,9 @@ def get_detail_from_code(request):
         }
         return Response(data, status=status.HTTP_200_OK)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # for i in num_list:
 #     if i[0]
-    # for j in collection:
-    #     if  i ==0:
-    #         collection.append(i)
-    #     if
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# for j in collection:
+#     if  i ==0:
+#         collection.append(i)
+#     if
