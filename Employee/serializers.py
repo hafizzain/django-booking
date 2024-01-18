@@ -1000,8 +1000,13 @@ class HolidaysSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class VacationSerializerResponse(serializers.ModelSerializer):
+    class Meta:
+        model = Vacation
+        fields= "__all__"
 class ScheduleSerializerOP(serializers.ModelSerializer):
     is_holidays = serializers.SerializerMethodField(read_only=True)
+    vacation = VacationSerializerResponse()
 
     def get_is_holidays(self, obj):
         pass
