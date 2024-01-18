@@ -733,7 +733,8 @@ def get_workingschedule(request):
             status=status.HTTP_200_OK
         )
     else:
-        employee_ids_in_schedule = EmployeDailySchedule.objects.filter(is_weekend=True,from_date__year=year,from_date__month=month,location_id=location_id)
+        employee_ids_in_schedule = EmployeDailySchedule.objects.filter(is_weekend=True, from_date__year=year,
+                                                                       from_date__month=month, location_id=location_id)
         serialized = ScheduleSerializerResponse(employee_ids_in_schedule, many=True, context={'request': request,
                                                                                               'location_id': location_id})
 
@@ -1125,12 +1126,12 @@ def create_employee(request):
         leave_data = json.loads(leave_data)
         leave_management = LeaveManagements.objects.create(
             employee_id=employee.id,
-            casual_leave=leave_data.get('casual_leave', 0),
-            annual_leave=leave_data.get('annual_leave', 0),
-            medical_leave=leave_data.get('medical_leave', 0),
-            operational_casual_leave=leave_data.get('casual_leave', 0),
-            operational_annual_leave=leave_data.get('annual_leave', 0),
-            operational_medical_leave=leave_data.get('medical_leave', 0),
+            operational_casual_leave=leave_data.get('operational_casual_leave', 0),
+            operational_annual_leave=leave_data.get('operational_annual_leave', 0),
+            operational_medical_leave=leave_data.get('operational_medical_leave', 0),
+            # operational_casual_leave=leave_data.get('casual_leave', 0),
+            # operational_annual_leave=leave_data.get('annual_leave', 0),
+            # operational_medical_leave=leave_data.get('medical_leave', 0),
             number_of_months=leave_data.get('number_of_months', 0)
         )
         leave_data = LeaveManagementSerializer(leave_management, many=False)
@@ -1391,25 +1392,30 @@ def update_employee(request):
         leave_management = LeaveManagements.objects.filter(employee_id=id)
         if leave_management:
             leave_management.update(
-                operational_casual_leave=leave_data.get('casual_leave', 0),
-                operational_annual_leave=leave_data.get('annual_leave', 0),
-                operational_medical_leave=leave_data.get('medical_leave', 0),
+                operational_casual_leave=leave_data.get('operational_casual_leave', 0),
+                operational_annual_leave=leave_data.get('operational_annual_leave', 0),
+                operational_medical_leave=leave_data.get('operational_medical_leave', 0),
                 number_of_months=leave_data.get('number_of_months', 0),
-                casual_leave=leave_data.get('casual_leave', 0),
-                annual_leave=leave_data.get('annual_leave', 0),
-                medical_leave=leave_data.get('medical_leave', 0)
             )
+            leave_management = LeaveManagements.objects.get(employee_id=id)
+            leave_management.casual_leave += leave_management.operational_casual_leave - leave_management.casual_leave
+            leave_management.medical_leave += leave_management.operational_medical_leave - leave_management.medical_leave
+            leave_management.annual_leave += leave_management.operational_annual_leave - leave_management.annual_leave
+            leave_management.save()
+
+
         else:
             leave_management = LeaveManagements.objects.create(
                 employee_id=employee.id,
-                casual_leave=leave_data.get('casual_leave', 0),
-                annual_leave=leave_data.get('annual_leave', 0),
-                medical_leave=leave_data.get('medical_leave', 0),
                 number_of_months=leave_data.get('number_of_months', 0),
                 operational_casual_leave=leave_data.get('casual_leave', 0),
                 operational_medical_leave=leave_data.get('medical_leave', 0),
                 operational_annual_leave=leave_data.get('annual_leave', 0)
             )
+            leave_management.casual_leave += leave_management.operational_casual_leave - leave_management.casual_leave
+            leave_management.medical_leave += leave_management.operational_medical_leave - leave_management.medical_leave
+            leave_management.annual_leave += leave_management.operational_annual_leave - leave_management.annual_leave
+            leave_management.save()
 
     try:
         staff = StaffGroup.objects.get(employees=id)
@@ -4347,7 +4353,7 @@ def create_vacation_emp(request):
                 working_sch.save()
             else:
                 working_schedule = EmployeDailySchedule.objects.create(
-                    vacation= empl_vacation,
+                    vacation=empl_vacation,
                     user=user,
                     business=business,
                     employee=employee_id,
@@ -4417,7 +4423,7 @@ def update_vacation_status(request):
         vacation_status = request.data.get('vacation_status', None)
         vacation_type = request.data.get('vacation_type', None)
         total_days_to_detect = request.data.get('total_days_to_detect', None)
-        created_from_dashboard = request.data.get('created_from_dashboard',None)
+        created_from_dashboard = request.data.get('created_from_dashboard', None)
         if total_days_to_detect is not None:
             total_days_to_detect = int(total_days_to_detect)
         if vacation_status == 'accepted':
@@ -4695,8 +4701,8 @@ def create_workingschedule(request):
     max_records = 2
     is_vacation = request.data.get('is_vacation', None)
     type_of_sceduale = request.data.get('type', None)
-    type_of_vacation = request.data.get('type_of_vacation',None)
-    id_to_maintain = request.data.get('id_to_maintain',None)
+    type_of_vacation = request.data.get('type_of_vacation', None)
+    id_to_maintain = request.data.get('id_to_maintain', None)
     is_weekend = request.data.get('is_weekend', None)
     is_leave = request.data.get('is_leave', None)
     is_off = request.data.get('is_off', None)
@@ -4741,7 +4747,7 @@ def create_workingschedule(request):
             working_sch = EmployeDailySchedule.objects.filter(employee_id=employee, date=date).first()
             if working_sch:
                 working_sch.is_weekend = True
-                working_sch.location_id= location_for_weekend
+                working_sch.location_id = location_for_weekend
                 working_sch.save()
 
                 schedule_ids.append(working_sch.id)
@@ -4871,7 +4877,7 @@ def create_workingschedule(request):
         if type_of_sceduale == 'vacation':
             try:
                 leave_object = LeaveManagements.objects.get(employee_id=employee_id.id)
-            except :
+            except:
                 leave_object = LeaveManagements.objects.create(employee_id=employee_id.id)
             if type_of_vacation == 'casual':
                 leave_object.casual_leave += 1
@@ -4885,7 +4891,7 @@ def create_workingschedule(request):
         if type_of_sceduale == 'weekend':
             try:
                 leave_object = LeaveManagements.objects.get(employee_id=employee_id.id)
-            except :
+            except:
                 leave_object = LeaveManagements.objects.create(employee_id=employee_id.id)
             leave_object.leo_leave += 1
             leave_object.save()
@@ -6963,7 +6969,6 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             }
             return Response(data, status=status.HTTP_200_OK)
 
-
     def delete(self, request, *args, **kwargs):
         id = request.query_params.get('id', None)
         if id is not None:
@@ -7056,24 +7061,26 @@ def update_gift_card(request):
     # else:
     #     return Response({"msg": "Id is None"}, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_gift_card(request):
-        query_set = GiftCards.objects.all()
-        search_text = request.query_params.get('search_text', None)
-        if search_text:
-            query_set = GiftCards.objects.filter(title_i__contains=search_text)
-        serializer = GiftCardSerializerResponse(query_set, many=True).data
-        data = {
-            "success": True,
-            "status_code": 200,
-            "response": {
-                "message": "gift card get successfully",
-                "error_message": None,
-                "results": serializer
-            }
+    query_set = GiftCards.objects.all()
+    search_text = request.query_params.get('search_text', None)
+    if search_text:
+        query_set = GiftCards.objects.filter(title_i__contains=search_text)
+    serializer = GiftCardSerializerResponse(query_set, many=True).data
+    data = {
+        "success": True,
+        "status_code": 200,
+        "response": {
+            "message": "gift card get successfully",
+            "error_message": None,
+            "results": serializer
         }
-        return Response(data, status=status.HTTP_200_OK)
+    }
+    return Response(data, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -7093,56 +7100,9 @@ def get_detail_from_code(request):
         }
         return Response(data, status=status.HTTP_200_OK)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # for i in num_list:
 #     if i[0]
-    # for j in collection:
-    #     if  i ==0:
-    #         collection.append(i)
-    #     if
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# for j in collection:
+#     if  i ==0:
+#         collection.append(i)
+#     if
