@@ -1388,7 +1388,7 @@ def update_employee(request):
             status=status.HTTP_404_NOT_FOUND
         )
     if leave_data:
-        return Response({"msg": "casual leave")
+        return Response({"msg": "casual leave"})
         # leave_data = json.loads(leave_data)
         # leave_management = LeaveManagements.objects.filter(employee_id=id)
         # if leave_management:
