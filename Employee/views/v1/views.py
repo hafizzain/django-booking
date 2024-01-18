@@ -4692,7 +4692,7 @@ def create_workingschedule(request):
     max_records = 2
     is_vacation = request.data.get('is_vacation', None)
     type_of_sceduale = request.data.get('type', None)
-    type_of_vacation = request.data.get('type_of_vacation')
+    type_of_vacation = request.data.get('type_of_vacation',None)
     id_to_maintain = request.data.get('id_to_maintain',None)
     is_weekend = request.data.get('is_weekend', None)
     is_leave = request.data.get('is_leave', None)
@@ -4865,16 +4865,24 @@ def create_workingschedule(request):
         working_schedule.is_weekend = False
         working_schedule.vacation_status = None
         working_schedule.save()
-        try:
-            if type_of_sceduale == 'vacation':
-                pass
-            is_leo_day_update = LeaveManagements.objects.get(employee_id=employee_id.id)
-            is_leo_day_update.leo_leave += 1
-            is_leo_day_update.save()
-        except:
-            is_leo_day_created = LeaveManagements.objects.create(employee_id=employee_id.id)
-            is_leo_day_created.leo_leave += 1
-            is_leo_day_created.save()
+        if type_of_sceduale == 'vacation':
+            try:
+                leave_object = LeaveManagements.objects.get(employee_id=employee_id.id)
+            except :
+                leave_object = LeaveManagements.objects.create(employee_id=employee_id.id)
+                if type_of_vacation == 'casual':
+                    leave_object.casual_leave += 1
+                    leave_object.save()
+                if type_of_sceduale == 'medical':
+                    leave_object.medical_leave += 1
+                    leave_object.save()
+                if type_of_sceduale == 'annual':
+                    leave_object.annual_leave += 1
+                    leave_object.save()
+            # except:
+            #     is_leo_day_created = LeaveManagements.objects.create(employee_id=employee_id.id)
+            #     is_leo_day_created.casual_leave += 1
+            #     is_leo_day_created.save()
 
         serializers = ScheduleSerializer(working_schedule, context={'request': request})
 
