@@ -2526,8 +2526,7 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
                 total = float(obj.subtotal) - float(obj.coupon_discounted_price)
                 return total
             else:
-                service_subtotal =  AppointmentCheckout.objects.filter(appointment = obj.appointment).with_subtotal()\
-                    .aggregate(final_subtotal=Coalesce(Sum('subtotal'), 0.0))['final_subtotal']
+                service_subtotal=AppointmentCheckout.objects.filter(appointment=obj.appointment).with_appointment_subtotal().aggregate(final_subtotal=Coalesce(Sum('subtotal'), 0.0))['final_subtotal']
                 return service_subtotal
         except Exception as e:
             return {'error': str(e)}
