@@ -899,8 +899,8 @@ def create_appointment(request):
                 'message': 'Appointment Create!',
                 'error_message': None,
                 'error': Errors,
-                'id': new_appointment.id,
-                # 'appointment_id' :  appointment_service.appointment,
+                'id': appointment_service.id,
+                'appointment_id' : new_appointment.id,
                 'appointments': serialized.data,
             }
         },
