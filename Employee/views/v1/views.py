@@ -697,6 +697,8 @@ def get_workingschedule(request):
     start_date = request.query_params.get('start_date', None)
     end_date = request.query_params.get('end_date', None)
     location_id = request.query_params.get('location_id', None)
+    month = request.query_params.get('month', None)
+    year = request.query_params.get('year', None)
     # is_vacation = request.query_params.get('is_vacation',None)
 
     if is_weekend is None:
@@ -731,7 +733,12 @@ def get_workingschedule(request):
             status=status.HTTP_200_OK
         )
     else:
-        employee_ids_in_schedule = EmployeDailySchedule.objects.filter(is_weekend=True)
+        filters = Q(is_weekend=True)
+        if year:
+            filters &= Q(created_at__year=year)
+        if month:
+            filters &= Q(created_at__month=month)
+        employee_ids_in_schedule = EmployeDailySchedule.objects.filter(filters)
         serialized = ScheduleSerializerResponse(employee_ids_in_schedule, many=True, context={'request': request,
                                                                                               'location_id': location_id})
 
@@ -6642,15 +6649,8 @@ def update_weekend_management(request):
 def get_weekend_management(request):
     try:
         id = request.query_params.get('id', False)
-        month = request.query_params.get('month',None)
-        year = request.query_params.get('year',None)
         if id:
-            filters = Q(id=id)
-            if year:
-                filters &= Q(created_at__year=year)
-            if month:
-                filters &= Q(created_at__month=month)
-            weekend = WeekManagement.objects.filter(filters)
+            weekend = WeekManagement.objects.filter(id=id)
             weekend = WeekendManagementSerializer(weekend, many=True)
             return Response(
                 {
@@ -7073,3 +7073,57 @@ def get_detail_from_code(request):
             }
         }
         return Response(data, status=status.HTTP_200_OK)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# for i in num_list:
+#     if i[0]
+    # for j in collection:
+    #     if  i ==0:
+    #         collection.append(i)
+    #     if
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
