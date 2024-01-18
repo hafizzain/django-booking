@@ -204,29 +204,29 @@ class Appointment(models.Model):
 
 class AppointmentServiceCustomManager(models.QuerySet):
 
-    def with_subtotal(self):
-        """
-        Return the subtotal.
-        subtotal: total_price + gst_price + gst_price1
-        """
-        status_list = [
-            AppointmentServiceStatus.STARTED, 
-            AppointmentServiceStatus.FINISHED,
-            AppointmentServiceStatus.BOOKED
-        ]
-        sum_filter=Q(appointment__appointment_services__status__in=status_list)
-        return self.annotate(
-            subtotal=Coalesce(
-                Sum('appointment__appointment_services__price', filter=sum_filter),
-                0.0,
-                output_field=FloatField()
-            ),
-            just_services_price_inside=Coalesce(
-                Sum(F('appointment__appointment_services__price'), filter=sum_filter),
-                0.0,
-                output_field=FloatField()
-            ),
-        )
+    # def with_subtotal(self):
+    #     """
+    #     Return the subtotal.
+    #     subtotal: total_price + gst_price + gst_price1
+    #     """
+    #     status_list = [
+    #         AppointmentServiceStatus.STARTED, 
+    #         AppointmentServiceStatus.FINISHED,
+    #         AppointmentServiceStatus.BOOKED
+    #     ]
+    #     sum_filter=Q(appointment__appointment_services__status__in=status_list)
+    #     return self.annotate(
+    #         subtotal=Coalesce(
+    #             Sum('appointment__appointment_services__price', filter=sum_filter),
+    #             0.0,
+    #             output_field=FloatField()
+    #         ),
+    #         just_services_price_inside=Coalesce(
+    #             Sum(F('appointment__appointment_services__price'), filter=sum_filter),
+    #             0.0,
+    #             output_field=FloatField()
+    #         ),
+    #     )
     def get_active_appointment_services(self, *args, **kwargs):
         return self.filter(
             status__in = [
