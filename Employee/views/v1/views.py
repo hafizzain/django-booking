@@ -1397,11 +1397,20 @@ def update_employee(request):
                 operational_medical_leave=leave_data.get('operational_medical_leave', 0),
                 number_of_months=leave_data.get('number_of_months', 0),
             )
-            leave_managements = LeaveManagements.objects.get(employee_id=id)
-            leave_managements.casual_leave += leave_managements.operational_casual_leave - leave_managements.casual_leave
-            leave_managements.medical_leave += leave_managements.operational_medical_leave - leave_managements.medical_leave
-            leave_managements.annual_leave += leave_managements.operational_annual_leave - leave_managements.annual_leave
-            leave_managements.save()
+            # leave_managements = LeaveManagements.objects.get(employee_id=id)
+            # leave_managements.casual_leave += leave_managements.operational_casual_leave - leave_managements.casual_leave
+            # leave_managements.medical_leave += leave_managements.operational_medical_leave - leave_managements.medical_leave
+            # leave_managements.annual_leave += leave_managements.operational_annual_leave - leave_managements.annual_leave
+            # leave_managements.save()
+            leave_management = LeaveManagements.objects.get(employee_id=id)
+            total_casual = leave_management.operational_casual_leave - leave_management.casual_leave
+            leave_management.casual_leave = leave_management.casual_leave + total_casual
+            total_medical = leave_management.operational_medical_leave - leave_management.medical_leave
+            leave_management.medical_leave = leave_management.medical_leave + total_medical
+            total_annual_leave = leave_management.operational_annual_leave - leave_management.operational_annual_leave
+            leave_management.annual_leave = leave_management.annual_leave + total_annual_leave
+            # leave_management.annual_leave += leave_management.operational_annual_leave - leave_management.annual_leave
+            leave_management.save()
             # return Response({"msg": "casual leave", "data": leave_managements.casual_leave})
         else:
             leave_management = LeaveManagements.objects.create(
@@ -1411,15 +1420,14 @@ def update_employee(request):
                 operational_medical_leave=leave_data.get('medical_leave', 0),
                 operational_annual_leave=leave_data.get('annual_leave', 0)
             )
-        leave_management = LeaveManagements.objects.get(employee_id=id)
-        total_casual = leave_management.operational_casual_leave - leave_management.casual_leave
-        leave_management.casual_leave =  leave_management.casual_leave + total_casual
-        total_medical= leave_management.operational_medical_leave - leave_management.medical_leave
-        leave_management.medical_leave = leave_management.medical_leave+total_medical
-        total_annual_leave = leave_management.operational_annual_leave - leave_management.operational_annual_leave
-        leave_management.annual_leave = leave_management.annual_leave + total_annual_leave
-        # leave_management.annual_leave += leave_management.operational_annual_leave - leave_management.annual_leave
-        leave_management.save()
+            total_casual = leave_management.operational_casual_leave - leave_management.casual_leave
+            leave_management.casual_leave =  leave_management.casual_leave + total_casual
+            total_medical= leave_management.operational_medical_leave - leave_management.medical_leave
+            leave_management.medical_leave = leave_management.medical_leave+total_medical
+            total_annual_leave = leave_management.operational_annual_leave - leave_management.operational_annual_leave
+            leave_management.annual_leave = leave_management.annual_leave + total_annual_leave
+            # leave_management.annual_leave += leave_management.operational_annual_leave - leave_management.annual_leave
+            leave_management.save()
 
     try:
         staff = StaffGroup.objects.get(employees=id)
