@@ -461,9 +461,8 @@ class EmployeDailySchedule(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     title = models.TextField(default='Weekend', null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='user_employedailyschedule')
-    business = models.ForeignKey(Business, on_delete=models.CASCADE, null=True,
-                                 related_name='business_employedailyschedule')
-
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, null=True,related_name='business_employedailyschedule')
+    location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, null=True,related_name='location_weekend_sceduale')
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_employedailyschedule')
     day = models.CharField(choices=DAYS_CHOICE, default='Monday', max_length=50, null=True, blank=True)
     vacation = models.ForeignKey(Vacation, on_delete=models.SET_NULL, null=True, blank=True,
