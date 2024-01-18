@@ -4877,7 +4877,7 @@ def create_workingschedule(request):
                 # return Response({"msg": "I am in casual"})
                 leave_object.casual_leave += 1
                 leave_object.save()
-                return Response({"msg":leave_object.casual_leave})
+                # return Response({"msg":leave_object.casual_leave})
             if type_of_sceduale == 'medical':
                 # return Response({"msg":"I am in medical"})
                 leave_object.medical_leave += 1
@@ -4890,9 +4890,6 @@ def create_workingschedule(request):
             #     is_leo_day_created = LeaveManagements.objects.create(employee_id=employee_id.id)
             #     is_leo_day_created.casual_leave += 1
             #     is_leo_day_created.save()
-
-        else:
-            return ({"msg":"I am here"})
 
         serializers = ScheduleSerializer(working_schedule, context={'request': request})
 
