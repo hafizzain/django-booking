@@ -899,7 +899,7 @@ def create_appointment(request):
                 'message': 'Appointment Create!',
                 'error_message': None,
                 'error': Errors,
-                'id': appointment_serialized.id,
+                # 'id': appointment_serialized.id,
                 'appointment_id' :  appointment_serialized.appointment,
                 'appointments': serialized.data,
             }
