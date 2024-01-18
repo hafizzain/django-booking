@@ -1003,7 +1003,7 @@ class HolidaysSerializer(serializers.ModelSerializer):
 class VacationSerializerResponse(serializers.ModelSerializer):
     class Meta:
         model = Vacation
-        fields= "__all__"
+        fields= ['id','vacation_type']
 class ScheduleSerializerOP(serializers.ModelSerializer):
     is_holidays = serializers.SerializerMethodField(read_only=True)
     vacation = VacationSerializerResponse()
