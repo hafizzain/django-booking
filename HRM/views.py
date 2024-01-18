@@ -179,9 +179,20 @@ class HolidayApiView(APIView):
         
     @transaction.atomic   
     def delete(self, request, pk):
-        holiday = get_object_or_404(Holiday, id=pk)
+        holiday_data ={}
+        holiday = Holiday.objects.filter(id=pk)
+        if holiday:
+            holiday = Holiday.objects.filter(id=pk).first()
+            holiday_data = {
+                'start_date': holiday.start_date,
+                'end_date': holiday.end_date if holiday.end_date else None,
+            }
         holiday.delete()
-        holiday_schedule = EmployeDailySchedule.objects.filter(is_holiday=True)
+        holiday_schedule = EmployeDailySchedule.objects.filter(
+            is_holiday=True,
+            from_date=holiday_data['start_date'],
+            to_date=holiday_data['end_date']
+        )
         holiday_schedule.delete()
         # holidays = Holiday.objects.all()
         # holidays.delete()
