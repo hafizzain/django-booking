@@ -43,7 +43,7 @@ from threading import Thread
 from Appointment.models import (Appointment, AppointmentService, AppointmentNotes, AppointmentCheckout,
                                 AppointmentLogs, LogDetails, AppointmentEmployeeTip, ClientMissedOpportunity,
                                 OpportunityEmployeeService)
-from Appointment.serializers import (BlockSerializer, CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer,
+from Appointment.serializers import (CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer,
                                      ServiceEmployeeSerializer,
                                      SingleAppointmentSerializer, AllAppoinmentSerializer, SingleNoteSerializer,
                                      TodayAppoinmentSerializer,
@@ -866,10 +866,8 @@ def create_appointment(request):
     appointment.extra_price = total_price_app
     appointment.service_commission = int(service_commission)
     appointment.service_commission_type = service_commission_type
-    new_appointment = appointment.save()
-
-    # appointment_serialized = BlockSerializer(new_appointment)
-
+    appointment.save()
+    serialized = AppoinmentSerializer(appointment)
     try:
         thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment': appointment, 'tenant': request.tenant,
                                                                'user': request.user})
@@ -899,8 +897,6 @@ def create_appointment(request):
                 'message': 'Appointment Create!',
                 'error_message': None,
                 'error': Errors,
-                'id': appointment_service.id,
-                'appointment_id' : new_appointment.id,
                 'appointments': serialized.data,
             }
         },
