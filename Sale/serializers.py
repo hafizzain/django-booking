@@ -2288,7 +2288,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             'service_commission_type', 'product_commission_type', 'voucher_commission_type', 'ids',
             'membership_product',
             'membership_service', 'membership_type', 'invoice', 'tax_name', 'tax_name1', 'total_discount',
-            'voucher_redeem_percentage', 'redeem_option', 'total_tip', 'client_loyalty_points'
+            'voucher_redeem_percentage', 'redeem_option', 'total_tip', 'client_loyalty_points','is_refund'
         ]
 
         # Remove Member from get all sale orders
@@ -2354,7 +2354,7 @@ class SaleOrders_CheckoutSerializerOP(serializers.ModelSerializer):
     class Meta:
         model = Checkout
         fields = ['id', 'payment_type', 'client', 'invoice', 'created_at',
-                  'subtotal', 'total_tax', 'total_tip']
+                  'subtotal', 'total_tax', 'total_tip','is_refund']
 
 
 class SaleInvoiceSerializer(serializers.ModelSerializer):
@@ -2483,7 +2483,7 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
                   'membership', 'rewards', 'tip', 'gst', 'gst1', 'gst_price', 'gst_price1', 'service_price',
                   'total_price', 'service_commission', 'service_commission_type', 'voucher_discount_percentage',
                   'created_at', 'order_type', 'client', 'location', 'price', 'promotion_name', 'invoice',
-                  'tax_name', 'tax_name1', 'total_tip', 'client_loyalty_points']
+                  'tax_name', 'tax_name1', 'total_tip', 'client_loyalty_points','is_refund]
 
 
 class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
@@ -2544,5 +2544,5 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
 
     class Meta:
         model = AppointmentCheckout
-        fields = ['id', 'payment_method', 'is_refund','order_type', 'client',
-                  'invoice', 'created_at', 'subtotal', 'total_tax', 'total_tip']
+        fields = ['id', 'payment_method','order_type', 'client',
+                  'invoice', 'created_at', 'subtotal', 'total_tax', 'total_tip','is_refund']
