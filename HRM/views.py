@@ -182,10 +182,10 @@ class HolidayApiView(APIView):
         holiday_data ={}
         holiday = Holiday.objects.filter(id=pk)
         if holiday:
-            holiday = Holiday.objects.filter(id=pk).first()
+            holiday_first = Holiday.objects.filter(id=pk).first()
             holiday_data = {
-                'start_date': holiday.start_date,
-                'end_date': holiday.end_date if holiday.end_date else None,
+                'start_date': holiday_first.start_date,
+                'end_date': holiday_first.end_date if holiday_first.end_date else None,
             }
         holiday.delete()
         holiday_schedule = EmployeDailySchedule.objects.filter(
