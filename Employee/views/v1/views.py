@@ -1402,9 +1402,7 @@ def update_employee(request):
             leave_managements.medical_leave += leave_managements.operational_medical_leave - leave_managements.medical_leave
             leave_managements.annual_leave += leave_managements.operational_annual_leave - leave_managements.annual_leave
             leave_managements.save()
-            return Response({"msg": "casual leave", "data": leave_managements.casual_leave})
-
-
+            # return Response({"msg": "casual leave", "data": leave_managements.casual_leave})
         else:
             leave_management = LeaveManagements.objects.create(
                 employee_id=employee.id,
