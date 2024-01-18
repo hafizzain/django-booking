@@ -204,7 +204,7 @@ class Appointment(models.Model):
 
 class AppointmentServiceCustomManager(models.QuerySet):
 
-    def with_subtotal(self):
+    def with_appointment_subtotal(self):
         """
         Return the subtotal.
         subtotal: total_price + gst_price + gst_price1
@@ -217,15 +217,10 @@ class AppointmentServiceCustomManager(models.QuerySet):
         sum_filter=Q(appointment__appointment_services__status__in=status_list)
         return self.annotate(
             subtotal=Coalesce(
-                Sum('appointment__appointment_services__price', filter=sum_filter) + F('gst_price') + F('gst_price1'),
+                Sum('appointment__appointment_services__total_price', filter=sum_filter) ,
                 0.0,
                 output_field=FloatField()
-            ),
-            just_services_price_inside=Coalesce(
-                Sum(F('appointment__appointment_services__price'), filter=sum_filter),
-                0.0,
-                output_field=FloatField()
-            ),
+            )
         )
     
     def get_active_appointment_services(self, *args, **kwargs):
