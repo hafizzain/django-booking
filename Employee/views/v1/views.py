@@ -4424,6 +4424,7 @@ def update_vacation_status(request):
         if vacation_status == 'accepted':
             leave_object = LeaveManagements.objects.get(employee_id=employee)
             if created_from_dashboard == 'true':
+                return Response({"msg":"asassaddsa"})
                 if type_of_vacation == 'casual':
                     leave_object.casual_leave += 1
                     leave_object.save()
