@@ -4424,7 +4424,6 @@ def update_vacation_status(request):
         if vacation_status == 'accepted':
             leave_object = LeaveManagements.objects.get(employee_id=employee)
             if created_from_dashboard == 'true':
-                return Response({"msg":"asassaddsa"})
                 if type_of_vacation == 'casual':
                     leave_object.casual_leave += 1
                     leave_object.save()
@@ -4893,6 +4892,7 @@ def create_workingschedule(request):
         working_schedule.is_vacation = False
         working_schedule.is_weekend = False
         working_schedule.vacation_status = None
+        working_schedule.created_from_dashboard='true'
         working_schedule.save()
         if type_of_sceduale == 'vacation':
             try:
