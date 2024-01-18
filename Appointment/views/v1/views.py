@@ -867,9 +867,7 @@ def create_appointment(request):
     appointment.service_commission = int(service_commission)
     appointment.service_commission_type = service_commission_type
     appointment.save()
-
     serialized = AppoinmentSerializer(appointment)
-
     try:
         thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment': appointment, 'tenant': request.tenant,
                                                                'user': request.user})
@@ -899,6 +897,7 @@ def create_appointment(request):
                 'message': 'Appointment Create!',
                 'error_message': None,
                 'error': Errors,
+                'appointment_id':appointment.id,
                 'appointments': serialized.data,
             }
         },
