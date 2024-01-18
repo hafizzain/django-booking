@@ -4867,6 +4867,7 @@ def create_workingschedule(request):
         working_schedule.save()
         try:
             if type_of_sceduale == 'vacation':
+                pass
             is_leo_day_update = LeaveManagements.objects.get(employee_id=employee_id.id)
             is_leo_day_update.leo_leave += 1
             is_leo_day_update.save()
