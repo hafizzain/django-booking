@@ -206,8 +206,8 @@ class AppointmentServiceCustomManager(models.QuerySet):
 
     def with_appointment_subtotal(self):
         """
-        Return the subtotal.
-        subtotal: total_price + gst_price + gst_price1
+        Return the subtotal of all the realted AppointmentServices
+        subtotal: toal_price
         """
         status_list = [
             AppointmentServiceStatus.STARTED, 

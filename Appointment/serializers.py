@@ -1097,6 +1097,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
     appointmnet_service = serializers.SerializerMethodField(read_only=True)
     appointment_tips = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
+    client_name = serializers.SerializerMethodField(read_only= True)
 
     def get_appointment_tips(self, obj):
         tips = AppointmentEmployeeTip.objects.filter(
@@ -1136,10 +1137,21 @@ class SingleNoteSerializer(serializers.ModelSerializer):
             return ClientSerializer(obj.client).data if obj.client else None
         else:
             return obj.client.id if obj.client else None
+        
+    def get_client_name(self, obj):
+        """
+        If is_mobile is true send complete client
+        object, otherwise just send client ID.
+        """
+        is_mobile = self.context.get('is_mobile', False)
+        if is_mobile:
+            return ClientSerializer(obj.client).data if obj.client else None
+        else:
+            return obj.client.full_name if obj.client else None
 
     class Meta:
         model = Appointment
-        fields = ['id', 'client', 'appointment_tips', 'notes', 'business_address',
+        fields = ['id', 'client','client_name', 'appointment_tips', 'notes', 'business_address',
                   'client_type', 'appointmnet_service', 'customer_note', 'status']
 
 
