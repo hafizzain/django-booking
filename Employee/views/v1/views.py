@@ -1406,11 +1406,12 @@ def update_employee(request):
             total_casual = leave_management.operational_casual_leave - leave_management.casual_leave
             leave_management.casual_leave = leave_management.casual_leave + total_casual
             total_medical = leave_management.operational_medical_leave - leave_management.medical_leave
-            leave_management.medical_leave = leave_management.medical_leave + total_medical
-            total_annual_leave = leave_management.operational_annual_leave - leave_management.operational_annual_leave
-            leave_management.annual_leave = leave_management.annual_leave + total_annual_leave
-            # leave_management.annual_leave += leave_management.operational_annual_leave - leave_management.annual_leave
-            leave_management.save()
+            return Response({"msg":total_medical})
+            # leave_management.medical_leave = leave_management.medical_leave + total_medical
+            # total_annual_leave = leave_management.operational_annual_leave - leave_management.operational_annual_leave
+            # leave_management.annual_leave = leave_management.annual_leave + total_annual_leave
+            # # leave_management.annual_leave += leave_management.operational_annual_leave - leave_management.annual_leave
+            # leave_management.save()
             # return Response({"msg": "casual leave", "data": leave_managements.casual_leave})
         else:
             leave_management = LeaveManagements.objects.create(
