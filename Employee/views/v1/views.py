@@ -1412,7 +1412,8 @@ def update_employee(request):
                 operational_annual_leave=leave_data.get('annual_leave', 0)
             )
             leave_management.casual_leave += leave_management.operational_casual_leave - leave_management.casual_leave
-            leave_management.medical_leave += leave_management.operational_medical_leave - leave_management.medical_leave
+            total_medical =  leave_management.operational_medical_leave - leave_management.medical_leave
+            leave_management.medical_leave += int(total_medical)
             leave_management.annual_leave += leave_management.operational_annual_leave - leave_management.annual_leave
             leave_management.save()
 
