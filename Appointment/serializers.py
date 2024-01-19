@@ -376,7 +376,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 employee=employee_instance,
                 date=selected_date,
                 is_holiday=False,
-                is_working_schedule=False,
+                # is_working_schedule=False,
                 is_weekend=False,
                 is_vacation=False
 
