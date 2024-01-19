@@ -4711,6 +4711,7 @@ def create_workingschedule(request):
     date = request.data.get('date', None)
     note = request.data.get('note', None)
     max_records = 2
+    check_holiday=None
     is_vacation = request.data.get('is_vacation', None)
     type_of_sceduale = request.data.get('type', None)
     type_of_vacation = request.data.get('type_of_vacation', None)
@@ -4739,7 +4740,6 @@ def create_workingschedule(request):
                         'error_message': None,
                     }
                 },
-
                 status=200
             )
         week_end_employee = json.loads(week_end_employee)
@@ -4747,7 +4747,6 @@ def create_workingschedule(request):
         try:
             business = Business.objects.get(id=business_id)
         except Exception as err:
-
             return Response(
                 {
                     'status': False,
@@ -4809,6 +4808,7 @@ def create_workingschedule(request):
         serializers = ScheduleSerializer(working_schedule, context={'request': request}, many=True)
         return Response(
             {
+                'check_holiday':check_holiday,
                 'status': True,
                 'status_code': 201,
                 'response': {
