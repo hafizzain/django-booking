@@ -4724,24 +4724,24 @@ def create_workingschedule(request):
     is_working_schedule = request.data.get('is_working_schedule', None)
     week_end_employee = request.data.get('week_end_employee', [])
     if is_weekend is not None and leo_value is None and is_working_schedule is None:
-        check_holiday = EmployeDailySchedule.objects.filter(
-            employee=employee,
-            from_date=from_date,
-            is_holiday=True
-        )
-        if check_holiday:
-            return Response(
-                {
-                    'status': 400,
-                    'status_code': 400,
-                    'status_code_text': '400',
-                    'response': {
-                        'message': f'Cannot create weekend on holiday.',
-                        'error_message': None,
-                    }
-                },
-                status=200
-            )
+        # check_holiday = EmployeDailySchedule.objects.filter(
+        #     employee=employee,
+        #     from_date=from_date,
+        #     is_holiday=True
+        # )
+        # if check_holiday:
+        #     return Response(
+        #         {
+        #             'status': 400,
+        #             'status_code': 400,
+        #             'status_code_text': '400',
+        #             'response': {
+        #                 'message': f'Cannot create weekend on holiday.',
+        #                 'error_message': None,
+        #             }
+        #         },
+        #         status=200
+        #     )
         week_end_employee = json.loads(week_end_employee)
         schedule_ids = []
         try:
@@ -5652,12 +5652,13 @@ def update_workingschedule(request):
         if qs_to_del:
             qs_to_del.delete()
         for employee in week_end_employee:
-            EmployeDailySchedule.objects.create(
-                employee_id=employee,
-                is_weekend=True,
-                date=date,
-                from_date=from_date
-            )
+            break
+            # EmployeDailySchedule.objects.create(
+            #     employee_id=employee,
+            #     is_weekend=True,
+            #     date=date,
+            #     from_date=from_date
+            # )
         qs = EmployeDailySchedule.objects.filter(
             is_weekend=True,
         )
