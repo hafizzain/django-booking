@@ -376,10 +376,10 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 employee=employee_instance,
                 date=selected_date,
                 is_holiday=False,
-                # is_working_schedule=True,
+                is_working_schedule=True,
                 is_weekend=False,
                 is_vacation=False,
-                is_leo_day=True
+                # is_leo_day=True
             )
             # employee_working_schedule = EmployeDailySchedule.objects.get(
             #     Q(employee=employee_instance,
