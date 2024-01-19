@@ -5550,6 +5550,7 @@ def update_workingschedule(request):
     start_time = request.data.get('start_time', None)
     end_time = request.data.get('end_time', None)
     schedule_id = request.data.get('schedule_id', None)
+    location_id_weekend = request.data.get('location',None)
     # is_working_schedule = request.data.get('is_working_schedule', None)
     if leo_value is not None:
         check_working_schedule = EmployeDailySchedule.objects.get(
@@ -5656,7 +5657,8 @@ def update_workingschedule(request):
                 employee_id=employee,
                 is_weekend=True,
                 date=date,
-                from_date=from_date
+                from_date=from_date,
+                location_id=location_id_weekend
             )
         qs = EmployeDailySchedule.objects.filter(
             is_weekend=True,
