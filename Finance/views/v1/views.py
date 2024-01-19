@@ -56,31 +56,34 @@ class RefundAPIView(APIView):
     def get(self, request, *args, **kwargs):
         refunds = Refund.objects.select_related(
     'client', 'business', 'location', 'refund_invoice_id', 'user').prefetch_related('refunded_products', 'refunded_services')
-        refund_serializer = RefundSerializer(refunds, many=True)
-        if not refunds:
-            response_data = {
-                'success': False,
-                'status_code': 400,
-                'response': {
-                    'message': 'No Records found',
-                    'error_message': refund_serializer.errors,
-                    'data': None
-                }
-            }
-            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
-        response_data = {
-            'success': True,
-            'status_code': 200,
-            'response': {
-                'message': 'Record created successfully',
-                'error_message': None,
-                'data': {
-                    'refund': RefundSerializer(refund_serializer.instance).data,
-                    'coupon': CouponSerializer(refund_serializer.instance).data,
-                }
-            }
-        }
-        return Response(response_data, status=status.HTTP_200_OK)
+        refunds = refunds.values()
+        return Response('refunds')
+        # refund_serializer = RefundSerializer(refunds, many=True)
+        
+        # if not refunds:
+        #     response_data = {
+        #         'success': False,
+        #         'status_code': 400,
+        #         'response': {
+        #             'message': 'No Records found',
+        #             'error_message': refund_serializer.errors,
+        #             'data': None
+        #         }
+        #     }
+        #     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+        # response_data = {
+        #     'success': True,
+        #     'status_code': 200,
+        #     'response': {
+        #         'message': 'Record created successfully',
+        #         'error_message': None,
+        #         'data': {
+        #             'refund': RefundSerializer(refund_serializer.instance).data,
+        #             'coupon': CouponSerializer(refund_serializer.instance).data,
+        #         }
+        #     }
+        # }
+        # return Response(response_data, status=status.HTTP_200_OK)
 
     '''
     POST REQUEST FOR THE REFUND
