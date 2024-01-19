@@ -1,11 +1,11 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view
-from django.http import JsonResponse
+from rest_framework.decorators import api_view, permission_classes
+from django.db.models import Q
 from Utility.Campaign import send_refund_email
 
-from Finance.models import Refund, RefundCoupon, AllowRefunds, RefundProduct, RefundServices
+from Finance.models import Refund, RefundCoupon, AllowRefunds,AllowRefundPermissionsEmployees, RefundProduct, RefundServices
 from Finance.serializers import RefundSerializer, CouponSerializer, AllowRefundsSerializer
 from Finance.helpers import short_uuid, check_permission, check_days
 from Invoices.models import SaleInvoice
@@ -55,37 +55,32 @@ class RefundAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         refunds = Refund.objects.select_related(
-    'client', 'business', 'location', 'refund_invoice_id', 'user').prefetch_related('refunded_products', 'refunded_services')
-        refunds = list(refunds.values())
-        return JsonResponse({
-            'refunds': refunds,
-    })
-        # refund_serializer = RefundSerializer(refunds, many=True)
-        
-        # if not refunds:
-        #     response_data = {
-        #         'success': False,
-        #         'status_code': 400,
-        #         'response': {
-        #             'message': 'No Records found',
-        #             'error_message': refund_serializer.errors,
-        #             'data': None
-        #         }
-        #     }
-        #     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
-        # response_data = {
-        #     'success': True,
-        #     'status_code': 200,
-        #     'response': {
-        #         'message': 'Record created successfully',
-        #         'error_message': None,
-        #         'data': {
-        #             'refund': RefundSerializer(refund_serializer.instance).data,
-        #             'coupon': CouponSerializer(refund_serializer.instance).data,
-        #         }
-        #     }
-        # }
-        # return Response(response_data, status=status.HTTP_200_OK)
+            'client', 'business', 'location', 'refund_invoice_id', 'user').prefetch_related('refunded_products').all()
+        refund_serializer = RefundSerializer(refunds, many=True)
+        if not refunds:
+            response_data = {
+                'success': False,
+                'status_code': 400,
+                'response': {
+                    'message': 'No Records found',
+                    'error_message': refund_serializer.errors,
+                    'data': None
+                }
+            }
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+        response_data = {
+            'success': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Record created successfully',
+                'error_message': None,
+                'data': {
+                    'refund': RefundSerializer(refund_serializer.instance).data,
+                    'coupon': CouponSerializer(refund_serializer.instance).data,
+                }
+            }
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
 
     '''
     POST REQUEST FOR THE REFUND
@@ -247,7 +242,7 @@ class RefundAPIView(APIView):
                             'message': 'Refund created successfully',
                             'error_message': None,
                             'data': {
-                                'refund': RefundSerializer(refund_instance).data,
+                                'refund': RefundSerializer(serializer.instance).data,
                                 'coupon': CouponSerializer(coupon_serializer.instance).data,
                                 'invoice': SaleInvoiceSerializer(newInvoice).data
                             }
@@ -262,7 +257,7 @@ class RefundAPIView(APIView):
                             'message': 'Refund created successfully',
                             'error_message': None,
                             'data': {
-                                'refund': RefundSerializer(refund_instance).data,
+                                'refund': RefundSerializer(serializer.instance).data,
                                 'invoice': SaleInvoiceSerializer(newInvoice).data, 
                             }
                         }
