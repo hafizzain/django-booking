@@ -87,8 +87,8 @@ class HolidayApiView(APIView):
             else:
                 paginator = self.pagination_class()
                 result_page = paginator.paginate_queryset(filtered_queryset, request)
-                qs = EmployeDailySchedule.objects.filter(is_holiday=True)
-                qs.delete()
+                # qs = EmployeDailySchedule.objects.filter(is_holiday=True)
+                # qs.delete()
                 serializer = HolidaySerializer(result_page, many=True,
                                                context={'request': request})
                 data = {
