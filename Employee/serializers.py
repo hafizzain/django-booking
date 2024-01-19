@@ -1423,13 +1423,12 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         if leo_day is None:
             employee_schedules = EmployeDailySchedule.objects.filter(
                 employee=obj,
-                # is_leave=False,
+                is_leo_day=False,
                 date__range=(month_start_date, month_end_date)
             ).order_by('-date')
             hours = 0
             for schedule in employee_schedules:
                 hours += schedule.total_hours
-
             return hours
         else:
             employee_schedules = EmployeDailySchedule.objects.filter(
