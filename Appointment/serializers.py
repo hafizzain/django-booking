@@ -381,7 +381,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 is_vacation=False )|
                 Q(is_leo_day=True,
                 employee = employee_instance,
-                date = selected_date,
+                date = selected_date
                 # is_holiday = False,
                 # is_working_schedule = False,
                 # is_weekend = False,
