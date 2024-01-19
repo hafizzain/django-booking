@@ -1176,7 +1176,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
     def get_total_hours(self, obj):
         income_type = self.context.get('income_type', None)
         # return str(obj)
-        try:
+        # try:
         #     if income_type == 'Hourly_Rate':
         #         if obj.is_vacation:
         #             return 8.0
