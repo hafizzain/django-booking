@@ -4726,7 +4726,7 @@ def create_workingschedule(request):
     if is_weekend is not None and leo_value is None and is_working_schedule is None:
         check_holiday = EmployeDailySchedule.objects.filter(
             employee=employee,
-            date=from_date,
+            from_date=from_date,
             is_holiday=True
         )
         if check_holiday:
