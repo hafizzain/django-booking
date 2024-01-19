@@ -5651,32 +5651,30 @@ def update_workingschedule(request):
         qs_to_del = EmployeDailySchedule.objects.filter(date__date=date, is_weekend=True)
         if qs_to_del:
             qs_to_del.delete()
-        return Response({"msg":str(week_end_employee)})
-        # for employee in week_end_employee:
-        #     break
-            # EmployeDailySchedule.objects.create(
-            #     employee_id=employee,
-            #     is_weekend=True,
-            #     date=date,
-            #     from_date=from_date
-            # )
-        # qs = EmployeDailySchedule.objects.filter(
-        #     is_weekend=True,
-        # )
-        # serializers = ScheduleSerializer(qs, context={'request': request}, many=True)
-        # return Response(
-        #     {
-        #         'status': True,
-        #         'status_code': 200,
-        #         'response': {
-        #             'message': 'Weekend update successfully across employees!',
-        #             'error_message': None,
-        #             'schedule': serializers.data,
-        #             'date': date
-        #         }
-        #     },
-        #     status=status.HTTP_200_OK
-        # )
+        for employee in week_end_employee:
+            EmployeDailySchedule.objects.create(
+                employee_id=employee,
+                is_weekend=True,
+                date=date,
+                from_date=from_date
+            )
+        qs = EmployeDailySchedule.objects.filter(
+            is_weekend=True,
+        )
+        serializers = ScheduleSerializer(qs, context={'request': request}, many=True)
+        return Response(
+            {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Weekend update successfully across employees!',
+                    'error_message': None,
+                    'schedule': serializers.data,
+                    'date': date
+                }
+            },
+            status=status.HTTP_200_OK
+        )
 
 
 @transaction.atomic
