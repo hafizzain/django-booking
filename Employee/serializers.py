@@ -1433,14 +1433,12 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         else:
             employee_schedules = EmployeDailySchedule.objects.filter(
                 employee=obj,
-                # is_leave=False,
                 is_leo_day=True,
                 date__range=(month_start_date, month_end_date)
             ).order_by('-date')
             hours = 0
             for schedule in employee_schedules:
                 hours += schedule.total_hours
-
             return hours
 
     def get_total_earning(self, obj):
@@ -1469,7 +1467,6 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
                 total_earning = 0
                 salary = income_type_info.salary  # 300
                 income_type = income_type_info.income_type
-
                 if income_type == 'Monthly_Salary':
                     per_day_salary = salary / total_days  # 10
                     total_earning += (employee_schedules.count() * per_day_salary)
@@ -1667,6 +1664,7 @@ class Payroll_WorkingScheduleSerializerOP(serializers.ModelSerializer):
 
         schedule = EmployeDailySchedule.objects.filter(
             employee=obj,
+            is_leo_day=True,
             date__range=(month_start_date, month_end_date)
         ).exclude(is_leave=True).order_by('-date')
         # ).order_by('employee__employee_employedailyschedule__date')            
