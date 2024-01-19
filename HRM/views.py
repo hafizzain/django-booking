@@ -35,8 +35,11 @@ class HolidayApiView(APIView):
 
         if pk is not None:
             holiday = get_object_or_404(Holiday, id=pk)
+            qs = EmployeDailySchedule.objects.filter(is_holiday=True)
+            qs = str(qs)
             serializer = HolidaySerializer(holiday)
             data = {
+                    "qs":qs,
                     "success": True,
                     "status_code" : 200,
                     "response" : {
