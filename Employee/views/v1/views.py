@@ -4723,6 +4723,25 @@ def create_workingschedule(request):
     is_working_schedule = request.data.get('is_working_schedule', None)
     week_end_employee = request.data.get('week_end_employee', [])
     if is_weekend is not None and leo_value is None and is_working_schedule is None:
+        check_holiday = EmployeDailySchedule.objects.filter(
+            employee=employee,
+            date=from_date,
+            is_holiday=True
+        )
+        if check_holiday:
+            return Response(
+                {
+                    'status': 400,
+                    'status_code': 400,
+                    'status_code_text': '400',
+                    'response': {
+                        'message': f'Cannot create weekend on holiday.',
+                        'error_message': None,
+                    }
+                },
+
+                status=200
+            )
         week_end_employee = json.loads(week_end_employee)
         schedule_ids = []
         try:
