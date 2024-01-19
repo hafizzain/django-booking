@@ -2200,9 +2200,10 @@ def create_sale_order(request):
 @transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+
 def new_create_sale_order(request):
     user = request.user
-
+    
     sale_type = request.data.get('selection_type', None)
     client_id = request.data.get('client', None)
     tax_amount = request.data.get('tax_amount', 0)
