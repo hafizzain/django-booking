@@ -1231,20 +1231,20 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
                 shift1_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
 
             total_hours = (shift1_end - shift1_start).total_seconds() / 3600  # calculate the time difference in hours
-
-            if obj.start_time_shift and obj.end_time_shift:
-                shift2_start = datetime.strptime(obj.start_time_shift.strftime("%H:%M:%S"), "%H:%M:%S")
-                shift2_end = datetime.strptime(obj.end_time_shift.strftime("%H:%M:%S"), "%H:%M:%S")
-
-                if shift2_end < shift2_start:
-                    shift2_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
-
-                shift2_hours = (
-                                       shift2_end - shift2_start).total_seconds() / 3600  # calculate the time difference in hours
-                total_hours += shift2_hours
-
-            total_hours = float(total_hours)  # convert to integer
-            return float(total_hours)
+            #
+            # if obj.start_time_shift and obj.end_time_shift:
+            #     shift2_start = datetime.strptime(obj.start_time_shift.strftime("%H:%M:%S"), "%H:%M:%S")
+            #     shift2_end = datetime.strptime(obj.end_time_shift.strftime("%H:%M:%S"), "%H:%M:%S")
+            #
+            #     if shift2_end < shift2_start:
+            #         shift2_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
+            #
+            #     shift2_hours = (
+            #                            shift2_end - shift2_start).total_seconds() / 3600  # calculate the time difference in hours
+            #     total_hours += shift2_hours
+            #
+            # total_hours = float(total_hours)  # convert to integer
+            return total_hours ,shift1_end ,shift1_start
 
         except Exception as err:
             return str(err)
