@@ -733,9 +733,8 @@ def get_workingschedule(request):
             status=status.HTTP_200_OK
         )
     else:
-        # employee_ids_in_schedule = EmployeDailySchedule.objects.filter(is_weekend=True, from_date__year=year,
-        #                                                                from_date__month=month, location_id=location_id)
-        employee_ids_in_schedule = EmployeDailySchedule.objects.filter(is_weekend=True)
+        employee_ids_in_schedule = EmployeDailySchedule.objects.filter(is_weekend=True, from_date__year=year,
+                                                                       from_date__month=month)
         serialized = ScheduleSerializerResponse(employee_ids_in_schedule, many=True, context={'request': request,
                                                                                               'location_id': location_id})
 
