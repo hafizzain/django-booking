@@ -55,7 +55,7 @@ class RefundAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         refunds = Refund.objects.select_related(
-            'client', 'business', 'location', 'refund_invoice_id', 'user').prefetch_related('refunded_products')
+    'client', 'business', 'location', 'refund_invoice_id', 'user').prefetch_related('refunded_products', 'refunded_services')
         refund_serializer = RefundSerializer(refunds, many=True)
         if not refunds:
             response_data = {
