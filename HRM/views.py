@@ -36,7 +36,6 @@ class HolidayApiView(APIView):
         location = request.GET.get('location', None)  # data deal with location
 
         if pk is not None:
-
             holiday = get_object_or_404(Holiday, id=pk)
             qs = EmployeDailySchedule.objects.filter(is_holiday=True)
             qs = str(qs)
@@ -88,9 +87,12 @@ class HolidayApiView(APIView):
             else:
                 paginator = self.pagination_class()
                 result_page = paginator.paginate_queryset(filtered_queryset, request)
+                qs = EmployeDailySchedule.objects.filter(is_holiday=True)
+                qs = str(qs)
                 serializer = HolidaySerializer(result_page, many=True,
                                                context={'request': request})
                 data = {
+                    'qs':qs,
                     'count': paginator.page.paginator.count,
                     'next': paginator.get_next_link(),
                     'previous': paginator.get_previous_link(),
