@@ -4457,6 +4457,7 @@ def update_vacation_status(request):
                         status=status.HTTP_200_OK
                     )
                 leave_managements.casual_leave -= total_days_to_detect
+                leave_managements.used_casual =  leave_managements.used_casual + total_days_to_detect
                 leave_managements.save()
             if vacation_type == 'annual':
                 if leave_managements.annual_leave == 0:
@@ -4473,6 +4474,7 @@ def update_vacation_status(request):
                         status=status.HTTP_200_OK
                     )
                 leave_managements.annual_leave -= total_days_to_detect
+                leave_managements.used_annual = leave_managements.used_annual + total_days_to_detect
                 leave_managements.save()
             if vacation_type == 'medical':
                 if leave_managements.medical_leave == 0:
@@ -4489,6 +4491,7 @@ def update_vacation_status(request):
                         status=status.HTTP_200_OK
                     )
                 leave_managements.medical_leave -= total_days_to_detect
+                leave_managements.used_medical = leave_managements.used_medical + total_days_to_detect
                 leave_managements.save()
             if vacation_type == 'leo_day':
                 if leave_managements.leo_leave == 0:
