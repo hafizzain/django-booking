@@ -1,11 +1,11 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view, permission_classes
-from django.db.models import Q
+from rest_framework.decorators import api_view
+from django.http import JsonResponse
 from Utility.Campaign import send_refund_email
 
-from Finance.models import Refund, RefundCoupon, AllowRefunds,AllowRefundPermissionsEmployees, RefundProduct, RefundServices
+from Finance.models import Refund, RefundCoupon, AllowRefunds, RefundProduct, RefundServices
 from Finance.serializers import RefundSerializer, CouponSerializer, AllowRefundsSerializer
 from Finance.helpers import short_uuid, check_permission, check_days
 from Invoices.models import SaleInvoice
@@ -56,8 +56,10 @@ class RefundAPIView(APIView):
     def get(self, request, *args, **kwargs):
         refunds = Refund.objects.select_related(
     'client', 'business', 'location', 'refund_invoice_id', 'user').prefetch_related('refunded_products', 'refunded_services')
-        refunds = refunds.values()
-        return Response('refunds')
+        refunds = list(refunds.values())
+        return JsonResponse({
+            'refunds': refunds,
+    })
         # refund_serializer = RefundSerializer(refunds, many=True)
         
         # if not refunds:
