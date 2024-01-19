@@ -495,18 +495,18 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
 
                 data.append([
                     {
-                        # "appointment_id": "51479f52-7943-44d1-b3b5-12e0125ca307",
-                        # "appointment_date": selected_date,
-                        # "appointment_time": start_time,
-                        # "end_time": end_time,
-                        # # 'difference' : f'{difference}min',
-                        # # "duration": "35min",
-                        # "duration": f'{hours}h {remaining_time}min',
-                        # "created_at": "2023-05-29T06:45:38.035196Z",
-                        # "is_blocked": True,
-                        # "is_unavailable": True,
-                        # 'errors': errors,
-                        # 'exluded_times': exluded_times
+                        "appointment_id": "51479f52-7943-44d1-b3b5-12e0125ca307",
+                        "appointment_date": selected_date,
+                        "appointment_time": start_time,
+                        "end_time": end_time,
+                        # 'difference' : f'{difference}min',
+                        # "duration": "35min",
+                        "duration": f'{hours}h {remaining_time}min',
+                        "created_at": "2023-05-29T06:45:38.035196Z",
+                        "is_blocked": True,
+                        "is_unavailable": True,
+                        'errors': errors,
+                        'exluded_times': exluded_times
                     }
                 ])
         return data
