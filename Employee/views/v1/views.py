@@ -4169,6 +4169,11 @@ def create_vacation_emp(request):
         date=from_date,
         is_weekend=True
     )
+    check_holiday = EmployeDailySchedule.objects.filter(
+        employee=employee,
+        date=from_date,
+        is_holiday=True
+    )
     if check_weekend:
         return Response(
             {
@@ -4177,6 +4182,20 @@ def create_vacation_emp(request):
                 'status_code_text': '400',
                 'response': {
                     'message': f'Cannot create vacation on weekend.',
+                    'error_message': None,
+                }
+            },
+
+            status=200
+        )
+    if check_holiday:
+        return Response(
+            {
+                'status': 400,
+                'status_code': 400,
+                'status_code_text': '400',
+                'response': {
+                    'message': f'Cannot create vacation on holiday.',
                     'error_message': None,
                 }
             },
