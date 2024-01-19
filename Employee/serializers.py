@@ -1174,45 +1174,44 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
         return obj.total_hours
 
     def get_total_hours(self, obj):
-
         income_type = self.context.get('income_type', None)
-
-        try:
-            if income_type == 'Hourly_Rate':
-                if obj.is_vacation:
-                    return '8'
-                elif obj.is_leave:
-                    return '0'
-                else:
-                    pass
-
-            if obj.start_time is None or obj.end_time is None:
-                return '0'  # Return '0' if any of the time values is None
-
-            shift1_start = datetime.strptime(obj.start_time.strftime("%H:%M:%S"), "%H:%M:%S")
-            shift1_end = datetime.strptime(obj.end_time.strftime("%H:%M:%S"), "%H:%M:%S")
-
-            if shift1_end < shift1_start:
-                shift1_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
-
-            total_hours = (shift1_end - shift1_start).total_seconds() / 3600  # calculate the time difference in hours
-
-            if obj.start_time_shift and obj.end_time_shift:
-                shift2_start = datetime.strptime(obj.start_time_shift.strftime("%H:%M:%S"), "%H:%M:%S")
-                shift2_end = datetime.strptime(obj.end_time_shift.strftime("%H:%M:%S"), "%H:%M:%S")
-
-                if shift2_end < shift2_start:
-                    shift2_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
-
-                shift2_hours = (
-                                       shift2_end - shift2_start).total_seconds() / 3600  # calculate the time difference in hours
-                total_hours += shift2_hours
-
-            total_hours = float(total_hours)  # convert to integer
-            return float(total_hours)
-
-        except Exception as err:
-            return str(err)
+        return income_type
+        # try:
+        #     if income_type == 'Hourly_Rate':
+        #         if obj.is_vacation:
+        #             return '8'
+        #         elif obj.is_leave:
+        #             return '0'
+        #         else:
+        #             pass
+        #
+        #     if obj.start_time is None or obj.end_time is None:
+        #         return '0'  # Return '0' if any of the time values is None
+        #
+        #     shift1_start = datetime.strptime(obj.start_time.strftime("%H:%M:%S"), "%H:%M:%S")
+        #     shift1_end = datetime.strptime(obj.end_time.strftime("%H:%M:%S"), "%H:%M:%S")
+        #
+        #     if shift1_end < shift1_start:
+        #         shift1_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
+        #
+        #     total_hours = (shift1_end - shift1_start).total_seconds() / 3600  # calculate the time difference in hours
+        #
+        #     if obj.start_time_shift and obj.end_time_shift:
+        #         shift2_start = datetime.strptime(obj.start_time_shift.strftime("%H:%M:%S"), "%H:%M:%S")
+        #         shift2_end = datetime.strptime(obj.end_time_shift.strftime("%H:%M:%S"), "%H:%M:%S")
+        #
+        #         if shift2_end < shift2_start:
+        #             shift2_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
+        #
+        #         shift2_hours = (
+        #                                shift2_end - shift2_start).total_seconds() / 3600  # calculate the time difference in hours
+        #         total_hours += shift2_hours
+        #
+        #     total_hours = float(total_hours)  # convert to integer
+        #     return float(total_hours)
+        #
+        # except Exception as err:
+        #     return str(err)
 
     class Meta:
         model = EmployeDailySchedule
@@ -1664,7 +1663,6 @@ class Payroll_WorkingScheduleSerializerOP(serializers.ModelSerializer):
 
         schedule = EmployeDailySchedule.objects.filter(
             employee=obj,
-            is_leo_day=True,
             date__range=(month_start_date, month_end_date)
         ).exclude(is_leave=True).order_by('-date')
         # ).order_by('employee__employee_employedailyschedule__date')            
