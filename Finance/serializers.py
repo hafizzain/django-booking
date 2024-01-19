@@ -12,14 +12,14 @@ class RefundProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = RefundProduct
         fields = '__all__'
-        read_only_fields = ['refund']
+        # read_only_fields = ['refund']
 
 
 class RefundServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = RefundServices
         fields = '__all__'
-        read_only_fields = ['refund']
+        # read_only_fields = ['refund']
 
 
 class RefundSerializer(serializers.ModelSerializer):
