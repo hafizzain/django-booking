@@ -1583,6 +1583,10 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         else:
             schedule = EmployeDailySchedule.objects.filter(
                 is_leo_day=True,
+                is_holiday=False,
+                is_working_schedule=False,
+                is_weekend=False,
+                is_vacation=False,
                 employee=obj,
                 date__range=(month_start_date, month_end_date)
             ).order_by('-date')
