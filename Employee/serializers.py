@@ -1175,7 +1175,44 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
 
     def get_total_hours(self, obj):
         income_type = self.context.get('income_type', None)
-        return str(obj)
+        # return str(obj)
+        try:
+            if income_type == 'Hourly_Rate':
+                if obj.is_vacation:
+                    return 8.0
+                elif obj.is_leave:
+                    return 0.0
+                else:
+                    pass
+
+            if obj.start_time is None or obj.end_time is None:
+                return 0.0  # Return 0.0 if any of the time values is None
+
+            shift1_start = datetime.strptime(obj.start_time.strftime("%H:%M:%S"), "%H:%M:%S")
+            shift1_end = datetime.strptime(obj.end_time.strftime("%H:%M:%S"), "%H:%M:%S")
+
+            if shift1_end < shift1_start:
+                shift1_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
+
+            total_hours = (shift1_end - shift1_start).total_seconds() / 3600  # calculate the time difference in hours
+
+            if obj.start_time_shift and obj.end_time_shift:
+                shift2_start = datetime.strptime(obj.start_time_shift.strftime("%H:%M:%S"), "%H:%M:%S")
+                shift2_end = datetime.strptime(obj.end_time_shift.strftime("%H:%M:%S"), "%H:%M:%S")
+
+                if shift2_end < shift2_start:
+                    shift2_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
+
+                shift2_hours = (
+                                           shift2_end - shift2_start).total_seconds() / 3600  # calculate the time difference in hours
+                total_hours += shift2_hours
+
+            total_hours = float(total_hours)  # convert to float (if it's not already)
+            return total_hours
+
+        except Exception as err:
+            return str(err)
+
         # try:
         #     if income_type == 'Hourly_Rate':
         #         if obj.is_vacation:
