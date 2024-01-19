@@ -1244,7 +1244,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
             #     total_hours += shift2_hours
             #
             # total_hours = float(total_hours)  # convert to integer
-            return total_hours ,shift1_end ,shift1_start
+            return total_hours
 
         except Exception as err:
             return str(err)
