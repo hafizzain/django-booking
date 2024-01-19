@@ -1461,35 +1461,58 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
                 employee=obj,
                 date__range=(month_start_date, month_end_date)
             ).order_by('-date')
+            try:
+                income_type_info = EmployeeProfessionalInfo.objects.get(employee=obj)
+            except:
+                income_type = None
+            else:
+                total_earning = 0
+                salary = income_type_info.salary  # 300
+                income_type = income_type_info.income_type
+
+                if income_type == 'Monthly_Salary':
+                    per_day_salary = salary / total_days  # 10
+                    total_earning += (employee_schedules.count() * per_day_salary)
+
+                elif income_type == 'Daily_Income':
+                    total_earning += (employee_schedules.count() * salary)
+                    pass
+                elif income_type == 'Hourly_Rate':
+                    total_hours = 0
+                    for schedule in employee_schedules:
+                        total_hours += schedule.total_hours
+                    total_earning += (total_hours * salary)
+
+                return total_earning
         else:
             employee_schedules = EmployeDailySchedule.objects.filter(
                 is_leo_day=False,
                 employee=obj,
                 date__range=(month_start_date, month_end_date)
             ).order_by('-date')
-        try:
-            income_type_info = EmployeeProfessionalInfo.objects.get(employee=obj)
-        except:
-            income_type = None
-        else:
-            total_earning = 0
-            salary = income_type_info.salary  # 300
-            income_type = income_type_info.income_type
+            try:
+                income_type_info = EmployeeProfessionalInfo.objects.get(employee=obj)
+            except:
+                income_type = None
+            else:
+                total_earning = 0
+                salary = income_type_info.salary  # 300
+                income_type = income_type_info.income_type
 
-            if income_type == 'Monthly_Salary':
-                per_day_salary = salary / total_days  # 10
-                total_earning += (employee_schedules.count() * per_day_salary)
+                if income_type == 'Monthly_Salary':
+                    per_day_salary = salary / total_days  # 10
+                    total_earning += (employee_schedules.count() * per_day_salary)
 
-            elif income_type == 'Daily_Income':
-                total_earning += (employee_schedules.count() * salary)
-                pass
-            elif income_type == 'Hourly_Rate':
-                total_hours = 0
-                for schedule in employee_schedules:
-                    total_hours += schedule.total_hours
-                total_earning += (total_hours * salary)
+                elif income_type == 'Daily_Income':
+                    total_earning += (employee_schedules.count() * salary)
+                    pass
+                elif income_type == 'Hourly_Rate':
+                    total_hours = 0
+                    for schedule in employee_schedules:
+                        total_hours += schedule.total_hours
+                    total_earning += (total_hours * salary)
 
-            return total_earning
+                return total_earning
 
     def get_salary(self, obj):
         try:
