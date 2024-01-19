@@ -375,10 +375,10 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             employee_working_schedule = EmployeDailySchedule.objects.get(
                 employee=employee_instance,
                 date=selected_date,
-                is_holiday=False,
-                # is_working_schedule=False,
-                is_weekend=False,
-                is_vacation=False
+                # is_holiday=False,
+                is_working_schedule=True,
+                # is_weekend=False,
+                # is_vacation=False
 
             )
             if employee_working_schedule.is_leave:
@@ -479,7 +479,6 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             if start_time and end_time:
                 start_time_f = datetime.strptime(start_time, '%H:%M:%S')
                 end_time_f = datetime.strptime('23:59:59' if end_time == '00:00:00' else end_time, '%H:%M:%S')
-
                 difference = end_time_f - start_time_f
                 seconds = difference.seconds
                 minutes = seconds // 60
