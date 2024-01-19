@@ -242,7 +242,7 @@ class RefundAPIView(APIView):
                             'message': 'Refund created successfully',
                             'error_message': None,
                             'data': {
-                                'refund': RefundSerializer(serializer.instance).data,
+                                'refund': RefundSerializer(refund_instance).data,
                                 'coupon': CouponSerializer(coupon_serializer.instance).data,
                                 'invoice': SaleInvoiceSerializer(newInvoice).data
                             }
@@ -257,7 +257,7 @@ class RefundAPIView(APIView):
                             'message': 'Refund created successfully',
                             'error_message': None,
                             'data': {
-                                'refund': RefundSerializer(serializer.instance).data,
+                                'refund': RefundSerializer(refund_instance).data,
                                 'invoice': SaleInvoiceSerializer(newInvoice).data, 
                             }
                         }
