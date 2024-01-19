@@ -1401,9 +1401,9 @@ def update_employee(request):
         leave_object = LeaveManagements.objects.get(employee_id=id)
     except:
         leave_object = LeaveManagements.objects.create(employee_id=id)
-    leave_object.casual_leave += leave_object.operational_casual_leave - leave_object.used_casual
-    leave_object.medical_leave += leave_object.operational_medical_leave - leave_object.used_medical
-    leave_object.annual_leave += leave_object.operational_annual_leave - leave_object.used_annual
+    leave_object.casual_leave = leave_object.operational_casual_leave - leave_object.used_casual
+    leave_object.medical_leave = leave_object.operational_medical_leave - leave_object.used_medical
+    leave_object.annual_leave = leave_object.operational_annual_leave - leave_object.used_annual
     leave_object.save()
 
 
