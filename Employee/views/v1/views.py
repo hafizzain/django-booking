@@ -5656,15 +5656,17 @@ def update_workingschedule(request):
         for employee in week_end_employee:
             qs_to_del= EmployeDailySchedule.objects.filter(employee_id=employee, date=date)
             if qs_to_del:
-                qs_to_del.delete()
-        for employee in week_end_employee:
-            EmployeDailySchedule.objects.create(
-                employee_id=employee,
-                is_weekend=True,
-                date=date,
-                from_date=from_date,
-                location_id=location_id_weekend
-            )
+                qs_to_del.is_weekend=True
+                qs_to_del.save()
+            else:
+                for employee in week_end_employee:
+                    EmployeDailySchedule.objects.create(
+                        employee_id=employee,
+                        is_weekend=True,
+                        date=date,
+                        from_date=from_date,
+                        location_id=location_id_weekend
+                    )
         qs = EmployeDailySchedule.objects.filter(
             is_weekend=True,
         )
