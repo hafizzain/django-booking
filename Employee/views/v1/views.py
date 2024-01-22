@@ -5380,7 +5380,7 @@ def delete_workingschedule(request):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_leo_day(request):
-    schedule_id = request.data.get('id', None)
+    schedule_id = request.query_params.get('id', None)
     if schedule_id is not None:
         schedule = EmployeDailySchedule.objects.filter(id=schedule_id)
         schedule.delete()
