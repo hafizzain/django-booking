@@ -5411,6 +5411,7 @@ def delete_leo_day(request):
             leave_manage.used_annual = leave_manage.used_annual - 1
             leave_manage.save()
 
+
         return Response(
             {
                 'data':data,
