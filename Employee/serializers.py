@@ -31,7 +31,7 @@ from Authentication.models import AccountType, User
 from django_tenants.utils import tenant_context
 
 
-<class VacationDetailsSerializer(serializers.ModelSerializer):
+class VacationDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = VacationDetails
         fields = "__all__"
