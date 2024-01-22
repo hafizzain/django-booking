@@ -134,7 +134,7 @@ class RefundAPIView(APIView):
         invoice_type = request.data.get('invoice_type')
         checkout_type = request.data.get('checkout_type') # appointment or sale
         checkout = request.data.get('checkout')
-        
+        expiry_date = request.data.get('expiry_date')
         try:
             user = request.user
             request.data['user'] = user.id
