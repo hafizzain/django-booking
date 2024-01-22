@@ -99,6 +99,7 @@ urlpatterns = [
     path('delete_all_data/', views.get_workingschedule),
     path('del_all_avaliable',views.del_all_avaliable),
     path('delete_workingschedule/', views.delete_workingschedule),
+    path('delete_leo_day/', views.delete_leo_day),
     path('update_workingschedule/', views.update_workingschedule),
     path('delete_all__workingschedule/', views.delete_all__workingschedule),
 

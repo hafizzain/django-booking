@@ -5292,6 +5292,7 @@ def delete_workingschedule(request):
     schedule_id = request.data.get('id', None)
     is_weekend_true = request.data.get('is_weekend', None)
     ids = request.data.get('ids', [])
+
     if is_weekend_true is None:
         if schedule_id is None:
             return Response(
@@ -5326,11 +5327,9 @@ def delete_workingschedule(request):
             )
         schedule.delete()
         if schedule.vacation:
-
             vacation = schedule.vacation
             remaingin_schedue = EmployeDailySchedule.objects.filter(
                 vacation=vacation,
-
             ).exclude(id=schedule.id)
             if len(remaingin_schedue) == 0:
                 vacation.delete()
@@ -5375,6 +5374,27 @@ def delete_workingschedule(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_leo_day(request):
+    schedule_id = request.data.get('id', None)
+    if schedule_id is not None:
+        schedule = EmployeDailySchedule.objects.filter(id=schedule_id)
+        schedule.delete()
+        return Response(
+            {
+                'status': 200,
+                'status_code': '200',
+                'response': {
+                    'message': 'Schedule deleted successfully',
+                    'error_message': None,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
 
 
 @api_view(['DELETE'])
@@ -7142,10 +7162,3 @@ def get_detail_from_code(request):
             }
         }
         return Response(data, status=status.HTTP_200_OK)
-
-# for i in num_list:
-#     if i[0]
-# for j in collection:
-#     if  i ==0:
-#         collection.append(i)
-#     if

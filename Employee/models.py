@@ -491,7 +491,8 @@ class EmployeDailySchedule(models.Model):
     is_schedule = models.BooleanField(default=False)
     is_working_schedule = models.BooleanField(default=False)
     is_holiday_due_to_update = models.BooleanField(default=False)
-
+    last_state_of_schedule = models.TextField(null=True)
+    vacation_type = models.TextField(null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(auto_now_add=now)
