@@ -3441,9 +3441,10 @@ def create_missed_opportunity(request):
     )
 
     for data in services_data:
-        employee_id = data.get('employee_id')  # Retrieve employee_id if present, else None
-        employee = Employee.objects.get(id=employee_id) if employee_id else None
-
+        employee_id = data.get('employee_id', None)  # Retrieve employee_id if present, else None
+        if employee_id:
+            employee = Employee.objects.get(id=employee_id)
+            
         service = Service.objects.get(id=data['service_id'])
         services_list.append(
             OpportunityEmployeeService(
