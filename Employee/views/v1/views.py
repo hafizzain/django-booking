@@ -5397,11 +5397,11 @@ def delete_leo_day(request):
             leave_manage.save()
         if schedule.vacation_type == "medical":
             leave_manage.medical_leave -= 1
-            leave_manage.used_medical_leave = leave_manage.used_medical_leave + 1
+            leave_manage.used_medical = leave_manage.used_medical_leave + 1
             leave_manage.save()
         if schedule.vacation_type == "annual":
             leave_manage.annual_leave -= 1
-            leave_manage.used_annual_leave = leave_manage.used_annual_leave + 1
+            leave_manage.used_annual = leave_manage.used_annual_leave + 1
             leave_manage.save()
         return Response(
             {
