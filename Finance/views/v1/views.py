@@ -71,7 +71,14 @@ class RefundAPIView(APIView):
 
         # Assuming you want to get coupons for the first refund in the queryset
         first_refund_instance = refunds.first()
-        coupon_serializer = CouponSerializer(instance=first_refund_instance.refund_coupon, many=False)
+
+        try:
+            # Assuming there's a ForeignKey relationship named 'refund_coupon'
+            refund_coupon_instance = first_refund_instance.refund_coupon
+        except RefundCoupon.DoesNotExist:
+            refund_coupon_instance = None
+
+        coupon_serializer = CouponSerializer(instance=refund_coupon_instance, many=False)
 
         response_data = {
             'success': True,
@@ -86,6 +93,7 @@ class RefundAPIView(APIView):
             }
         }
         return Response(response_data, status=status.HTTP_200_OK)
+
 
     '''
     POST REQUEST FOR THE REFUND
