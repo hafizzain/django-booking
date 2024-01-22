@@ -4288,6 +4288,8 @@ def create_vacation_emp(request):
                 },
                 status=status.HTTP_200_OK
             )
+    if vacation_type == 'medical':
+        value = employee_leave_management_obj.medical_leave
     if vacation_type == 'casual':
         value = employee_leave_management_obj.casual_leave
     if vacation_type == 'leo_day':
