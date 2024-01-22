@@ -5656,7 +5656,6 @@ def update_workingschedule(request):
             qs = EmployeDailySchedule.objects.filter(date__date=date, employee_id=employee)
             if qs:
                 qs = qs.delete()
-            else:
                 EmployeDailySchedule.objects.create(
                     employee_id=employee,
                     is_weekend=True,
