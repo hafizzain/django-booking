@@ -1127,12 +1127,12 @@ def create_employee(request):
         leave_data = json.loads(leave_data)
         leave_management = LeaveManagements.objects.create(
             employee_id=employee.id,
-            operational_casual_leave=leave_data.get('casual_leave', 0),
-            operational_annual_leave=leave_data.get('annual_leave', 0),
-            operational_medical_leave=leave_data.get('medical_leave', 0),
-            casual_leave=leave_data.get('casual_leave', 0),
-            annual_leave=leave_data.get('annual_leave', 0),
-            medical_leave=leave_data.get('medical_leave', 0),
+            operational_casual_leave=leave_data.get('operational_casual_leave', 0),
+            operational_annual_leave=leave_data.get('operational_annual_leave', 0),
+            operational_medical_leave=leave_data.get('operational_medical_leave', 0),
+            casual_leave=leave_data.get('operational_casual_leave', 0),
+            annual_leave=leave_data.get('operational_annual_leave', 0),
+            medical_leave=leave_data.get('operational_medical_leave', 0),
             number_of_months=leave_data.get('number_of_months', 0)
         )
         leave_data = LeaveManagementSerializer(leave_management, many=False)
