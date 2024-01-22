@@ -4,7 +4,7 @@ from Authentication.models import User
 from Utility.models import CommonField
 from SaleRecords.choices import *
 
-from Business.models import BusinessAddress
+from Business.models import BusinessAddress,  BusinessTax
 from Promotions.models import Coupon
 from Product.models import Product
 from Service.models import Service
@@ -16,21 +16,22 @@ from Order.models import Checkout
 from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip
 from Invoices.models import SaleInvoice
 
-from Business.models import BusinessTax
+# from Business.models import
 
 
 
 
 class SaleRecords(CommonField):
     
-    coupon_discounted_price = models.FloatField(null=True) 
-    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, null=True, blank=True) 
-    is_coupon_redeemed = models.TextField(null=True) 
-    tip = models.FloatField(default=0, null=True, blank=True) 
-    is_refund = models.CharField(max_length=50, null=True, blank=True) 
-
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_checkout_order', null=True, blank=True) 
     member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='member_checkout_orders', null=True, blank=True) 
+    
+    
+    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, null=True, blank=True) 
+    coupon_discounted_price = models.FloatField(null=True) 
+    coupon_discounted_price = models.FloatField(null=True)  
+    is_coupon_redeemed = models.TextField(null=True) 
+
     business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='appointment_address_tips') 
 
     checkout_type = models.CharField(choices = CheckoutType.choices, max_length = 50, null=True) 
@@ -42,7 +43,8 @@ class SaleRecords(CommonField):
     payment_method = models.CharField(choices=PaymentMethods.choices, max_length=50, default='')
     
     invoice = models.ForeignKey(SaleInvoice, on_delete = models.SET_NULL, null= True)
-
+    
+    is_refund = models.CharField(max_length=50, null=True, blank=True)
     refunds_data = models.ForeignKey(Refund, on_delete = models.CASCADE, null= True, blank= True, related_name = 'refunds')
     coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, null=True, blank=True) 
     
@@ -50,20 +52,22 @@ class SaleRecords(CommonField):
     total_discount = models.FloatField(default=None, null=True, blank=True) 
     voucher_redeem_percentage = models.FloatField(default=None, null=True, blank=True) 
     redeem_option = models.CharField(max_length=250, default=None, null=True, blank=True)
+    tip = models.FloatField(default=0, null=True, blank=True) 
 
     is_promotion = models.BooleanField(default=False) 
     selected_promotion_id = models.CharField(default='', max_length=800) 
     selected_promotion_type = models.CharField(default='', max_length=400) 
     status = models.CharField(max_length=100, default='Active') 
+    
     sub_total = models.DecimalField(max_digit = 10, decimal_places = 2) 
 
-    coupon_discounted_price = models.FloatField(null=True)  
     is_coupon_redeemed = models.TextField(null=True) 
-    tip = models.FloatField(default=0, null=True, blank=True) 
+    # tip = models.FloatField(default=0, null=True, blank=True) 
     is_refund = models.CharField(max_length=50, null=True, blank=True) 
     checkout_type = models.CharField(choices = CheckoutType.choices, max_length = 50, null=True) 
+    
     # Fields specific to AppointmentCheckout
-    payment_method = models.CharField(max_length=100, null=True, blank=True) 
+    # payment_method = models.CharField(max_length=100, null=True, blank=True) 
     # payment_methods = models.
     
     
