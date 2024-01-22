@@ -5554,6 +5554,7 @@ def update_workingschedule(request):
     end_time = request.data.get('end_time', None)
     schedule_id = request.data.get('schedule_id', None)
     location_id_weekend = request.data.get('location', None)
+    is_vacation = request.data.get('is_vacation',None)
     # is_working_schedule = request.data.get('is_working_schedule', None)
     if leo_value is not None:
         check_working_schedule = EmployeDailySchedule.objects.get(
@@ -5583,7 +5584,7 @@ def update_workingschedule(request):
             },
             status=200
         )
-    if is_weekend is None:
+    if is_vacation is not None:
         if schedule_id is None:
             return Response(
                 {
@@ -5614,7 +5615,6 @@ def update_workingschedule(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-
         if employee is not None:
             try:
                 emp = Employee.objects.get(id=employee)
@@ -5622,7 +5622,6 @@ def update_workingschedule(request):
                 schedule.leo_value = leo_value
             except Exception as err:
                 pass
-
         schedule.save()
         serializer = ScheduleSerializer(schedule, data=request.data, partial=True, context={'request': request})
         if not serializer.is_valid():
@@ -5650,7 +5649,7 @@ def update_workingschedule(request):
             },
             status=status.HTTP_200_OK
         )
-    else:
+    if is_weekend is not None:
         week_end_employee = json.loads(week_end_employee)
         for employee in week_end_employee:
             qs = EmployeDailySchedule.objects.filter(date__date=date, employee_id=employee)
