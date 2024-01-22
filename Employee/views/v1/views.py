@@ -4763,22 +4763,21 @@ def create_workingschedule(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
         for employee_id in week_end_employee:
-            try:
-                employee = Employee.objects.get(id=employee_id)
-            except:
-                return Response(
-                    {
-                        'status': False,
-                        'status_code': StatusCodes.INVALID_EMPLOYEE_4025,
-                        'response': {
-                            'message': 'Employee not found',
-                            'error_message': str(err),
-                        }
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-            working_sch = EmployeDailySchedule.objects.filter(employee_id=employee, date=date).first()
+            # try:
+            #     employee = Employee.objects.get(id=employee_id)
+            # except:
+            #     return Response(
+            #         {
+            #             'status': False,
+            #             'status_code': StatusCodes.INVALID_EMPLOYEE_4025,
+            #             'response': {
+            #                 'message': 'Employee not found',
+            #                 'error_message': str(err),
+            #             }
+            #         },
+            #         status=status.HTTP_400_BAD_REQUEST
+            #     )
+            working_sch = EmployeDailySchedule.objects.filter(employee_id=employee_id, date=date).first()
             if working_sch:
                 working_sch.is_weekend = True
                 working_sch.location_id = location_for_weekend
