@@ -5663,6 +5663,14 @@ def update_workingschedule(request):
                     from_date=from_date,
                     location_id=location_id_weekend
                 )
+            else:
+                EmployeDailySchedule.objects.create(
+                    employee_id=employee,
+                    is_weekend=True,
+                    date=date,
+                    from_date=from_date,
+                    location_id=location_id_weekend
+                )
         qs = EmployeDailySchedule.objects.filter(
             is_weekend=True,
         )
