@@ -5399,17 +5399,18 @@ def delete_leo_day(request):
         leave_manage = LeaveManagements.objects.get(employee_id=schedule.employee.id)
         data = LeaveManagementSerializer(leave_manage , many=False).data
         if str(schedule.vacation_type) == "casual":
-            leave_manage.casual_leave -= 1
+            leave_manage.casual_leave += 1
             leave_manage.used_casual = leave_manage.used_casual - 1
             leave_manage.save()
         if str(schedule.vacation_type) == "medical":
-            leave_manage.medical_leave -= 1
+            leave_manage.medical_leave += 1
             leave_manage.used_medical = leave_manage.used_medical - 1
             leave_manage.save()
         if str(schedule.vacation_type) == "annual":
-            leave_manage.annual_leave -= 1
+            leave_manage.annual_leave += 1
             leave_manage.used_annual = leave_manage.used_annual - 1
             leave_manage.save()
+
         return Response(
             {
                 'data':data,
