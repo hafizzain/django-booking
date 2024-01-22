@@ -4408,9 +4408,9 @@ def create_vacation_emp(request):
 
     return Response(
         {
-            'days':days,
             'status': 200,
             'vacation_type': vacation_type,
+            'available_value':available_value,
             'days': days,
             'status_code': '200',
             'response': {
