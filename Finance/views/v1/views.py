@@ -75,7 +75,7 @@ class RefundAPIView(APIView):
                 'message': 'Record created successfully',
                 'error_message': None,
                 'data': {
-                    'refund': RefundSerializer(refund_serializer.instance).data,
+                    'refunds': refund_serializer.data,
                     # 'coupon': CouponSerializer(refund_serializer.instance).data,
                 }
             }
