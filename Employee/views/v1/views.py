@@ -35,7 +35,7 @@ from Employee.serializers import (EmployeSerializer, EmployeInformationsSerializ
                                   NewAbsenceSerializer, singleEmployeeSerializerOP, Payroll_WorkingScheduleSerializerOP,
                                   WeekendManagementSerializer, LeaveManagementSerializer, ScheduleSerializerOP,
                                   ScheduleSerializerResponse, GiftCardSerializer, GiftCardSerializerResponse,
-                                  EmployeDailyScheduleResponse
+                                  EmployeDailyScheduleResponse, VacationDetailsSerializer
                                   )
 from Employee.optimized_serializers import OptimizedEmployeeSerializerDashboard
 from django.db import connection, transaction
@@ -5383,9 +5383,14 @@ def delete_leo_day(request):
     schedule_id = request.query_params.get('id', None)
     if schedule_id is not None:
         schedule = EmployeDailySchedule.objects.filter(id=schedule_id)
-        schedule.delete()
+        schedule.update(is_leo_day=False, is_vacation=True)
+        schedule = EmployeDailySchedule.objects.filter(id=schedule_id).first()
+        vacations = Vacation.objects.filter(id=schedule.vacation.id)
+        data = VacationDetailsSerializer(vacations , many=True).data
+
         return Response(
             {
+                'data':data,
                 'status': 200,
                 'status_code': '200',
                 'response': {
