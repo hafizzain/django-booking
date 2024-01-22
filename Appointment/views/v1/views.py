@@ -3441,22 +3441,31 @@ def create_missed_opportunity(request):
     )
 
     for data in services_data:
-        employee_id = data.get('employee_id', None)  # Retrieve employee_id if present, else None
-        employee = None  # Initialize employee to None
-        
+        employee_id = data.get('employee_id', None)
+        employee = None
+
         if employee_id:
-            employee = Employee.objects.get(id=employee_id)
-            
+            try:
+                employee = Employee.objects.get(id=employee_id)
+            except Employee.DoesNotExist:
+                pass  # Handle the case where the employee doesn't exist if needed
+
         service = Service.objects.get(id=data['service_id'])
-        services_list.append(
-            OpportunityEmployeeService(
-                client_missed_opportunity=client_opportunity,
-                employee=employee,
-                service=service,
-                duration=data['duration'],
-                time=data['time']
+
+        # Check if employee is not None before creating OpportunityEmployeeService
+        if employee is not None:
+            services_list.append(
+                OpportunityEmployeeService(
+                    client_missed_opportunity=client_opportunity,
+                    employee=employee,
+                    service=service,
+                    duration=data['duration'],
+                    time=data['time']
+                )
             )
-        )
+        else:
+            # Handle the case where employee is None (skip or provide a default)
+            pass
 
     OpportunityEmployeeService.objects.bulk_create(services_list)
 
