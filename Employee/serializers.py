@@ -1583,7 +1583,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
             schedule = EmployeDailySchedule.objects.filter(
                 Q(employee=obj) &
                 Q(date__range=(month_start_date, month_end_date))
-            ).exclude(~Q(vacation_status='accepted')).order_by('-date')
+            ).exclude(~Q(vacation_status='accepted') & Q(is_vacation=True)).order_by('-date')
         else:
             schedule = EmployeDailySchedule.objects.filter(
                 is_leo_day=True,
