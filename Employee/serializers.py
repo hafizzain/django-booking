@@ -1576,10 +1576,14 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
         month_end_date = end_date or f'{now_date.year}-{now_date.month}-{total_days}'
         if leo_day is None:
+            # schedule = EmployeDailySchedule.objects.filter(
+            #     employee=obj,
+            #     date__range=(month_start_date, month_end_date)
+            # ).order_by('-date')
             schedule = EmployeDailySchedule.objects.filter(
-                employee=obj,
-                date__range=(month_start_date, month_end_date)
-            ).order_by('-date')
+                Q(employee=obj) &
+                Q(date__range=(month_start_date, month_end_date))
+            ).exclude(~Q(vacation_status='accepted')).order_by('-date')
         else:
             schedule = EmployeDailySchedule.objects.filter(
                 is_leo_day=True,
