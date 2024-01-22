@@ -5394,7 +5394,7 @@ def delete_leo_day(request):
         return Response(
             {
                 'data':data,
-                'schedule':schedule.vacation_type,
+                'schedule':str(schedule.vacation_type),
                 'status': 200,
                 'status_code': '200',
                 'response': {
