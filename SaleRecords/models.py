@@ -99,24 +99,6 @@ class SaleRecordTip(CommonField):
         return str(self.id) 
 
 
-class SaleRecordItem(CommonField): 
-
-    # id = models.UUIDField(default=uuid4, unique=True, primary_key=True, editable=False) 
-    sale_order = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, related_name='sale_order_items') 
-
-    checkout_type = models.CharField(choices = CheckoutType.choices, max_length = 50, null=True) 
-    item_type = models.CharField(max_length=100, choices=ItemType.choices, default='product') 
-    item_id = models.CharField(max_length=999, default='')  # This will be either Product Id, Service Id, Appointment Id 
-    
-    quantity = models.IntegerField(default=0) 
-    price = models.FloatField(default=0) 
-    discount = models.FloatField(default=0) 
-
-
-    total = models.FloatField(default=0) 
-    
-    
-
 
 class SaleRecordServices(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, related_name = 'sale_records')
