@@ -5584,7 +5584,7 @@ def update_workingschedule(request):
             },
             status=200
         )
-    if is_weekend is None:
+    if is_vacation is not None:
         if schedule_id is None:
             return Response(
                 {
@@ -5649,7 +5649,7 @@ def update_workingschedule(request):
             },
             status=status.HTTP_200_OK
         )
-    else:
+    if is_weekend is not None:
         week_end_employee = json.loads(week_end_employee)
         for employee in week_end_employee:
             qs = EmployeDailySchedule.objects.filter(date__date=date, employee_id=employee)
