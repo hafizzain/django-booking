@@ -52,11 +52,11 @@ def check_permission_view(request):
         return Response({'erorr': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 class RefundAPIView(APIView):
-
     def get(self, request, *args, **kwargs):
         refunds = Refund.objects.select_related(
             'client', 'business', 'location', 'refund_invoice_id', 'user')
         refund_serializer = RefundSerializer(refunds, many=True)
+        
         if not refunds:
             response_data = {
                 'success': False,
@@ -68,6 +68,11 @@ class RefundAPIView(APIView):
                 }
             }
             return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
+        # Assuming you want to get coupons for the first refund in the queryset
+        first_refund_instance = refunds.first()
+        coupon_serializer = CouponSerializer(instance=first_refund_instance.refund_coupon, many=False)
+
         response_data = {
             'success': True,
             'status_code': 200,
@@ -75,11 +80,8 @@ class RefundAPIView(APIView):
                 'message': 'Record created successfully',
                 'error_message': None,
                 'data': {
-                    # 'refund': RefundSerializer(refund_serializer.instance).data,
-                    # 'coupon': CouponSerializer(refund_serializer.instance).data,
                     'refunds': refund_serializer.data,
-                    # Include coupon data if applicable
-                    'coupons': CouponSerializer(instance=refund_serializer.instance).data,
+                    'coupons': coupon_serializer.data,
                 }
             }
         }
