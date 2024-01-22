@@ -4305,6 +4305,7 @@ def create_vacation_emp(request):
     if days > available_value:
         return Response(
             {
+                'days':days,
                 'status': 400,
                 'status_code': '400',
                 'response': {
@@ -4407,6 +4408,7 @@ def create_vacation_emp(request):
 
     return Response(
         {
+            'days':days,
             'status': 200,
             'vacation_type': vacation_type,
             'days': days,
