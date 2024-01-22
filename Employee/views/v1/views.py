@@ -5654,7 +5654,7 @@ def update_workingschedule(request):
     else:
         week_end_employee = json.loads(week_end_employee)
         for employee in week_end_employee:
-            qs_to_del= EmployeDailySchedule.objects.filter(employee_id=employee, date=date)
+            qs_to_del= EmployeDailySchedule.objects.filter(employee_id=employee, date=date).first()
             if qs_to_del:
                 qs_to_del.is_weekend=True
                 qs_to_del.save()
