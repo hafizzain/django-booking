@@ -470,6 +470,7 @@ class EmployeDailySchedule(models.Model):
     start_time = models.TimeField(null=True, blank=True)
     end_time = models.TimeField(null=True, blank=True)
 
+
     is_display = models.BooleanField(default=False)
     vacation_status = models.TextField(null=True)
 

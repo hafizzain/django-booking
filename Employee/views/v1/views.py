@@ -4378,7 +4378,8 @@ def create_vacation_emp(request):
                     from_date=current_date,
                     to_date=to_date,
                     note=note,
-                    vacation_status='pending'
+                    vacation_status='pending',
+                    vacation_type=vacation_type
                 )
 
                 if is_vacation is not None:
