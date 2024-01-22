@@ -3440,26 +3440,6 @@ def create_missed_opportunity(request):
         note=note,
     )
 
-    # for data in services_data:
-    #     employee_id = data.get('employee_id', None)  # Retrieve employee_id if present, else None
-    #     employee = None  # Initialize employee to None
-        
-    #     if employee_id:
-    #         employee = Employee.objects.get(id=employee_id)
-            
-    #     service = Service.objects.get(id=data['service_id'])
-    #     services_list.append(
-    #         OpportunityEmployeeService(
-    #             client_missed_opportunity=client_opportunity,
-    #             employee=employee,
-    #             service=service,
-    #             duration=data['duration'],
-    #             time=data['time']
-    #         )
-    #     )
-
-    # OpportunityEmployeeService.objects.bulk_create(services_list)
-
     for data in services_data:
         employee_id = data.get('employee_id', None)
         employee = None
@@ -3486,7 +3466,6 @@ def create_missed_opportunity(request):
         else:
             # Handle the case where employee is None (skip or provide a default)
             pass
-
 
     OpportunityEmployeeService.objects.bulk_create(services_list)
 
