@@ -1406,7 +1406,6 @@ def update_employee(request):
     leave_object.annual_leave = leave_object.operational_annual_leave - leave_object.used_annual
     leave_object.save()
 
-
     try:
         staff = StaffGroup.objects.get(employees=id)
         staff.employees.remove(employee)
@@ -4305,7 +4304,7 @@ def create_vacation_emp(request):
     if days > available_value:
         return Response(
             {
-                'days':days,
+                'days': days,
                 'status': 400,
                 'status_code': '400',
                 'response': {
@@ -4410,7 +4409,7 @@ def create_vacation_emp(request):
         {
             'status': 200,
             'vacation_type': vacation_type,
-            'available_value':available_value,
+            'available_value': available_value,
             'days': days,
             'status_code': '200',
             'response': {
@@ -4456,7 +4455,7 @@ def update_vacation_status(request):
                         status=status.HTTP_200_OK
                     )
                 leave_managements.casual_leave -= total_days_to_detect
-                leave_managements.used_casual =  leave_managements.used_casual + total_days_to_detect
+                leave_managements.used_casual = leave_managements.used_casual + total_days_to_detect
                 leave_managements.save()
             if vacation_type == 'annual':
                 if leave_managements.annual_leave == 0:
@@ -4715,7 +4714,7 @@ def create_workingschedule(request):
     date = request.data.get('date', None)
     note = request.data.get('note', None)
     max_records = 2
-    check_holiday=None
+    check_holiday = None
     is_vacation = request.data.get('is_vacation', None)
     type_of_sceduale = request.data.get('type', None)
     type_of_vacation = request.data.get('type_of_vacation', None)
@@ -4812,7 +4811,7 @@ def create_workingschedule(request):
         serializers = ScheduleSerializer(working_schedule, context={'request': request}, many=True)
         return Response(
             {
-                'check_holiday':check_holiday,
+                'check_holiday': check_holiday,
                 'status': True,
                 'status_code': 201,
                 'response': {
@@ -5554,7 +5553,7 @@ def update_workingschedule(request):
     start_time = request.data.get('start_time', None)
     end_time = request.data.get('end_time', None)
     schedule_id = request.data.get('schedule_id', None)
-    location_id_weekend = request.data.get('location',None)
+    location_id_weekend = request.data.get('location', None)
     # is_working_schedule = request.data.get('is_working_schedule', None)
     if leo_value is not None:
         check_working_schedule = EmployeDailySchedule.objects.get(
@@ -5654,9 +5653,9 @@ def update_workingschedule(request):
     else:
         week_end_employee = json.loads(week_end_employee)
         for employee in week_end_employee:
-            qs = EmployeDailySchedule.objects.filter(date__date=date ,employee_id=employee)
+            qs = EmployeDailySchedule.objects.filter(date__date=date, employee_id=employee)
             if qs:
-                qs = qs.update(is_weekend=True)
+                qs = qs.delete()
             else:
                 EmployeDailySchedule.objects.create(
                     employee_id=employee,
