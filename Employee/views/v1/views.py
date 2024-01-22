@@ -1402,10 +1402,16 @@ def update_employee(request):
         leave_object = LeaveManagements.objects.get(employee_id=id)
     except:
         leave_object = LeaveManagements.objects.create(employee_id=id)
-    leave_object.casual_leave = leave_object.operational_casual_leave - leave_object.used_casual
-    leave_object.medical_leave = leave_object.operational_medical_leave - leave_object.used_medical
-    leave_object.annual_leave = leave_object.operational_annual_leave - leave_object.used_annual
-    leave_object.save()
+    casual_leave = leave_object.operational_casual_leave - leave_object.used_casual
+    medical_leave = leave_object.operational_medical_leave - leave_object.used_medical
+    annual_leave = leave_object.operational_annual_leave - leave_object.used_annual
+    if 0 > casual_leave or 0 > medical_leave or 0 > annual_leave:
+        pass
+    else:
+        leave_object.casual_leave = leave_object.operational_casual_leave - leave_object.used_casual
+        leave_object.medical_leave = leave_object.operational_medical_leave - leave_object.used_medical
+        leave_object.annual_leave = leave_object.operational_annual_leave - leave_object.used_annual
+        leave_object.save()
 
     try:
         staff = StaffGroup.objects.get(employees=id)
