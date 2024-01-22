@@ -4924,10 +4924,10 @@ def create_workingschedule(request):
             if type_of_vacation == 'casual':
                 leave_object.casual_leave += 1
                 leave_object.save()
-            if type_of_sceduale == 'medical':
+            if type_of_vacation == 'medical':
                 leave_object.medical_leave += 1
                 leave_object.save()
-            if type_of_sceduale == 'annual':
+            if type_of_vacation == 'annual':
                 leave_object.annual_leave += 1
                 leave_object.save()
         if type_of_sceduale == 'weekend':
