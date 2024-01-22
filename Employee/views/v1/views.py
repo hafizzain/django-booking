@@ -5385,11 +5385,12 @@ def delete_leo_day(request):
     schedule_id = request.query_params.get('id', None)
     if schedule_id is not None:
         schedule = EmployeDailySchedule.objects.filter(id=schedule_id)
-        schedule.update(is_leo_day=False, is_vacation=True)
+        schedule.is_leo_day=False
+        schedule.is_vacation=True
+        schedule.save()
         schedule = EmployeDailySchedule.objects.filter(id=schedule_id).first()
         leave_manage = LeaveManagements.objects.filter(employee_id=schedule.employee.id)
         data = LeaveManagementSerializer(leave_manage , many=True).data
-
         return Response(
             {
                 'data':data,
