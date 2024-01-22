@@ -76,7 +76,7 @@ class RefundAPIView(APIView):
                 'error_message': None,
                 'data': {
                     'refunds': refund_serializer.data,
-                    # 'coupon': CouponSerializer(refund_serializer.instance).data,
+                    'coupon': CouponSerializer(refund_serializer.instance).data,
                 }
             }
         }
