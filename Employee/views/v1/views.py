@@ -5387,6 +5387,7 @@ def delete_leo_day(request):
         schedule = EmployeDailySchedule.objects.get(id=schedule_id)
         schedule.is_leo_day=False
         schedule.is_vacation=True
+        schedule.vacation_status = 'accepted'
         schedule.save()
         schedule = EmployeDailySchedule.objects.get(id=schedule_id)
         leave_manage = LeaveManagements.objects.get(employee_id=schedule.employee.id)
