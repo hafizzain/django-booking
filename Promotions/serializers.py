@@ -5,7 +5,7 @@ from Sale.serializers import AvailPriceServiceSerializers, PriceServiceSerialize
 from Service.models import PriceService
 from rest_framework import serializers
 
-from Business.models import BusinessAddress, BusinessTax, Business, RefundSetting
+from Business.models import BusinessAddress, BusinessTax, Business
 from Product.Constants.index import tenant_media_base_url
 from django_tenants.utils import tenant_context
 from Product.models import Product, Brand

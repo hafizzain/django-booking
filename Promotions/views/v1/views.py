@@ -11,7 +11,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from Authentication.serializers import UserTenantLoginSerializer
-from Business.models import BusinessAddressMedia, BusinessType, RefundSetting
+from Business.models import BusinessAddressMedia, BusinessType
 from Business.serializers.v1_serializers import EmployeTenatSerializer, OpeningHoursSerializer, \
     AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, \
     Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, \
@@ -7082,57 +7082,57 @@ def delete_all_coupon(request):
 #         )
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def get_refund(request):
-    location = request.data.get('location', None)
-    if location:
-        refundsetting = RefundSetting.objects.filter(location_id=location)
-        if refundsetting:
-            serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request},
-                                                                       many=True)
-            return Response(
-                {
-                    'status': True,
-                    'status_code': 200,
-                    'response': {
-                        'message': 'Refund get successfully!',
-                        'error_message': None,
-                        'errors': [],
-                        'data': serializer.data,
+# @api_view(['GET'])
+# @permission_classes([AllowAny])
+# def get_refund(request):
+#     location = request.data.get('location', None)
+#     if location:
+#         refundsetting = RefundSetting.objects.filter(location_id=location)
+#         if refundsetting:
+#             serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request},
+#                                                                        many=True)
+#             return Response(
+#                 {
+#                     'status': True,
+#                     'status_code': 200,
+#                     'response': {
+#                         'message': 'Refund get successfully!',
+#                         'error_message': None,
+#                         'errors': [],
+#                         'data': serializer.data,
 
-                    }
-                },
-                status=status.HTTP_200_OK
-            )
-        else:
-            return Response(
-                {
-                    'status': False,
-                    'status_code': 400,
-                    'response': {
-                        'message': 'Refund doesnot exists',
-                        'error_message': None,
+#                     }
+#                 },
+#                 status=status.HTTP_200_OK
+#             )
+#         else:
+#             return Response(
+#                 {
+#                     'status': False,
+#                     'status_code': 400,
+#                     'response': {
+#                         'message': 'Refund doesnot exists',
+#                         'error_message': None,
 
-                    }
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-    else:
-        refundsetting = RefundSetting.objects.all()
-        serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request},
-                                                                   many=True)
-        return Response(
-            {
-                'status': True,
-                'status_code': 200,
-                'response': {
-                    'message': 'Refund get successfully!',
-                    'error_message': None,
-                    'errors': [],
-                    'data': serializer.data,
+#                     }
+#                 },
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+#     else:
+#         refundsetting = RefundSetting.objects.all()
+#         serializer = PromtoionsSerializers.RefundSettingSerializer(refundsetting, context={'request': request},
+#                                                                    many=True)
+#         return Response(
+#             {
+#                 'status': True,
+#                 'status_code': 200,
+#                 'response': {
+#                     'message': 'Refund get successfully!',
+#                     'error_message': None,
+#                     'errors': [],
+#                     'data': serializer.data,
 
-                }
-            },
-            status=status.HTTP_200_OK
-        )
+#                 }
+#             },
+#             status=status.HTTP_200_OK
+#         )

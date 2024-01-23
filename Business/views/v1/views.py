@@ -15,7 +15,7 @@ from rest_framework.generics import (ListAPIView, CreateAPIView, UpdateAPIView, 
 from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Authentication.serializers import UserTenantLoginSerializer
 
-from Business.models import BusinessAddressMedia, BusinessType, BusinessPrivacy, BusinessPolicy, RefundSetting
+from Business.models import BusinessAddressMedia, BusinessType, BusinessPrivacy, BusinessPolicy
 from Business.serializers.v1_serializers import (BusinessAddress_CustomerSerializer,
                                                  EmployeAppointmentServiceSerializer,
                                                  EmployeTenatSerializer, OpeningHoursSerializer,

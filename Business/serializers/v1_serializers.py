@@ -13,7 +13,7 @@ from Business.models import (BookingSetting, BusinessAddressMedia, BusinessType,
                              BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, 
                              ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, 
                              BusinessPaymentMethod, BusinessTax, BusinessVendor,BusinessOpeningHour,
-                             BusinessTaxSetting, BusinessPolicy, BusinessPrivacy, RefundSetting
+                             BusinessTaxSetting, BusinessPolicy, BusinessPrivacy
                         )
 from Authentication.serializers import UserSerializer
 from django.conf import settings
@@ -749,8 +749,8 @@ class BusinessPrivacySerializer(serializers.ModelSerializer):
         model = BusinessPrivacy
         fields = '__all__'
 
-class RefundSettingSerializer(serializers.ModelSerializer):
+# class RefundSettingSerializer(serializers.ModelSerializer):
 
-    class Meta:
-        model = RefundSetting
-        fields = '__all__'
+#     class Meta:
+#         model = RefundSetting
+#         fields = '__all__'
