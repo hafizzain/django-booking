@@ -4163,65 +4163,63 @@ def create_vacation_emp(request):
     is_working_schedule = request.data.get('is_working_schedule', None)
     value = 0
     difference_days = 0
-
     working_sch = None
-    check_leo_day = EmployeDailySchedule.objects.filter(
-        employee=employee,
-        date=from_date,
-        is_leo_day=True
-    )
-    check_weekend = EmployeDailySchedule.objects.filter(
-        employee=employee,
-        date=from_date,
-        is_weekend=True
-    )
-    check_holiday = EmployeDailySchedule.objects.filter(
-        employee=employee,
-        date=from_date,
-        is_holiday=True
-    )
-    if check_weekend:
-        return Response(
-            {
-                'status': 400,
-                'status_code': 400,
-                'status_code_text': '400',
-                'response': {
-                    'message': f'Cannot create vacation on weekend.',
-                    'error_message': None,
-                }
-            },
 
-            status=200
-        )
-    if check_holiday:
-        return Response(
-            {
-                'status': 400,
-                'status_code': 400,
-                'status_code_text': '400',
-                'response': {
-                    'message': f'Cannot create vacation on holiday.',
-                    'error_message': None,
-                }
-            },
-
-            status=200
-        )
-    if check_leo_day:
-        return Response(
-            {
-                'status': 400,
-                'status_code': 400,
-                'status_code_text': '400',
-                'response': {
-                    'message': f'Cannot create vacation on leo day.',
-                    'error_message': None,
-                }
-            },
-
-            status=200
-        )
+    # check_leo_day = EmployeDailySchedule.objects.filter(
+    #     employee=employee,
+    #     date=from_date,
+    #     is_leo_day=True
+    # )
+    # check_weekend = EmployeDailySchedule.objects.filter(
+    #     employee=employee,
+    #     date=from_date,
+    #     is_weekend=True
+    # )
+    # check_holiday = EmployeDailySchedule.objects.filter(
+    #     employee=employee,
+    #     date=from_date,
+    #     is_holiday=True
+    # )
+    # if check_weekend:
+    #     return Response(
+    #         {
+    #             'status': 400,
+    #             'status_code': 400,
+    #             'status_code_text': '400',
+    #             'response': {
+    #                 'message': f'Cannot create vacation on weekend.',
+    #                 'error_message': None,
+    #             }
+    #         },
+    #         status=200
+    #     )
+    # if check_holiday:
+    #     return Response(
+    #         {
+    #             'status': 400,
+    #             'status_code': 400,
+    #             'status_code_text': '400',
+    #             'response': {
+    #                 'message': f'Cannot create vacation on holiday.',
+    #                 'error_message': None,
+    #             }
+    #         },
+    #         status=200
+    #     )
+    # if check_leo_day:
+    #     return Response(
+    #         {
+    #             'status': 400,
+    #             'status_code': 400,
+    #             'status_code_text': '400',
+    #             'response': {
+    #                 'message': f'Cannot create vacation on leo day.',
+    #                 'error_message': None,
+    #             }
+    #         },
+    # 
+    #         status=200
+    #     )
 
     if not all([business_id, employee]):
         return Response(
@@ -4338,6 +4336,25 @@ def create_vacation_emp(request):
         employee=employee_id,
         from_date=from_date,
     ).first()
+    if is_vacation_exist:
+        return Response(
+            {
+                'status': 400,
+                'status_code': '400',
+                'response': {
+                    'message': 'Employee Vacation Already Exist',
+                    'error_message': None,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
+    is_vacation_exist = Vacation.objects.filter(
+        business=business,
+        employee=employee_id,
+        # from_date=from_date,
+        vacation_status='pending'
+    )
     if is_vacation_exist:
         return Response(
             {
