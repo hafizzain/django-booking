@@ -4848,7 +4848,3 @@ class BusinessTaxSettingView(APIView):
 #     authentication_classes = [AllowAny]
 #     queryset = BusinessPolicy.objects.all()
 #     serializer_class = BusinessPolicySerializer
-
-# class RefundSettingViewset(viewsets.ModelViewSet):
-#     queryset = RefundSetting.objects.all()
-#     serializer_class = RefundSettingSerializer

@@ -96,6 +96,7 @@ class SaleRecordsAppointmentServices(CommonField):
     
 class PaymentMethods(CommonField):
     sale_records = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, related_name = 'sale_records')
+    
     payment_method = models.CharField(choices = PaymentMethods.choices , default = '')
     amount = models.FloatField(default  = 0 , null = True, blank = True)
 class RedeemedItems(CommonField):
