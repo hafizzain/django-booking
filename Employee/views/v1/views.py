@@ -4331,6 +4331,24 @@ def create_vacation_emp(request):
     # diff = to_date - from_date
     # working_sch = None
     # days = int(diff.days)
+    is_vacations = Vacation.objects.filter(
+        business=business,
+        employee=employee_id,
+        # from_date=from_date,
+        vacation_status='pending'
+    )
+    if is_vacations:
+        return Response(
+            {
+                'status': 400,
+                'status_code': '400',
+                'response': {
+                    'message': 'Employee vacation is already on pending state',
+                    'error_message': None,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
     is_vacation_exist = Vacation.objects.filter(
         business=business,
         employee=employee_id,
@@ -4343,25 +4361,6 @@ def create_vacation_emp(request):
                 'status_code': '400',
                 'response': {
                     'message': 'Employee Vacation Already Exist',
-                    'error_message': None,
-                }
-            },
-            status=status.HTTP_200_OK
-        )
-
-    is_vacation_exist = Vacation.objects.filter(
-        business=business,
-        employee=employee_id,
-        # from_date=from_date,
-        vacation_status='pending'
-    )
-    if is_vacation_exist:
-        return Response(
-            {
-                'status': 400,
-                'status_code': '400',
-                'response': {
-                    'message': 'Employee vacation is already on pending state',
                     'error_message': None,
                 }
             },
