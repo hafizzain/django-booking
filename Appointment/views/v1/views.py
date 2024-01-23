@@ -42,7 +42,7 @@ from threading import Thread
 
 from Appointment.models import (Appointment, AppointmentService, AppointmentNotes, AppointmentCheckout,
                                 AppointmentLogs, LogDetails, AppointmentEmployeeTip, ClientMissedOpportunity,
-                                OpportunityEmployeeService)
+                                OpportunityEmployeeService, Reversal)
 from Appointment.serializers import (CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer,
                                      ServiceEmployeeSerializer,
                                      SingleAppointmentSerializer, AllAppoinmentSerializer, SingleNoteSerializer,
@@ -56,6 +56,8 @@ from Appointment.serializers import (CheckoutSerializer, AppoinmentSerializer, S
                                      AppointmentSerializerForStatus, SingleNoteResponseSerializer)
 from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
+
+from Utility.Campaign import send_reversal_email
 from Utility.models import ExceptionRecord
 from Invoices.models import SaleInvoice
 from Reports.models import DiscountPromotionSalesReport
@@ -124,6 +126,36 @@ def get_single_appointments(request):
             }
         },
         status=status.HTTP_200_OK
+    )
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def create_reversal(request):
+    description = request.data.get('description', None)
+    business = request.data.get('business', None)
+    service_id = request.data.get('appointment_service', None)
+    appointment_id = request.data.get('appointment_id', None)
+    Reversal.objects.create(
+        description=description,
+        business_id=business,
+        appointment_services_id=service_id,
+        appointment_id=appointment_id
+    )
+    business = Business.objects.get(id=business)
+    email = business.user.email
+    send_reversal_email(email=email, appointment_id=appointment_id, service_id=service_id)
+    return Response(
+        {
+            'status': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Reversal created successfully!',
+                'error_message': None,
+                'errors': []
+            }
+        },
+        status=status.HTTP_200_OK  
     )
 
 
@@ -407,7 +439,7 @@ def get_recent_ten_appointments(request):
                                   .select_related('member', 'service', 'appointment__client') \
                                   .order_by('-created_at')[:10]
 
-    serialized = AppointmentSerializerDashboard(recent_ten_appointments, many=True , context={'request': request})
+    serialized = AppointmentSerializerDashboard(recent_ten_appointments, many=True, context={'request': request})
 
     return Response(
         {
@@ -899,7 +931,7 @@ def create_appointment(request):
                 'message': 'Appointment Create!',
                 'error_message': None,
                 'error': Errors,
-                'appointment_id':appointment.id,
+                'appointment_id': appointment.id,
                 'appointment_service_id': service_appointments[0],
                 'appointments': serialized.data,
             }
@@ -2036,12 +2068,12 @@ def create_checkout(request):
         appointment=appointment,
         appointment_service=f'{service_appointment.id}',
         payment_type=payment_method,
-        
+
         # Added new fields
 
-        invoice_type = 'order',
-        checkout_type = 'appointment',
-        
+        invoice_type='order',
+        checkout_type='appointment',
+
         service=f'{service.id}' if service else '',
         member=f'{member.id}' if member else '',
         business_address=f'{business_address.id}',
@@ -2370,9 +2402,9 @@ def service_appointment_count(request):
         query &= Q(id__in=service_ids)
 
     services = Service.objects \
-                .filter(query) \
-                .with_total_sale_count(location=location, duration=duration) \
-                .order_by('-total_count')
+        .filter(query) \
+        .with_total_sale_count(location=location, duration=duration) \
+        .order_by('-total_count')
 
     serializer = BasicServiceSerializer(services, many=True)
 

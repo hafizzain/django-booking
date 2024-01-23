@@ -58,3 +58,22 @@ def send_refund_email(client_email):
     # Create a thread and start it
     email_thread = Thread(target=send_email_in_thread)
     email_thread.start()
+
+
+def send_reversal_email(email=None,appointment_id=None,service_id=None):
+    subject = 'reversal email'
+    message = 'Appointment id {appointment_id} Service id {service_id}'.format(appointment_id=appointment_id , service_id=service_id)
+
+
+    def send_email_in_thread():
+        send_mail(
+            subject,
+            message,
+            settings.EMAIL_HOST_USER,
+            [email],
+            fail_silently=False,
+        )
+
+    # Create a thread and start it
+    email_thread = Thread(target=send_email_in_thread)
+    email_thread.start()

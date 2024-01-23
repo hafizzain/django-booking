@@ -14,7 +14,7 @@ from rest_framework import serializers
 from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Appointment.models import (Appointment, AppointmentCheckout, AppointmentNotes, AppointmentService,
                                 AppointmentLogs, LogDetails, AppointmentEmployeeTip, ClientMissedOpportunity,
-                                OpportunityEmployeeService)
+                                OpportunityEmployeeService, Reversal)
 from Business.models import BusinessAddress
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
 from Client.serializers import ClientAppointmentSerializer, ClientSerializerOP
@@ -31,6 +31,13 @@ from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Utility.models import ExceptionRecord
 from Service.models import Service
 
+
+
+
+class ReversalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reversal
+        fields = "__all__"
 
 class ServiceImageSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
