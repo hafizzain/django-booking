@@ -13,7 +13,7 @@ from Promotions.models import Coupon
 from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs
 from Finance.models import Refund
 from Order.models import Checkout
-from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip
+from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip , Appointment
 from Invoices.models import SaleInvoice
 
 # from Business.models import
@@ -35,10 +35,11 @@ class SaleRecords(CommonField):
     business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='appointment_address_tips') 
 
     checkout_type = models.CharField(choices = CheckoutType.choices, max_length = 50, null=True) 
-    checkout = models.ForeignKey(Checkout, on_delete=models.CASCADE, related_name='sale_orders_checkout', null=True, blank=True) 
-    appointment_checkout = models.ForeignKey(AppointmentCheckout, on_delete=models.CASCADE, related_name='appointment_orders_checkout', null=True, blank=True) 
+    # checkout = models.ForeignKey(Checkout, on_delete=models.CASCADE, related_name='sale_orders_checkout', null=True, blank=True) 
+    # appointment_checkout = models.ForeignKey(AppointmentCheckout, on_delete=models.CASCADE, related_name='appointment_orders_checkout', null=True, blank=True) 
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_checkout_orders', null=True, blank=True) 
+    employee = models.ForeignKey(Employee, on_delete = models.CASCADE)
     client_type = models.CharField(choices=ClientTypeChoices.choices, max_length=50, default='')
     payment_method = models.CharField(choices=PaymentMethods.choices, max_length=50, default='')
     
@@ -62,28 +63,16 @@ class SaleRecords(CommonField):
     sub_total = models.DecimalField(max_digit = 10, decimal_places = 2) 
 
     is_coupon_redeemed = models.TextField(null=True) 
-    # tip = models.FloatField(default=0, null=True, blank=True) 
-    is_refund = models.CharField(max_length=50, null=True, blank=True) 
-    checkout_type = models.CharField(choices = CheckoutType.choices, max_length = 50, null=True) 
-    
-    # Fields specific to AppointmentCheckout
-    # payment_method = models.CharField(max_length=100, null=True, blank=True) 
-    # payment_methods = models.
-    
-    
-    service_price = models.FloatField(default=0, null=True, blank=True) 
-    total_price = models.FloatField(default=0, null=True, blank=True) 
-
-
-    # Fields specific to Checkout
-    client_type = models.CharField(choices=ClientTypeChoices.choices, max_length=50, default='') 
-    payment_type = models.CharField(choices=PaymentMethods.choices, max_length=50, default='') 
 
     class Meta:
         verbose_name_plural = 'Sale Records'
 
+class SaleRecordAppliedCoupons(CommonField):
+    sale_records = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True)
+    is_coupon_redeemed = models.TextField(null=True) 
+    coupon_type = models.CharField(choice = CouponType.choices, null = True, blank = True)
 
-class SaleTax(models.Model):
+class SaleTax(CommonField):
     # self.id is a seperate field 
     
     sale_order = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, related_name='sale_taxs') 
@@ -97,39 +86,43 @@ class SaleTax(models.Model):
     def __str__(self):
         return self.tax_name
 
-class SaleOrderTip(models.Model):    
+class SaleRecordTip(CommonField):    
 
-    id = models.UUIDField(default=uuid4, unique=True, primary_key=True, editable=False) 
+    # id = models.UUIDField(default=uuid4, unique=True, primary_key=True, editable=False) 
     member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_checkout_tips', null=True, blank=True) 
     sale_order = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, related_name='sale_order_tips') 
     tip = models.FloatField(default=0, null=True, blank=True) 
 
-    created_at = models.DateTimeField(auto_now_add=True) 
+    # created_at = models.DateTimeField(auto_now_add=True) 
     
     def __str__(self): 
         return str(self.id) 
 
 
 
-class SaleOrderItem(models.Model): 
-
-    ITEM_TYPE_CHOICES = ( 
-        ('Product', 'Product'), 
-        ('Service', 'Service'), 
-    ) 
-
-    id = models.UUIDField(default=uuid4, unique=True, primary_key=True, editable=False) 
-    sale_order = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, related_name='sale_order_items') 
-
-    checkout_type = models.CharField(choices = CheckoutType.choices, max_length = 50, null=True) 
-    item_type = models.CharField(max_length=100, choices=ITEM_TYPE_CHOICES, default='Product') 
-    item_id = models.CharField(max_length=999, default='') # This will be either Product Id, Service Id, Appointment Id 
-
-    item_primary_name = models.CharField(max_length=999, default='') 
-    item_secondary_name = models.CharField(max_length=999, default='') 
-
-    quantity = models.IntegerField(default=0) 
-    price = models.FloatField(default=0) 
-    discount = models.FloatField(default=0) 
-
-    total = models.FloatField(default=0) 
+class SaleRecordServices(CommonField):
+    sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, related_name = 'sale_records')
+    service = models.ForeignKey(Service, on_delete = models.CASCADE)
+    qty = models.PositiveIntegerField(default = 0)
+    price = models.FloatField()
+    
+    
+class SaleRecordsProducts(CommonField):
+    sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, related_name = 'sale_records')
+    product = models.ForeignKey(Product, on_delete = models.CASCADE)
+    qty = models.PositiveIntegerField(default = 0)
+    price = models.FloatField()
+    
+    
+class SaleRecordsAppointmentServices(CommonField):
+    sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, related_name = 'sale_records')
+    # appointment = models.ForeignKey(Appointment, on_delete = models.CASCADE , related_name = 'related_appointment')
+    service = models.ForeignKey(Service, on_delete = models.CASCADE)
+    appointment_status = models.CharField(choices = AppointmentStatus.choices, default = 'void')
+    qty = models.PositiveIntegerField(default = 0)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    duration = models.PositiveIntegerField()
+    appointment_notes = models.CharField(max_length = 255 , null = True , blank = True)
+    cancel_reason = models.CharField(max_length=150, null=True, blank=True)
+    cancel_note = models.TextField(null=True)

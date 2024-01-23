@@ -117,8 +117,9 @@ class AllowRefundsSerializer(serializers.ModelSerializer):
         instance.number_of_days = validated_data.get('number_of_days', instance.number_of_days)
         instance.save()
         allowed_employees_data = validated_data.get('allowed_refund', [])
+        
         provided_employee_ids = {str(data['employee']) for data in allowed_employees_data}
-        print(provided_employee_ids)
+        # print(provided_employee_ids)
         instance.allowed_refund.filter(~Q(employee_id__in=provided_employee_ids)).delete()
 
         for employee_data in allowed_employees_data:
