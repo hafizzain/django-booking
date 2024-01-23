@@ -1214,8 +1214,8 @@ class SingleNoteSerializer(serializers.ModelSerializer):
         ) \
         .select_related('member', 'user', 'service') \
         .order_by('-created_at')
-        client_all_appointment = appointment_checkout_all.aggregate(total_sale=Sum('price')).get('total_sale', 0)
-        return client_all_appointment.count()
+        # client_all_appointment = appointment_checkout_all.aggregate(total_sale=Sum('price')).get('total_sale', 0)
+        return appointment_checkout_all.count()
     
     class Meta:
         model = Appointment
