@@ -19,6 +19,7 @@ from Appointment.models import AppointmentCheckout, AppointmentService
 from Order.models import Checkout, ProductOrder, ServiceOrder
 
 
-class SaleRecordApiView(APIView):
+class SaleRecordViews(APIView):
+    
     def post(self, request, *args, **kwargs):
         pass
