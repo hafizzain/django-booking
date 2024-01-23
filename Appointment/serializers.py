@@ -226,7 +226,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
         #             last_month = int(last_app.created_at.strftime('%m'))
 
         #             months = max(client_f_month - last_month, 1)
-        #             monthly_spending = 0
+        #             monthly_spending = 0Appointment_Booked
         #             tag = ''
 
         #             if client_appointments.count() >= months:
@@ -541,7 +541,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
         # single_data = {
         #     "id": "51479f52-7943-44d1-b3b5-12e0125ca307",
         #     "appointment_id": "51479f52-7943-44d1-b3b5-12e0125ca307",
-        #     "appointment_date": "2023-05-29",
+        #     "appointment_date": "2023-05-29",appointment_service_status_update
         #     "appointment_time": "00:00:00",
         #     "end_time": "00:00:00",
         #     "duration": "35min",
