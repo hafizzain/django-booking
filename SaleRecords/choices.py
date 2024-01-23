@@ -32,9 +32,9 @@ class ItemType(models.TextChoices):
     
 class Status (models.TextChoices):
     IS_REFUND = 'is_refund','Is Refund'
-    CANCELLED = 'cancelled','cancelled'
-    PAID = 'paid' , 'paid'
-    UN_PAID = 'un_paid' , 'un_paid'
+    CANCELLED = 'cancelled','Cancelled'
+    PAID = 'paid' , 'Paid'
+    UN_PAID = 'un_paid' , 'Un Paid'
 
     
 class AppointmentStatus(models.TextChoices):
@@ -49,4 +49,8 @@ class CouponType (models.TextChoices):
     SPEICFIC_PRODUCT_SERVICES = 'specific_product_services','Specific Service/Product Coupon'
     BUY_ONE_GET_ONE = 'buy_one_get' ,'Buy one Get one Free'
     SPEND_SOME_AMOUNT_= 'spend_some_amount' ,'Spend Some Amount'
+    PROMOTION = "is_promotion","Promotion"
+    VOUCHER = "voucher","Voucher"
+    MEMBERSHIP = "membership","Membership"
+    GIFT = "gift", "Gift"
     
