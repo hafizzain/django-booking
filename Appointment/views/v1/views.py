@@ -142,6 +142,7 @@ def create_reversal(request):
         appointment_services_id=service_id,
         appointment_id=appointment_id
     )
+    business = Business.objects.get(id=business)
     email = business.user.email
     send_reversal_email(email=email, appointment_id=appointment_id, service_id=service_id)
     return Response(
