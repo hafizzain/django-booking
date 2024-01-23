@@ -534,6 +534,6 @@ class BusinessPolicy(models.Model):
     def __str__(self) -> str:
         return self.title
 
-# class RefundSetting(CommonField):
-#     location = models.OneToOneField(BusinessAddress, on_delete=models.CASCADE,related_name='refund_location')
-#     number_of_days = models.IntegerField(default=30)
+class RefundSetting(CommonField):
+    location = models.OneToOneField(BusinessAddress, on_delete=models.CASCADE,related_name='refund_location')
+    number_of_days = models.IntegerField(default=30)
