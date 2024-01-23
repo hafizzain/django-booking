@@ -1207,15 +1207,18 @@ class SingleNoteSerializer(serializers.ModelSerializer):
             return obj.client.mobile_number if obj.client else None    
         
     def get_client_all_appointment(self, obj):
-        appointment_checkout_all = AppointmentService.objects \
-        .filter(
-            appointment__client=obj.client,
-            appointment_status__in=['Done', 'Paid']
-        ) \
-        .select_related('member', 'user', 'service') \
-        .order_by('-created_at')
-        # client_all_appointment = appointment_checkout_all.aggregate(total_sale=Sum('price')).get('total_sale', 0)
-        return appointment_checkout_all.count()
+        if obj.client != None:
+            appointment_checkout_all = AppointmentService.objects \
+            .filter(
+                appointment__client=obj.client,
+                appointment_status__in=['Done', 'Paid']
+            ) \
+            .select_related('member', 'user', 'service') \
+            .order_by('-created_at')
+            # client_all_appointment = appointment_checkout_all.aggregate(total_sale=Sum('price')).get('total_sale', 0)
+            return appointment_checkout_all.count()
+        else:
+            return 0
     
     class Meta:
         model = Appointment
