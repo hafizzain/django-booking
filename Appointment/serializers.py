@@ -1133,6 +1133,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
     client_email = serializers.SerializerMethodField(read_only=True)
     client_phone = serializers.SerializerMethodField(read_only=True)
     client_all_appointment = serializers.SerializerMethodField(read_only=True)
+    client_all_sales = serializers.SerializerMethodField(read_only=True)
     
     def get_appointment_tips(self, obj):
         tips = AppointmentEmployeeTip.objects.filter(
@@ -1219,10 +1220,23 @@ class SingleNoteSerializer(serializers.ModelSerializer):
             return appointment_checkout_all.count()
         else:
             return 0
+    def get_client_all_sales(self, obj):
+        if obj.client != None:
+            appointment_checkout_all = AppointmentService.objects \
+            .filter(
+                appointment__client=obj.client,
+                appointment_status__in=['Done', 'Paid']
+            ) \
+            .select_related('member', 'user', 'service') \
+            .order_by('-created_at')
+            client_all_sales = appointment_checkout_all.aggregate(total_sale=Sum('price')).get('total_sale', 0)
+            return client_all_sales
+        else:
+            return 0    
     
     class Meta:
         model = Appointment
-        fields = ['id', 'client','client_name', 'client_email', 'client_phone', 'client_all_appointment','appointment_tips', 'notes', 'business_address',
+        fields = ['id', 'client','client_name', 'client_email', 'client_phone', 'client_all_appointment','appointment_tips', 'client_all_sales', 'notes', 'business_address',
                   'client_type', 'appointmnet_service', 'customer_note', 'status']
 
 
