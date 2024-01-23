@@ -636,3 +636,11 @@ class OpportunityEmployeeService(CommonField):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_missed_opportunities')
     duration = models.CharField(default='', max_length=200)
     time = models.TimeField()
+
+
+class Reversal(CommonField):
+    description = models.TextField(null=True)
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, null=True)
+    appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True)
+    appointment_services = models.ForeignKey(AppointmentService, on_delete=models.CASCADE, null=True)
+    request_status = models.TextField(default="void",null=True)
