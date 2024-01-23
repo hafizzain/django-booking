@@ -60,7 +60,7 @@ def send_refund_email(client_email):
     email_thread.start()
 
 
-def send_reversal_email(client_email,appointment_id=None,service_id=None):
+def send_reversal_email(email=None,appointment_id=None,service_id=None):
     subject = 'reversal email'
     message = 'Appointment id {appointment_id} Service id {service_id}'.format(appointment_id=appointment_id , service_id=service_id)
     client_email = client_email
