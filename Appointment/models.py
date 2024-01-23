@@ -312,7 +312,9 @@ class AppointmentService(models.Model):
 
     client_tag = models.CharField(max_length=50, default='')
     client_type = models.CharField(max_length=50, default='')
-
+    
+    reason = models.CharField(max_length=100, null=True, blank=True)
+    
     objects = AppointmentServiceCustomManager.as_manager()
 
 
