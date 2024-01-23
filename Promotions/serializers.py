@@ -2321,17 +2321,3 @@ class CouponSerializer(serializers.ModelSerializer):
                   'excluded_products', 'coupon_blockdays', 'buy_one_get_one_product', 'buy_one_get_one_service',
                   'servicegroup_discount'
                   ]
-
-
-# class Locationserializerresponse(serializers.ModelSerializer):
-#     class Meta:
-#         model = BusinessAddress
-#         fields = ['id', 'address_name']
-
-
-# class RefundSettingSerializer(serializers.ModelSerializer):
-#     location = Locationserializerresponse()
-
-#     class Meta:
-#         model = RefundSetting
-#         fields = ['id', 'number_of_days', 'location']

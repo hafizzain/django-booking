@@ -29,6 +29,10 @@ class SaleRecordAppliedCouponsSerializer(serializers.ModelSerializer):
         models = SaleRecordAppliedCoupons
         fields = "__all__"
 
+class PaymentMethodsSerializer(serializers.ModelSerializer):
+    class Meta:
+        models = PaymentMethods
+        fields = "__all__"
 
 class RedeemedItemsSerializer(serializers.ModelSerializer):
     class Meta: 
