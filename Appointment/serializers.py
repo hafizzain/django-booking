@@ -1194,7 +1194,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
         else:
             return obj.client.email if obj.client else None
     
-    def get_client_email(self, obj):
+    def get_client_phone(self, obj):
         """
         If is_mobile is true send complete client
         object, otherwise just send client ID.
