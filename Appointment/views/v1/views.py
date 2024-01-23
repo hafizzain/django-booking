@@ -139,7 +139,7 @@ def create_reversal(request):
     Reversal.objects.create(
         description=description,
         business_id=business,
-        service_id=service_id,
+        appointment_services_id=service_id,
         appointment_id=appointment_id
     )
     email = business.user.email
