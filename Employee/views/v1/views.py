@@ -4361,7 +4361,7 @@ def create_vacation_emp(request):
                 'status': 400,
                 'status_code': '400',
                 'response': {
-                    'message': 'Employee Vacation Already Exist',
+                    'message': 'Employee vacation is already on pending state',
                     'error_message': None,
                 }
             },
