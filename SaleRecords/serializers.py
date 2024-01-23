@@ -18,17 +18,44 @@ class SaleRecordProductsSerializer(serializers.ModelSerializer):
         models = SaleRecordsProducts
         fields = "__all__"
 
+
+class  SaleRecordServicesSerializer(serializers.ModelSerializer):
+    class Meta:
+        models = SaleRecordServices
+        fields = "__all__"
+
 class SaleRecordAppliedCouponsSerializer(serializers.ModelSerializer):
     class Meta:
         models = SaleRecordAppliedCoupons
         fields = "__all__"
 
+class PaymentMethodsSerializer(serializers.ModelSerializer):
+    class Meta:
+        models = PaymentMethods
+        fields = "__all__"
+
+class RedeemedItemsSerializer(serializers.ModelSerializer):
+    class Meta: 
+        models = RedeemedItems
+        fields = "__all__"
+
+
+class SaleTaxSerializer(serializers.ModelSerializer):
+    class Meta:
+        models = SaleTax
+        fields = "__all__"
+        
 class SaleRecordSerializer(serializers.ModelSerializer):
-    sale_record_appointments_services = SaleRecordsAppointmentServicesSerializer(read_only = True)
-    sale_record_tips = SaleOrderTipSerializer(many = True, read_only = True)
-    sale_record_services = SaleRecordProductsSerializer(many= True, read_only= True)
-    sale_record_prodcuts = SaleRecordProductsSerializer(many= True, read_only = True)
-    sale_record_applied_coupons = SaleRecordAppliedCouponsSerializer(many= True , read_only = True)
+    appointments_services = SaleRecordsAppointmentServicesSerializer(read_only = True)
+    tips = SaleOrderTipSerializer(many = True, read_only = True)
+    services = SaleRecordServicesSerializer(many= True, read_only= True)
+    products = SaleRecordProductsSerializer(many= True, read_only = True)
+    applied_coupons = SaleRecordAppliedCouponsSerializer(many= True , read_only = True)
+    redeemed_items = RedeemedItemsSerializer(many= True , read_only = True)
+    tax = SaleTaxSerializer(many =True, read_only = True)
     class Meta:
         model = SaleRecords
         fields = '__all__'
+        
+    def create(self, validated_data):
+        pass

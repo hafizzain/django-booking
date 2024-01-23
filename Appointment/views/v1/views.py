@@ -3330,7 +3330,8 @@ def appointment_service_status_update(request):
 
     seperate_or_combined = None
     group_or_individual = None
-
+    reason = request.data.get('reason', None)
+    
     status_list = [choices.AppointmentServiceStatus.STARTED, choices.AppointmentServiceStatus.FINISHED]
 
     # changing the status
@@ -3342,6 +3343,8 @@ def appointment_service_status_update(request):
         appointment_service.service_start_time = datetime.now()
     elif appointment_service_status == choices.AppointmentServiceStatus.FINISHED:
         appointment_service.service_end_time = datetime.now()
+    elif appointment_service_status == choices.AppointmentServiceStatus.VOID:
+        appointment_service.reason = reason
     appointment_service.save()
 
     appoint_service_statuses = list(

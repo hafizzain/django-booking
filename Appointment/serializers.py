@@ -233,7 +233,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
         #             last_month = int(last_app.created_at.strftime('%m'))
 
         #             months = max(client_f_month - last_month, 1)
-        #             monthly_spending = 0
+        #             monthly_spending = 0Appointment_Booked
         #             tag = ''
 
         #             if client_appointments.count() >= months:
@@ -548,7 +548,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
         # single_data = {
         #     "id": "51479f52-7943-44d1-b3b5-12e0125ca307",
         #     "appointment_id": "51479f52-7943-44d1-b3b5-12e0125ca307",
-        #     "appointment_date": "2023-05-29",
+        #     "appointment_date": "2023-05-29",appointment_service_status_update
         #     "appointment_time": "00:00:00",
         #     "end_time": "00:00:00",
         #     "duration": "35min",
@@ -1137,7 +1137,11 @@ class SingleNoteSerializer(serializers.ModelSerializer):
     appointment_tips = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
     client_name = serializers.SerializerMethodField(read_only= True)
-
+    client_email = serializers.SerializerMethodField(read_only=True)
+    client_phone = serializers.SerializerMethodField(read_only=True)
+    client_all_appointment = serializers.SerializerMethodField(read_only=True)
+    client_all_sales = serializers.SerializerMethodField(read_only=True)
+    
     def get_appointment_tips(self, obj):
         tips = AppointmentEmployeeTip.objects.filter(
             appointment=obj
@@ -1188,9 +1192,58 @@ class SingleNoteSerializer(serializers.ModelSerializer):
         else:
             return obj.client.full_name if obj.client else None
 
+    def get_client_email(self, obj):
+        """
+        If is_mobile is true send complete client
+        object, otherwise just send client ID.
+        """
+        is_mobile = self.context.get('is_mobile', False)
+        if is_mobile:
+            return ClientSerializer(obj.client).data if obj.client else None
+        else:
+            return obj.client.email if obj.client else None
+    
+    def get_client_phone(self, obj):
+        """
+        If is_mobile is true send complete client
+        object, otherwise just send client ID.
+        """
+        is_mobile = self.context.get('is_mobile', False)
+        if is_mobile:
+            return ClientSerializer(obj.client).data if obj.client else None
+        else:
+            return obj.client.mobile_number if obj.client else None    
+        
+    def get_client_all_appointment(self, obj):
+        if obj.client != None:
+            appointment_checkout_all = AppointmentService.objects \
+            .filter(
+                appointment__client=obj.client,
+                appointment_status__in=['Done', 'Paid']
+            ) \
+            .select_related('member', 'user', 'service') \
+            .order_by('-created_at')
+            # client_all_appointment = appointment_checkout_all.aggregate(total_sale=Sum('price')).get('total_sale', 0)
+            return appointment_checkout_all.count()
+        else:
+            return 0
+    def get_client_all_sales(self, obj):
+        if obj.client != None:
+            appointment_checkout_all = AppointmentService.objects \
+            .filter(
+                appointment__client=obj.client,
+                appointment_status__in=['Done', 'Paid']
+            ) \
+            .select_related('member', 'user', 'service') \
+            .order_by('-created_at')
+            client_all_sales = appointment_checkout_all.aggregate(total_sale=Sum('price')).get('total_sale', 0)
+            return client_all_sales
+        else:
+            return 0    
+    
     class Meta:
         model = Appointment
-        fields = ['id', 'client','client_name', 'appointment_tips', 'notes', 'business_address',
+        fields = ['id', 'client','client_name', 'client_email', 'client_phone', 'client_all_appointment', 'client_all_sales','appointment_tips', 'notes', 'business_address',
                   'client_type', 'appointmnet_service', 'customer_note', 'status']
 
 
