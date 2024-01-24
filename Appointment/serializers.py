@@ -46,11 +46,7 @@ class ReversalSerializer(serializers.ModelSerializer):
         model = Reversal
         fields = "__all__"
 
-class AppointmentResponse(serializers.ModelSerializer):
-    # appointment_services = AppointmentServiceSerializerResponse(many=True)
-    class Meta:
-        model = Appointment
-        fields = ['id','created_at']
+
 
 class ReversalSerializerResponse(serializers.ModelSerializer):
     appointment_services = AppointmentServiceSerializerResponse()
