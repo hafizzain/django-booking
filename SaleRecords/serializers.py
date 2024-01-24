@@ -23,6 +23,16 @@ class  SaleRecordServicesSerializer(serializers.ModelSerializer):
     class Meta:
         model = SaleRecordServices
         fields = "__all__"
+        
+class SaleRecordVouchersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SaleRecordVouchers
+        fields = '__all__'
+        
+class SaleRecordMembershipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SaleRecordMembership
+        fields = "__all__"
 
 class SaleRecordAppliedCouponsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -50,6 +60,8 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     tips = SaleOrderTipSerializer(many = True, read_only = True)
     services = SaleRecordServicesSerializer(many= True, read_only= True)
     products = SaleRecordProductsSerializer(many= True, read_only = True)
+    vouchers = SaleRecordVouchersSerializer(many =True , read_only= True)
+    membership = SaleRecordMembershipSerializer(many = True , read_only = True)
     applied_coupons = SaleRecordAppliedCouponsSerializer(many= True , read_only = True)
     redeemed_items = RedeemedItemsSerializer(many= True , read_only = True)
     tax = SaleTaxSerializer(many =True, read_only = True)
