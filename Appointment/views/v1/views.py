@@ -3795,21 +3795,37 @@ def get_available_appointments(request):
 
 
 
-# @api_view(['PUT'])
-# @permission_classes([AllowAny])
-# def get_reversals(request):
-#    id = request.data.get('id', None)
-#    request_status = request.data.get('request_status', None)
-   
-#    reversal = get_object_or_404(Reversal, id=id)
-#    reversal.request_status = request_status
-#    reversal.save()
-#    data = {
-#         'status': True,
-#         'status_code': 200,
-#         'response': {
-#             'message': 'Reversal Status Updated Successfully',
-#             'error_message': None,
-#         }
-#     }
-#    return Response(data,status=)
+@api_view(['PATCH'])
+@permission_classes([AllowAny])
+def update_reversals(request):
+    id = request.data.get('id', None)
+    request_status = request.data.get('request_status', None)
+    appointment_id = request.data.get("appointment_id",None)
+    service_id = request.data.get("service_id",None)
+    
+    if request_status == "accepted":
+        reversal = AppointmentService.objects.filter(appointment_id=appointment_id).update(
+        status = 'Booked'
+        )
+        data = {
+            'status': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Reversal Status Updated Successfully',
+                'error_message': None,
+            }
+        }
+        return Response(data,status=status.HTTP_200_OK)
+    else:
+        Reversal.objects.filter(appointment_id=appointment_id, service_id=service_id).update(
+            request_status=request_status
+        )
+        data = {
+            'status': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Reversal Status Updated Successfully',
+                'error_message': None,
+            }
+        }
+        return Response(data,status=status.HTTP_200_OK)
