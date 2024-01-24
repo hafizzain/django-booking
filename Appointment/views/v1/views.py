@@ -3793,8 +3793,6 @@ def get_available_appointments(request):
         return Response(data, status=status.HTTP_200_OK)
 
 
-
-
 @api_view(['PATCH'])
 @permission_classes([AllowAny])
 def update_reversals(request):
@@ -3818,7 +3816,7 @@ def update_reversals(request):
         }
         return Response(data,status=status.HTTP_200_OK)
     else:
-        Reversal.objects.filter(appointment_id=appointment_id, service_id=service_id).update(
+        Reversal.objects.filter(appointment_id=appointment_id, appointment_services_id=service_id).update(
             request_status=request_status
         )
         data = {
