@@ -173,7 +173,7 @@ def create_reversal(request):
     )
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 @permission_classes([AllowAny])
 def get_reversal(request):
     # description = request.data.get('description', None)
@@ -3783,7 +3783,7 @@ def get_available_appointments(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_reversal(request):
+def get_reversals(request):
     # description = request.data.get('description', None)
     # business = request.data.get('business', None)
     # service_id = request.data.get('appointment_service', None)

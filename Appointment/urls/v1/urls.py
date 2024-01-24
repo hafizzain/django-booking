@@ -72,5 +72,5 @@ urlpatterns = [
     path('missed_opportunities/', views.MissedOpportunityListCreate.as_view(), name='list-create-missed-opportunities'),
     path('missed_opportunities/<uuid:id>/', views.MissedOpportunityListCreate.as_view(), name='missed-opportunities-delete'),
 
-    path('test/', views.get_reversal),
+    path('test/', views.get_reversals),
 ]
