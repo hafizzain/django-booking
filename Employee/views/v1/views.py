@@ -4961,7 +4961,7 @@ def create_workingschedule(request):
                 'status': True,
                 'status_code': 201,
                 'response': {
-                    'message': 'Working Schedule Created Successfully2!',
+                    'message': 'Working Schedule Created Successfully!',
                     'error_message': None,
                     'schedule': serializers.data,
                     'leo_value': leo_value
@@ -5081,7 +5081,7 @@ def create_workingschedule(request):
                 'status': True,
                 'status_code': 201,
                 'response': {
-                    'message': 'Working Schedule Created Successfully!1',
+                    'message': 'Working Schedule Created Successfully!',
                     'error_message': None,
                     'schedule': serializers.data,
                 }
