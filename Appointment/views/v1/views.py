@@ -3805,3 +3805,5 @@ def get_reversal(request):
                         appointment_date='10-08-2024',
                         service_name='myservices',
                         url='www.google.com')
+
+    return Response({"msg": "Email sent successfully"})

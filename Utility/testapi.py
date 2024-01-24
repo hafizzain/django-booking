@@ -34,7 +34,7 @@ def send_reversal_email(client_phone=None,email=None, appointment_id=None, servi
         )
         email.attach_alternative(html_file, "text/html")
         email.send()
-        
+        return Response({"msg": "Email sent successfully"})
         # email_thread = Thread(target=send_email)
         # email_thread.start()
 
