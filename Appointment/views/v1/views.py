@@ -53,7 +53,7 @@ from Appointment.serializers import (CheckoutSerializer, AppoinmentSerializer, S
                                      AppointmentServiceSerializerBasic,
                                      PaidUnpaidAppointmentSerializer, MissedOpportunityBasicSerializer,
                                      OpportunityEmployeeServiceSerializer, PaidUnpaidAppointmentCheckoutSerializer,
-                                     AppointmentSerializerForStatus, SingleNoteResponseSerializer, ReversalSerializer)
+                                     AppointmentSerializerForStatus, SingleNoteResponseSerializer, ReversalSerializer,ReversalSerializerResponse)
 from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
 
@@ -198,7 +198,7 @@ def get_reversal(request):
     paginator = AppointmentsPagination()
     paginator.page_size = 10
     reversal_qs = paginator.paginate_queryset(all_reversal, request)
-    serialized = ReversalSerializer(reversal_qs, many=True)
+    serialized = ReversalSerializerResponse(reversal_qs, many=True)
     data = {
             'status': True,
             'status_code': 200,

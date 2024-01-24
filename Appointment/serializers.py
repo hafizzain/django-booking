@@ -32,13 +32,24 @@ from Utility.models import ExceptionRecord
 from Service.models import Service
 
 
-
+class AppointmentServiceSerializerResponse(serializers.ModelSerializer):
+    class Meta:
+        model =     AppointmentService
+         fields = ['id','status']
 
 class ReversalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reversal
         fields = "__all__"
 
+
+
+class ReversalSerializerResponse(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Reversal
+        fields = ['id','request_status','description','client_type','client_name','appointment_services']
+        
 class ServiceImageSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
     
