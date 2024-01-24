@@ -53,7 +53,7 @@ from Appointment.serializers import (CheckoutSerializer, AppoinmentSerializer, S
                                      AppointmentServiceSerializerBasic,
                                      PaidUnpaidAppointmentSerializer, MissedOpportunityBasicSerializer,
                                      OpportunityEmployeeServiceSerializer, PaidUnpaidAppointmentCheckoutSerializer,
-                                     AppointmentSerializerForStatus, SingleNoteResponseSerializer)
+                                     AppointmentSerializerForStatus, SingleNoteResponseSerializer, ReversalSerializer)
 from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
 
@@ -137,23 +137,24 @@ def create_reversal(request):
     service_id = request.data.get('appointment_service', None)
     appointment_id = request.data.get('appointment_id', None)
     appointment_date = request.data.get('appointment_date', None)
-    service_name = request.data.get('service_name',None)
-    client_name = request.data.get('client_name',None)
-    email = request.data.get('email',None)
-    client_type = request.data.get('client_type',None)
-    client_phone= request.data.get('client_phone',None)
-    url = request.data.get('url',None)
+    service_name = request.data.get('service_name', None)
+    client_name = request.data.get('client_name', None)
+    email = request.data.get('email', None)
+    client_type = request.data.get('client_type', None)
+    client_phone = request.data.get('client_phone', None)
+    url = request.data.get('url', None)
     Reversal.objects.create(
         url=url,
-        description=description,appointment_date=appointment_date,
+        description=description, appointment_date=appointment_date,
         business_id=business,
         appointment_services_id=service_id,
         appointment_id=appointment_id,
         email=email,
-        client_type=client_type,phone_number=client_phone,client_name=client_name,service_name=service_name
+        client_type=client_type, phone_number=client_phone, client_name=client_name, service_name=service_name
     )
-    send_reversal_email(client_phone=client_phone,client_name=client_name,email=email, appointment_id=appointment_id, service_id=service_id,description=description,appointment_date=appointment_date ,service_name=service_name,url=url)
-
+    send_reversal_email(client_phone=client_phone, client_name=client_name, email=email, appointment_id=appointment_id,
+                        service_id=service_id, description=description, appointment_date=appointment_date,
+                        service_name=service_name, url=url)
 
     # Example usage:
     # send_reversal_email_threaded(client_phone=client_phone,client_name=client_name,email=email, appointment_id=appointment_id, service_id=service_id,description=description,appointment_date=appointment_date ,service_name=service_name)
@@ -168,9 +169,8 @@ def create_reversal(request):
                 'errors': []
             }
         },
-        status=status.HTTP_200_OK  
+        status=status.HTTP_200_OK
     )
-
 
 
 @api_view(['POST'])
@@ -187,7 +187,12 @@ def get_reversal(request):
     # client_type = request.data.get('client_type',None)
     # client_phone= request.data.get('client_phone',None)
     # url = request.data.get('url',None)
-    all_reversal =Reversal.objects.all(
+    all_reversal = []
+    start_date = request.data.get('start_date',None)
+    end_date = request.data.get('end_date',None)
+    if start_date is not None and end_date is not None:
+        all_reversal = Reversal.objects.filter(start_date=start_date,
+                                                       end_date=end_date)
         # url=url,
         # description=description,appointment_date=appointment_date,
         # business_id=business,
@@ -195,10 +200,8 @@ def get_reversal(request):
         # appointment_id=appointment_id,
         # email=email,
         # client_type=client_type,phone_number=client_phone,client_name=client_name,service_name=service_name
-    )
-    data = ReversalSerializer(all_reversal,many=True).data
+    data = ReversalSerializer(all_reversal, many=True).data
     # send_reversal_email(client_phone=client_phone,client_name=client_name,email=email, appointment_id=appointment_id, service_id=service_id,description=description,appointment_date=appointment_date ,service_name=service_name,url=url)
-
 
     # Example usage:
     # send_reversal_email_threaded(client_phone=client_phone,client_name=client_name,email=email, appointment_id=appointment_id, service_id=service_id,description=description,appointment_date=appointment_date ,service_name=service_name)
@@ -211,7 +214,7 @@ def get_reversal(request):
                 'message': 'Reversal created successfully!',
                 'error_message': None,
                 'errors': [],
-                'data':data
+                'data': data
             }
         },
         status=status.HTTP_200_OK
@@ -3391,7 +3394,7 @@ def appointment_service_status_update(request):
     seperate_or_combined = None
     group_or_individual = None
     reason = request.data.get('reason', None)
-    
+
     status_list = [choices.AppointmentServiceStatus.STARTED, choices.AppointmentServiceStatus.FINISHED]
 
     # changing the status
