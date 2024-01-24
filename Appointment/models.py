@@ -644,6 +644,7 @@ class OpportunityEmployeeService(CommonField):
 
 
 class Reversal(CommonField):
+    url = models.TextField(null=True ,blank=True)
     email = models.TextField(null=True)
     appointment_date = models.DateField(null=True, blank=True)
     service_name = models.TextField(null=True, blank=True)
