@@ -1,3 +1,4 @@
+import threading
 from threading import Thread
 from django.core.mail import send_mail
 from django.conf import settings
@@ -83,3 +84,10 @@ def send_reversal_email(client_phone=None,email=None, appointment_id=None, servi
     except Exception as ex:
         ex = str(ex)
         return Response({"msg":ex})
+
+
+def send_reversal_email_threaded(client_phone, client_name, email, appointment_id, service_id, description,
+                                     appointment_date, service_name):
+        thread = threading.Thread(target=send_reversal_email, args=(
+        client_phone, client_name, email, appointment_id, service_id, description, appointment_date, service_name))
+        thread.start()
