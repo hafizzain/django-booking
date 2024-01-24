@@ -143,7 +143,7 @@ def create_reversal(request):
     client_type = request.data.get('client_type',None)
     client_phone= request.data.get('client_phone',None)
     Reversal.objects.create(
-        description=description,date=appointment_date,
+        description=description,appointment_date=appointment_date,
         business_id=business,
         appointment_services_id=service_id,
         appointment_id=appointment_id,
