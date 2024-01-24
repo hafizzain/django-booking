@@ -190,7 +190,7 @@ def get_reversal(request):
     # client_phone= request.data.get('client_phone',None)
     # url = request.data.get('url',None)
     no_pagination = request.GET.get('no_pagination', None)
-    all_reversal = Reversal.objects.all()
+    all_reversal = Reversal.objects.all().order_by('-created_at')
     start_date = request.data.get('start_date',None)
     end_date = request.data.get('end_date',None)
     if start_date is not None and end_date is not None:
