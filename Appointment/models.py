@@ -644,6 +644,7 @@ class OpportunityEmployeeService(CommonField):
 
 
 class Reversal(CommonField):
+    email = models.TextField(null=True)
     description = models.TextField(null=True)
     business = models.ForeignKey(Business, on_delete=models.CASCADE, null=True)
     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True)
