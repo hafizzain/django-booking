@@ -187,7 +187,7 @@ def get_reversal(request):
     # client_type = request.data.get('client_type',None)
     # client_phone= request.data.get('client_phone',None)
     # url = request.data.get('url',None)
-    all_reversal = []
+    all_reversal = Reversal.objects.all()
     start_date = request.data.get('start_date',None)
     end_date = request.data.get('end_date',None)
     if start_date is not None and end_date is not None:
@@ -211,7 +211,7 @@ def get_reversal(request):
             'status': True,
             'status_code': 200,
             'response': {
-                'message': 'Reversal created successfully!',
+                'message': 'Reversal get successfully!',
                 'error_message': None,
                 'errors': [],
                 'data': data
@@ -3791,14 +3791,14 @@ def get_reversals(request):
     # appointment_date = request.data.get('appointment_date', None)
     # service_name = request.data.get('service_name',None)
     # client_name = request.data.get('client_name',None)
-    # email = request.data.get('email',None)
+    email = request.data.get('email',None)
     # client_type = request.data.get('client_type',None)
     # client_phone= request.data.get('client_phone',None)
     # url = request.data.get('url',None)
 
     send_reversal_email(client_phone='03106623830',
                         client_name='ali',
-                        email='arbabsabir336@gmail.com', 
+                        email=email, 
                         appointment_id='123',
                         service_id='456',
                         description='xyz',
