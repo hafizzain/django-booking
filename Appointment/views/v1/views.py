@@ -195,44 +195,43 @@ def get_reversal(request):
     if start_date is not None and end_date is not None:
         all_reversal = Reversal.objects.filter(start_date=start_date,
                                                        end_date=end_date)
-        
-        # url=url,
-        # description=description,appointment_date=appointment_date,
-        # business_id=business,
-        # appointment_services_id=service_id,
-        # appointment_id=appointment_id,
-        # email=email,
-        # client_type=client_type,phone_number=client_phone,client_name=client_name,service_name=service_name
-    data = ReversalSerializer(all_reversal, many=True).data
-    # send_reversal_email(client_phone=client_phone,client_name=client_name,email=email, appointment_id=appointment_id, service_id=service_id,description=description,appointment_date=appointment_date ,service_name=service_name,url=url)
-
-    # Example usage:
-    # send_reversal_email_threaded(client_phone=client_phone,client_name=client_name,email=email, appointment_id=appointment_id, service_id=service_id,description=description,appointment_date=appointment_date ,service_name=service_name)
-    all_reversal_count=all_reversal.count()
-    page_count = all_reversal_count / 10
-    if page_count > int(page_count):
-        page_count = int(page_count) + 1
-    
-    results_per_page = 10000 if no_pagination else 10
-    paginator = Paginator(all_reversal, results_per_page)
-    page_number = request.GET.get("page") 
-    customers_points = paginator.get_page(page_number)
-    return Response(
-        {
+    paginator = AppointmentsPagination()
+    paginator.page_size = 10
+    reversal_qs = paginator.paginate_queryset(all_reversal, request)
+    serialized = ReversalSerializer(reversal_qs, many=True)
+    data = {
             'status': True,
             'status_code': 200,
-            'response': {
-                'message': 'Reversal get successfully!',
-                'count':all_reversal_count,
-                'pages':page_count,
-                'per_page_result':results_per_page,
-                'error_message': None,
-                'errors': [],
-                'data': data
+            'status_code_text': '200',
+            "response": {
+                "message": "Appointments  get Successfully",
+                "error_message": None,
+                "data": serialized.data,
+                'count': paginator.page.paginator.count,
+                'next': paginator.get_next_link(),
+                'previous': paginator.get_previous_link(),
+                'current_page': paginator.page.number,
+                'per_page': paginator.page_size,
+                'total_pages': paginator.page.paginator.num_pages,
             }
-        },
-        status=status.HTTP_200_OK
-    )
+        }
+    return Response(data, status=status.HTTP_200_OK)
+    # return Response(
+    #     {
+    #         'status': True,
+    #         'status_code': 200,
+    #         'response': {
+    #             'message': 'Reversal get successfully!',
+    #             'count':all_reversal_count,
+    #             'pages':page_count,
+    #             'per_page_result':results_per_page,
+    #             'error_message': None,
+    #             'errors': [],
+    #             'data': data
+    #         }
+    #     },
+    #     status=status.HTTP_200_OK
+    # )
 
 
 @api_view(['GET'])
