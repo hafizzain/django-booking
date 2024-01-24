@@ -57,7 +57,7 @@ from Appointment.serializers import (CheckoutSerializer, AppoinmentSerializer, S
 from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
 
-from Utility.Campaign import send_reversal_email ,send_reversal_email_threaded
+from Utility.Campaign import send_reversal_email
 from Utility.models import ExceptionRecord
 from Invoices.models import SaleInvoice
 from Reports.models import DiscountPromotionSalesReport
