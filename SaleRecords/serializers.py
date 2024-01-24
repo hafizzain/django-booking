@@ -56,15 +56,15 @@ class SaleTaxSerializer(serializers.ModelSerializer):
         fields = "__all__"
         
 class SaleRecordSerializer(serializers.ModelSerializer):
-    appointments_services = SaleRecordsAppointmentServicesSerializer(read_only = True)
-    tips = SaleOrderTipSerializer(many = True, read_only = True)
-    services = SaleRecordServicesSerializer(many= True, read_only= True)
-    products = SaleRecordProductsSerializer(many= True, read_only = True)
-    vouchers = SaleRecordVouchersSerializer(many =True , read_only= True)
-    membership = SaleRecordMembershipSerializer(many = True , read_only = True)
-    applied_coupons = SaleRecordAppliedCouponsSerializer(many= True , read_only = True)
-    redeemed_items = RedeemedItemsSerializer(many= True , read_only = True)
-    tax = SaleTaxSerializer(many =True, read_only = True)
+    appointments_services = SaleRecordsAppointmentServicesSerializer(many= True, write_only = True)
+    tips = SaleOrderTipSerializer(many = True, write_only = True)
+    services = SaleRecordServicesSerializer(many= True, write_only= True)
+    products = SaleRecordProductsSerializer(many= True, write_only = True)
+    vouchers = SaleRecordVouchersSerializer(many =True , write_only= True)
+    membership = SaleRecordMembershipSerializer(many = True , write_only = True)
+    applied_coupons = SaleRecordAppliedCouponsSerializer(many= True , write_only = True)
+    redeemed_items = RedeemedItemsSerializer(many= True , write_only = True)
+    tax = SaleTaxSerializer(many =True, write_only = True)
     class Meta:
         model = SaleRecords
         fields = '__all__'
