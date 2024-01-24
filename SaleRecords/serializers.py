@@ -10,7 +10,7 @@ class SaleOrderTipSerializer(serializers.ModelSerializer):
         
 class SaleRecordsAppointmentServicesSerializer(serializers.ModelSerializer):
     class Meta:
-        models = SaleRecordsAppointmentServices
+        model = SaleRecordsAppointmentServices
         fields = "__all__"
     
 class SaleRecordProductsSerializer(serializers.ModelSerializer):
@@ -21,28 +21,28 @@ class SaleRecordProductsSerializer(serializers.ModelSerializer):
 
 class  SaleRecordServicesSerializer(serializers.ModelSerializer):
     class Meta:
-        models = SaleRecordServices
+        model = SaleRecordServices
         fields = "__all__"
 
 class SaleRecordAppliedCouponsSerializer(serializers.ModelSerializer):
     class Meta:
-        models = SaleRecordAppliedCoupons
+        model = SaleRecordAppliedCoupons
         fields = "__all__"
 
 class PaymentMethodsSerializer(serializers.ModelSerializer):
     class Meta:
-        models = PaymentMethods
+        model = PaymentMethods
         fields = "__all__"
 
 class RedeemedItemsSerializer(serializers.ModelSerializer):
     class Meta: 
-        models = RedeemedItems
+        model = RedeemedItems
         fields = "__all__"
 
 
 class SaleTaxSerializer(serializers.ModelSerializer):
     class Meta:
-        models = SaleTax
+        model = SaleTax
         fields = "__all__"
         
 class SaleRecordSerializer(serializers.ModelSerializer):
