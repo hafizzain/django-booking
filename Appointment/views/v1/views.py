@@ -152,7 +152,7 @@ def create_reversal(request):
         email=email,
         client_type=client_type,phone_number=client_phone,client_name=client_name,service_name=service_name
     )
-    send_reversal_email(client_phone=client_phone,client_name=client_name,email=email, appointment_id=appointment_id, service_id=service_id,description=description,appointment_date=appointment_date ,service_name=service_name)
+    send_reversal_email(client_phone=client_phone,client_name=client_name,email=email, appointment_id=appointment_id, service_id=service_id,description=description,appointment_date=appointment_date ,service_name=service_name,url=url)
 
 
     # Example usage:
