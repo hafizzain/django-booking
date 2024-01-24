@@ -1,6 +1,11 @@
 from threading import Thread
 from django.core.mail import send_mail
 from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from rest_framework.response import Response
+
 
     
 def run_campaign(message=None, subject=None, client_email_list=None, campaign_type=None):
@@ -62,17 +67,21 @@ def send_refund_email(client_email):
 
 
 def send_reversal_email(email=None,appointment_id=None,service_id=None):
-    subject = 'reversal email'
-    message = 'Appointment id {appointment_id} Service id {service_id}'.format(appointment_id=appointment_id , service_id=service_id)
-    # email = email
-    send_mail(
-        subject,
-        message,
-        settings.EMAIL_HOST_USER,
-        [email],
-        fail_silently=False,
-    )
-
-    # # Create a thread and start it
-    # email_thread = Thread(target=send_email_in_thread)
-    # email_thread.start()
+    # subject = 'reversal email'
+    # message = 'Appointment id {appointment_id} Service id {service_id}'.format(appointment_id=appointment_id , service_id=service_id)
+    try:
+        # context =
+        html_file = render_to_string("AppointmentEmail/reversal.html",
+                                     {'client':'Fadeseela MS','mobile':'+923224521103','email':'hassanbutt0030@gmail.com','appointment_date':'2022-09-12','service':'massage over view','reason':'massage not provided good'})
+        text_content = strip_tags(html_file)
+        email = EmailMultiAlternatives(
+            'Reversal',
+            text_content,
+            settings.EMAIL_HOST_USER,
+            to=[email],
+        )
+        email.attach_alternative(html_file, "text/html")
+        email.send()
+    except Exception as ex:
+        ex = str(ex)
+        return Response({"msg":ex})
