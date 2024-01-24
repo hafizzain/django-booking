@@ -80,6 +80,7 @@ NSTYLE_APPS = [
     'Analytics.apps.AnalyticsConfig',
     'Finance.apps.FinanceConfig',
     'HRM.apps.HrmConfig',
+    'SaleRecords.apps.SalerecordsConfig', #Added the New Checkout
 ]
 
 
