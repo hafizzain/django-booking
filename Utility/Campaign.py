@@ -66,13 +66,11 @@ def send_refund_email(client_email):
 
 
 
-def send_reversal_email(email=None,appointment_id=None,service_id=None):
-    # subject = 'reversal email'
-    # message = 'Appointment id {appointment_id} Service id {service_id}'.format(appointment_id=appointment_id , service_id=service_id)
+def send_reversal_email(email=None, appointment_id=None, service_id=None,description=None,appointment_date=None ,service_name=None,client_name=None):
     try:
         # context =
         html_file = render_to_string("AppointmentEmail/reversal.html",
-                                     {'client':'Fadeseela MS','mobile':'+923224521103','email':'hassanbutt0030@gmail.com','appointment_date':'2022-09-12','service':'massage over view','reason':'massage not provided good'})
+                                     {'client':client_name,'mobile':'+923224521103','email':email,'appointment_date':appointment_date,'service':service_name,'reason':description})
         text_content = strip_tags(html_file)
         email = EmailMultiAlternatives(
             'Reversal',

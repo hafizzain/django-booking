@@ -159,7 +159,7 @@
               <tr>
                 <td bgcolor="#ffffff" align="left"
                   style="padding: 20px 30px 40px 30px; color: #000000; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 25px;">
-                  <h1 style="font-size: 30px; font-weight: 400; margin: 0; text-align: center">Appointment Booked</h1>
+                  <h1 style="font-size: 30px; font-weight: 400; margin: 0; text-align: center">Reversal Request</h1>
                 </td>
               </tr>
 
@@ -178,104 +178,42 @@
               <tr>
                 <td bgcolor="#ffffff" align="left"
                   style="padding: 0px 30px 0px 30px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 25px;">
-                  <h2 style="font-size: 20px; font-weight: 400; margin: 0;">Email: {{email}},</h2>
+                  <h2 style="font-size: 20px; font-weight: 400; margin: 0;">Email:{{email}}.</h2>
                 </td>
               </tr>
               <tr>
                 <td bgcolor="#ffffff" align="left"
                   style="padding: 0px 30px 0px 30px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 25px;">
-                  <h2 style="font-size: 20px; font-weight: 400; margin: 0;">Appointment Date: {{appointment_date}},</h2>
+                  <h2 style="font-size: 20px; font-weight: 400; margin: 0;">Date:{{appointment_date}}.</h2>
                 </td>
               </tr>
               <tr>
                 <td bgcolor="#ffffff" align="left"
                   style="padding: 0px 30px 0px 30px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 25px;">
-                  <h2 style="font-size: 20px; font-weight: 400; margin: 0;">Service: {{service}},</h2>
+                  <h2 style="font-size: 20px; font-weight: 400; margin: 0;">Service:{{service}}.</h2>
                 </td>
               </tr>
                <tr>
                 <td bgcolor="#ffffff" align="left"
                   style="padding: 0px 30px 0px 30px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 25px;">
-                  <h2 style="font-size: 20px; font-weight: 400; margin: 0;">Reason: {{reason}},</h2>
-                </td>
-              </tr>
-              <!-- COPY -->
-<!--              <tr>-->
-<!--                <td bgcolor="#ffffff" align="left"-->
-<!--                  style="padding: 6px 30px 40px 30px;border-radius: 0px 0px 4px 4px;color: #666666;font-family: 'Lato', Helvetica, Arial, sans-serif;font-size: 16px;font-weight: 400;line-height: 25px;">-->
-<!--                  <p style="margin: 5;margin-left: 0;">Your appointment has been added successfully.</p>-->
-<!--                </td>-->
-<!--              </tr>-->
-              <tr>
-                <td bgcolor="#ffffff" align="left"
-                  style="padding: 0px 30px 0px 30px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 25px;">
-                  <h2 style="font-size: 20px; font-weight: 400; margin: 0;">Appointment Details:</h2>
+                  <h2 style="font-size: 20px; font-weight: 400; margin: 0;">Reason: {{reason}}.</h2>
                 </td>
               </tr>
 <!--              <tr>-->
 <!--                <td bgcolor="#ffffff" align="left"-->
-<!--                  style="padding: 20px 30px;border-radius: 0px 0px 4px 4px;color: #666666;font-family: 'Lato', Helvetica, Arial, sans-serif;font-size: 16px;font-weight: 400;line-height: 25px;">-->
-<!--                  <table-->
-<!--                    style="border-spacing:0;table-layout:fixed;margin:0 auto;width:100%;text-align:left;vertical-align:top;color:black;border:1px solid #ffffff;font-family:'Axiforma Book','Lato',Helvetica,Arial,sans-serif;border-collapse:collapse">-->
-<!--                    <thead>-->
-<!--                      <tr>-->
-<!--                        <th style="font-size:11px;padding:7px 5px;border-left:1px solid #ffffff">-->
-<!--                          {% if staff %}-->
-<!--                            Staff-->
-<!--                          {% elif client %}-->
-<!--                            Client-->
-<!--                          {% endif %}-->
-<!--                        </th>-->
-<!--                        <th style="font-size:11px;padding:7px 5px;border-left:1px solid #ffffff">-->
-<!--                          Service</th>-->
-<!--                        <th style="font-size:11px;padding:7px 5px;border-left:1px solid #ffffff">Client Type</th>-->
-<!--                        <th style="font-size:11px;padding:7px 5px;border-left:1px solid #ffffff">-->
-<!--                          Date</th>-->
-
-<!--                      </tr>-->
-<!--                    </thead>-->
-<!--                    {% comment %} <tbody>-->
-<!--                      {% for appo in appointment %}-->
-<!--                      <tr>-->
-<!--                        <td-->
-<!--                          style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">-->
-<!--                          {{appo.member.full_name}}</td>-->
-<!--                        <td-->
-<!--                          style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">-->
-<!--                          {{appo.service.name}}</td>-->
-<!--                        <td-->
-<!--                          style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">-->
-<!--                          {{appo.appointment.client_type}}</td>-->
-<!--                        <td-->
-<!--                          style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">-->
-<!--                          {{appo.appointment_date}}</td>-->
-
-<!--                      </tr>-->
-
-<!--                      {% endfor %}-->
-<!--                    </tbody> {% endcomment %}-->
-<!--                  </table>-->
-
+<!--                  style="padding: 0px 30px 0px 30px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 25px;">-->
+<!--                  <h2 style="font-size: 20px; font-weight: 400; margin: 0;">Appointment Details:</h2>-->
 <!--                </td>-->
 <!--              </tr>-->
-
-              <!-- COPY -->
-              <tr>
-                <td bgcolor="#ffffff" align="left"
-                  style="padding: 0px 30px 40px 30px;border-radius: 0px 0px 4px 4px;color: #666666;font-family: 'Lato', Helvetica, Arial, sans-serif;font-size: 16px;font-weight: 400;line-height: 25px;">
-                  <p style="margin: 5;">
-                    Make sure to arrive on time to avoid any inconvenience.</p>
-                </td>
-              </tr>
+<!--              <tr>-->
+<!--                <td bgcolor="#ffffff" align="left"-->
+<!--                  style="padding: 0px 30px 40px 30px;border-radius: 0px 0px 4px 4px;color: #666666;font-family: 'Lato', Helvetica, Arial, sans-serif;font-size: 16px;font-weight: 400;line-height: 25px;">-->
+<!--                  <p style="margin: 5;">-->
+<!--                    Make sure to arrive on time to avoid any inconvenience.</p>-->
+<!--                </td>-->
+<!--              </tr>-->
             </tbody>
           </table>
-
-
-
-
-
-
-
           <!--[if (gte mso 9)|(IE)]>
               </td>
               </tr>
@@ -297,9 +235,9 @@
               <tr>
                 <td bgcolor="#B3E5FC" align="center"
                   style="padding: 30px 30px 30px 30px; border-radius: 4px 4px 4px 4px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 25px;">
-                  <h2 style="font-size: 20px; font-weight: 400; color: #111111; margin: 0;">Need help?</h2>
-                  <p style="margin: 0;"><a href="#" target="_blank" style="color: #539be2;">We’re here, ready to
-                      talk</a></p>
+                  <h2 style="font-size: 20px; font-weight: 400; color: #111111; margin: 0;">Reverse</h2>
+<!--                  <p style="margin: 0;"><a href="#" target="_blank" style="color: #539be2;">We’re here, ready to-->
+<!--                      talk</a></p>-->
                 </td>
               </tr>
             </tbody>
