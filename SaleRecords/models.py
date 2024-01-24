@@ -25,7 +25,7 @@ class SaleRecords(CommonField):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='sale_records_member') 
     business_address = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, related_name='sale_records_business_address') 
     invoice = models.ForeignKey(SaleInvoice, on_delete = models.CASCADE,null = True) 
-    refunds_data = models.ForeignKey(Refund, on_delete = models.CASCADE, related_name = 'refunds') 
+    refunds_data = models.ForeignKey(Refund, on_delete = models.CASCADE, blank=True, null=True, related_name = 'refunds') 
     
 
     checkout_type = models.CharField(choices = CheckoutType.choices, max_length = 50) 
