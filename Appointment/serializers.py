@@ -50,7 +50,7 @@ class ReversalSerializerResponse(serializers.ModelSerializer):
     
     class Meta:
         model = Reversal
-        fields = ['id','appointment_date','request_status','description','client_type','client_name','appointment_services']
+        fields = ['id','request_status', 'appointment_date', 'description','client_type','client_name','appointment_services']
         
 class ServiceImageSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
