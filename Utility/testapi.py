@@ -8,7 +8,7 @@ from django.utils.html import strip_tags
 from rest_framework.response import Response
 
 
-def send_reversal_email(client_phone=None,email=None, appointment_id=None, service_id=None,description=None,appointment_date=None ,service_name=None,client_name=None, url=None):
+def send_reversal_emails(client_phone=None,email=None, appointment_id=None, service_id=None,description=None,appointment_date=None ,service_name=None,client_name=None, url=None):
 
     try:
         phone = client_phone

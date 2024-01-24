@@ -80,21 +80,26 @@ def send_reversal_email(client_phone=None,email=None, appointment_id=None, servi
         name = client_name
         s_name = service_name
         url=url
+        
         # context =
         html_file = render_to_string("AppointmentEmail/reversal.html",
                                      {'url':url,'client':name,'mobile':phone,'email':client_email,'appointment_date':date,'service':s_name,'reason':desc})
         text_content = strip_tags(html_file)
+        # def send_email():
         email = EmailMultiAlternatives(
             'Reversal',
             text_content,
             settings.EMAIL_HOST_USER,
-            to=[client_email],
+  
+
+            to=[email],
         )
         email.attach_alternative(html_file, "text/html")
         email.send()
         
         # email_thread = Thread(target=send_email)
         # email_thread.start()
+
     except Exception as ex:
         ex = str(ex)
         return Response({"msg":ex})
