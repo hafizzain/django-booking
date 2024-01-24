@@ -24,8 +24,8 @@ class SaleRecords(CommonField):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sale_records_user') 
     member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='sale_records_member') 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='sale_records_client')
-    business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, blank=True, null=True, related_name='sale_records_business_address') 
-    invoice = models.ForeignKey(SaleInvoice, on_delete = models.SET_NULL,blank=True, null=True) 
+    business_address = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, related_name='sale_records_business_address') 
+    invoice = models.ForeignKey(SaleInvoice, on_delete = models.CASCADE,null = True) 
     refunds_data = models.ForeignKey(Refund, on_delete = models.CASCADE, related_name = 'refunds') 
     
 
