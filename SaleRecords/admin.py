@@ -22,6 +22,14 @@ class SaleRecordServicesAdmin(admin.ModelAdmin):
 @admin.register(SaleRecordsProducts)
 class SaleRecordsProductsAdmin(admin.ModelAdmin):
     list_display = ['id']
+
+@admin.register(SaleRecordMembership)
+class SaleRecordMembershipAdmin(admin.ModelAdmin):
+    list_display = ['id']
+
+@admin.register(SaleRecordVouchers)
+class SaleRecordVouchersAdmin(admin.ModelAdmin):
+    list_display = ['id']
     
     
 @admin.register(SaleRecordTip)
