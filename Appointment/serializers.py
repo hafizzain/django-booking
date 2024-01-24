@@ -34,8 +34,8 @@ from Service.models import Service
 
 class AppointmentServiceSerializerResponse(serializers.ModelSerializer):
     class Meta:
-        model =     AppointmentService
-         fields = ['id','status']
+        model =  AppointmentService
+        fields = ['id','status']
 
 class ReversalSerializer(serializers.ModelSerializer):
     class Meta:
@@ -45,6 +45,8 @@ class ReversalSerializer(serializers.ModelSerializer):
 
 
 class ReversalSerializerResponse(serializers.ModelSerializer):
+    appointment_services = AppointmentServiceSerializerResponse()
+    
     
     class Meta:
         model = Reversal
