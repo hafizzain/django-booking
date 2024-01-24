@@ -13,13 +13,20 @@ from Finance.helpers import short_uuid, check_permission, check_days
 from Invoices.models import SaleInvoice
 from Client.serializers import SaleInvoiceSerializer
 from Client.models import Client
-
-
 from Appointment.models import AppointmentCheckout, AppointmentService
 from Order.models import Checkout, ProductOrder, ServiceOrder
+
+from SaleRecords.serializers import *
 
 
 class SaleRecordViews(APIView):
     
     def post(self, request, *args, **kwargs):
-        pass
+        try:
+            serializer = SaleRecordSerializer(data=request.data)
+            if serializer.is_valid():
+                sale_record = serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
