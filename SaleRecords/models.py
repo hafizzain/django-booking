@@ -24,8 +24,8 @@ class SaleRecords(CommonField):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sale_records_user') 
     member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='sale_records_member') 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='sale_records_client')
-    business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, related_name='sale_records_business_address') 
-    invoice = models.ForeignKey(SaleInvoice, on_delete = models.SET_NULL) 
+    business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, blank=True, null=True, related_name='sale_records_business_address') 
+    invoice = models.ForeignKey(SaleInvoice, on_delete = models.SET_NULL,blank=True, null=True) 
     refunds_data = models.ForeignKey(Refund, on_delete = models.CASCADE, related_name = 'refunds') 
     
 
@@ -96,7 +96,7 @@ class RedeemedItems(CommonField):
 class SaleRecordAppliedCoupons(CommonField):
     
     sale_records = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'sale_applied_coupons_records')
-    coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL)
+    coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null = True)
     
     coupon_type = models.CharField(choices = CouponType.choices,max_length = 50, default = '')
     coupon_discounted_price = models.FloatField(default =0) 
@@ -109,7 +109,7 @@ class SaleTax(CommonField):
     sale_order = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, blank=True, null=True, related_name='sale_tax_records') 
 
     # Following are the Major Information for Tax Applied
-    business_tax_id = models.ForeignKey(BusinessTax, on_delete=models.SET_NULL) # This will be Tax Instance ID 
+    business_tax_id = models.ForeignKey(BusinessTax, on_delete=models.CASCADE) # This will be Tax Instance ID 
     tax_name = models.CharField(max_length=999, default='') 
     # tax_amount = models.FloatField(default=0, null= True, blank = True)  null = True, blank = True
     tax_percentage = models.FloatField(default=0) 
@@ -120,7 +120,7 @@ class SaleTax(CommonField):
 class SaleRecordTip(CommonField):    
     sale_record = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, null=True, blank=True,related_name='sale_tip_records') 
     
-    member = models.ForeignKey(Employee, on_delete=models.SET_NULL, related_name='sale_record_employee_tips') 
+    member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='sale_record_employee_tips') 
     tip_amount = models.FloatField(default=0) 
     
     def __str__(self): 
