@@ -57,7 +57,7 @@ from Appointment.serializers import (CheckoutSerializer, AppoinmentSerializer, S
 from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
 
-from Utility.Campaign import send_reversal_email ,send_reversal_email_threaded
+from Utility.Campaign import send_reversal_email
 from Utility.models import ExceptionRecord
 from Invoices.models import SaleInvoice
 from Reports.models import DiscountPromotionSalesReport
@@ -152,8 +152,11 @@ def create_reversal(request):
         email=email,
         client_type=client_type,phone_number=client_phone,client_name=client_name,service_name=service_name
     )
-    # send_reversal_email(client_phone=client_phone,client_name=client_name,email=email, appointment_id=appointment_id, service_id=service_id,description=description,appointment_date=appointment_date ,service_name=service_name)
-    send_reversal_email_threaded(client_phone=client_phone,client_name=client_name,email=email, appointment_id=appointment_id, service_id=service_id,description=description,appointment_date=appointment_date ,service_name=service_name)
+    send_reversal_email(client_phone=client_phone,client_name=client_name,email=email, appointment_id=appointment_id, service_id=service_id,description=description,appointment_date=appointment_date ,service_name=service_name)
+
+
+    # Example usage:
+    # send_reversal_email_threaded(client_phone=client_phone,client_name=client_name,email=email, appointment_id=appointment_id, service_id=service_id,description=description,appointment_date=appointment_date ,service_name=service_name)
 
     return Response(
         {
