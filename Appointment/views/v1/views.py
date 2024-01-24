@@ -75,6 +75,7 @@ from rest_framework.pagination import PageNumberPagination
 from ... import choices
 from Service.serializers import BasicServiceSerializer
 
+from Utility.testapi import send_reversal_emails
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -3796,7 +3797,7 @@ def get_reversals(request):
     # client_phone= request.data.get('client_phone',None)
     # url = request.data.get('url',None)
 
-    send_reversal_email(client_phone='03106623830',
+    send_reversal_emails(client_phone='03106623830',
                         client_name='ali',
                         email=email, 
                         appointment_id='123',
