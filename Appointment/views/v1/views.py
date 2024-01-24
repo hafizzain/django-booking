@@ -140,16 +140,19 @@ def create_reversal(request):
     service_name = request.data.get('service_name',None)
     client_name = request.data.get('client_name',None)
     email = request.data.get('email',None)
+    client_type = request.data.get('client_type',None)
+    client_phone= request.data.get('client_phone',None)
     Reversal.objects.create(
-        description=description,
+        description=description,date=appointment_date,
         business_id=business,
         appointment_services_id=service_id,
         appointment_id=appointment_id,
-        email=email
+        email=email,
+        client_type=client_type,phone_number=client_phone,client_name=client_name,service_name=service_name
     )
     business = Business.objects.get(id=business)
     email = business.user.email
-    send_reversal_email(client_name=client_name,email=email, appointment_id=appointment_id, service_id=service_id,description=description,appointment_date=appointment_date ,service_name=service_name)
+    send_reversal_email(client_phone=client_phone,client_name=client_name,email=email, appointment_id=appointment_id, service_id=service_id,description=description,appointment_date=appointment_date ,service_name=service_name)
     return Response(
         {
             'status': True,

@@ -66,11 +66,11 @@ def send_refund_email(client_email):
 
 
 
-def send_reversal_email(email=None, appointment_id=None, service_id=None,description=None,appointment_date=None ,service_name=None,client_name=None):
+def send_reversal_email(client_phone=None,email=None, appointment_id=None, service_id=None,description=None,appointment_date=None ,service_name=None,client_name=None):
     try:
         # context =
         html_file = render_to_string("AppointmentEmail/reversal.html",
-                                     {'client':client_name,'mobile':'+923224521103','email':email,'appointment_date':appointment_date,'service':service_name,'reason':description})
+                                     {'client':client_name,'mobile':client_phone,'email':email,'appointment_date':appointment_date,'service':service_name,'reason':description})
         text_content = strip_tags(html_file)
         email = EmailMultiAlternatives(
             'Reversal',
