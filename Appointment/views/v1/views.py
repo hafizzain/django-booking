@@ -74,8 +74,7 @@ from rest_framework.pagination import PageNumberPagination
 
 from ... import choices
 from Service.serializers import BasicServiceSerializer
-
-from Utility.testapi import send_reversal_emails
+from django.core.paginator import Paginator
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -177,6 +176,7 @@ def create_reversal(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_reversal(request):
+    
     # description = request.data.get('description', None)
     # business = request.data.get('business', None)
     # service_id = request.data.get('appointment_service', None)
@@ -188,12 +188,14 @@ def get_reversal(request):
     # client_type = request.data.get('client_type',None)
     # client_phone= request.data.get('client_phone',None)
     # url = request.data.get('url',None)
+    no_pagination = request.GET.get('no_pagination', None)
     all_reversal = Reversal.objects.all()
     start_date = request.data.get('start_date',None)
     end_date = request.data.get('end_date',None)
     if start_date is not None and end_date is not None:
         all_reversal = Reversal.objects.filter(start_date=start_date,
                                                        end_date=end_date)
+        
         # url=url,
         # description=description,appointment_date=appointment_date,
         # business_id=business,
@@ -206,13 +208,24 @@ def get_reversal(request):
 
     # Example usage:
     # send_reversal_email_threaded(client_phone=client_phone,client_name=client_name,email=email, appointment_id=appointment_id, service_id=service_id,description=description,appointment_date=appointment_date ,service_name=service_name)
-
+    all_reversal_count=all_reversal.count()
+    page_count = all_reversal_count / 10
+    if page_count > int(page_count):
+        page_count = int(page_count) + 1
+    
+    results_per_page = 10000 if no_pagination else 10
+    paginator = Paginator(all_reversal, results_per_page)
+    page_number = request.GET.get("page") 
+    customers_points = paginator.get_page(page_number)
     return Response(
         {
             'status': True,
             'status_code': 200,
             'response': {
                 'message': 'Reversal get successfully!',
+                'count':all_reversal_count,
+                'pages':page_count,
+                'per_page_result':results_per_page,
                 'error_message': None,
                 'errors': [],
                 'data': data
