@@ -90,6 +90,8 @@ def send_reversal_email(client_phone=None,email=None, appointment_id=None, servi
             'Reversal',
             text_content,
             settings.EMAIL_HOST_USER,
+  
+
             to=[email],
         )
         email.attach_alternative(html_file, "text/html")
@@ -97,6 +99,7 @@ def send_reversal_email(client_phone=None,email=None, appointment_id=None, servi
         
         # email_thread = Thread(target=send_email)
         # email_thread.start()
+
     except Exception as ex:
         ex = str(ex)
         return Response({"msg":ex})
