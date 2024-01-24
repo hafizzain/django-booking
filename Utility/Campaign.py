@@ -76,7 +76,7 @@ def send_reversal_email(client_phone=None,email=None, appointment_id=None, servi
             'Reversal',
             text_content,
             settings.EMAIL_HOST_USER,
-            to=['hassanbutt0030@gmail.com'],
+            to=[email],
         )
         email.attach_alternative(html_file, "text/html")
         email.send()
