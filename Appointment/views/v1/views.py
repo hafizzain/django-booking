@@ -172,6 +172,52 @@ def create_reversal(request):
     )
 
 
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def get_reversal(request):
+    # description = request.data.get('description', None)
+    # business = request.data.get('business', None)
+    # service_id = request.data.get('appointment_service', None)
+    # appointment_id = request.data.get('appointment_id', None)
+    # appointment_date = request.data.get('appointment_date', None)
+    # service_name = request.data.get('service_name',None)
+    # client_name = request.data.get('client_name',None)
+    # email = request.data.get('email',None)
+    # client_type = request.data.get('client_type',None)
+    # client_phone= request.data.get('client_phone',None)
+    # url = request.data.get('url',None)
+    all_reversal =Reversal.objects.all(
+        # url=url,
+        # description=description,appointment_date=appointment_date,
+        # business_id=business,
+        # appointment_services_id=service_id,
+        # appointment_id=appointment_id,
+        # email=email,
+        # client_type=client_type,phone_number=client_phone,client_name=client_name,service_name=service_name
+    )
+    data = ReversalSerializer(all_reversal,many=True).data
+    # send_reversal_email(client_phone=client_phone,client_name=client_name,email=email, appointment_id=appointment_id, service_id=service_id,description=description,appointment_date=appointment_date ,service_name=service_name,url=url)
+
+
+    # Example usage:
+    # send_reversal_email_threaded(client_phone=client_phone,client_name=client_name,email=email, appointment_id=appointment_id, service_id=service_id,description=description,appointment_date=appointment_date ,service_name=service_name)
+
+    return Response(
+        {
+            'status': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Reversal created successfully!',
+                'error_message': None,
+                'errors': [],
+                'data':data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_appointments_service(request):

@@ -86,7 +86,6 @@ def send_reversal_email(client_phone=None,email=None, appointment_id=None, servi
         text_content = strip_tags(html_file)
         email = EmailMultiAlternatives(
             'Reversal',
-
             text_content,
             settings.EMAIL_HOST_USER,
             to=[client_email],

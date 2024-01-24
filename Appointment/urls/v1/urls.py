@@ -48,7 +48,7 @@ urlpatterns = [
     
     #Search by client 
     path('get_client_sale/', views.get_client_sale),
-    
+
     #Create Client Book Appointment
     path('create_appointment_client/', views.create_appointment_client),
     
@@ -59,6 +59,7 @@ urlpatterns = [
 
     #Appointment Logs
     path('get_appointment_logs/', views.get_appointment_logs),
+    path('get_reversal_logs/', views.get_reversal),
 
     # Employee Inshights
     path('get_employee_insights/', views.get_employee_appointment_insights),
