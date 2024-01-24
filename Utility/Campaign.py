@@ -80,7 +80,7 @@ def send_reversal_email(client_phone=None,email=None, appointment_id=None, servi
         
         # context =
         html_file = render_to_string("AppointmentEmail/reversal.html",
-                                     {'client':client_name,'mobile':client_phone,'email':email,'appointment_date':appointment_date,'service':service_name,'reason':description})
+                                     {'client':name,'mobile':phone,'email':client_email,'appointment_date':date,'service':s_name,'reason':desc})
         text_content = strip_tags(html_file)
         def send_email():
             email = EmailMultiAlternatives(
