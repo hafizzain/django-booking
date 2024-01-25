@@ -3800,9 +3800,9 @@ def update_reversals(request):
     request_status = request.data.get('request_status', None)
     appointment_id = request.data.get("appointment_id",None)
     service_id = request.data.get("service_id",None)
-    status = request.data.get("status",None)
+    stat = request.data.get("status.",None)
     
-    if status == "accepted":
+    if stat == "accepted":
         reversal = AppointmentService.objects.filter(appointment_id=appointment_id).update(
         status = request_status
         )
