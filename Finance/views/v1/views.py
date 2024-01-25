@@ -152,11 +152,11 @@ class RefundAPIView(APIView):
                 try:    
                     invoice = SaleInvoice.objects.get(id=refund_invoice_id) 
                     checkout_instance = invoice.checkout_instance 
-                    checkout_instance.is_refund = True
+                    checkout_instance.is_refund = 'refund'
                     checkout_instance.save() 
                     newCheckoutInstance = checkout_instance  
                     newCheckoutInstance.pk = None 
-                    newCheckoutInstance.is_refund = True
+                    newCheckoutInstance.is_refund = 'refund'
                     newCheckoutInstance.save()
                     newCheckoutInstance.previous_checkout = checkout_instance
                     newCheckoutInstance.save()
@@ -172,7 +172,7 @@ class RefundAPIView(APIView):
 
                         for order in order_items:
                             order.pk = None
-                            order.is_refund = True
+                            order.is_refund = 'refund'
                             order.total_price = -RefundServices.objects.get(service__id = order.id).refunded_amount
                             order.tip = 0
                             order.gst = 0
@@ -192,7 +192,7 @@ class RefundAPIView(APIView):
                             order.tip = 0
                             order.gst = 0
                             # order.tax_amount = 0
-                            order.is_refund = True
+                            order.is_refund = 'refund'
                             order.price = RefundProduct.objects.get(product__id = order.id).refunded_amount 
                             order.save()
                             
@@ -201,7 +201,7 @@ class RefundAPIView(APIView):
                         for order in service_orders:
                             order.pk = None
                             order.checkout = newCheckoutInstance
-                            order.is_refund = True
+                            order.is_refund = 'refund'
                             order.price = -RefundServices.objects.get(service__id = order.id).refunded_amount
                             order.save()
                         
