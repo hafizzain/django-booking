@@ -214,7 +214,13 @@ class RefundAPIView(APIView):
                     newInvoice.payment_type = payment_type
                     newInvoice.save() 
 
-                    client_email = Client.objects.get(id=client).email 
+                    try:
+                        client_instance = Client.objects.get(id=client)
+                        client_email = client_instance.email
+                    except Client.DoesNotExist:
+                        # Handle the case where the client does not exist
+                        client_email = None  # or any default value or appropriate handling
+                        
                     #send email to client running on thread
                     send_refund_email(client_email=client_email)  
                 except Exception as e:
