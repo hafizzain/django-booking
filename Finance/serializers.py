@@ -75,7 +75,7 @@ class RefundSerializer(serializers.ModelSerializer):
             ]
             RefundServices.objects.bulk_create(refunded_services_instances)
 
-        return refund
+        return refunded_products_data
 
 
 
