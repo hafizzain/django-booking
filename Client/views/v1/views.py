@@ -2914,7 +2914,7 @@ def get_client_all_memberships(request):
             'response': {
                 'message': 'Client Available Memberships',
                 'error_message': None,
-                'client_memberships': serializer.data
+                'client_memberships': list(serializer.data)
             }
         },
         status=status.HTTP_200_OK
