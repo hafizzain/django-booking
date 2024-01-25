@@ -139,7 +139,9 @@ class RefundAPIView(APIView):
             expiry_date = request.data.get('expiry_date')
             serializer = RefundSerializer(data=request.data, context={'request': request})
             if serializer.is_valid():
+                return Response({'data': serializer.validated_data} , status=status.HTTP_200_OK)
                 refund_instance = serializer.save()
+                
                 
                 # refunded_products_ids = list(refundprodcts.objects.filter().values_list('id', flat=True))
                 refunded_products_ids = refund_instance.refunded_products.values_list('product__id', flat=True)
