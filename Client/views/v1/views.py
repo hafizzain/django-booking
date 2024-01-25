@@ -174,7 +174,7 @@ def get_single_client(request):
     seralized = SingleClientSerializer(client, context={'request': request})
     return Response(
         {
-            'length':length,
+            'length': length,
             'status': 200,
             'status_code': '200',
             'response': {
@@ -606,14 +606,15 @@ def update_client(request):
         if images is not None:
             ids = json.loads(images)
             for id in ids:
-                all_images=ClientImages.objects.filter(client_id=client.id)
+                all_images = ClientImages.objects.filter(client_id=client.id)
                 if all_images:
                     all_images.delete()
-                    ClientImages.objects.filter(id=id).update(client_id=client.id)
+            for id in ids:
+                ClientImages.objects.filter(id=id).update(client_id=client.id)
 
-                # # If the object already exists, update the client_id
-                # if not created:
-                #     ClientImages.objects.filter(id=id).update(client_id=client.id)
+            # # If the object already exists, update the client_id
+            # if not created:
+            #     ClientImages.objects.filter(id=id).update(client_id=client.id)
     except Exception as err:
         return Response(
             {
