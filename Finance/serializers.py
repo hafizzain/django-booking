@@ -62,7 +62,7 @@ class RefundSerializer(serializers.ModelSerializer):
 
         with transaction.atomic():
             refund = Refund.objects.create(**validated_data)
-            
+
             # Corrected code for creating RefundProduct instances
             refunded_products_instances = [
                 RefundProduct(refund=refund, **product_data)
