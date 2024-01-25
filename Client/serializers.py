@@ -1,4 +1,4 @@
-
+# from Appointment.serializers import ClientImagesSerializerResponse
 from Business.models import BusinessAddress
 from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
@@ -8,7 +8,8 @@ from Product.models import Product
 from Service.models import Service
 from Utility.models import Country, State, City
 
-from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs , VoucherCurrencyPrice 
+from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, \
+    Promotion, Rewards, Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs, VoucherCurrencyPrice, ClientImages
 from Invoices.models import SaleInvoice
 from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip, AppointmentService, Appointment
 from Order.models import Checkout, Order
@@ -42,6 +43,11 @@ class CountrySerializer(serializers.ModelSerializer):
         model = Country
         exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
 
+class ClientImagesSerializerResponses(serializers.ModelSerializer):
+    class Meta:
+        model = ClientImages
+        fields = "__all__"
+
 class SingleClientSerializer(serializers.ModelSerializer):
     country_obj = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
@@ -50,6 +56,15 @@ class SingleClientSerializer(serializers.ModelSerializer):
     country = serializers.SerializerMethodField()
     state = serializers.SerializerMethodField()
     city = serializers.SerializerMethodField()
+    images = serializers.SerializerMethodField(read_only=True)
+
+    def get_images(self,obj):
+        try:
+            images = ClientImages.objects.filter(client_id=obj.id)
+            aval_images = ClientImagesSerializerResponses(images,many=True , context={'request':self.context.get('request')}).data
+            return aval_images
+        except Exception as ex:
+            return [str(ex)]
 
     def get_country(self, obj):
         return CountrySerializer(obj.country).data if obj.country else None
@@ -110,7 +125,7 @@ class SingleClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
         fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number',
-                 'country','city','state', 'is_active',
+                 'country','city','state', 'is_active','images',
                  'language', 'about_us', 'marketing','country_obj','customer_note',
                  'created_at', 'total_done_appointments', 'total_sales']
         
