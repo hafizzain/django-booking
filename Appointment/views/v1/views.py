@@ -148,7 +148,7 @@ def create_reversal(request):
     Reversal.objects.create(
         url=url,
         description=description, appointment_date=appointment_date,
-        business_id=business,
+        business_id=business,request_status='pending',
         appointment_services_id=service_id,
         appointment_id=appointment_id,
         email=email,generated_by=generated_by,
