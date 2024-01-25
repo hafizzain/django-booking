@@ -126,26 +126,23 @@ class RefundAPIView(APIView):
             '''
 
     def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
-        refunded_products = request.data.get('refunded_products')
-        
         refund_invoice_id = request.data.get('refund_invoice_id')
         refund_price = request.data.get('total_refund_amount')
         payment_type = request.data.get('payment_type')
-        client_type = request.data.get('client_type')
         client = request.data.get('client')
-        invoice_type = request.data.get('invoice_type')
         checkout_type = request.data.get('checkout_type') # appointment or sale
-        checkout = request.data.get('checkout')
         expiry_date = request.data.get('expiry_date')
+        
         try:
             user = request.user
             request.data['user'] = user.id
             expiry_date = request.data.get('expiry_date')
-            serializer = RefundSerializer(
-                data=request.data, context={'request': request})
+            serializer = RefundSerializer(data=request.data, context={'request': request})
+            # return Response({'data': serializer.validated_data}, status=status.HTTP_200_OK)
             if serializer.is_valid():
-                return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+                # return Response({'data': serializer.initial_data}, status=status.HTTP_200_OK)
                 refund_instance = serializer.save()
+                
                 
                 # refunded_products_ids = list(refundprodcts.objects.filter().values_list('id', flat=True))
                 refunded_products_ids = refund_instance.refunded_products.values_list('product__id', flat=True)
@@ -155,11 +152,11 @@ class RefundAPIView(APIView):
                 try:    
                     invoice = SaleInvoice.objects.get(id=refund_invoice_id) 
                     checkout_instance = invoice.checkout_instance 
-                    checkout_instance.is_refund = True
+                    # checkout_instance.is_refund = True
                     checkout_instance.save() 
                     newCheckoutInstance = checkout_instance  
                     newCheckoutInstance.pk = None 
-                    newCheckoutInstance.is_refund = True
+                    # newCheckoutInstance.is_refund = True
                     newCheckoutInstance.save()
                     newCheckoutInstance.previous_checkout = checkout_instance
                     newCheckoutInstance.save()
@@ -216,14 +213,8 @@ class RefundAPIView(APIView):
                     newInvoice.checkout_type = 'refund'
                     newInvoice.payment_type = payment_type
                     newInvoice.save() 
-                    try:
-                        client_instance = Client.objects.get(id=client)
-                        client_email = client_instance.email
-                    except Client.DoesNotExist:
-                        # Handle the case where the client does not exist
-                        client_email = None  # or any default value or appropriate handling
 
-                    # client_email = Client.objects.get(id=client).email 
+                    client_email = Client.objects.get(id=client).email 
                     #send email to client running on thread
                     send_refund_email(client_email=client_email)  
                 except Exception as e:
@@ -268,7 +259,6 @@ class RefundAPIView(APIView):
                             'data': {
                                 'refund': RefundSerializer(serializer.instance).data,
                                 'invoice': SaleInvoiceSerializer(newInvoice).data, 
-                                
                             }
                         }
                     }
