@@ -88,7 +88,9 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         SaleRecordTip.objects.bulk_create([
             SaleRecordTip(sale_record=sale_record, **data) for data in tips_data
         ])
-
+        SaleRecordMembership.objects.bulk_create([
+            
+        ])
         SaleRecordServices.objects.bulk_create([
             SaleRecordServices(sale_record=sale_record, **data) for data in services_data
         ])
@@ -108,5 +110,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         SaleTax.objects.bulk_create([
             SaleTax(sale_order=sale_record, **data) for data in tax_data
         ])
+        
+        
 
         return sale_record
