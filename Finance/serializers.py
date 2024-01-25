@@ -52,7 +52,6 @@ class RefundSerializer(serializers.ModelSerializer):
             for product_data in refunded_products_data if product_data['in_stock'] == True]
         except Exception as e:
             return ({'error': str(e)})
-        return True
 
     def create(self, validated_data):  # sourcery skip: extract-method
         request = self.context.get('request')
