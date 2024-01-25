@@ -118,11 +118,11 @@ class SaleRecordAppliedCoupons(CommonField):
     coupon_discounted_price = models.FloatField(default =0, blank=False, null=False) 
     is_coupon_redeemed = models.BooleanField(default = False, blank=False, null=False) 
     
-# class AppliedMemberships(CommonField):
-#     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'sale_applied_coupons_records')
-#     membership = models.ForeignKey(Membership, on_delete = models.SET_NULL, blank=True, null=True)
+class AppliedMemberships(CommonField):
+    sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'sale_applied_coupons_records')
+    membership = models.ForeignKey(Membership, on_delete = models.SET_NULL, blank=True, null=True)
     
-#     points = 
+    points = 
 
 class SaleTax(CommonField):
     # self.id is a seperate field 

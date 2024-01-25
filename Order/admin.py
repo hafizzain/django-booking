@@ -74,4 +74,10 @@ class OrderAdmin(admin.ModelAdmin):
     # search_fields = ('id')
 
     
-admin.site.register(CheckoutPayment)
+# admin.site.register(CheckoutPayment)
+
+
+
+@admin.register(MemberShipOrder)
+class MemberShipOrderAdmin(admin.ModelAdmin):
+    list_display = ['id','business','']
