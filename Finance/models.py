@@ -28,8 +28,8 @@ class Refund(CommonField):
 
 class RefundProduct(CommonField):
     
-    refund = models.ForeignKey(Refund, on_delete=models.CASCADE, verbose_name = 'Refund id', related_name='refunded_products')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Product id')
+    refund = models.ForeignKey(Refund, on_delete=models.CASCADE, related_name='refunded_products')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     
     
     refunded_quantity = models.PositiveIntegerField()
@@ -37,8 +37,8 @@ class RefundProduct(CommonField):
     in_stock = models.BooleanField(default = False)
     
 class RefundServices(CommonField):
-    refund = models.ForeignKey(Refund, on_delete=models.CASCADE, verbose_name = 'Refund id', related_name='refunded_services')
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, verbose_name='Service id')
+    refund = models.ForeignKey(Refund, on_delete=models.CASCADE, related_name='refunded_services')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
     
     refunded_amount = models.DecimalField(max_digits=10, decimal_places=2)
 
