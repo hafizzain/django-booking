@@ -605,8 +605,9 @@ def update_client(request):
             ids = json.loads(images)
             for id in ids:
                 all_images=ClientImages.objects.filter(client_id=client.id)
-                all_images.delete()
-                ClientImages.objects.filter(id=id).update(client_id=client.id)
+                if all_images:
+                    all_images.delete()
+                    ClientImages.objects.filter(id=id).update(client_id=client.id)
 
                 # # If the object already exists, update the client_id
                 # if not created:
@@ -669,9 +670,11 @@ def update_client(request):
     serialized = ClientSerializer(client, data=request.data, partial=True, context={'request': request})
     if serialized.is_valid():
         serialized.save()
-
+        qs = ClientImages.objects.filter(client_id=client.id)
+        length = qs.count()
         return Response(
             {
+                'length':length,
                 'status': True,
                 'status_code': 200,
                 'response': {
