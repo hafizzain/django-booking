@@ -44,11 +44,10 @@ class PaymentMethodsSerializer(serializers.ModelSerializer):
         model = PaymentMethods
         fields = "__all__"
 
-class RedeemedItemsSerializer(serializers.ModelSerializer):
+class PaymentMethodSerializer(serializers.ModelSerializer):
     class Meta: 
-        model = RedeemedItems
-        fields = "__all__"
-
+        model = PaymentMethods
+        fields  = "__all__"
 
 class SaleTaxSerializer(serializers.ModelSerializer):
     class Meta:
@@ -57,14 +56,14 @@ class SaleTaxSerializer(serializers.ModelSerializer):
         
 class SaleRecordSerializer(serializers.ModelSerializer):
     appointments_services = SaleRecordsAppointmentServicesSerializer(many= True, write_only = True)
-    tips = SaleOrderTipSerializer(many = True, write_only = True)
     services = SaleRecordServicesSerializer(many= True, write_only= True)
     products = SaleRecordProductsSerializer(many= True, write_only = True)
-    vouchers = SaleRecordVouchersSerializer(many =True , write_only= True)
-    membership = SaleRecordMembershipSerializer(many = True , write_only = True)
+    payment_methods = PaymentMethodSerializer(many = True, write_only = True)
     applied_coupons = SaleRecordAppliedCouponsSerializer(many= True , write_only = True)
-    redeemed_items = RedeemedItemsSerializer(many= True , write_only = True)
+    membership = SaleRecordMembershipSerializer(many = True , write_only = True)
+    vouchers = SaleRecordVouchersSerializer(many =True , write_only= True)
     tax = SaleTaxSerializer(many =True, write_only = True)
+    tips = SaleOrderTipSerializer(many = True, write_only = True)
     class Meta:
         model = SaleRecords
         fields = '__all__'

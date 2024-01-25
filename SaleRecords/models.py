@@ -108,15 +108,6 @@ class PaymentMethods(CommonField):
     payment_method = models.CharField(choices = PaymentMethodsChoices.choices, max_length = 50 , null = True , blank = False)
     amount = models.FloatField(default  = 0 , blank= False)
     
-class RedeemedItems(CommonField):
-    sale_record = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, related_name='sale_redeemed_items_records') 
-    
-    item_id  = models.CharField(max_length = 50 , blank=True, null=True)
-    redeemed_type = models.CharField(max_length = 50, blank=True, null=True)
-    is_redeemed = models.BooleanField(default = False, blank=False, null=False)
-    percentage = models.FloatField(default=0, blank=True, null=True) 
-    discount = models.FloatField(default=0, blank=True, null=True) 
-    redeem_option = models.CharField(max_length=250, default=None, blank=True, null=True)
     
 class SaleRecordAppliedCoupons(CommonField):
     
@@ -126,6 +117,12 @@ class SaleRecordAppliedCoupons(CommonField):
     coupon_type = models.CharField(choices = CouponType.choices,max_length = 50, default = '', blank=False, null=False)
     coupon_discounted_price = models.FloatField(default =0, blank=False, null=False) 
     is_coupon_redeemed = models.BooleanField(default = False, blank=False, null=False) 
+    
+# class AppliedMemberships(CommonField):
+#     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'sale_applied_coupons_records')
+#     membership = models.ForeignKey(Membership, on_delete = models.SET_NULL, blank=True, null=True)
+    
+#     points = 
 
 class SaleTax(CommonField):
     # self.id is a seperate field 
