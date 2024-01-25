@@ -943,7 +943,7 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
     def get_reversal_status(self, obj):
         try:
             revarsal = Reversal.objects.filter(appointment_services_id=obj.id)
-            revarsal = revarsal.last()
+            revarsal = revarsal.first()
             return str(revarsal.request_status)
         except:
             return []
