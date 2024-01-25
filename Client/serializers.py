@@ -125,7 +125,7 @@ class SingleClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
         fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number',
-                 'country','city','state', 'is_active',
+                 'country','city','state', 'is_active','images',
                  'language', 'about_us', 'marketing','country_obj','customer_note',
                  'created_at', 'total_done_appointments', 'total_sales']
         
