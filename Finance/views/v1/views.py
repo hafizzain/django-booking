@@ -144,6 +144,7 @@ class RefundAPIView(APIView):
             serializer = RefundSerializer(
                 data=request.data, context={'request': request})
             if serializer.is_valid():
+                return Response({'data': serializer.data}, status=status.HTTP_200_OK)
                 refund_instance = serializer.save()
                 
                 # refunded_products_ids = list(refundprodcts.objects.filter().values_list('id', flat=True))
@@ -267,7 +268,7 @@ class RefundAPIView(APIView):
                             'data': {
                                 'refund': RefundSerializer(serializer.instance).data,
                                 'invoice': SaleInvoiceSerializer(newInvoice).data, 
-                                'data': serializer.data,
+                                
                             }
                         }
                     }
