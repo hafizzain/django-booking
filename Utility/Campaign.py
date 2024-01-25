@@ -66,8 +66,6 @@ def send_refund_email(client_email):
     email_thread.start()
 
 
-
-
 def send_reversal_email(client_phone=None,email=None, appointment_id=None, service_id=None,description=None,appointment_date=None ,service_name=None,client_name=None, url=None):
 
     try:
@@ -85,6 +83,7 @@ def send_reversal_email(client_phone=None,email=None, appointment_id=None, servi
         html_file = render_to_string("AppointmentEmail/reversal.html",
                                     {'url':url,'client':name,'mobile':phone,'email':client_email,'appointment_date':date,'service':s_name,'reason':desc})
         text_content = strip_tags(html_file)
+        
         def send_email():
             email = EmailMultiAlternatives(
                 'Reversal',
@@ -97,7 +96,6 @@ def send_reversal_email(client_phone=None,email=None, appointment_id=None, servi
             
         email_thread = Thread(target=send_email)
         email_thread.start()
-
     except Exception as ex:
         ex = str(ex)
         return Response({"msg":ex})
