@@ -59,6 +59,7 @@ class RefundSerializer(serializers.ModelSerializer):
         location = request.data.get('location')
         refunded_products_data = validated_data.pop('refunded_products', [])
         refunded_services_data = validated_data.pop('refunded_services', [])
+        
         with transaction.atomic():
             refund = Refund.objects.create(**validated_data)
             refunded_products_instances = [
