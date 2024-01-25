@@ -790,6 +790,11 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
                   'appointment_status', 'location', 'created_at', 'cancel_note', 'cancel_reason')
 
 
+
+class ServiceReversal(serializers.ModelSerializer):
+    class Meta:
+        model = Reversal
+        fields= ['id','request_status']
 class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     avaliable_service_group = serializers.SerializerMethodField(read_only=True)
@@ -937,7 +942,9 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
 
     def get_reversal_status(self, obj):
         try:
-            Reversal.objects.filter(appointment_services_id=obj.id)
+            revarsal = Reversal.objects.filter(appointment_services_id=obj.id)
+            status_reversal = ServiceReversal(revarsal , many=True).data
+            return status_reversal
         except:
             return []
 
