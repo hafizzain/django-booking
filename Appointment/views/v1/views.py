@@ -3779,29 +3779,31 @@ def get_available_appointments(request):
         return Response(data, status=status.HTTP_200_OK)
 
 
-# 
-# 
-# @api_view(['GET'])
-# @permission_classes([AllowAny])
-# def get_reversal(request):
-#     # description = request.data.get('description', None)
-#     # business = request.data.get('business', None)
-#     # service_id = request.data.get('appointment_service', None)
-#     # appointment_id = request.data.get('appointment_id', None)
-#     # appointment_date = request.data.get('appointment_date', None)
-#     # service_name = request.data.get('service_name',None)
-#     # client_name = request.data.get('client_name',None)
-#     # email = request.data.get('email',None)
-#     # client_type = request.data.get('client_type',None)
-#     # client_phone= request.data.get('client_phone',None)
-#     # url = request.data.get('url',None)
-# 
-#     send_reversal_email(client_phone='03106623830',
-#                         client_name='ali',
-#                         email='arbabsabir336@gmail.com', 
-#                         appointment_id='123',
-#                         service_id='456',
-#                         description='xyz',
-#                         appointment_date='10-08-2024',
-#                         service_name='myservices',
-#                         url='www.google.com')
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_reversal(request):
+    # description = request.data.get('description', None)
+    # business = request.data.get('business', None)
+    # service_id = request.data.get('appointment_service', None)
+    # appointment_id = request.data.get('appointment_id', None)
+    # appointment_date = request.data.get('appointment_date', None)
+    # service_name = request.data.get('service_name',None)
+    # client_name = request.data.get('client_name',None)
+    # email = request.data.get('email',None)
+    # client_type = request.data.get('client_type',None)
+    # client_phone= request.data.get('client_phone',None)
+    # url = request.data.get('url',None)
+
+    send_reversal_email(client_phone='03106623830',
+                        client_name='ali',
+                        email='arbabsabir336@gmail.com', 
+                        appointment_id='123',
+                        service_id='456',
+                        description='xyz',
+                        appointment_date='10-08-2024',
+                        service_name='myservices',
+                        url='www.google.com')
+
+    return Response({"msg": "Email sent successfully"})
