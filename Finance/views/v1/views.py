@@ -267,7 +267,7 @@ class RefundAPIView(APIView):
                             'data': {
                                 'refund': RefundSerializer(serializer.instance).data,
                                 'invoice': SaleInvoiceSerializer(newInvoice).data, 
-                                'refunded_products': refunded_products,
+                                'data': serializer.data,
                             }
                         }
                     }
