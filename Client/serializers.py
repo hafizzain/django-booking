@@ -61,7 +61,7 @@ class SingleClientSerializer(serializers.ModelSerializer):
     def get_images(self,obj):
         try:
             images = ClientImages.objects.filter(client_id=obj.id)
-            aval_images = ClientImagesSerializerResponses(images,many=True).data
+            aval_images = ClientImagesSerializerResponses(images,many=True , context={'request':self.request}).data
             return aval_images
         except Exception as ex:
             return []
