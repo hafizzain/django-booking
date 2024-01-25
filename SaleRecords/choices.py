@@ -12,7 +12,7 @@ class RefundSatus(models.TextChoices):
     REFUND = 'refund', 'Refund'
     CANCEL = 'cancel','Cancel'
 
-class PaymentMethods(models.TextChoices):
+class PaymentMethodsChoices(models.TextChoices):
     CASH = 'cash','Cash Payment'
     MASTER_CARD = 'master','Master Payment'
     VISA_CARD = 'visa','Visa Payment'
