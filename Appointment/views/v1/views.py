@@ -144,13 +144,14 @@ def create_reversal(request):
     client_type = request.data.get('client_type', None)
     client_phone = request.data.get('client_phone', None)
     url = request.data.get('url', None)
+    generated_by = request.data.get('generated_by',None)
     Reversal.objects.create(
         url=url,
         description=description, appointment_date=appointment_date,
         business_id=business,
         appointment_services_id=service_id,
         appointment_id=appointment_id,
-        email=email,
+        email=email,generated_by=generated_by,
         client_type=client_type, phone_number=client_phone, client_name=client_name, service_name=service_name
     )
     send_reversal_email(client_phone=client_phone, client_name=client_name, email=email, appointment_id=appointment_id,
