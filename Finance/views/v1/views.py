@@ -152,7 +152,7 @@ class RefundAPIView(APIView):
                 try:    
                     invoice = SaleInvoice.objects.get(id=refund_invoice_id) 
                     checkout_instance = invoice.checkout_instance 
-                    checkout_instance.is_refund = 'refund'
+                    checkout_instance.is_refund = True
                     checkout_instance.save() 
                     newCheckoutInstance = checkout_instance  
                     newCheckoutInstance.pk = None 
@@ -172,7 +172,7 @@ class RefundAPIView(APIView):
 
                         for order in order_items:
                             order.pk = None
-                            order.is_refund = 'refund'
+                            order.is_refund = True
                             order.total_price = -RefundServices.objects.get(service__id = order.id).refunded_amount
                             order.tip = 0
                             order.gst = 0
