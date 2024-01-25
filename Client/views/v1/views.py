@@ -577,7 +577,7 @@ def create_client(request):
 @permission_classes([IsAuthenticated])
 def update_client(request):
     # sourcery skip: avoid-builtin-shadow
-
+    images = request.data.get('image_ids', [])
     country_unique_id = request.data.get('country', None)
     state_unique_id = request.data.get('state', None)
     city_name = request.data.get('city', None)
@@ -601,6 +601,17 @@ def update_client(request):
         )
     try:
         client = Client.objects.get(id=id)
+        if images is not None:
+            ids = json.loads(images)
+            for id in ids:
+                client_image, created = ClientImages.objects.get_or_create(
+                    id=id,
+                    defaults={'client_id': client.id}
+                )
+
+                # If the object already exists, update the client_id
+                if not created:
+                    ClientImages.objects.filter(id=id).update(client_id=client.id)
     except Exception as err:
         return Response(
             {
