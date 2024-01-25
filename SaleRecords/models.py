@@ -136,7 +136,8 @@ class SaleTax(CommonField):
     business_tax_id = models.ForeignKey(BusinessTax, on_delete=models.SET_NULL,  blank=False, null=True) # This will be Tax Instance ID 
     tax_name = models.CharField(max_length=999, blank=False, null=False) 
     # tax_amount = models.FloatField(default=0, null= True, blank = True)  null = True, blank = True
-    tax_percentage = models.FloatField(blank=False, null=False) 
+    tax_percentage = models.FloatField(default = 0,blank=False, null=False) 
+    tax_value = models.FloatField(default = 0,blank=False, null=False)
 
     def __str__(self):
         return self.tax_name
