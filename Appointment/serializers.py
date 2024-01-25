@@ -5,7 +5,7 @@ from pyexpat import model
 from re import A
 
 from Authentication.models import User
-from Client.models import Client
+from Client.models import Client, ClientImages
 
 from django.db.models.functions import Coalesce
 from django.db.models import Sum, Case, When, FloatField, Subquery, OuterRef
@@ -1485,3 +1485,10 @@ class MissedOpportunityBasicSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientMissedOpportunity
         fields = ['id', 'client_name', 'client_type', 'note', 'date_time', 'services', 'dependency']
+
+
+
+class ClientImagesSerializerResponse(serializers.ModelSerializer):
+    class Meta:
+        model = ClientImages
+        fields = "__all__"

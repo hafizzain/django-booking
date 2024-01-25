@@ -15,7 +15,9 @@ from Service.models import Service
 from Business.models import Business, BusinessAddress
 from Product.models import Product
 from Utility.models import Country, Currency, ExceptionRecord, Language, State, City
-from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs,VoucherCurrencyPrice
+from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, \
+    DiscountMembership, LoyaltyPoints, Subscription, Rewards, Promotion, Membership, Vouchers, ClientLoyaltyPoint, \
+    LoyaltyPointLogs, VoucherCurrencyPrice, ClientImages
 from Client.serializers import (SingleClientSerializer, ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, 
                                 SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , 
                                 VoucherSerializer, ClientLoyaltyPointSerializer, CustomerLoyaltyPointsLogsSerializer, 
@@ -36,8 +38,7 @@ from Order.models import Checkout
 
 from Appointment import choices
 from Appointment.models import Appointment
-from Appointment.serializers import PaidUnpaidAppointmentSerializer
-
+from Appointment.serializers import PaidUnpaidAppointmentSerializer, ClientImagesSerializerResponse
 
 
 @transaction.atomic
@@ -386,6 +387,7 @@ def create_client(request):
     country_unique_id = request.data.get('country', None)
     state_unique_id = request.data.get('state', None)
     languages= request.data.get('language', None)
+    images = request.data.get('image_ids',[])
     errors = []
     
     if not all([business_id, client_id, full_name ,gender  , languages]):
@@ -536,6 +538,10 @@ def create_client(request):
         language = language_id,
         about_us =  about_us,
     )
+    if images is not None:
+        ids = json.loads(images)
+        for id in ids:
+            ClientImages.objects.filter(id=id).update(client_id=client.id)
 
     if address is not None:
         client.address = address
@@ -3390,3 +3396,38 @@ def check_client_existance(request):
         },
         status=status.HTTP_200_OK
     )
+
+
+def create_client_image(request):
+    image = request.data.get('image',None)
+    file_name = request.data.get('file_name',None)
+    file_type = request.data.get('file_type',None)
+    if image is not None:
+        client_image = ClientImages.objects.create(image=image,
+                                                   file_name=file_name,file_type=file_type,is_image_uploaded_s3=True)
+        data = ClientImagesSerializerResponse(client_image ,many=True).data
+        return Response(
+            {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Client images added successfully!',
+                    'error_message': [],
+                    'data': data
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+    else:
+        return Response(
+            {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Enter a valid image',
+                    'error_message': [],
+                    'data': []
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
