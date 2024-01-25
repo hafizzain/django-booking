@@ -126,6 +126,8 @@ class RefundAPIView(APIView):
             '''
 
     def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
+        refunded_products = request.data.get('refunded_products')
+        
         refund_invoice_id = request.data.get('refund_invoice_id')
         refund_price = request.data.get('total_refund_amount')
         payment_type = request.data.get('payment_type')
@@ -265,6 +267,7 @@ class RefundAPIView(APIView):
                             'data': {
                                 'refund': RefundSerializer(serializer.instance).data,
                                 'invoice': SaleInvoiceSerializer(newInvoice).data, 
+                                'refunded_products': refunded_products,
                             }
                         }
                     }
