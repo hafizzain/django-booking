@@ -156,7 +156,7 @@ class RefundAPIView(APIView):
                     checkout_instance.save() 
                     newCheckoutInstance = checkout_instance  
                     newCheckoutInstance.pk = None 
-                    newCheckoutInstance.is_refund = 'refund'
+                    newCheckoutInstance.is_refund = True
                     newCheckoutInstance.save()
                     newCheckoutInstance.previous_checkout = checkout_instance
                     newCheckoutInstance.save()
