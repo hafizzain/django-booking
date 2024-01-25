@@ -61,14 +61,16 @@ class RefundSerializer(serializers.ModelSerializer):
         refunded_services_data = validated_data.pop('refunded_services', [])
         with transaction.atomic():
             refund = Refund.objects.create(**validated_data)
+            
+            # Corrected code for creating RefundProduct instances
             refunded_products_instances = [
                 RefundProduct(refund=refund, **product_data)
                 for product_data in refunded_products_data
             ]
-            #  Creating RefundedProduct 
             RefundProduct.objects.bulk_create(refunded_products_instances)
-            self.product_stock_update(location,refunded_products_data)
-            # Create refunded services
+            self.product_stock_update(location, refunded_products_data)
+
+            # Corrected code for creating RefundServices instances
             refunded_services_instances = [
                 RefundServices(refund=refund, **service_data)
                 for service_data in refunded_services_data
