@@ -58,8 +58,9 @@ class RefundSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         location = request.data.get('location')
         refunded_products_data = validated_data.get('refunded_products')
-        raise serializers.ValidationError(str(refunded_products_data))
-        refunded_services_data = validated_data.pop('refunded_services')
+        return refunded_products_data
+        # raise serializers.ValidationError(str(refunded_products_data))
+        # refunded_services_data = validated_data.pop('refunded_services')
 
         with transaction.atomic():
             refund = Refund.objects.create(**validated_data)
