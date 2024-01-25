@@ -29,9 +29,11 @@ class CouponSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class RefundSerializer(serializers.ModelSerializer):
-    refunded_products = RefundProductSerializer(many=True, read_only = True)
+    refunded_products = serializers.IntegerField()
     refunded_services = RefundServiceSerializer(many=True, read_only=True)
     related_refund_coupon = CouponSerializer(many=True, read_only=True)
+    
+    
 
     class Meta:
         model = Refund
@@ -58,7 +60,7 @@ class RefundSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         location = request.data.get('location')
         refunded_products_data = validated_data.get('refunded_products',None)
-        return True
+        return refunded_products_data
         # raise serializers.ValidationError(str(refunded_products_data))
         # refunded_services_data = validated_data.pop('refunded_services')
 
