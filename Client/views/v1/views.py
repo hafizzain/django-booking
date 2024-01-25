@@ -3417,7 +3417,7 @@ def create_client_image(request):
                     'data': data
                 }
             },
-            status=status.HTTP_201_CREATED
+            status=200
         )
     else:
         return Response(
