@@ -169,10 +169,12 @@ def get_single_client(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-
+    qs = ClientImages.objects.filter(client_id=client.id)
+    length = qs.count()
     seralized = SingleClientSerializer(client, context={'request': request})
     return Response(
         {
+            'length':length,
             'status': 200,
             'status_code': '200',
             'response': {
@@ -670,11 +672,9 @@ def update_client(request):
     serialized = ClientSerializer(client, data=request.data, partial=True, context={'request': request})
     if serialized.is_valid():
         serialized.save()
-        qs = ClientImages.objects.filter(client_id=client.id)
-        length = qs.count()
+
         return Response(
             {
-                'length':length,
                 'status': True,
                 'status_code': 200,
                 'response': {
