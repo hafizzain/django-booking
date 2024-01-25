@@ -2519,7 +2519,6 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
             return str(e)
 
     # Resolved the Subtotal Error
-    
     def get_subtotal(self, obj):
         try:
             if obj.coupon:
