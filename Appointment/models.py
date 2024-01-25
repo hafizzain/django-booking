@@ -655,4 +655,5 @@ class Reversal(CommonField):
     business = models.ForeignKey(Business, on_delete=models.CASCADE, null=True)
     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True)
     appointment_services = models.ForeignKey(AppointmentService, on_delete=models.CASCADE, null=True)
+    generated_by = models.TextField(null=True ,blank=True)
     request_status = models.TextField(default="void",null=True)
