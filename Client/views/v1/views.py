@@ -2905,7 +2905,7 @@ def get_client_all_memberships(request):
         client__id = client_id,
 
     )
-    data = ClientMembershipsSerializer(client_membership, many=True).data
+    serializer = ClientMembershipsSerializer(client_membership, many=True).data
 
     return Response(
         {
@@ -2914,7 +2914,7 @@ def get_client_all_memberships(request):
             'response': {
                 'message': 'Client Available Memberships',
                 'error_message': None,
-                'client_memberships': list(data)
+                'client_memberships': serializer.data
             }
         },
         status=status.HTTP_200_OK
