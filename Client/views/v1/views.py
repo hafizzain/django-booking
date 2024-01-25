@@ -3397,7 +3397,8 @@ def check_client_existance(request):
         status=status.HTTP_200_OK
     )
 
-
+@api_view(['POST'])
+@permission_classes([AllowAny])
 def create_client_image(request):
     image = request.data.get('image',None)
     file_name = request.data.get('file_name',None)
