@@ -70,11 +70,15 @@ class RefundSerializer(serializers.ModelSerializer):
             RefundProduct.objects.bulk_create(refunded_products_instances)
             self.product_stock_update(location,refunded_products)
             # Create refunded services
-            refunded_services_instances = [
-                RefundServices(refund=refund, **service_data)
-                for service_data in refunded_services
-            ]
-            RefundServices.objects.bulk_create(refunded_services_instances)
+            # refunded_services_instances = [
+            #     RefundServices(refund=refund, **service_data)
+            #     for service_data in refunded_services
+            # ]
+            # RefundServices.objects.bulk_create(refunded_services_instances)
+            
+            for service_data in refunded_services:
+                refunded_service_instance = RefundServices(refund=refund, **service_data)
+                refunded_service_instance.save()
 
         return refund
 

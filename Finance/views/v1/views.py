@@ -140,7 +140,7 @@ class RefundAPIView(APIView):
             serializer = RefundSerializer(data=request.data, context={'request': request})
             # return Response({'data': serializer.validated_data}, status=status.HTTP_200_OK)
             if serializer.is_valid():
-                return Response({'data': serializer.initial_data}, status=status.HTTP_200_OK)
+                # return Response({'data': serializer.initial_data}, status=status.HTTP_200_OK)
                 refund_instance = serializer.save()
                 
                 
