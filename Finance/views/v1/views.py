@@ -308,7 +308,6 @@ class RefundedCoupons(APIView):
             'response': {
                 'message': 'Record created successfully',
                 'error_message': None,
-                'data': serializer.data
             }
         }
         return Response(response_data, status=status.HTTP_200_OK)
