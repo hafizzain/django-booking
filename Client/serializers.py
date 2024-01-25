@@ -140,6 +140,16 @@ class ClientDropdownSerializer(serializers.ModelSerializer):
 
     image = serializers.SerializerMethodField()
     total_visit = serializers.IntegerField(read_only=True)
+    images = serializers.SerializerMethodField(read_only=True)
+
+    def get_images(self, obj):
+        try:
+            images = ClientImages.objects.filter(client_id=obj.id)
+            aval_images = ClientImagesSerializerResponses(images, many=True,
+                                                          context={'request': self.context.get('request')}).data
+            return aval_images
+        except Exception as ex:
+            return [str(ex)]
 
     def get_image(self, obj):
         if obj.image:
@@ -153,7 +163,7 @@ class ClientDropdownSerializer(serializers.ModelSerializer):
 
     class Meta:
         model  = Client
-        fields = ['id', 'full_name', 'email', 'client_id', 'image', 'total_visit']
+        fields = ['id','images', 'full_name', 'email', 'client_id', 'image', 'total_visit']
 
 class ClientSerializer(serializers.ModelSerializer):
     country = CountrySerializer(read_only=True)
