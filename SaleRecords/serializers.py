@@ -72,6 +72,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         appointments_services_data = validated_data.pop('appointments_services', [])
         tips_data = validated_data.pop('tips', [])
+        
         services_data = validated_data.pop('services', [])
         products_data = validated_data.pop('products', [])
         applied_coupons_data = validated_data.pop('applied_coupons', [])
@@ -88,7 +89,9 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         SaleRecordTip.objects.bulk_create([
             SaleRecordTip(sale_record=sale_record, **data) for data in tips_data
         ])
-
+        # SaleRecordMembership.objects.bulk_create([
+        #     SaleRecordMembership(sale_record = sale_record , **data) for data in 
+        # ])
         SaleRecordServices.objects.bulk_create([
             SaleRecordServices(sale_record=sale_record, **data) for data in services_data
         ])
@@ -108,5 +111,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         SaleTax.objects.bulk_create([
             SaleTax(sale_order=sale_record, **data) for data in tax_data
         ])
+        
+        
 
         return sale_record

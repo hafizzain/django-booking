@@ -1,4 +1,6 @@
 from Appointment.Constants.Reschedulen import reschedule_appointment_n
+from django.db.models import Sum, Subquery, OuterRef, FloatField, Case, When, Value, CharField, F, DateTimeField, Q
+from django.db import models
 from Appointment.Constants.Reschedulen import reschedule_appointment_n
 from Appointment.Constants.ConvertTime import convert_24_to_12
 from django.utils import timezone
@@ -144,13 +146,14 @@ def create_reversal(request):
     client_type = request.data.get('client_type', None)
     client_phone = request.data.get('client_phone', None)
     url = request.data.get('url', None)
+    generated_by = request.data.get('generated_by',None)
     Reversal.objects.create(
         url=url,
         description=description, appointment_date=appointment_date,
-        business_id=business,
+        business_id=business,request_status='pending',
         appointment_services_id=service_id,
         appointment_id=appointment_id,
-        email=email,
+        email=email,generated_by=generated_by,
         client_type=client_type, phone_number=client_phone, client_name=client_name, service_name=service_name
     )
     send_reversal_email(client_phone=client_phone, client_name=client_name, email=email, appointment_id=appointment_id,
@@ -3800,24 +3803,56 @@ def update_reversals(request):
     request_status = request.data.get('request_status', None)
     appointment_id = request.data.get("appointment_id",None)
     service_id = request.data.get("service_id",None)
-    stat = request.data.get("status.",None)
+    stat = request.data.get("status",None)
     
     if stat == "accepted":
-        reversal = AppointmentService.objects.filter(appointment_id=appointment_id).update(
-        status = request_status
+        all_services= AppointmentService.objects.filter(appointment_id=appointment_id).exclude(status='void')
+        qs = all_services.annotate(
+            condition_check=Case(
+                When(~Q(status='Started'), then=Value(True)),
+                When(~Q(status='Finished'), then=Value(True)),
+                default=Value(False),
+                output_field=models.BooleanField(),
+            )
         )
-        data = {
-            'status': True,
-            'status_code': 200,
-            'response': {
-                'message': 'Reversal Status Updated Successfully',
-                'error_message': None,
+        check_status = qs.filter(condition_check=True)
+        if check_status:
+            Appointment.objects.filter(id=appointment_id).update(status='Booked')
+            reversal = AppointmentService.objects.filter(appointment_id=appointment_id,id=service_id).update(
+                status=request_status, service_start_time=None, service_end_time=None
+            )
+            Reversal.objects.filter(appointment_id=appointment_id, appointment_services_id=service_id).update(
+                request_status=stat
+            )
+            data = {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Reversal Status Updated Successfully',
+                    'error_message': None,
+                }
             }
-        }
-        return Response(data,status=status.HTTP_200_OK)
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            reversal = AppointmentService.objects.filter(appointment_id=appointment_id, id=service_id).update(
+                status=request_status, service_start_time=None, service_end_time=None
+            )
+            Reversal.objects.filter(appointment_id=appointment_id, appointment_services_id=service_id).update(
+                request_status=stat
+            )
+            data = {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Reversal Status Updated Successfully',
+                    'error_message': None,
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+
     else:
         Reversal.objects.filter(appointment_id=appointment_id, appointment_services_id=service_id).update(
-            request_status=request_status
+            request_status='rejected'
         )
         data = {
             'status': True,

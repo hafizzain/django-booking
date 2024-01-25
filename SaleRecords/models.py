@@ -31,16 +31,16 @@ class SaleRecords(CommonField):
     checkout_type = models.CharField(choices = CheckoutType.choices, max_length = 50) 
     
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, null = True, related_name='sale_records_client')
-    client_type = models.CharField(choices=ClientTypeChoices.choices, max_length=50, default='') 
+    client_type = models.CharField(choices=ClientTypeChoices.choices, max_length=50, blank=False, null=False) 
     
     
 
-    is_promotion = models.BooleanField(default=False) 
-    selected_promotion_id = models.CharField(default='', max_length=800) 
-    selected_promotion_type = models.CharField(default='', max_length=400) 
+    is_promotion = models.BooleanField(null = False, blank = False) 
+    selected_promotion_id = models.CharField( max_length=800, blank=False, null=False) 
+    selected_promotion_type = models.CharField( max_length=400, blank=False, null=False) 
     status = models.CharField(choices = Status.choices, max_length=50 , default = Status.UN_PAID) 
     
-    sub_total = models.FloatField(default =0 ) 
+    sub_total = models.FloatField(blank=False, null=False) 
 
     # is_coupon_redeemed = models.TextField(null=True) 
 
@@ -53,8 +53,8 @@ class SaleRecordServices(CommonField):
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True)
     service = models.ForeignKey(Service, on_delete = models.SET_NULL, null = True)
     
-    qty = models.PositiveIntegerField(default = 0)
-    price = models.FloatField(default =0)
+    qty = models.PositiveIntegerField(blank=True, null=True)
+    price = models.FloatField(blank=True, null=True)
     
     
 class SaleRecordsProducts(CommonField):
@@ -62,8 +62,8 @@ class SaleRecordsProducts(CommonField):
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True)
     product = models.ForeignKey(Product, on_delete = models.SET_NULL, null = True)
     
-    qty = models.PositiveIntegerField(default = 0)
-    price = models.FloatField(default =0)
+    qty = models.PositiveIntegerField(blank=True, null=True)
+    price = models.FloatField(blank=True, null=True)
     
     
 class SaleRecordsAppointmentServices(CommonField):
@@ -73,13 +73,13 @@ class SaleRecordsAppointmentServices(CommonField):
     
     
     service = models.ForeignKey(Service, on_delete = models.SET_NULL, null = True)
-    appointment_status = models.CharField(choices = AppointmentStatus.choices,max_length = 50, default = AppointmentStatus.BOOKED)
-    reason = models.CharField(max_length = 255)
-    qty = models.PositiveIntegerField(default = 0)
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
-    duration = models.PositiveIntegerField(default = 0)
-    is_favourite = models.BooleanField(default = False)
+    appointment_status = models.CharField(choices = AppointmentStatus.choices,max_length = 50, default = AppointmentStatus.BOOKED, blank=False, null=False)
+    reason = models.CharField(max_length = 255, blank=True, null=True)
+    qty = models.PositiveIntegerField(blank=True, null=True)
+    start_time = models.DateTimeField(blank=True, null=True)
+    end_time = models.DateTimeField(blank=True, null=True)
+    duration = models.PositiveIntegerField(blank=True, null=True)
+    is_favourite = models.BooleanField(blank=True, null=True , default = False)
     # appointment_notes = models.CharField(max_length = 255 , null = True , blank = True)
     
     
@@ -88,8 +88,8 @@ class SaleRecordVouchers(CommonField):
     vouchers = models.ForeignKey(Vouchers, on_delete = models.SET_NULL, null = True)
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_vouchers_employee')
     
-    price = models.FloatField(default=0) 
-    qty = models.PositiveSmallIntegerField(default = 0)
+    price = models.FloatField(blank=True, null=True) 
+    qty = models.PositiveSmallIntegerField(blank=True, null=True)
 
 
 class SaleRecordMembership(CommonField):
@@ -98,35 +98,34 @@ class SaleRecordMembership(CommonField):
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_membership_employee')
     
     
-    price = models.FloatField(default=0) 
-    qty = models.PositiveSmallIntegerField(default = 0)
+    price = models.FloatField(blank=True, null=True) 
+    qty = models.PositiveSmallIntegerField(blank=True, null=True)
     
 class PaymentMethods(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'sale_payment_methods_records')
     
     
-    payment_method = models.CharField(choices = PaymentMethods.choices, max_length = 50 , default = '')
-    amount = models.FloatField(default  = 0)
+    payment_method = models.CharField(choices = PaymentMethods.choices, max_length = 50 , null = True , blank = False)
+    amount = models.FloatField(default  = 0 , blank= False)
     
 class RedeemedItems(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, related_name='sale_redeemed_items_records') 
     
-    item_id  = models.CharField(max_length = 50)
-    redeemed_type = models.CharField(max_length = 50)
-    is_redeemed = models.BooleanField(default = False)
-    percentage = models.FloatField(default=None) 
-    discount = models.FloatField(default=None) 
-    redeem_option = models.CharField(max_length=250, default=None)
+    item_id  = models.CharField(max_length = 50 , blank=True, null=True)
+    redeemed_type = models.CharField(max_length = 50, blank=True, null=True)
+    is_redeemed = models.BooleanField(default = False, blank=False, null=False)
+    percentage = models.FloatField(default=0, blank=True, null=True) 
+    discount = models.FloatField(default=0, blank=True, null=True) 
+    redeem_option = models.CharField(max_length=250, default=None, blank=True, null=True)
     
 class SaleRecordAppliedCoupons(CommonField):
     
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'sale_applied_coupons_records')
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL,null = True)
     
-    coupon_type = models.CharField(choices = CouponType.choices,max_length = 50, default = '')
-    coupon_discounted_price = models.FloatField(default =0) 
-    coupon_discounted_price = models.FloatField(default =0)
-    is_coupon_redeemed = models.BooleanField(default = False) 
+    coupon_type = models.CharField(choices = CouponType.choices,max_length = 50, default = '', blank=False, null=False)
+    coupon_discounted_price = models.FloatField(default =0, blank=False, null=False) 
+    is_coupon_redeemed = models.BooleanField(default = False, blank=False, null=False) 
 
 class SaleTax(CommonField):
     # self.id is a seperate field 
@@ -134,10 +133,11 @@ class SaleTax(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, blank=True, null=True, related_name='sale_tax_records') 
 
     # Following are the Major Information for Tax Applied
-    business_tax_id = models.ForeignKey(BusinessTax, on_delete=models.SET_NULL, null = True) # This will be Tax Instance ID 
-    tax_name = models.CharField(max_length=999, default='') 
+    business_tax_id = models.ForeignKey(BusinessTax, on_delete=models.SET_NULL,  blank=False, null=True) # This will be Tax Instance ID 
+    tax_name = models.CharField(max_length=999, blank=False, null=False) 
     # tax_amount = models.FloatField(default=0, null= True, blank = True)  null = True, blank = True
-    tax_percentage = models.FloatField(default=0) 
+    tax_percentage = models.FloatField(default = 0,blank=False, null=False) 
+    tax_value = models.FloatField(default = 0,blank=False, null=False)
 
     def __str__(self):
         return self.tax_name
@@ -149,7 +149,7 @@ class SaleRecordTip(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, null=True, blank=True,related_name='sale_tip_records') 
     
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_record_employee_tips') 
-    tip_amount = models.FloatField(default=0) 
+    tip_amount = models.FloatField(blank=False, null=False) 
     
     def __str__(self): 
         return str(self.id) 

@@ -41,7 +41,8 @@ urlpatterns = [
     
     #delete tip
     path('delete_appointment_employee_tip/', views.delete_appointment_employee_tip),
-    
+
+
     #Service Employee
     path('get_service_employee/', views.get_service_employee),
     path('get_employees_for_selected_service/', views.get_employees_for_selected_service),
