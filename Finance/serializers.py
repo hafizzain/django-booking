@@ -54,31 +54,34 @@ class RefundSerializer(serializers.ModelSerializer):
             return ({'error': str(e)})
         return True
 
-    def create(self, validated_data):  # sourcery skip: extract-method
+    def create(self, validated_data):
         request = self.context.get('request')
         location = request.data.get('location')
-        # refunded_products_data = validated_data.pop('refunded_products', [])
-        # refunded_services_data = validated_data.pop('refunded_services', [])
         
-        refunded_products = validated_data.get('refunded_products', [])
-        refunded_services = validated_data.get('refunded_services', [])
+        # Retrieve the refunded products and services from request.data
+        refunded_products_data = request.data.get('refunded_products', [])
+        refunded_services_data = request.data.get('refunded_services', [])
+        
         with transaction.atomic():
             refund = Refund.objects.create(**validated_data)
+            
+            # Creating RefundedProduct
             refunded_products_instances = [
                 RefundProduct(refund=refund, **product_data)
-                for product_data in refunded_products
+                for product_data in refunded_products_data
             ]
-            #  Creating RefundedProduct 
             RefundProduct.objects.bulk_create(refunded_products_instances)
-            self.product_stock_update(location,refunded_products)
+            self.product_stock_update(location, refunded_products_data)
+            
             # Create refunded services
             refunded_services_instances = [
                 RefundServices(refund=refund, **service_data)
-                for service_data in refunded_services
+                for service_data in refunded_services_data
             ]
             RefundServices.objects.bulk_create(refunded_services_instances)
 
         return refund
+
 
 
 
