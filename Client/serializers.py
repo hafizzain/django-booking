@@ -50,6 +50,15 @@ class SingleClientSerializer(serializers.ModelSerializer):
     country = serializers.SerializerMethodField()
     state = serializers.SerializerMethodField()
     city = serializers.SerializerMethodField()
+    images = serializers.SerializerMethodField(read_only=True)
+
+    def get_images(self,obj):
+        try:
+            images = ClientImages.objects.filter(client_id=obj.id)
+            aval_images = ClientImagesSerializerResponse(images,mnay=True).data
+            return aval_images
+        except:
+            return []
 
     def get_country(self, obj):
         return CountrySerializer(obj.country).data if obj.country else None
