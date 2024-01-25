@@ -10,7 +10,7 @@ class SaleOrderTipSerializer(serializers.ModelSerializer):
         
 class SaleRecordsAppointmentServicesSerializer(serializers.ModelSerializer):
     class Meta:
-        models = SaleRecordsAppointmentServices
+        model = SaleRecordsAppointmentServices
         fields = "__all__"
     
 class SaleRecordProductsSerializer(serializers.ModelSerializer):
@@ -21,38 +21,50 @@ class SaleRecordProductsSerializer(serializers.ModelSerializer):
 
 class  SaleRecordServicesSerializer(serializers.ModelSerializer):
     class Meta:
-        models = SaleRecordServices
+        model = SaleRecordServices
+        fields = "__all__"
+        
+class SaleRecordVouchersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SaleRecordVouchers
+        fields = '__all__'
+        
+class SaleRecordMembershipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SaleRecordMembership
         fields = "__all__"
 
 class SaleRecordAppliedCouponsSerializer(serializers.ModelSerializer):
     class Meta:
-        models = SaleRecordAppliedCoupons
+        model = SaleRecordAppliedCoupons
         fields = "__all__"
 
 class PaymentMethodsSerializer(serializers.ModelSerializer):
     class Meta:
-        models = PaymentMethods
+        model = PaymentMethods
         fields = "__all__"
 
 class RedeemedItemsSerializer(serializers.ModelSerializer):
     class Meta: 
-        models = RedeemedItems
+        model = RedeemedItems
         fields = "__all__"
 
 
 class SaleTaxSerializer(serializers.ModelSerializer):
     class Meta:
-        models = SaleTax
+        model = SaleTax
         fields = "__all__"
         
 class SaleRecordSerializer(serializers.ModelSerializer):
-    appointments_services = SaleRecordsAppointmentServicesSerializer(read_only = True)
-    tips = SaleOrderTipSerializer(many = True, read_only = True)
-    services = SaleRecordServicesSerializer(many= True, read_only= True)
-    products = SaleRecordProductsSerializer(many= True, read_only = True)
-    applied_coupons = SaleRecordAppliedCouponsSerializer(many= True , read_only = True)
-    redeemed_items = RedeemedItemsSerializer(many= True , read_only = True)
-    tax = SaleTaxSerializer(many =True, read_only = True)
+    appointments_services = SaleRecordsAppointmentServicesSerializer(many= True, write_only = True)
+    tips = SaleOrderTipSerializer(many = True, write_only = True)
+    services = SaleRecordServicesSerializer(many= True, write_only= True)
+    products = SaleRecordProductsSerializer(many= True, write_only = True)
+    vouchers = SaleRecordVouchersSerializer(many =True , write_only= True)
+    membership = SaleRecordMembershipSerializer(many = True , write_only = True)
+    applied_coupons = SaleRecordAppliedCouponsSerializer(many= True , write_only = True)
+    redeemed_items = RedeemedItemsSerializer(many= True , write_only = True)
+    tax = SaleTaxSerializer(many =True, write_only = True)
     class Meta:
         model = SaleRecords
         fields = '__all__'

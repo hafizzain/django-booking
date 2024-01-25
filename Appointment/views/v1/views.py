@@ -53,7 +53,7 @@ from Appointment.serializers import (CheckoutSerializer, AppoinmentSerializer, S
                                      AppointmentServiceSerializerBasic,
                                      PaidUnpaidAppointmentSerializer, MissedOpportunityBasicSerializer,
                                      OpportunityEmployeeServiceSerializer, PaidUnpaidAppointmentCheckoutSerializer,
-                                     AppointmentSerializerForStatus, SingleNoteResponseSerializer, ReversalSerializer)
+                                     AppointmentSerializerForStatus, SingleNoteResponseSerializer, ReversalSerializer,ReversalSerializerResponse)
 from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
 
@@ -74,7 +74,8 @@ from rest_framework.pagination import PageNumberPagination
 
 from ... import choices
 from Service.serializers import BasicServiceSerializer
-
+from django.core.paginator import Paginator
+from django.shortcuts import get_object_or_404
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -173,9 +174,10 @@ def create_reversal(request):
     )
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 @permission_classes([AllowAny])
 def get_reversal(request):
+    
     # description = request.data.get('description', None)
     # business = request.data.get('business', None)
     # service_id = request.data.get('appointment_service', None)
@@ -187,38 +189,50 @@ def get_reversal(request):
     # client_type = request.data.get('client_type',None)
     # client_phone= request.data.get('client_phone',None)
     # url = request.data.get('url',None)
-    all_reversal = []
+    no_pagination = request.GET.get('no_pagination', None)
+    all_reversal = Reversal.objects.all().order_by('-created_at')
     start_date = request.data.get('start_date',None)
     end_date = request.data.get('end_date',None)
     if start_date is not None and end_date is not None:
         all_reversal = Reversal.objects.filter(start_date=start_date,
                                                        end_date=end_date)
-        # url=url,
-        # description=description,appointment_date=appointment_date,
-        # business_id=business,
-        # appointment_services_id=service_id,
-        # appointment_id=appointment_id,
-        # email=email,
-        # client_type=client_type,phone_number=client_phone,client_name=client_name,service_name=service_name
-    data = ReversalSerializer(all_reversal, many=True).data
-    # send_reversal_email(client_phone=client_phone,client_name=client_name,email=email, appointment_id=appointment_id, service_id=service_id,description=description,appointment_date=appointment_date ,service_name=service_name,url=url)
-
-    # Example usage:
-    # send_reversal_email_threaded(client_phone=client_phone,client_name=client_name,email=email, appointment_id=appointment_id, service_id=service_id,description=description,appointment_date=appointment_date ,service_name=service_name)
-
-    return Response(
-        {
+    paginator = AppointmentsPagination()
+    paginator.page_size = 10
+    reversal_qs = paginator.paginate_queryset(all_reversal, request)
+    serialized = ReversalSerializerResponse(reversal_qs, many=True)
+    data = {
             'status': True,
             'status_code': 200,
-            'response': {
-                'message': 'Reversal created successfully!',
-                'error_message': None,
-                'errors': [],
-                'data': data
+            'status_code_text': '200',
+            "response": {
+                "message": "Appointments  get Successfully",
+                "error_message": None,
+                "data": serialized.data,
+                'count': paginator.page.paginator.count,
+                'next': paginator.get_next_link(),
+                'previous': paginator.get_previous_link(),
+                'current_page': paginator.page.number,
+                'per_page': paginator.page_size,
+                'total_pages': paginator.page.paginator.num_pages,
             }
-        },
-        status=status.HTTP_200_OK
-    )
+        }
+    return Response(data, status=status.HTTP_200_OK)
+    # return Response(
+    #     {
+    #         'status': True,
+    #         'status_code': 200,
+    #         'response': {
+    #             'message': 'Reversal get successfully!',
+    #             'count':all_reversal_count,
+    #             'pages':page_count,
+    #             'per_page_result':results_per_page,
+    #             'error_message': None,
+    #             'errors': [],
+    #             'data': data
+    #         }
+    #     },
+    #     status=status.HTTP_200_OK
+    # )
 
 
 @api_view(['GET'])
@@ -3779,31 +3793,38 @@ def get_available_appointments(request):
         return Response(data, status=status.HTTP_200_OK)
 
 
-
-
-@api_view(['GET'])
+@api_view(['PATCH'])
 @permission_classes([AllowAny])
-def get_reversal(request):
-    # description = request.data.get('description', None)
-    # business = request.data.get('business', None)
-    # service_id = request.data.get('appointment_service', None)
-    # appointment_id = request.data.get('appointment_id', None)
-    # appointment_date = request.data.get('appointment_date', None)
-    # service_name = request.data.get('service_name',None)
-    # client_name = request.data.get('client_name',None)
-    # email = request.data.get('email',None)
-    # client_type = request.data.get('client_type',None)
-    # client_phone= request.data.get('client_phone',None)
-    # url = request.data.get('url',None)
-
-    send_reversal_email(client_phone='03106623830',
-                        client_name='ali',
-                        email='arbabsabir336@gmail.com', 
-                        appointment_id='123',
-                        service_id='456',
-                        description='xyz',
-                        appointment_date='10-08-2024',
-                        service_name='myservices',
-                        url='www.google.com')
-
-    return Response({"msg": "Email sent successfully"})
+def update_reversals(request):
+    id = request.data.get('id', None)
+    request_status = request.data.get('request_status', None)
+    appointment_id = request.data.get("appointment_id",None)
+    service_id = request.data.get("service_id",None)
+    stat = request.data.get("status.",None)
+    
+    if stat == "accepted":
+        reversal = AppointmentService.objects.filter(appointment_id=appointment_id).update(
+        status = request_status
+        )
+        data = {
+            'status': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Reversal Status Updated Successfully',
+                'error_message': None,
+            }
+        }
+        return Response(data,status=status.HTTP_200_OK)
+    else:
+        Reversal.objects.filter(appointment_id=appointment_id, appointment_services_id=service_id).update(
+            request_status=request_status
+        )
+        data = {
+            'status': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Reversal Status Updated Successfully',
+                'error_message': None,
+            }
+        }
+        return Response(data,status=status.HTTP_200_OK)

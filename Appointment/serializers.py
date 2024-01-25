@@ -31,14 +31,31 @@ from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Utility.models import ExceptionRecord
 from Service.models import Service
 
-
-
+class SerializerResponse(serializers.ModelSerializer):
+    class Meta:
+        model =  Service
+        fields = ['id','name']
+class AppointmentServiceSerializerResponse(serializers.ModelSerializer):
+    service = SerializerResponse()
+    class Meta:
+        model =  AppointmentService
+        fields = ['id','status','service']
 
 class ReversalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reversal
         fields = "__all__"
 
+
+
+class ReversalSerializerResponse(serializers.ModelSerializer):
+    appointment_services = AppointmentServiceSerializerResponse()
+    
+    
+    class Meta:
+        model = Reversal
+        fields = ['id','request_status', 'appointment','appointment_date', 'description','client_type','client_name','appointment_services']
+        
 class ServiceImageSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
     

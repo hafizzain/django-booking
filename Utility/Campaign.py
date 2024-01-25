@@ -80,28 +80,24 @@ def send_reversal_email(client_phone=None,email=None, appointment_id=None, servi
         name = client_name
         s_name = service_name
         url=url
-        # context =
-        html_file = render_to_string("AppointmentEmail/reversal.html",
-                                     {'url':url,'client':name,'mobile':phone,'email':client_email,'appointment_date':date,'service':s_name,'reason':desc})
-        text_content = strip_tags(html_file)
-        email = EmailMultiAlternatives(
-            'Reversal',
-            text_content,
-            settings.EMAIL_HOST_USER,
-            to=[client_email],
-        )
-        email.attach_alternative(html_file, "text/html")
-        email.send()
         
-        # email_thread = Thread(target=send_email)
-        # email_thread.start()
+        # html file for email template
+        html_file = render_to_string("AppointmentEmail/reversal.html",
+                                    {'url':url,'client':name,'mobile':phone,'email':client_email,'appointment_date':date,'service':s_name,'reason':desc})
+        text_content = strip_tags(html_file)
+        def send_email():
+            email = EmailMultiAlternatives(
+                'Reversal',
+                text_content,
+                settings.EMAIL_HOST_USER,
+                to=[client_email],
+            )
+            email.attach_alternative(html_file, "text/html")
+            email.send()
+            
+        email_thread = Thread(target=send_email)
+        email_thread.start()
+
     except Exception as ex:
         ex = str(ex)
         return Response({"msg":ex})
-
-
-# def send_reversal_email_threaded(client_phone, client_name, email, appointment_id, service_id, description,
-#                                      appointment_date, service_name):
-#         thread = threading.Thread(target=send_reversal_email, args=(
-#         client_phone, client_name, email, appointment_id, service_id, description, appointment_date, service_name))
-#         thread.start()
