@@ -3807,6 +3807,9 @@ def update_reversals(request):
         reversal = AppointmentService.objects.filter(appointment_id=appointment_id).update(
         status = request_status
         )
+        Reversal.objects.filter(appointment_id=appointment_id, appointment_services_id=service_id).update(
+            request_status=stat
+        )
         data = {
             'status': True,
             'status_code': 200,
