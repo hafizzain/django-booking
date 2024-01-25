@@ -57,9 +57,9 @@ class RefundSerializer(serializers.ModelSerializer):
     def create(self, validated_data):  # sourcery skip: extract-method
         request = self.context.get('request')
         location = request.data.get('location')
-        refunded_products_data = validated_data.pop('refunded_products', [])
-        refunded_services_data = validated_data.pop('refunded_services', [])
-        
+
+        refunded_products_data = request.data.get('refunded_products', [])
+        refunded_services_data = request.data.get('refunded_services', [])
         with transaction.atomic():
             refund = Refund.objects.create(**validated_data)
             refunded_products_instances = [
@@ -76,7 +76,7 @@ class RefundSerializer(serializers.ModelSerializer):
             ]
             RefundServices.objects.bulk_create(refunded_services_instances)
 
-        return refunded_products_data
+        return refund
 
 
 
