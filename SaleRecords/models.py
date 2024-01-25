@@ -53,8 +53,8 @@ class SaleRecordServices(CommonField):
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True)
     service = models.ForeignKey(Service, on_delete = models.SET_NULL, null = True)
     
-    qty = models.PositiveIntegerField(blank=False, null=False)
-    price = models.FloatField(blank=False, null=False)
+    qty = models.PositiveIntegerField(blank=True, null=True)
+    price = models.FloatField(blank=True, null=True)
     
     
 class SaleRecordsProducts(CommonField):
@@ -62,8 +62,8 @@ class SaleRecordsProducts(CommonField):
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True)
     product = models.ForeignKey(Product, on_delete = models.SET_NULL, null = True)
     
-    qty = models.PositiveIntegerField(blank=False, null=False)
-    price = models.FloatField(blank=False, null=False)
+    qty = models.PositiveIntegerField(blank=True, null=True)
+    price = models.FloatField(blank=True, null=True)
     
     
 class SaleRecordsAppointmentServices(CommonField):
@@ -74,12 +74,12 @@ class SaleRecordsAppointmentServices(CommonField):
     
     service = models.ForeignKey(Service, on_delete = models.SET_NULL, null = True)
     appointment_status = models.CharField(choices = AppointmentStatus.choices,max_length = 50, default = AppointmentStatus.BOOKED, blank=False, null=False)
-    reason = models.CharField(max_length = 255, blank=False, null=False)
-    qty = models.PositiveIntegerField(blank=False, null=False)
-    start_time = models.DateTimeField(blank=False, null=False)
-    end_time = models.DateTimeField(blank=False, null=False)
-    duration = models.PositiveIntegerField(blank=False, null=False)
-    is_favourite = models.BooleanField(blank=False, null=False)
+    reason = models.CharField(max_length = 255, blank=True, null=True)
+    qty = models.PositiveIntegerField(blank=True, null=True)
+    start_time = models.DateTimeField(blank=True, null=True)
+    end_time = models.DateTimeField(blank=True, null=True)
+    duration = models.PositiveIntegerField(blank=True, null=True)
+    is_favourite = models.BooleanField(blank=True, null=True , default = False)
     # appointment_notes = models.CharField(max_length = 255 , null = True , blank = True)
     
     
@@ -88,8 +88,8 @@ class SaleRecordVouchers(CommonField):
     vouchers = models.ForeignKey(Vouchers, on_delete = models.SET_NULL, null = True)
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_vouchers_employee')
     
-    price = models.FloatField(blank=False, null=False) 
-    qty = models.PositiveSmallIntegerField(blank=False, null=False)
+    price = models.FloatField(blank=True, null=True) 
+    qty = models.PositiveSmallIntegerField(blank=True, null=True)
 
 
 class SaleRecordMembership(CommonField):
@@ -98,8 +98,8 @@ class SaleRecordMembership(CommonField):
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_membership_employee')
     
     
-    price = models.FloatField(blank=False, null=False) 
-    qty = models.PositiveSmallIntegerField(blank=False, null=False)
+    price = models.FloatField(blank=True, null=True) 
+    qty = models.PositiveSmallIntegerField(blank=True, null=True)
     
 class PaymentMethods(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'sale_payment_methods_records')
@@ -111,12 +111,12 @@ class PaymentMethods(CommonField):
 class RedeemedItems(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, related_name='sale_redeemed_items_records') 
     
-    item_id  = models.CharField(max_length = 50 , blank=False, null=False)
-    redeemed_type = models.CharField(max_length = 50, blank=False, null=False)
+    item_id  = models.CharField(max_length = 50 , blank=True, null=True)
+    redeemed_type = models.CharField(max_length = 50, blank=True, null=True)
     is_redeemed = models.BooleanField(default = False, blank=False, null=False)
-    percentage = models.FloatField(default=None, blank=False, null=False) 
-    discount = models.FloatField(default=None, blank=False, null=False) 
-    redeem_option = models.CharField(max_length=250, default=None, blank=False, null=False)
+    percentage = models.FloatField(default=0, blank=True, null=True) 
+    discount = models.FloatField(default=0, blank=True, null=True) 
+    redeem_option = models.CharField(max_length=250, default=None, blank=True, null=True)
     
 class SaleRecordAppliedCoupons(CommonField):
     
@@ -125,7 +125,6 @@ class SaleRecordAppliedCoupons(CommonField):
     
     coupon_type = models.CharField(choices = CouponType.choices,max_length = 50, default = '', blank=False, null=False)
     coupon_discounted_price = models.FloatField(default =0, blank=False, null=False) 
-    coupon_discounted_price = models.FloatField(default =0, blank=False, null=False)
     is_coupon_redeemed = models.BooleanField(default = False, blank=False, null=False) 
 
 class SaleTax(CommonField):
