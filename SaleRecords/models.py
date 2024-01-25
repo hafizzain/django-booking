@@ -35,9 +35,9 @@ class SaleRecords(CommonField):
     
     
 
-    is_promotion = models.BooleanField(default=False) 
-    selected_promotion_id = models.CharField(default='', max_length=800, blank=False, null=False) 
-    selected_promotion_type = models.CharField(default='', max_length=400, blank=False, null=False) 
+    is_promotion = models.BooleanField(null = False, blank = False) 
+    selected_promotion_id = models.CharField( max_length=800, blank=False, null=False) 
+    selected_promotion_type = models.CharField( max_length=400, blank=False, null=False) 
     status = models.CharField(choices = Status.choices, max_length=50 , default = Status.UN_PAID) 
     
     sub_total = models.FloatField(blank=False, null=False) 
