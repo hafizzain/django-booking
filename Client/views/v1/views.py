@@ -3405,7 +3405,7 @@ def create_client_image(request):
     file_type = request.data.get('file_type',None)
     if image is not None:
         client_image = ClientImages.objects.create(image=image,
-                                                   file_name=file_name,file_type=file_type,is_image_uploaded_s3=True)
+                                                   name=file_name,file_type=file_type,is_image_uploaded_s3=True)
         data = ClientImagesSerializerResponse(client_image ,many=True).data
         return Response(
             {

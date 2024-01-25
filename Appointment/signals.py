@@ -20,4 +20,4 @@ def onAppointmentCreateAddClientStatus(sender, instance, created, **kwargs):
 @receiver(post_save, sender=ClientImages)
 def UploadLogoToS3Bucket(sender, instance, *args, **kwargs):
     if instance.image:
-        upload_to_bucket(instance.image.path, instance.image.file_name)
+        upload_to_bucket(instance.image.path, instance.image.name)

@@ -198,7 +198,7 @@ class ClientImages(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True)
     image = models.ImageField(upload_to='avaliableclient/images/', null=True, blank=True)
     is_image_uploaded_s3 = models.BooleanField(default=False)
-    file_name = models.TextField(null=True, blank=True)
+    name = models.TextField(null=True, blank=True)
     file_type = models.TextField(null=True, blank=True)
 
 
