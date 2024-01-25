@@ -30,7 +30,7 @@ class CouponSerializer(serializers.ModelSerializer):
 
 class RefundSerializer(serializers.ModelSerializer):
     refunded_products = RefundProductSerializer(many=True, read_only = True)
-    refunded_services = RefundServiceSerializer(many=True, read_only=True)
+    refunded_services = RefundServiceSerializer(many=True)
     related_refund_coupon = CouponSerializer(many=True, read_only=True)
 
     class Meta:
