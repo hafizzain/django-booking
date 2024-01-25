@@ -44,6 +44,3 @@ class SaleTaxAdmin(admin.ModelAdmin):
 class PaymentMethodsAdmin(admin.ModelAdmin):
     list_display = ['id']
     
-@admin.register(RedeemedItems)
-class RedeemedItems(admin.ModelAdmin):
-    list_display = ['id']
