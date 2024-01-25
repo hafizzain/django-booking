@@ -2901,8 +2901,8 @@ def get_client_all_memberships(request):
     client_membership = MemberShipOrder.objects.filter(
 
         location__id = location_id,
-        created_at__lt = F('end_date'),
-        end_date__gte = today_date,
+        # created_at__lt = F('end_date'),
+        # end_date__gte = today_date,
         client__id = client_id,
 
     )
