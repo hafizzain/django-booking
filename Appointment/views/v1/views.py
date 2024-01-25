@@ -3805,7 +3805,7 @@ def update_reversals(request):
     
     if stat == "accepted":
         reversal = AppointmentService.objects.filter(appointment_id=appointment_id).update(
-        status = request_status
+        status = request_status ,service_start_time=None ,service_end_time=None
         )
         Reversal.objects.filter(appointment_id=appointment_id, appointment_services_id=service_id).update(
             request_status=stat
