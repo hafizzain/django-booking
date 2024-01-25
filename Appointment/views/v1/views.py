@@ -3835,7 +3835,7 @@ def update_reversals(request):
         return Response(data,status=status.HTTP_200_OK)
     else:
         Reversal.objects.filter(appointment_id=appointment_id, appointment_services_id=service_id).update(
-            request_status=request_status
+            request_status='rejected'
         )
         data = {
             'status': True,
