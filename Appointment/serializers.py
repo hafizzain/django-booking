@@ -945,8 +945,8 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
             revarsal = Reversal.objects.filter(appointment_services_id=obj.id)
             revarsal = revarsal.first()
             return str(revarsal.request_status)
-        except:
-            return []
+        except Exception as ex:
+            return ""
 
     class Meta:
         model = AppointmentService
