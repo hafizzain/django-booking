@@ -139,7 +139,7 @@ class RefundAPIView(APIView):
         product_data = ProductStock.objects.filter(product_id="c776926e-7430-4a4e-baf8-0d0bb2bb9e37",
                                                 location_id = "73f662bd-9720-4af7-bcef-6aec2888d1de")
         
-        return JsonResponse({'data': product_data.values()}, status=status.HTTP_200_OK)
+        return JsonResponse({'data': product_data}, status=status.HTTP_200_OK)
         try:
             user = request.user
             request.data['user'] = user.id
