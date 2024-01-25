@@ -16,9 +16,6 @@ from Client.models import Client
 from Appointment.models import AppointmentCheckout, AppointmentService
 from Order.models import Checkout, ProductOrder, ServiceOrder
 
-from Product.models import ProductStock
-from django.http import JsonResponse
-
 @api_view(['GET'])
 def check_permission_view(request):
     try:
@@ -136,11 +133,6 @@ class RefundAPIView(APIView):
         checkout_type = request.data.get('checkout_type') # appointment or sale
         expiry_date = request.data.get('expiry_date')
         
-        product_data = ProductStock.objects.filter(product_id="c776926e-7430-4a4e-baf8-0d0bb2bb9e37",
-                                                location_id = "73f662bd-9720-4af7-bcef-6aec2888d1de") \
-                                                .values()
-        
-        return JsonResponse({'data': list(product_data)}, status=status.HTTP_200_OK)
         try:
             user = request.user
             request.data['user'] = user.id
