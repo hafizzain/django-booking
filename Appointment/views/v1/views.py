@@ -3818,7 +3818,7 @@ def update_reversals(request):
         check_status = qs.filter(condition_check=True)
         if check_status:
             Appointment.objects.filter(id=appointment_id).update(status='Booked')
-            reversal = AppointmentService.objects.filter(appointment_id=appointment_id).update(
+            reversal = AppointmentService.objects.filter(appointment_id=appointment_id,id=service_id).update(
                 status=request_status, service_start_time=None, service_end_time=None
             )
             Reversal.objects.filter(appointment_id=appointment_id, appointment_services_id=service_id).update(
@@ -3834,8 +3834,11 @@ def update_reversals(request):
             }
             return Response(data, status=status.HTTP_200_OK)
         else:
+            reversal = AppointmentService.objects.filter(appointment_id=appointment_id, id=service_id).update(
+                status=request_status, service_start_time=None, service_end_time=None
+            )
             Reversal.objects.filter(appointment_id=appointment_id, appointment_services_id=service_id).update(
-                request_status='rejected'
+                request_status=stat
             )
             data = {
                 'status': True,
@@ -3846,6 +3849,7 @@ def update_reversals(request):
                 }
             }
             return Response(data, status=status.HTTP_200_OK)
+
     else:
         Reversal.objects.filter(appointment_id=appointment_id, appointment_services_id=service_id).update(
             request_status='rejected'
