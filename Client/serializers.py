@@ -61,10 +61,10 @@ class SingleClientSerializer(serializers.ModelSerializer):
     def get_images(self,obj):
         try:
             images = ClientImages.objects.filter(client_id=obj.id)
-            aval_images = ClientImagesSerializerResponses(images,mnay=True).data
+            aval_images = ClientImagesSerializerResponses(images,many=True).data
             return aval_images
         except Exception as ex:
-            return [str(ex)]
+            return []
 
     def get_country(self, obj):
         return CountrySerializer(obj.country).data if obj.country else None
