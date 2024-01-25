@@ -156,7 +156,7 @@ class RefundAPIView(APIView):
                     checkout_instance.save() 
                     newCheckoutInstance = checkout_instance  
                     newCheckoutInstance.pk = None 
-                    newCheckoutInstance.is_refund = 'refund'
+                    newCheckoutInstance.is_refund = True
                     newCheckoutInstance.save()
                     newCheckoutInstance.previous_checkout = checkout_instance
                     newCheckoutInstance.save()
@@ -192,7 +192,7 @@ class RefundAPIView(APIView):
                             order.tip = 0
                             order.gst = 0
                             # order.tax_amount = 0
-                            order.is_refund = 'refund'
+                            order.is_refund = True
                             order.price = RefundProduct.objects.get(product__id = order.id).refunded_amount 
                             order.save()
                             
@@ -201,7 +201,7 @@ class RefundAPIView(APIView):
                         for order in service_orders:
                             order.pk = None
                             order.checkout = newCheckoutInstance
-                            order.is_refund = 'refund'
+                            order.is_refund = True
                             order.price = -RefundServices.objects.get(service__id = order.id).refunded_amount
                             order.save()
                         
@@ -213,8 +213,14 @@ class RefundAPIView(APIView):
                     newInvoice.checkout_type = 'refund'
                     newInvoice.payment_type = payment_type
                     newInvoice.save() 
+                    try:
+                        client_instance = Client.objects.get(id=client)
+                        client_email = client_instance.email
+                    except Client.DoesNotExist:
+                        # Handle the case where the client does not exist
+                        client_email = None  # or any default value or appropriate handling
 
-                    client_email = Client.objects.get(id=client).email 
+                    # client_email = Client.objects.get(id=client).email 
                     #send email to client running on thread
                     send_refund_email(client_email=client_email)  
                 except Exception as e:
