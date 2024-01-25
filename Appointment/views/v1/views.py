@@ -1,4 +1,6 @@
 from Appointment.Constants.Reschedulen import reschedule_appointment_n
+from django.db.models import Sum, Subquery, OuterRef, FloatField, Case, When, Value, CharField, F, DateTimeField, Q
+from django.db import models
 from Appointment.Constants.Reschedulen import reschedule_appointment_n
 from Appointment.Constants.ConvertTime import convert_24_to_12
 from django.utils import timezone
@@ -3804,6 +3806,18 @@ def update_reversals(request):
     stat = request.data.get("status",None)
     
     if stat == "accepted":
+        all_services= AppointmentService.objects.filter(appointment_id=appointment_id).exclude(status='void')
+        qs = all_services.annotate(
+            condition_check=Case(
+                When(~Q(status='Started'), then=Value(True)),
+                When(~Q(status='Finished'), then=Value(True)),
+                default=Value(False),
+                output_field=models.BooleanField(),
+            )
+        )
+        check_status = qs.filter(condition_check=True)
+        if check_status:
+            return Response({"msg":"True"})
         reversal = AppointmentService.objects.filter(appointment_id=appointment_id).update(
         status = request_status ,service_start_time=None ,service_end_time=None
         )
