@@ -1,4 +1,4 @@
-from Appointment.serializers import ClientImagesSerializerResponse
+# from Appointment.serializers import ClientImagesSerializerResponse
 from Business.models import BusinessAddress
 from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
@@ -43,6 +43,11 @@ class CountrySerializer(serializers.ModelSerializer):
         model = Country
         exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
 
+class ClientImagesSerializerResponses(serializers.ModelSerializer):
+    class Meta:
+        model = ClientImages
+        fields = "__all__"
+
 class SingleClientSerializer(serializers.ModelSerializer):
     country_obj = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
@@ -56,7 +61,7 @@ class SingleClientSerializer(serializers.ModelSerializer):
     def get_images(self,obj):
         try:
             images = ClientImages.objects.filter(client_id=obj.id)
-            aval_images = ClientImagesSerializerResponse(images,mnay=True).data
+            aval_images = ClientImagesSerializerResponses(images,mnay=True).data
             return aval_images
         except:
             return []
