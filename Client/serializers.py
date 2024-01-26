@@ -185,6 +185,13 @@ class ClientSerializer(serializers.ModelSerializer):
     total_sales = serializers.SerializerMethodField(read_only=True)
     
     client_info = ClientInfoSerializer(read_only=True)
+    
+    def get_client_info(self, obj):
+        client_info_data = {
+            'client_type': obj.client_type,
+            'client_tag': obj.client_tag,
+        }
+        return ClientInfoSerializer(client_info_data).data
 
     def get_last_sale(self, obj):
         last_sale = Checkout.objects.filter(client=obj).order_by('-created_at')
@@ -249,7 +256,7 @@ class ClientSerializer(serializers.ModelSerializer):
         fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number',
                 'country','city','state', 'is_active', 'language', 'about_us', 'marketing','country_obj','customer_note',
                 'created_at', 'total_done_appointments', 'total_sales', 'last_appointment', 'last_sale', 'last_transaction_date',
-                'client_info', 'client_tag','client_type']
+                'client_info']
         
 class ClientSerializerOP(serializers.ModelSerializer):
     
