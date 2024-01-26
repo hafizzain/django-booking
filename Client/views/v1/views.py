@@ -258,14 +258,14 @@ def get_client_dropdown(request):
         .order_by('-created_at')
 
     serialized = list(ClientDropdownSerializer(all_client, many=True, context={'request': request}).data)
-    c_images = ClientImagesSerializerResponses(all_client ,many=True).data
+    # c_images = ClientImagesSerializerResponses(all_client ,many=True).data
 
     paginator = CustomPagination()
     paginator.page_size = 10 if page else 100000
     paginated_data = paginator.paginate_queryset(serialized, request)
     response = paginator.get_paginated_response(paginated_data, 'clients', invoice_translations=None,
                                                 current_page=page, is_searched=is_searched, is_filtered=isFiltered)
-    response['images']=c_images
+    # response['images']=c_images
     return response
 
 
@@ -610,35 +610,7 @@ def update_client(request):
         )
     try:
         client = Client.objects.get(id=id)
-        if images is not None:
-            ids = json.loads(images)
-            for image_id in ids:
-                clients = ClientImages.objects.filter(id=image_id,client_id=client.id)
-                if clients:
-                    pass
-                else:
-                    ClientImages.objects.filter(id=image_id).update(client_id=client.id)
-
-
-                # Try to get the ClientImages object with the given image_id
-                # client_image, created = ClientImages.objects.get_or_create(
-                #     id=image_id,
-                #     defaults={'client_id': client.id}
-                # )
-                #
-                # # If the object already exists, update the client_id
-                # if not created:
-                #     client_image.client_id = client.id
-                #     client_image.save()
-            # all_images = ClientImages.objects.filter(client_id=client.id)
-            # if all_images:
-            #     all_images.delete()
-            # for id in ids:
-            #     ClientImages.objects.filter(id=id).update(client_id=client.id)
-
-            # # If the object already exists, update the client_id
-            # if not created:
-            #     ClientImages.objects.filter(id=id).update(client_id=client.id)
+        # ClientImages.objects.filter(client_id=client.id).delete()
     except Exception as err:
         return Response(
             {
@@ -697,6 +669,47 @@ def update_client(request):
     serialized = ClientSerializer(client, data=request.data, partial=True, context={'request': request})
     if serialized.is_valid():
         serialized.save()
+    if images is not None:
+        ids = json.loads(images)
+        # Get all existing images for the client
+        existing_images = ClientImages.objects.filter(client_id=client.id)
+
+        # Iterate through existing images and update or delete
+        for existing_image in existing_images:
+            if existing_image.id not in ids:
+                # Delete the image if it's not in the new list
+                existing_image.delete()
+            else:
+                # Update the client_id if it's in the new list
+                existing_image.client_id = client.id
+                existing_image.save()
+        for id in ids:
+            ClientImages.objects.filter(id=id).update(client_id=client.id)
+            # if clients:
+            #     ClientImages.objects.filter(id=image_id).update(client_id=None)
+            #     ClientImages.objects.filter(id=image_id).update(client_id=client.id)
+            # else:
+            #     ClientImages.objects.filter(id=image_id).update(client_id=client.id)
+
+            # Try to get the ClientImages object with the given image_id
+            # client_image, created = ClientImages.objects.get_or_create(
+            #     id=image_id,
+            #     defaults={'client_id': client.id}
+            # )
+            #
+            # # If the object already exists, update the client_id
+            # if not created:
+            #     client_image.client_id = client.id
+            #     client_image.save()
+        # all_images = ClientImages.objects.filter(client_id=client.id)
+        # if all_images:
+        #     all_images.delete()
+        # for id in ids:
+        #     ClientImages.objects.filter(id=id).update(client_id=client.id)
+
+        # # If the object already exists, update the client_id
+        # if not created:
+        #     ClientImages.objects.filter(id=id).update(client_id=client.id)
 
         return Response(
             {
@@ -2906,13 +2919,13 @@ def get_client_all_memberships(request):
     today_date = today_date.strftime('%Y-%m-%d')
     client_membership = MemberShipOrder.objects.filter(
 
-        location__id = location_id,
+        location__id=location_id,
         # created_at__lt = F('end_date'),
         # end_date__gte = today_date,
-        client__id = client_id,
+        client__id=client_id,
 
     )
-    
+
     # return JsonResponse({'data': client_membership})
     serializer = ClientMembershipsSerializer(client_membership, many=True)
 
@@ -2924,7 +2937,7 @@ def get_client_all_memberships(request):
                 'message': 'Client Available Memberships',
                 'error_message': None,
                 'client_memberships': serializer.data
-                
+
             }
         },
         status=status.HTTP_200_OK
@@ -3475,6 +3488,76 @@ def create_client_image(request):
             status=status.HTTP_201_CREATED
         )
 
+
+
+
+
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_client_images(request):
+    id = request.data.get('id', None)
+    if id is not None:
+        client_image = ClientImages.objects.get(clie)
+        data = ClientImagesSerializerResponse(client_image, many=False, context={'request': request}).data
+        return Response(
+            {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Client images added successfully!',
+                    'error_message': [],
+                    'data': data
+                }
+            },
+            status=200
+        )
+    else:
+        return Response(
+            {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Enter a valid image',
+                    'error_message': [],
+                    'data': []
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_client_image(request):
+    ids = request.GET.get('ids', None)
+    # if images is not None:
+    # ids = json.loads(images)
+    # Get all existing images for the client
+    existing_images = ClientImages.objects.filter(id__in=ids)
+    # Iterate through existing images and update or delete
+    # for existing_image in existing_images:
+    #     if existing_image.id not in ids:
+    #         # Delete the image if it's not in the new list
+    #         existing_image.delete()
+    #     else:
+    #         # Update the client_id if it's in the new list
+    #         existing_image.client_id = client.id
+    #         existing_image.save()
+    return Response(
+        {
+            'status': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Client ids fetched successfully!',
+                'error_message': [],
+                'data': ClientImagesSerializerResponses(existing_images, many=True, context={'request': request}).data
+            }
+        },
+        status=200
+    )
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
