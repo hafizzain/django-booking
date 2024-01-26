@@ -789,3 +789,8 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentCheckout
         fields = '__all__'
+        
+class ClientImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Client
+        fields = '__all__'

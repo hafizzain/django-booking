@@ -79,6 +79,6 @@ urlpatterns = [
    path('check_client_existance/', views.check_client_existance),
    path('create_client_image/', views.create_client_image),
 
-   
+   path('get_client_image/', views.get_client_image),
 
 ]
