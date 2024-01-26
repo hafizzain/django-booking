@@ -1482,13 +1482,13 @@ def update_employee(request):
             return Response(
                 {
                     'status': False,
-                    'status_code': 4026,
+                    'status_code': 402,
                     'response': {
-                        'message': 'Cannot inactive',
+                        'message': 'Employee cannot be marked as inactive until all bookings are completed or canceled.',
                         'error_message': [],
                     }
                 },
-                status=status.HTTP_404_NOT_FOUND
+                status=402
             )
         else:
             employee.is_active = True
