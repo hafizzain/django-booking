@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from threading import Thread
+from django.http import JsonResponse
 from Appointment.models import Appointment, AppointmentCheckout
 from Order.models import VoucherOrder, Vouchers, MemberShipOrder, Membership
 from django.db.models.functions import Cast
@@ -2905,12 +2906,14 @@ def get_client_all_memberships(request):
     client_membership = MemberShipOrder.objects.filter(
 
         location__id = location_id,
-        created_at__lt = F('end_date'),
-        end_date__gte = today_date,
+        # created_at__lt = F('end_date'),
+        # end_date__gte = today_date,
         client__id = client_id,
 
     )
-    data = ClientMembershipsSerializer(client_membership, many=True).data
+    
+    # return JsonResponse({'data': client_membership})
+    serializer = ClientMembershipsSerializer(client_membership, many=True)
 
     return Response(
         {
@@ -2919,7 +2922,8 @@ def get_client_all_memberships(request):
             'response': {
                 'message': 'Client Available Memberships',
                 'error_message': None,
-                'client_memberships': list(data)
+                'client_memberships': serializer.data
+                
             }
         },
         status=status.HTTP_200_OK
