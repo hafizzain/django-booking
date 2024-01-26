@@ -610,47 +610,6 @@ def update_client(request):
     try:
         client = Client.objects.get(id=id)
         # ClientImages.objects.filter(client_id=client.id).delete()
-        if images is not None:
-            ids = json.loads(images)
-            # Get all existing images for the client
-            existing_images = ClientImages.objects.filter(client_id=client.id)
-
-            # Iterate through existing images and update or delete
-            for existing_image in existing_images:
-                if existing_image.id not in ids:
-                    # Delete the image if it's not in the new list
-                    existing_image.delete()
-                    for id in ids:
-                        ClientImages.objects.filter(id=id).update(client_id=client.id)
-                else:
-                    # Update the client_id if it's in the new list
-                    existing_image.client_id = client.id
-                    existing_image.save()
-                # if clients:
-                #     ClientImages.objects.filter(id=image_id).update(client_id=None)
-                #     ClientImages.objects.filter(id=image_id).update(client_id=client.id)
-                # else:
-                #     ClientImages.objects.filter(id=image_id).update(client_id=client.id)
-
-                # Try to get the ClientImages object with the given image_id
-                # client_image, created = ClientImages.objects.get_or_create(
-                #     id=image_id,
-                #     defaults={'client_id': client.id}
-                # )
-                #
-                # # If the object already exists, update the client_id
-                # if not created:
-                #     client_image.client_id = client.id
-                #     client_image.save()
-            # all_images = ClientImages.objects.filter(client_id=client.id)
-            # if all_images:
-            #     all_images.delete()
-            # for id in ids:
-            #     ClientImages.objects.filter(id=id).update(client_id=client.id)
-
-            # # If the object already exists, update the client_id
-            # if not created:
-            #     ClientImages.objects.filter(id=id).update(client_id=client.id)
     except Exception as err:
         return Response(
             {
@@ -709,6 +668,47 @@ def update_client(request):
     serialized = ClientSerializer(client, data=request.data, partial=True, context={'request': request})
     if serialized.is_valid():
         serialized.save()
+    if images is not None:
+        ids = json.loads(images)
+        # Get all existing images for the client
+        existing_images = ClientImages.objects.filter(client_id=client.id)
+
+        # Iterate through existing images and update or delete
+        for existing_image in existing_images:
+            if existing_image.id not in ids:
+                # Delete the image if it's not in the new list
+                existing_image.delete()
+            else:
+                # Update the client_id if it's in the new list
+                existing_image.client_id = client.id
+                existing_image.save()
+        for id in ids:
+            ClientImages.objects.filter(id=id).update(client_id=client.id)
+            # if clients:
+            #     ClientImages.objects.filter(id=image_id).update(client_id=None)
+            #     ClientImages.objects.filter(id=image_id).update(client_id=client.id)
+            # else:
+            #     ClientImages.objects.filter(id=image_id).update(client_id=client.id)
+
+            # Try to get the ClientImages object with the given image_id
+            # client_image, created = ClientImages.objects.get_or_create(
+            #     id=image_id,
+            #     defaults={'client_id': client.id}
+            # )
+            #
+            # # If the object already exists, update the client_id
+            # if not created:
+            #     client_image.client_id = client.id
+            #     client_image.save()
+        # all_images = ClientImages.objects.filter(client_id=client.id)
+        # if all_images:
+        #     all_images.delete()
+        # for id in ids:
+        #     ClientImages.objects.filter(id=id).update(client_id=client.id)
+
+        # # If the object already exists, update the client_id
+        # if not created:
+        #     ClientImages.objects.filter(id=id).update(client_id=client.id)
 
         return Response(
             {
