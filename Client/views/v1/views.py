@@ -612,12 +612,13 @@ def update_client(request):
         if images is not None:
             ids = json.loads(images)
             for image_id in ids:
-                clients = ClientImages.objects.filter(id=image_id,client_id=client.id)
-                if clients:
-                    ClientImages.objects.filter(id=image_id).update(client_id=None)
-                    ClientImages.objects.filter(id=image_id).update(client_id=client.id)
-                else:
-                    ClientImages.objects.filter(id=image_id).update(client_id=client.id)
+                # clients = ClientImages.objects.filter(id=image_id,client_id=client.id)
+                ClientImages.objects.filter(id=image_id).update(client_id=None)
+                # if clients:
+                #     ClientImages.objects.filter(id=image_id).update(client_id=None)
+                #     ClientImages.objects.filter(id=image_id).update(client_id=client.id)
+                # else:
+                #     ClientImages.objects.filter(id=image_id).update(client_id=client.id)
 
 
                 # Try to get the ClientImages object with the given image_id
