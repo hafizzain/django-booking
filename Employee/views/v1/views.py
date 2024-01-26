@@ -5019,6 +5019,7 @@ def create_workingschedule(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+
         try:
             business = Business.objects.get(id=business_id)
         except Exception as err:
@@ -5042,6 +5043,38 @@ def create_workingschedule(request):
                     'status_code': StatusCodes.INVALID_EMPLOYEE_4025,
                     'response': {
                         'message': 'Employee not found',
+                        'error_message': str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            current_date = timezone.now().date()
+            check_exists = EmployeDailySchedule.objects.filter(
+                employee_id=employee_id,
+                created_at__date__gte=current_date
+            )
+            if check_exists:
+                return Response(
+                    {
+                        'status': False,
+                        'status_code': 404,
+                        'status_code_text': '404',
+                        'response': {
+                            'message': f'Error',
+                            'error_message': None,
+                        }
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+        except Exception as err:
+            return Response(
+                {
+                    'status': False,
+                    'status_code': StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response': {
+                        'message': 'Business not found',
                         'error_message': str(err),
                     }
                 },
