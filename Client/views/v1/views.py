@@ -612,6 +612,9 @@ def update_client(request):
         # ClientImages.objects.filter(client_id=client.id).delete()
         if images is not None:
             ids = json.loads(images)
+            id = ClientImages.objects.filter(client_id=client.id)
+            if id:
+                id.delete()
             for image_id in ids:
                 ClientImages.objects.filter(id=image_id).update(client_id=client.id)
                 # if clients:
