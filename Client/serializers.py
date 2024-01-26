@@ -184,7 +184,8 @@ class ClientSerializer(serializers.ModelSerializer):
     total_done_appointments = serializers.SerializerMethodField(read_only=True)
     total_sales = serializers.SerializerMethodField(read_only=True)
     
-    client_info = ClientInfoSerializer(read_only=True)
+    client_info = serializers.SerializerMethodField(read_only=True, source='*')
+
     
     def get_client_info(self, obj):
         client_info_data = {
@@ -255,8 +256,7 @@ class ClientSerializer(serializers.ModelSerializer):
         model = Client
         fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number',
                 'country','city','state', 'is_active', 'language', 'about_us', 'marketing','country_obj','customer_note',
-                'created_at', 'total_done_appointments', 'total_sales', 'last_appointment', 'last_sale', 'last_transaction_date',
-                'client_info']
+                'created_at', 'total_done_appointments', 'total_sales', 'last_appointment', 'last_sale', 'last_transaction_date','client_info']
         
 class ClientSerializerOP(serializers.ModelSerializer):
     
