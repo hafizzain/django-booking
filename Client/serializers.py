@@ -169,6 +169,9 @@ class ClientDropdownSerializer(serializers.ModelSerializer):
 class ClientInfoSerializer(serializers.Serializer):
     client_type = serializers.CharField(source='client_type')
     client_tag = serializers.CharField(source='client_tag')
+    
+    model = Client
+    fields = ['client_type', 'client_tag']
 class ClientSerializer(serializers.ModelSerializer):
     country = CountrySerializer(read_only=True)
     state = StateSerializer(read_only=True)
