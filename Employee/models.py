@@ -688,6 +688,7 @@ class GiftCard(models.Model):
     discount_to_show = models.TextField(null=True)
 
 
+# this model is being used in the checkout
 class GiftCards(models.Model):
     VALIDITY_DAY = [
         ('7 Days', '7 Days'),

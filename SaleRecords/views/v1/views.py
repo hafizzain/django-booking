@@ -23,7 +23,9 @@ class SaleRecordViews(APIView):
     
     def post(self, request, *args, **kwargs):
         try:
-            serializer = SaleRecordSerializer(data=request.data)
+            user = request.user
+            request.data['user'] = user.id
+            serializer = SaleRecordSerializer(data=request.data, context = {'request': request})
             if serializer.is_valid():
                 sale_record = serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
