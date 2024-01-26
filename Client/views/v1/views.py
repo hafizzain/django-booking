@@ -18,7 +18,7 @@ from Product.models import Product
 from Utility.models import Country, Currency, ExceptionRecord, Language, State, City
 from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, \
     DiscountMembership, LoyaltyPoints, Subscription, Rewards, Promotion, Membership, Vouchers, ClientLoyaltyPoint, \
-    LoyaltyPointLogs, VoucherCurrencyPrice, ClientImages
+    LoyaltyPointLogs, VoucherCurrencyPrice, ClientImages, Comments
 from Client.serializers import (SingleClientSerializer, ClientSerializer, ClientGroupSerializer,
                                 LoyaltyPointsSerializer,
                                 SubscriptionSerializer, RewardSerializer, PromotionSerializer, MembershipSerializer,
@@ -27,7 +27,7 @@ from Client.serializers import (SingleClientSerializer, ClientSerializer, Client
                                 ClientMembershipsSerializer,
                                 ClientDropdownSerializer, CustomerDetailedLoyaltyPointsLogsSerializerOP,
                                 ClientImagesSerializerResponses,
-                                ClientImageSerializer,
+                                ClientImageSerializer, ClientResponse,
                                 )
 from Business.serializers.v1_serializers import BusinessAddressSerilaizer
 from Utility.models import NstyleFile
@@ -3491,11 +3491,6 @@ def create_client_image(request):
         )
 
 
-
-
-
-
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_client_images(request):
@@ -3529,3 +3524,59 @@ def get_client_images(request):
             status=status.HTTP_201_CREATED
         )
 
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def create_comment(request):
+    comment = request.data.get('comment', None)
+    employee_id = request.data.get('employee_id', None)
+    comment = Comments.objects.create(employee_id=employee_id, comment=comment)
+    client_data = ClientResponse(comment, many=False).data
+    return Response(
+        {
+            'status': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Comment added successfully',
+                'error_message': [],
+                'data': client_data
+            }
+        },
+        status=status.HTTP_201_CREATED
+    )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_comment(request):
+    employee_id = request.query_params.get('employee_id', None)
+    if employee_id:
+        comment = Comments.objects.filter(employee_id=employee_id)
+        client_data = ClientResponse(comment, many=False).data
+        return Response(
+            {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Comment added successfully',
+                    'error_message': [],
+                    'data': client_data
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+    else:
+        comment = Comments.objects.all()
+        client_data = ClientResponse(comment, many=True).data
+        return Response(
+            {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Comment added successfully',
+                    'error_message': [],
+                    'data': client_data
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )

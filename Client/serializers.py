@@ -9,7 +9,8 @@ from Service.models import Service
 from Utility.models import Country, State, City
 
 from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, \
-    Promotion, Rewards, Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs, VoucherCurrencyPrice, ClientImages
+    Promotion, Rewards, Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs, VoucherCurrencyPrice, ClientImages, \
+    Comments
 from Invoices.models import SaleInvoice
 from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip, AppointmentService, Appointment
 from Order.models import Checkout, Order
@@ -794,3 +795,9 @@ class ClientImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
         fields = '__all__'
+
+
+class ClientResponse(serializers.ModelSerializer):
+    class Meta:
+        model = Comments
+        fields = "__all__"

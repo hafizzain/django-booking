@@ -12,7 +12,9 @@ from django.db import connection
 from django.db.models import Subquery, OuterRef, DateTimeField, Count, Case, When, F, IntegerField, Value
 from django.db.models.functions import Coalesce
 from django.apps import apps
-from Utility.models import Country, Currency, Language, State, City
+
+from Employee.models import Employee
+from Utility.models import Country, Currency, Language, State, City, CommonField
 from django.utils.timezone import now
 from Product.models import Product
 from Service.models import Service
@@ -21,6 +23,8 @@ from googletrans import Translator
 from dateutil.relativedelta import relativedelta
 from django.db.models import Count, Q
 from django.db.models.functions import Coalesce
+
+
 # from Appointment.models import AppointmentService
 # from Order.models import Checkout
 
@@ -200,6 +204,11 @@ class ClientImages(models.Model):
     is_image_uploaded_s3 = models.BooleanField(default=False)
     name = models.TextField(null=True, blank=True)
     file_type = models.TextField(null=True, blank=True)
+
+
+class Comments(CommonField):
+    comment = models.TextField(null=True)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
 
 
 class ClientGroup(models.Model):
