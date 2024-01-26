@@ -184,7 +184,8 @@ class ClientSerializer(serializers.ModelSerializer):
     total_done_appointments = serializers.SerializerMethodField(read_only=True)
     total_sales = serializers.SerializerMethodField(read_only=True)
     
-    client_info = ClientInfoSerializer(read_only=True)
+    client_info = serializers.SerializerMethodField(read_only=True, source='*')
+
     
     def get_client_info(self, obj):
         client_info_data = {
