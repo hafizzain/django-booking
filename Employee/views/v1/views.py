@@ -1468,16 +1468,26 @@ def update_employee(request):
 
     if is_active is not None:
         current_date = timezone.now().date()
+        check_exists = EmployeDailySchedule.objects.filter(
+            employee_id=employee.id,
+            created_at__date__gte=current_date
+        )
+        if check_exists:
+            return Response(
+                {
+                    'status': False,
+                    'status_code': 402,
+                    'response': {
+                        'message': 'Employee cannot be marked as inactive until all bookings are completed or canceled.',
+                        'error_message': [],
+                    }
+                },
+                status=402
+            )
+        else:
+            employee.is_active = True
+        current_date = timezone.now().date()
         qs = AppointmentService.objects.filter(member_id=employee, created_at__date__gte=current_date)
-        # qs = all_services.annotate(
-        #     condition_check=Case(
-        #         When(~Q(status='Started'), then=Value(True)),
-        #         When(~Q(status='Finished'), then=Value(True)),
-        #         default=Value(False),
-        #         output_field=models.BooleanField(),
-        #     )
-        # )
-        # qs = qs.filter(condition_check=True)
         if qs:
             return Response(
                 {
@@ -5054,20 +5064,19 @@ def create_workingschedule(request):
                 employee_id=employee_id,
                 created_at__date__gte=current_date
             )
-            if check_exists:
-                pass
-                # return Response(
-                #     {
-                #         'status': False,
-                #         'status_code': 404,
-                #         'status_code_text': '404',
-                #         'response': {
-                #             'message': f'Error',
-                #             'error_message': None,
-                #         }
-                #     },
-                #     status=status.HTTP_404_NOT_FOUND
-                # )
+            # if check_exists:
+            #     return Response(
+            #         {
+            #             'status': False,
+            #             'status_code': 404,
+            #             'status_code_text': '404',
+            #             'response': {
+            #                 'message': f'Error',
+            #                 'error_message': None,
+            #             }
+            #         },
+            #         status=status.HTTP_404_NOT_FOUND
+            #     )
 
         except Exception as err:
             return Response(
