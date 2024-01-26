@@ -37,7 +37,7 @@ class RefundSerializer(serializers.ModelSerializer):
         model = Refund
         fields = '__all__'
 
-    def product_stock_update(self, location, refunded_products_data):
+    def __product_stock_update(self, location, refunded_products_data):
         '''
         This fundtion is updating the stock if the product has the in_stock key. 
         Only thoes product record will be update in the ProductStock but the refund_quantity 
@@ -52,7 +52,7 @@ class RefundSerializer(serializers.ModelSerializer):
             for product_data in refunded_products_data if product_data['in_stock'] == True]
         except Exception as e:
             return ({'error': str(e)})
-         
+        
 
     def create(self, validated_data):  # sourcery skip: extract-method
         request = self.context.get('request')
@@ -70,7 +70,7 @@ class RefundSerializer(serializers.ModelSerializer):
             ]
             #  Creating RefundedProduct 
             RefundProduct.objects.bulk_create(refunded_products_instances)
-            self.product_stock_update(location,refunded_products)
+            self.__product_stock_update(location,refunded_products)
             # Create refunded services
             refunded_services_instances = [
                 RefundServices(refund=refund, **service_data)

@@ -143,6 +143,15 @@ class ClientDropdownSerializer(serializers.ModelSerializer):
     total_visit = serializers.IntegerField(read_only=True)
     images = serializers.SerializerMethodField(read_only=True)
 
+    client_info = serializers.SerializerMethodField(read_only=True)
+
+    def get_client_info(self, obj):
+        client_info_data = {
+            'client_type': obj.client_type,
+            'client_tag': obj.client_tag,
+        }
+        return ClientInfoSerializer(client_info_data).data
+    
     def get_images(self, obj):
         try:
             images = ClientImages.objects.filter(client_id=obj.id)
@@ -164,7 +173,7 @@ class ClientDropdownSerializer(serializers.ModelSerializer):
 
     class Meta:
         model  = Client
-        fields = ['id','images', 'full_name', 'email', 'client_id', 'image', 'total_visit']
+        fields = ['id','images', 'full_name', 'email', 'client_id', 'image', 'total_visit', 'client_info']
 
 class ClientInfoSerializer(serializers.Serializer):
     client_type = serializers.CharField()

@@ -8,11 +8,9 @@ from Business.models import BusinessAddress,  BusinessTax
 from Promotions.models import Coupon
 from Product.models import Product
 from Service.models import Service
-from Employee.models import Employee
-from Promotions.models import Coupon
+from Employee.models import Employee, GiftCards
 from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs
 from Finance.models import Refund
-from Order.models import Checkout
 from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip , Appointment
 from Invoices.models import SaleInvoice
 
@@ -43,7 +41,6 @@ class SaleRecords(CommonField):
     total_tax = models.FloatField(default = 0)
     total_price = models.FloatField(default = 0) # with tax amount
     sub_total = models.FloatField(blank=False, null=False)  # without tax amount
-    
 
     class Meta:
         verbose_name_plural = 'Sale Records'
@@ -134,6 +131,13 @@ class PaymentMethods(CommonField):
     payment_method = models.CharField(choices = PaymentMethodsChoices.choices, max_length = 50 , null = True , blank = False)
     amount = models.FloatField(default  = 0 , blank= False)
     
+class PurchasedGiftCards(CommonField):
+    sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'sale_gift_cards_records')
+    gift_card = models.ForeignKey(GiftCards, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'sale_gift_cards_records')
+    
+    price = models.FloatField(default = 0)
+    qty = models.FloatField
+    
     
 # ====================================================== Appllied on checkout data ===========================================
     
@@ -153,7 +157,15 @@ class AppliedMemberships(CommonField):
 class AppliedVouchers(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'sale_applied_vouchers_records')
     voucher = models.ForeignKey(Vouchers, on_delete = models.SET_NULL, blank=False, null=True)
-    is_redeemed = models.BooleanField(default = True)
+    is_redeemed = models.BooleanField(default = False)
+    
+    
+class AppliedGiftCards(CommonField):
+    sale_record = models.ForeignKey(SaleRecords,  on_delete = models.CASCADE, null = True, blank = True, related_name = 'sale_applied_gift_cards_records')
+    gift_card = models.ForeignKey(GiftCards, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'sale_applied_gift_cards_records' )
+    is_redeemed = models.BooleanField(default = False)
+    
+    
     
     
     
