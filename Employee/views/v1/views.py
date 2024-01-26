@@ -1474,11 +1474,13 @@ def update_employee(request):
     if check_exists:
         return Response(
             {
-                'status': False,
+                'status': True,
                 'status_code': 402,
                 'response': {
-                    'message': 'Employee cannot be marked as inactive until all bookings are completed or canceled.',
-                    'error_message': [],
+                    'message': ' Employee cannot be marked as inactive until all bookings are completed or canceled.',
+                    'error_message': 'Employee cannot be marked as inactive until all bookings are completed or canceled.',
+                    # 'Employee': data,
+                    # 'lev_id': lev_id
                 }
             },
             status=402
@@ -1488,17 +1490,31 @@ def update_employee(request):
     current_date = timezone.now().date()
     qs = AppointmentService.objects.filter(member_id=employee, created_at__date__gte=current_date)
     if qs:
+        # return Response(
+        #     {
+        #         'status': False,
+        #         'status_code': 402,
+        #         'response': {
+        #             'message': 'Employee cannot be marked as inactive until all bookings are completed or canceled.',
+        #             'error_message': [],
+        #         }
+        #     },
+        #     status=402
+        # )
         return Response(
             {
-                'status': False,
+                'status': True,
                 'status_code': 402,
                 'response': {
-                    'message': 'Employee cannot be marked as inactive until all bookings are completed or canceled.',
-                    'error_message': [],
+                    'message': ' Employee cannot be marked as inactive until all bookings are completed or canceled.',
+                    'error_message': 'Employee cannot be marked as inactive until all bookings are completed or canceled.',
+                    # 'Employee': data,
+                    # 'lev_id': lev_id
                 }
             },
             status=402
         )
+
     else:
         pass
 
