@@ -170,7 +170,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             
             # ============================================================= Redeemed Items records ===================================================================
             '''
-            Redeemed Items records is being creating here if any
+            Redeemed Items records are being creating here (if any)
             '''
             SaleRecordAppliedCoupons.objects.bulk_create([
                 SaleRecordAppliedCoupons(sale_record=sale_record, **data) for data in applied_coupons_data
