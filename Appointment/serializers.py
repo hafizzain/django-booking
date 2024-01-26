@@ -354,7 +354,6 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                   'client_type', 'duration', 'currency', 'created_at', 'service', 'client', 'location', 'is_blocked',
                   'details',
                   'status', 'appointment_status',
-                  'client_info'
                   ]
 
 
