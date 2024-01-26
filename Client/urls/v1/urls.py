@@ -18,6 +18,7 @@ urlpatterns = [
    path('get_client_group/', views.get_client_group),
    path('update_client_group/', views.update_client_group),
    path('delete_client_group/', views.delete_client_group),
+   path('get_client_ids/', views.get_client_image),
    
    #Subscription
    path('create_subscription/', views.create_subscription),
