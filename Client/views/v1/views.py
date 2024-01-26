@@ -612,7 +612,6 @@ def update_client(request):
         # ClientImages.objects.filter(client_id=client.id).delete()
         if images is not None:
             ids = json.loads(images)
-
             # Get all existing images for the client
             existing_images = ClientImages.objects.filter(client_id=client.id)
 
@@ -621,6 +620,8 @@ def update_client(request):
                 if existing_image.id not in ids:
                     # Delete the image if it's not in the new list
                     existing_image.delete()
+                    for id in ids:
+                        ClientImages.objects.filter(id=id).update(client_id=client.id)
                 else:
                     # Update the client_id if it's in the new list
                     existing_image.client_id = client.id
