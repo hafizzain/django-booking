@@ -5055,18 +5055,19 @@ def create_workingschedule(request):
                 created_at__date__gte=current_date
             )
             if check_exists:
-                return Response(
-                    {
-                        'status': False,
-                        'status_code': 404,
-                        'status_code_text': '404',
-                        'response': {
-                            'message': f'Error',
-                            'error_message': None,
-                        }
-                    },
-                    status=status.HTTP_404_NOT_FOUND
-                )
+                pass
+                # return Response(
+                #     {
+                #         'status': False,
+                #         'status_code': 404,
+                #         'status_code_text': '404',
+                #         'response': {
+                #             'message': f'Error',
+                #             'error_message': None,
+                #         }
+                #     },
+                #     status=status.HTTP_404_NOT_FOUND
+                # )
 
         except Exception as err:
             return Response(
