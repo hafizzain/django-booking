@@ -26,7 +26,8 @@ from Client.serializers import (SingleClientSerializer, ClientSerializer, Client
                                 CustomerDetailedLoyaltyPointsLogsSerializer, ClientVouchersSerializer,
                                 ClientMembershipsSerializer,
                                 ClientDropdownSerializer, CustomerDetailedLoyaltyPointsLogsSerializerOP,
-                                ClientImagesSerializerResponses
+                                ClientImagesSerializerResponses,
+                                ClientImageSerializer,
                                 )
 from Business.serializers.v1_serializers import BusinessAddressSerilaizer
 from Utility.models import NstyleFile
@@ -684,6 +685,8 @@ def update_client(request):
                 # Update the client_id if it's in the new list
                 existing_image.client_id = client.id
                 existing_image.save()
+        for id in ids:
+            ClientImages.objects.filter(id=id).update(client_id=client.id)
             # if clients:
             #     ClientImages.objects.filter(id=image_id).update(client_id=None)
             #     ClientImages.objects.filter(id=image_id).update(client_id=client.id)
