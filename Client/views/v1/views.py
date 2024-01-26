@@ -614,7 +614,8 @@ def update_client(request):
             for image_id in ids:
                 clients = ClientImages.objects.filter(id=image_id,client_id=client.id)
                 if clients:
-                    pass
+                    ClientImages.objects.filter(id=image_id).update(client_id=None)
+                    ClientImages.objects.filter(id=image_id).update(client_id=client.id)
                 else:
                     ClientImages.objects.filter(id=image_id).update(client_id=client.id)
 
