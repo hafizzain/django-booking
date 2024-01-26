@@ -39,7 +39,7 @@ import json
 from django.db.models import Q, F
 
 from Client.models import Client, ClientPackageValidation, ClientPromotions, LoyaltyPoints, ClientLoyaltyPoint, \
-    LoyaltyPointLogs
+    LoyaltyPointLogs, ClientImages
 from datetime import date, timedelta
 from threading import Thread
 
@@ -2611,8 +2611,9 @@ def get_client_sale(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    client_images = Client.objects.filter(id=client)
-    c_images = ClientImagesSerializerResponses(client_images ,many=True).data
+    images = ClientImages.objects.filter(client_id=client)
+    c_images = ClientImagesSerializerResponses(images, many=True,
+                                                  context={'request': request}).data
 
     # Product Order---------------------
     product_order = ProductOrder.objects \
