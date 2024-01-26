@@ -167,8 +167,8 @@ class ClientDropdownSerializer(serializers.ModelSerializer):
         fields = ['id','images', 'full_name', 'email', 'client_id', 'image', 'total_visit']
 
 class ClientInfoSerializer(serializers.Serializer):
-    client_type = serializers.CharField(source='client_type')
-    client_tag = serializers.CharField(source='client_tag')
+    client_type = serializers.CharField()
+    client_tag = serializers.CharField()
     
 class ClientSerializer(serializers.ModelSerializer):
     country = CountrySerializer(read_only=True)
@@ -184,9 +184,8 @@ class ClientSerializer(serializers.ModelSerializer):
     total_done_appointments = serializers.SerializerMethodField(read_only=True)
     total_sales = serializers.SerializerMethodField(read_only=True)
     
-    client_info = serializers.SerializerMethodField(read_only=True, source='*')
+    client_info = serializers.SerializerMethodField(read_only=True)
 
-    
     def get_client_info(self, obj):
         client_info_data = {
             'client_type': obj.client_type,
