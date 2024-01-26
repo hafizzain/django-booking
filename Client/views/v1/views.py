@@ -678,12 +678,12 @@ def update_client(request):
             if existing_image.id not in ids:
                 # Delete the image if it's not in the new list
                 existing_image.delete()
+                for id in ids:
+                    ClientImages.objects.filter(id=id).update(client_id=client.id)
             else:
                 # Update the client_id if it's in the new list
                 existing_image.client_id = client.id
                 existing_image.save()
-        for id in ids:
-            ClientImages.objects.filter(id=id).update(client_id=client.id)
             # if clients:
             #     ClientImages.objects.filter(id=image_id).update(client_id=None)
             #     ClientImages.objects.filter(id=image_id).update(client_id=client.id)
@@ -3526,35 +3526,3 @@ def get_client_images(request):
             status=status.HTTP_201_CREATED
         )
 
-
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def get_client_image(request):
-    ids = request.GET.get('ids', None)
-    ids= json.loads(ids)
-    # if images is not None:
-    # ids = json.loads(images)
-    # Get all existing images for the client
-    existing_images = ClientImages.objects.filter(id__in=ids)
-    # Iterate through existing images and update or delete
-    # for existing_image in existing_images:
-    #     if existing_image.id not in ids:
-    #         # Delete the image if it's not in the new list
-    #         existing_image.delete()
-    #     else:
-    #         # Update the client_id if it's in the new list
-    #         existing_image.client_id = client.id
-    #         existing_image.save()
-    return Response(
-        {
-            'status': True,
-            'status_code': 200,
-            'response': {
-                'message': 'Client ids fetched successfully!',
-                'error_message': [],
-                'data': ClientImagesSerializerResponses(existing_images, many=True, context={'request': request}).data
-            }
-        },
-        status=200
-    )
