@@ -614,12 +614,13 @@ def update_client(request):
             for image_id in ids:
                 # clients = ClientImages.objects.filter(id=image_id,client_id=client.id)
                 ClientImages.objects.filter(id=image_id).update(client_id=None)
+            for image_id in ids:
+                ClientImages.objects.filter(id=image_id).update(client_id=client.id)
                 # if clients:
                 #     ClientImages.objects.filter(id=image_id).update(client_id=None)
                 #     ClientImages.objects.filter(id=image_id).update(client_id=client.id)
                 # else:
                 #     ClientImages.objects.filter(id=image_id).update(client_id=client.id)
-
 
                 # Try to get the ClientImages object with the given image_id
                 # client_image, created = ClientImages.objects.get_or_create(
@@ -2907,13 +2908,13 @@ def get_client_all_memberships(request):
     today_date = today_date.strftime('%Y-%m-%d')
     client_membership = MemberShipOrder.objects.filter(
 
-        location__id = location_id,
+        location__id=location_id,
         # created_at__lt = F('end_date'),
         # end_date__gte = today_date,
-        client__id = client_id,
+        client__id=client_id,
 
     )
-    
+
     # return JsonResponse({'data': client_membership})
     serializer = ClientMembershipsSerializer(client_membership, many=True)
 
@@ -2925,7 +2926,7 @@ def get_client_all_memberships(request):
                 'message': 'Client Available Memberships',
                 'error_message': None,
                 'client_memberships': serializer.data
-                
+
             }
         },
         status=status.HTTP_200_OK
