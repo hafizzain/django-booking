@@ -11,9 +11,6 @@ class SaleRecords(admin.ModelAdmin):
 class SaleRecordsAppointmentServicesAdmin(admin.ModelAdmin):
     list_display = ['id']
 
-@admin.register(SaleRecordAppliedCoupons)
-class SaleRecordAppliedCouponsAdmin(admin.ModelAdmin):
-    list_display = ['id']
     
 @admin.register(SaleRecordServices)
 class SaleRecordServicesAdmin(admin.ModelAdmin):
@@ -44,3 +41,15 @@ class SaleTaxAdmin(admin.ModelAdmin):
 class PaymentMethodsAdmin(admin.ModelAdmin):
     list_display = ['id']
     
+# ============================================= Redeemed Items Records ====================================
+    
+@admin.register(AppliedMemberships)
+class AppliedMembershipsAdmin(admin.ModelAdmin):
+    list_display = ['id']
+@admin.register(SaleRecordAppliedCoupons)
+class SaleRecordAppliedCouponsAdmin(admin.ModelAdmin):
+    list_display = ['id']
+    
+@admin.register(AppliedVouchers)
+class AppliedMembershipsAdmin(admin.ModelAdmin):
+    list_display = ['id']

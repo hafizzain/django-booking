@@ -390,6 +390,8 @@ class VoucherCurrencyPrice(models.Model):
         return str(self.id)
 
 
+
+# No use for now  (REDFlag)
 class Rewards(models.Model):
     REWARD_TYPES = [
         ('Product', 'Product'),

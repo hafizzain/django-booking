@@ -36,7 +36,7 @@ class Status (models.TextChoices):
     PAID = 'paid' , 'Paid'
     UN_PAID = 'un_paid' , 'Un Paid'
 
-    
+
 class AppointmentStatus(models.TextChoices):
     VOID = 'void','Void'
     BOOKED = 'booked' , 'Booked'
