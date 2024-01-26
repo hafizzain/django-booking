@@ -242,7 +242,8 @@ class ClientSerializer(serializers.ModelSerializer):
         model = Client
         fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number',
                  'country','city','state', 'is_active', 'language', 'about_us', 'marketing','country_obj','customer_note',
-                 'created_at', 'total_done_appointments', 'total_sales', 'last_appointment', 'last_sale', 'last_transaction_date']
+                 'created_at', 'total_done_appointments', 'total_sales', 'last_appointment', 'last_sale', 'last_transaction_date',
+                 'client_tag','client_type']
         
 class ClientSerializerOP(serializers.ModelSerializer):
     
