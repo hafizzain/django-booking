@@ -609,7 +609,7 @@ def update_client(request):
         )
     try:
         client = Client.objects.get(id=id)
-        ClientImages.objects.filter(client_id=client.id).delete()
+        # ClientImages.objects.filter(client_id=client.id).delete()
         if images is not None:
             ids = json.loads(images)
             for image_id in ids:
@@ -3474,3 +3474,43 @@ def create_client_image(request):
             },
             status=status.HTTP_201_CREATED
         )
+
+
+
+
+
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_client_images(request):
+    id = request.data.get('id', None)
+    if id is not None:
+        client_image = ClientImages.objects.get(clie)
+        data = ClientImagesSerializerResponse(client_image, many=False, context={'request': request}).data
+        return Response(
+            {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Client images added successfully!',
+                    'error_message': [],
+                    'data': data
+                }
+            },
+            status=200
+        )
+    else:
+        return Response(
+            {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Enter a valid image',
+                    'error_message': [],
+                    'data': []
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+

@@ -11,6 +11,7 @@ urlpatterns = [
    path('delete_client/', views.delete_client),
    path('get_single_client/', views.get_single_client),
    path('import_client/', views.import_client),
+   path('client_images/', views.get_client_images),
    
    #Client_Group
    path('create_client_group/',views.create_client_group),
