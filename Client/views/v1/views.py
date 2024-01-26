@@ -3532,6 +3532,7 @@ def get_client_images(request):
 @permission_classes([AllowAny])
 def get_client_image(request):
     ids = request.GET.get('ids', None)
+    ids= json.loads(ids)
     # if images is not None:
     # ids = json.loads(images)
     # Get all existing images for the client
