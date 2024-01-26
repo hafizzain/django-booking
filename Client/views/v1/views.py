@@ -257,14 +257,14 @@ def get_client_dropdown(request):
         .order_by('-created_at')
 
     serialized = list(ClientDropdownSerializer(all_client, many=True, context={'request': request}).data)
-    c_images = ClientImagesSerializerResponses(all_client ,many=True).data
+    # c_images = ClientImagesSerializerResponses(all_client ,many=True).data
 
     paginator = CustomPagination()
     paginator.page_size = 10 if page else 100000
     paginated_data = paginator.paginate_queryset(serialized, request)
     response = paginator.get_paginated_response(paginated_data, 'clients', invoice_translations=None,
                                                 current_page=page, is_searched=is_searched, is_filtered=isFiltered)
-    response['images']=c_images
+    # response['images']=c_images
     return response
 
 
