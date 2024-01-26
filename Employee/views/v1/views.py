@@ -1,12 +1,16 @@
 import threading
 from rest_framework.decorators import action
-
-from datetime import datetime, timedelta, timezone
+from django.db.models import Count, IntegerField, Sum, FloatField, Q, Subquery, OuterRef, Case, When, F, Value, CharField
+from django.utils import timezone
+from django.db import models
+from datetime import datetime, timedelta
 import random
 import string
 from rest_framework import viewsets
 from time import strptime
 from django.shortcuts import render
+
+from Appointment.models import AppointmentService
 from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee, EmployeeProfessionalInfo,
                              EmployeePermissionSetting, EmployeeModulePermission
 , EmployeeMarketingPermission, EmployeeSelectedService, SallarySlipPayrol, StaffGroup
@@ -1463,9 +1467,37 @@ def update_employee(request):
         employee.image = image
 
     if is_active is not None:
-        employee.is_active = True
+        current_date = timezone.now().date()
+        qs = AppointmentService.objects.filter(member_id=employee, created_at__date__gte=current_date)
+        # qs = all_services.annotate(
+        #     condition_check=Case(
+        #         When(~Q(status='Started'), then=Value(True)),
+        #         When(~Q(status='Finished'), then=Value(True)),
+        #         default=Value(False),
+        #         output_field=models.BooleanField(),
+        #     )
+        # )
+        # qs = qs.filter(condition_check=True)
+        if qs:
+            return Response(
+                {
+                    'status': False,
+                    'status_code': 4026,
+                    'response': {
+                        'message': 'Cannot inactive',
+                        'error_message': [],
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        else:
+            employee.is_active = True
+
+
+
     else:
         employee.is_active = False
+
     employee.can_refunds = can_refund
     employee.save()
 
