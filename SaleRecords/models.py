@@ -69,10 +69,8 @@ class SaleRecordsProducts(CommonField):
 class SaleRecordsAppointmentServices(CommonField):
     
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null =True , blank =True , related_name = 'sale_appointment_services_records')
-    appointment = models.ForeignKey(Appointment, on_delete = models.SET_NULL, null = True)
+    appointment_id = models.ForeignKey(Appointment, on_delete = models.SET_NULL, null = True, related_name = 'sale_appointments_records')
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_appointment_services_employee')
-    
-    
     service = models.ForeignKey(Service, on_delete = models.SET_NULL, null = True)
     appointment_status = models.CharField(choices = AppointmentStatus.choices,max_length = 50, default = AppointmentStatus.BOOKED, blank=False, null=False)
     reason = models.CharField(max_length = 255, blank=True, null=True)
