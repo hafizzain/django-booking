@@ -186,4 +186,4 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                 AppliedGiftCards(sale_record=sale_record, **data) for data in applied_gift_card_data
             ])
 
-        # return sale_record
+        return sale_record
