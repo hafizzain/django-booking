@@ -87,15 +87,15 @@ class AppliedGiftCardsSerializer(serializers.ModelSerializer):
 
         
 class SaleRecordSerializer(serializers.ModelSerializer):
-    appointments_services = SaleRecordsAppointmentServicesSerializer(many= True, write_only = True)
-    services = SaleRecordServicesSerializer(many= True, write_only= True)
-    products = SaleRecordProductsSerializer(many= True, write_only = True)
-    payment_methods = PaymentMethodsSerializer(many = True, write_only = True)
-    gift_card = PurchasedGiftCardsSerilizer(many = True, write_only = True)
-    membership = SaleRecordMembershipSerializer(many = True , write_only = True)
-    vouchers = SaleRecordVouchersSerializer(many =True , write_only= True)
-    tax = SaleTaxSerializer(many =True, write_only = True)
-    tips = SaleOrderTipSerializer(many = True, write_only = True)
+    appointments_services = SaleRecordsAppointmentServicesSerializer(many= True)
+    services = SaleRecordServicesSerializer(many= True)
+    products = SaleRecordProductsSerializer(many= True)
+    payment_methods = PaymentMethodsSerializer(many = True)
+    gift_card = PurchasedGiftCardsSerilizer(many = True)
+    membership = SaleRecordMembershipSerializer(many = True )
+    vouchers = SaleRecordVouchersSerializer(many =True )
+    tax = SaleTaxSerializer(many =True)
+    tips = SaleOrderTipSerializer(many = True)
     
     # ================================================================   Applied Items  ==========================================
     applied_coupons = SaleRecordAppliedCouponsSerializer(many = True)
