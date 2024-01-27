@@ -11,7 +11,7 @@ class SaleRecordsAppointmentServicesSerializer(serializers.ModelSerializer):
     
 class SaleRecordProductsSerializer(serializers.ModelSerializer):
     class Meta: 
-        models = SaleRecordsProducts
+        model = SaleRecordsProducts
         fields = "__all__"
         read_only_fields = ['sale_record']
 
