@@ -14,7 +14,7 @@ class RefundSatus(models.TextChoices):
 
 class PaymentMethodsChoices(models.TextChoices):
     CASH = 'cash','Cash Payment'
-    MASTER_CARD = 'master','Master Payment'
+    MASTER_CARD = 'mastercard','Master Card Payment'
     VISA_CARD = 'visa','Visa Payment'
     PAYPAL = 'paypal','PayPal Payment'
     GIFT = 'gift','Gift Payment'
