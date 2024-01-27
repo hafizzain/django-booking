@@ -87,7 +87,8 @@ class AppliedGiftCardsSerializer(serializers.ModelSerializer):
 
         
 class SaleRecordSerializer(serializers.ModelSerializer):
-    appointments_services = SaleRecordsAppointmentServicesSerializer(many= True)
+    
+    appointment_services = SaleRecordsAppointmentServicesSerializer(many= True)
     services = SaleRecordServicesSerializer(many= True)
     products = SaleRecordProductsSerializer(many= True)
     payment_methods = PaymentMethodsSerializer(many = True)
