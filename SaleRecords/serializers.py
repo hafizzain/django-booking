@@ -111,7 +111,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         
     def create(self, validated_data):
         
-        appointments_services_data = validated_data.pop('appointments_services', [])
+        appointments_services_data = validated_data.pop('appointment_services', [])
         services_data = validated_data.pop('services', [])
         products_data = validated_data.pop('products', [])
         payment_methods_data = validated_data.pop('payment_methods', [])
