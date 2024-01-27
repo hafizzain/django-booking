@@ -130,8 +130,9 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         '''
             Checkout records are being created here
         '''
-        sale_record = SaleRecords.objects.create(**validated_data)
+        
         with transaction.atomic():
+            sale_record = SaleRecords.objects.create(**validated_data)
             SaleRecordsAppointmentServices.objects.bulk_create([
                 SaleRecordsAppointmentServices(sale_record=sale_record, **data) for data in appointments_services_data
             ])
