@@ -67,8 +67,9 @@ class SaleRecordsProducts(CommonField):
     
     
 class SaleRecordsAppointmentServices(CommonField):
+    
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null =True , blank =True , related_name = 'sale_appointment_services_records')
-    appointment = models.ForeignKey(Appointment, on_delete = models.CASCADE)
+    appointment = models.ForeignKey(Appointment, on_delete = models.SET_NULL, null = True)
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_appointment_services_employee')
     
     
