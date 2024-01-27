@@ -11,12 +11,14 @@ urlpatterns = [
    path('delete_client/', views.delete_client),
    path('get_single_client/', views.get_single_client),
    path('import_client/', views.import_client),
+   path('client_images/', views.get_client_images),
    
    #Client_Group
    path('create_client_group/',views.create_client_group),
    path('get_client_group/', views.get_client_group),
    path('update_client_group/', views.update_client_group),
    path('delete_client_group/', views.delete_client_group),
+   # path('get_client_ids/', views.get_client_image),
    
    #Subscription
    path('create_subscription/', views.create_subscription),
@@ -76,7 +78,8 @@ urlpatterns = [
 
    path('check_client_existance/', views.check_client_existance),
    path('create_client_image/', views.create_client_image),
+   path('create_comment/', views.create_comment),
+   path('get_comment/', views.get_comment),
 
-   
 
 ]

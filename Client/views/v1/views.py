@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from threading import Thread
+from django.http import JsonResponse
 from Appointment.models import Appointment, AppointmentCheckout
 from Order.models import VoucherOrder, Vouchers, MemberShipOrder, Membership
 from django.db.models.functions import Cast
@@ -17,14 +18,16 @@ from Product.models import Product
 from Utility.models import Country, Currency, ExceptionRecord, Language, State, City
 from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, \
     DiscountMembership, LoyaltyPoints, Subscription, Rewards, Promotion, Membership, Vouchers, ClientLoyaltyPoint, \
-    LoyaltyPointLogs, VoucherCurrencyPrice, ClientImages
+    LoyaltyPointLogs, VoucherCurrencyPrice, ClientImages, Comments
 from Client.serializers import (SingleClientSerializer, ClientSerializer, ClientGroupSerializer,
                                 LoyaltyPointsSerializer,
                                 SubscriptionSerializer, RewardSerializer, PromotionSerializer, MembershipSerializer,
                                 VoucherSerializer, ClientLoyaltyPointSerializer, CustomerLoyaltyPointsLogsSerializer,
                                 CustomerDetailedLoyaltyPointsLogsSerializer, ClientVouchersSerializer,
                                 ClientMembershipsSerializer,
-                                ClientDropdownSerializer, CustomerDetailedLoyaltyPointsLogsSerializerOP
+                                ClientDropdownSerializer, CustomerDetailedLoyaltyPointsLogsSerializerOP,
+                                ClientImagesSerializerResponses,
+                                ClientImageSerializer, ClientResponse,
                                 )
 from Business.serializers.v1_serializers import BusinessAddressSerilaizer
 from Utility.models import NstyleFile
@@ -190,6 +193,7 @@ def get_single_client(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_client_dropdown(request):
+    c_images = []
     search_text = request.GET.get('search_text', None)
     # no_pagination = request.GET.get('no_pagination', None)
     page = request.GET.get('page', None)
@@ -252,13 +256,16 @@ def get_client_dropdown(request):
         .count_total_visit(start_date, end_date) \
         .filter(query) \
         .order_by('-created_at')
+
     serialized = list(ClientDropdownSerializer(all_client, many=True, context={'request': request}).data)
+    # c_images = ClientImagesSerializerResponses(all_client ,many=True).data
 
     paginator = CustomPagination()
     paginator.page_size = 10 if page else 100000
     paginated_data = paginator.paginate_queryset(serialized, request)
     response = paginator.get_paginated_response(paginated_data, 'clients', invoice_translations=None,
                                                 current_page=page, is_searched=is_searched, is_filtered=isFiltered)
+    # response['images']=c_images
     return response
 
 
@@ -603,35 +610,7 @@ def update_client(request):
         )
     try:
         client = Client.objects.get(id=id)
-        if images is not None:
-            ids = json.loads(images)
-            for image_id in ids:
-                clients = ClientImages.objects.filter(id=image_id)
-                if clients:
-                    client.delete()
-            for image_id in ids:
-                ClientImages.objects.filter(id=image_id).update(client_id=client.id)
-
-
-                # Try to get the ClientImages object with the given image_id
-                # client_image, created = ClientImages.objects.get_or_create(
-                #     id=image_id,
-                #     defaults={'client_id': client.id}
-                # )
-                #
-                # # If the object already exists, update the client_id
-                # if not created:
-                #     client_image.client_id = client.id
-                #     client_image.save()
-            # all_images = ClientImages.objects.filter(client_id=client.id)
-            # if all_images:
-            #     all_images.delete()
-            # for id in ids:
-            #     ClientImages.objects.filter(id=id).update(client_id=client.id)
-
-            # # If the object already exists, update the client_id
-            # if not created:
-            #     ClientImages.objects.filter(id=id).update(client_id=client.id)
+        # ClientImages.objects.filter(client_id=client.id).delete()
     except Exception as err:
         return Response(
             {
@@ -690,6 +669,49 @@ def update_client(request):
     serialized = ClientSerializer(client, data=request.data, partial=True, context={'request': request})
     if serialized.is_valid():
         serialized.save()
+    if images is not None:
+        ids = json.loads(images)
+        # Get all existing images for the client
+        existing_images = ClientImages.objects.filter(client_id=client.id)
+
+        # Iterate through existing images and update or delete
+        for existing_image in existing_images:
+            if existing_image.id not in ids:
+                # Delete the image if it's not in the new list
+                existing_image.delete()
+                for id in ids:
+                    ClientImages.objects.filter(id=id).update(client_id=client.id)
+            else:
+                # Update the client_id if it's in the new list
+                existing_image.client_id = client.id
+                existing_image.save()
+        for id in ids:
+            ClientImages.objects.filter(id=id).update(client_id=client.id)
+            # if clients:
+            #     ClientImages.objects.filter(id=image_id).update(client_id=None)
+            #     ClientImages.objects.filter(id=image_id).update(client_id=client.id)
+            # else:
+            #     ClientImages.objects.filter(id=image_id).update(client_id=client.id)
+
+            # Try to get the ClientImages object with the given image_id
+            # client_image, created = ClientImages.objects.get_or_create(
+            #     id=image_id,
+            #     defaults={'client_id': client.id}
+            # )
+            #
+            # # If the object already exists, update the client_id
+            # if not created:
+            #     client_image.client_id = client.id
+            #     client_image.save()
+        # all_images = ClientImages.objects.filter(client_id=client.id)
+        # if all_images:
+        #     all_images.delete()
+        # for id in ids:
+        #     ClientImages.objects.filter(id=id).update(client_id=client.id)
+
+        # # If the object already exists, update the client_id
+        # if not created:
+        #     ClientImages.objects.filter(id=id).update(client_id=client.id)
 
         return Response(
             {
@@ -2899,13 +2921,15 @@ def get_client_all_memberships(request):
     today_date = today_date.strftime('%Y-%m-%d')
     client_membership = MemberShipOrder.objects.filter(
 
-        location__id = location_id,
-        created_at__lt = F('end_date'),
-        end_date__gte = today_date,
-        client__id = client_id,
+        location__id=location_id,
+        # created_at__lt = F('end_date'),
+        # end_date__gte = today_date,
+        client__id=client_id,
 
     )
-    data = ClientMembershipsSerializer(client_membership, many=True).data
+
+    # return JsonResponse({'data': client_membership})
+    serializer = ClientMembershipsSerializer(client_membership, many=True)
 
     return Response(
         {
@@ -2914,7 +2938,8 @@ def get_client_all_memberships(request):
             'response': {
                 'message': 'Client Available Memberships',
                 'error_message': None,
-                'client_memberships': list(data)
+                'client_memberships': serializer.data
+
             }
         },
         status=status.HTTP_200_OK
@@ -3460,6 +3485,97 @@ def create_client_image(request):
                     'message': 'Enter a valid image',
                     'error_message': [],
                     'data': []
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_client_images(request):
+    id = request.data.get('id', None)
+    if id is not None:
+        client_image = ClientImages.objects.get(clie)
+        data = ClientImagesSerializerResponse(client_image, many=False, context={'request': request}).data
+        return Response(
+            {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Client images added successfully!',
+                    'error_message': [],
+                    'data': data
+                }
+            },
+            status=200
+        )
+    else:
+        return Response(
+            {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Enter a valid image',
+                    'error_message': [],
+                    'data': []
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def create_comment(request):
+    comment = request.data.get('comment', None)
+    employee_id = request.data.get('employee_id', None)
+    comment = Comments.objects.create(employee_id=employee_id, comment=comment)
+    client_data = ClientResponse(comment, many=False).data
+    return Response(
+        {
+            'status': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Comment added successfully',
+                'error_message': [],
+                'data': client_data
+            }
+        },
+        status=status.HTTP_201_CREATED
+    )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_comment(request):
+    employee_id = request.query_params.get('employee_id', None)
+    if employee_id:
+        comment = Comments.objects.filter(employee_id=employee_id)
+        client_data = ClientResponse(comment, many=False).data
+        return Response(
+            {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Comment added successfully',
+                    'error_message': [],
+                    'data': client_data
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+    else:
+        comment = Comments.objects.all()
+        client_data = ClientResponse(comment, many=True).data
+        return Response(
+            {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Comment added successfully',
+                    'error_message': [],
+                    'data': client_data
                 }
             },
             status=status.HTTP_201_CREATED

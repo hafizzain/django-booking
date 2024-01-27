@@ -8,6 +8,7 @@ from Appointment.Constants.Reschedule import reschedule_appointment
 from Appointment.Constants.AddAppointment import Add_appointment
 from Appointment.Constants.cancelappointment import cancel_appointment
 from Appointment.Constants.comisionCalculate import calculate_commission
+from Client.serializers import ClientImagesSerializerResponses
 from Promotions.models import ComplimentaryDiscount, PackagesDiscount, ServiceDurationForSpecificTime, Coupon
 from Sale.Constants.Custom_pag import CustomPagination
 
@@ -38,7 +39,7 @@ import json
 from django.db.models import Q, F
 
 from Client.models import Client, ClientPackageValidation, ClientPromotions, LoyaltyPoints, ClientLoyaltyPoint, \
-    LoyaltyPointLogs
+    LoyaltyPointLogs, ClientImages
 from datetime import date, timedelta
 from threading import Thread
 
@@ -2610,6 +2611,9 @@ def get_client_sale(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    images = ClientImages.objects.filter(client_id=client)
+    c_images = ClientImagesSerializerResponses(images, many=True,
+                                                  context={'request': request}).data
 
     # Product Order---------------------
     product_order = ProductOrder.objects \
@@ -2686,6 +2690,7 @@ def get_client_sale(request):
             'status_code': 201,
             'response': {
                 'message': 'Client Order Sales!',
+                'c_images':c_images,
                 'error_message': None,
                 'product': product.data,
                 'service': services_data.data,

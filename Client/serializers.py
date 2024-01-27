@@ -9,7 +9,8 @@ from Service.models import Service
 from Utility.models import Country, State, City
 
 from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, \
-    Promotion, Rewards, Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs, VoucherCurrencyPrice, ClientImages
+    Promotion, Rewards, Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs, VoucherCurrencyPrice, ClientImages, \
+    Comments
 from Invoices.models import SaleInvoice
 from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip, AppointmentService, Appointment
 from Order.models import Checkout, Order
@@ -142,6 +143,15 @@ class ClientDropdownSerializer(serializers.ModelSerializer):
     total_visit = serializers.IntegerField(read_only=True)
     images = serializers.SerializerMethodField(read_only=True)
 
+    client_info = serializers.SerializerMethodField(read_only=True)
+
+    def get_client_info(self, obj):
+        client_info_data = {
+            'client_type': obj.client_type,
+            'client_tag': obj.client_tag,
+        }
+        return ClientInfoSerializer(client_info_data).data
+    
     def get_images(self, obj):
         try:
             images = ClientImages.objects.filter(client_id=obj.id)
@@ -163,8 +173,12 @@ class ClientDropdownSerializer(serializers.ModelSerializer):
 
     class Meta:
         model  = Client
-        fields = ['id','images', 'full_name', 'email', 'client_id', 'image', 'total_visit']
+        fields = ['id','images', 'full_name', 'email', 'client_id', 'image', 'total_visit', 'client_info']
 
+class ClientInfoSerializer(serializers.Serializer):
+    client_type = serializers.CharField()
+    client_tag = serializers.CharField()
+    
 class ClientSerializer(serializers.ModelSerializer):
     country = CountrySerializer(read_only=True)
     state = StateSerializer(read_only=True)
@@ -178,6 +192,15 @@ class ClientSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     total_done_appointments = serializers.SerializerMethodField(read_only=True)
     total_sales = serializers.SerializerMethodField(read_only=True)
+    
+    client_info = serializers.SerializerMethodField(read_only=True)
+
+    def get_client_info(self, obj):
+        client_info_data = {
+            'client_type': obj.client_type,
+            'client_tag': obj.client_tag,
+        }
+        return ClientInfoSerializer(client_info_data).data
 
     def get_last_sale(self, obj):
         last_sale = Checkout.objects.filter(client=obj).order_by('-created_at')
@@ -240,8 +263,8 @@ class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
         fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number',
-                 'country','city','state', 'is_active', 'language', 'about_us', 'marketing','country_obj','customer_note',
-                 'created_at', 'total_done_appointments', 'total_sales', 'last_appointment', 'last_sale', 'last_transaction_date']
+                'country','city','state', 'is_active', 'language', 'about_us', 'marketing','country_obj','customer_note',
+                'created_at', 'total_done_appointments', 'total_sales', 'last_appointment', 'last_sale', 'last_transaction_date','client_info']
         
 class ClientSerializerOP(serializers.ModelSerializer):
     
@@ -789,3 +812,14 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentCheckout
         fields = '__all__'
+        
+class ClientImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Client
+        fields = '__all__'
+
+
+class ClientResponse(serializers.ModelSerializer):
+    class Meta:
+        model = Comments
+        fields = "__all__"
