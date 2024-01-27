@@ -125,6 +125,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         applied_memberships_data  = validated_data.pop('applied_memberships',[])
         applied_gift_card_data = validated_data.pop('applied_gift_cards',[])
         
+        
         # =================================================== Checkout Records ========================================================
         '''
             Checkout records are being created here
