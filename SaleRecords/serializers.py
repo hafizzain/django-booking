@@ -76,7 +76,7 @@ class AppliedMembershipsSerializer(serializers.ModelSerializer):
 class AppliedVouchersSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppliedVouchers
-        field = "__all__"
+        fields = "__all__"
         read_only_fields = ['sale_record']
         
 class AppliedGiftCardsSerializer(serializers.ModelSerializer):
