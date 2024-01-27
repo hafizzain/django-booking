@@ -88,21 +88,21 @@ class AppliedGiftCardsSerializer(serializers.ModelSerializer):
         
 class SaleRecordSerializer(serializers.ModelSerializer):
     
-    sale_appointment_services_records = SaleRecordsAppointmentServicesSerializer(many= True)
-    services = SaleRecordServicesSerializer(many= True)
-    products = SaleRecordProductsSerializer(many= True)
-    payment_methods = PaymentMethodsSerializer(many = True)
-    gift_card = PurchasedGiftCardsSerilizer(many = True)
-    membership = SaleRecordMembershipSerializer(many = True )
-    vouchers = SaleRecordVouchersSerializer(many =True )
-    tax = SaleTaxSerializer(many =True)
-    tips = SaleOrderTipSerializer(many = True)
+    appointment_services = SaleRecordsAppointmentServicesSerializer(many= True)
+    services_records = SaleRecordServicesSerializer(many= True)
+    products_records = SaleRecordProductsSerializer(many= True)
+    payment_methods_records = PaymentMethodsSerializer(many = True)
+    gift_cards_records = PurchasedGiftCardsSerilizer(many = True)
+    membership_records = SaleRecordMembershipSerializer(many = True )
+    vouchers_records = SaleRecordVouchersSerializer(many =True )
+    tax_records = SaleTaxSerializer(many =True)
+    tip_records = SaleOrderTipSerializer(many = True)
     
     # ================================================================   Applied Items  ==========================================
-    applied_coupons = SaleRecordAppliedCouponsSerializer(many = True)
-    applied_memberships = AppliedMembershipsSerializer(many = True)
-    applied_vouchers = AppliedVouchersSerializer(many = True)
-    applied_gift_cards = AppliedGiftCardsSerializer(many = True)
+    applied_coupons_records = SaleRecordAppliedCouponsSerializer(many = True)
+    applied_memberships_records = AppliedMembershipsSerializer(many = True)
+    applied_vouchers_records = AppliedVouchersSerializer(many = True)
+    applied_gift_cards_records = AppliedGiftCardsSerializer(many = True)
     
     
     class Meta:
@@ -111,20 +111,20 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         
     def create(self, validated_data):
         
-        appointments_services_data = validated_data.pop('appointment_services', [])
-        services_data = validated_data.pop('services', [])
-        products_data = validated_data.pop('products', [])
-        payment_methods_data = validated_data.pop('payment_methods', [])
-        membership_data = validated_data.pop('membership', [])
-        gift_cards_data = validated_data.pop('gift_card', [])
-        vouchers_data = validated_data.pop('vouchers', [])
-        tax_data = validated_data.pop('tax', [])
-        tips_data = validated_data.pop('tips', [])
+        appointment_services = validated_data.pop('appointment_services', [])
+        services_records = validated_data.pop('services_records', [])
+        products_records = validated_data.pop('products_records', [])
+        payment_methods_records = validated_data.pop('payment_methods_records', [])
+        gift_cards_records = validated_data.pop('gift_cards_records', [])
+        membership_records = validated_data.pop('membership_records', [])
+        vouchers_records = validated_data.pop('vouchers_records', [])
+        tax_records = validated_data.pop('tax_records', [])
+        tip_records = validated_data.pop('tip_records', [])
 
-        applied_coupons_data = validated_data.pop('applied_coupons', [])
-        applied_vouchers_data = validated_data.pop('applied_vouchers', [])
-        applied_memberships_data = validated_data.pop('applied_memberships', [])
-        applied_gift_card_data = validated_data.pop('applied_gift_cards', [])
+        applied_coupons_records = validated_data.pop('applied_coupons_records', [])
+        applied_vouchers_records = validated_data.pop('applied_vouchers_records', [])
+        applied_memberships_records = validated_data.pop('applied_memberships_records', [])
+        applied_gift_cards_records = validated_data.pop('applied_gift_cards_records', [])
         
         
         # =================================================== Checkout Records ========================================================
@@ -138,47 +138,47 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             
             # Create records for SaleRecordsAppointmentServices
             SaleRecordsAppointmentServices.objects.bulk_create([
-                SaleRecordsAppointmentServices(sale_record=sale_record, **data) for data in appointments_services_data
+                SaleRecordsAppointmentServices(sale_record=sale_record, **data) for data in appointment_services
             ])
 
             # Create records for SaleRecordServices
             SaleRecordServices.objects.bulk_create([
-                SaleRecordServices(sale_record=sale_record, **data) for data in services_data
+                SaleRecordServices(sale_record=sale_record, **data) for data in services_records
             ])
 
             # Create records for SaleRecordsProducts
             SaleRecordsProducts.objects.bulk_create([
-                SaleRecordsProducts(sale_record=sale_record, **data) for data in products_data
+                SaleRecordsProducts(sale_record=sale_record, **data) for data in products_records
             ])
 
             # Create records for PaymentMethods
             PaymentMethods.objects.bulk_create([
-                PaymentMethods(sale_record=sale_record, **data) for data in payment_methods_data
+                PaymentMethods(sale_record=sale_record, **data) for data in payment_methods_records
             ])
 
             # Create records for SaleRecordMembership
             SaleRecordMembership.objects.bulk_create([
-                SaleRecordMembership(sale_record=sale_record, **data) for data in membership_data
+                SaleRecordMembership(sale_record=sale_record, **data) for data in membership_records
             ])
 
             # Create records for SaleRecordVouchers
             SaleRecordVouchers.objects.bulk_create([
-                SaleRecordVouchers(sale_record=sale_record, **data) for data in vouchers_data
+                SaleRecordVouchers(sale_record=sale_record, **data) for data in vouchers_records
             ])
 
             # Create records for PurchasedGiftCards
             PurchasedGiftCards.objects.bulk_create([
-                PurchasedGiftCards(sale_record=sale_record, **data) for data in gift_cards_data
+                PurchasedGiftCards(sale_record=sale_record, **data) for data in gift_cards_records
             ])
 
             # Create records for SaleTax
             SaleTax.objects.bulk_create([
-                SaleTax(sale_order=sale_record, **data) for data in tax_data
+                SaleTax(sale_order=sale_record, **data) for data in tax_records
             ])
 
             # Create records for SaleRecordTip
             SaleRecordTip.objects.bulk_create([
-                SaleRecordTip(sale_record=sale_record, **data) for data in tips_data
+                SaleRecordTip(sale_record=sale_record, **data) for data in tip_records
             ])
 
             # ============================================================= Redeemed Items records ===================================================================
@@ -188,22 +188,22 @@ class SaleRecordSerializer(serializers.ModelSerializer):
 
             # Create records for SaleRecordAppliedCoupons
             SaleRecordAppliedCoupons.objects.bulk_create([
-                SaleRecordAppliedCoupons(sale_record=sale_record, **data) for data in applied_coupons_data
+                SaleRecordAppliedCoupons(sale_record=sale_record, **data) for data in applied_coupons_records
             ])
 
             # Create records for AppliedVouchers
             AppliedVouchers.objects.bulk_create([
-                AppliedVouchers(sale_record=sale_record, **data) for data in applied_vouchers_data
+                AppliedVouchers(sale_record=sale_record, **data) for data in applied_vouchers_records
             ])
 
             # Create records for AppliedMemberships
             AppliedMemberships.objects.bulk_create([
-                AppliedMemberships(sale_record=sale_record, **data) for data in applied_memberships_data
+                AppliedMemberships(sale_record=sale_record, **data) for data in applied_memberships_records
             ])
 
             # Create records for AppliedGiftCards
             AppliedGiftCards.objects.bulk_create([
-                AppliedGiftCards(sale_record=sale_record, **data) for data in applied_gift_card_data
+                AppliedGiftCards(sale_record=sale_record, **data) for data in applied_gift_cards_records
             ])
 
         return sale_record
