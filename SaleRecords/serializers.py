@@ -85,7 +85,13 @@ class AppliedGiftCardsSerializer(serializers.ModelSerializer):
         fields = "__all__"
         read_only_fields = ['sale_record']
 
-        
+
+class AppliedPromotionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AppliedPromotion
+        fields = "__all__"
+
+
 class SaleRecordSerializer(serializers.ModelSerializer):
     
     appointment_services = SaleRecordsAppointmentServicesSerializer(many= True)
@@ -103,6 +109,9 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     applied_memberships_records = AppliedMembershipsSerializer(many = True)
     applied_vouchers_records = AppliedVouchersSerializer(many = True)
     applied_gift_cards_records = AppliedGiftCardsSerializer(many = True)
+    applied_promotions_records = AppliedPromotionSerializer(many = True)
+    
+    
     
     
     class Meta:
@@ -133,6 +142,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         applied_vouchers_records = validated_data.pop('applied_vouchers_records', [])
         applied_memberships_records = validated_data.pop('applied_memberships_records', [])
         applied_gift_cards_records = validated_data.pop('applied_gift_cards_records', [])
+        applied_promotions_records = validated_data.pop('applied_promotions_records',[])
         
         
         # =================================================== Checkout Records ========================================================
@@ -212,6 +222,10 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             # Create records for AppliedGiftCards
             AppliedGiftCards.objects.bulk_create([
                 AppliedGiftCards(sale_record=sale_record, **data) for data in applied_gift_cards_records
+            ])
+            
+            AppliedPromotion.objects.bulk_create([
+                AppliedPromotion(sale_record= sale_record, **data) for data in applied_promotions_records
             ])
 
         return sale_record
