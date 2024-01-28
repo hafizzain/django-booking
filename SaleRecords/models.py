@@ -37,9 +37,9 @@ class SaleRecords(CommonField):
     status = models.CharField(choices = Status.choices, max_length=50 , default = Status.UN_PAID) 
     
     
-    total_tip = models.FloatField(default = 0)
-    total_tax = models.FloatField(default = 0)
-    total_price = models.FloatField(default = 0) # with tax amount
+    total_tip = models.FloatField(blank=False, null=False)
+    total_tax = models.FloatField(blank=False, null=False)
+    total_price = models.FloatField(blank=False, null=False) # with tax amount
     sub_total = models.FloatField(blank=False, null=False)  # without tax amount
 
     class Meta:

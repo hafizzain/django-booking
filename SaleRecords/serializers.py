@@ -108,6 +108,14 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = SaleRecords
         fields = '__all__'
+    
+    def validate(self, data):
+        # Validate that there is at least one record in appointment_services, services_records, and products_records
+
+        if not data.get('appointment_services') and not data.get('services_records') and not data.get('products_records'):
+            raise serializers.ValidationError("At least one record is required in appointment_services, services_records, or products_records.")
+
+        return data
         
     def create(self, validated_data):
         
