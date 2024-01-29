@@ -3531,7 +3531,8 @@ def get_client_images(request):
 def create_comment(request):
     comment = request.data.get('comment', None)
     employee_id = request.data.get('employee_id', None)
-    comment = Comments.objects.create(employee_id=employee_id, comment=comment)
+    user_id = request.data.get('user_id', None)
+    comment = Comments.objects.create(employee_id=employee_id, comment=comment,user_id=user_id)
     client_data = ClientResponse(comment, many=False).data
     return Response(
         {
@@ -3550,9 +3551,9 @@ def create_comment(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_comment(request):
-    employee_id = request.query_params.get('employee_id', None)
-    if employee_id:
-        comment = Comments.objects.filter(employee_id=employee_id)
+    user_id = request.query_params.get('user_id', None)
+    if user_id:
+        comment = Comments.objects.filter(user_id=user_id)
         client_data = ClientResponse(comment, many=False).data
         return Response(
             {

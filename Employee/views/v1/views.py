@@ -41,7 +41,7 @@ from Employee.serializers import (EmployeSerializer, EmployeInformationsSerializ
                                   WeekendManagementSerializer, LeaveManagementSerializer, ScheduleSerializerOP,
                                   ScheduleSerializerResponse, GiftCardSerializer, GiftCardSerializerResponse,
                                   EmployeDailyScheduleResponse, VacationDetailsSerializer,
-                                  VacationDetailsResponseSerializer
+                                  VacationDetailsResponseSerializer, Allscedulae
                                   )
 from Employee.optimized_serializers import OptimizedEmployeeSerializerDashboard
 from django.db import connection, transaction
@@ -715,8 +715,18 @@ def get_workingschedule(request):
         # if end_date:
         #     query['employee_employedailyschedule__date__date__lte'] = end_date
 
-        all_employee = Employee.objects.filter(is_active=True, is_deleted=False, is_blocked=False, **query).order_by(
-            '-created_at')
+        # all_employee = Employee.objects.filter(is_deleted=False, is_blocked=False, **query).order_by(
+        #     '-created_at')
+        # all_employee = all_employee.filter(
+        #     Q(
+        #         is_active=False ,is_active_date_lte=end_date
+        #     ) | Q(is_active=True)
+        # )
+        all_employee = Employee.objects.filter(is_deleted=False, is_blocked=False, **query).order_by('-created_at')
+        all_employee = all_employee.filter(
+            Q(is_active=False, in_active_date__gte=end_date
+            ) | Q(is_active=True)
+        )
 
         # all_employee = all_memebers.annotate(
         #     filtered_in_active_date=Case(
@@ -727,15 +737,20 @@ def get_workingschedule(request):
         #     )
         # )
         # all_employee = all_employee.filter(filtered_in_active_date__lte=selected_date)
-        all_employee = Employee.objects.filter(query).order_by('-created_at')
-        all_employee = all_employee.annotate(
-            filtered_in_active_date=Case(
-                When(in_active_date__isnull=False,
-                     then=Case(When(in_active_date__lte=end_date, then=F('in_active_date')))),
-                default=Value(end_date),
-                output_field=models.DateField(),
-            )
-        )
+        # all_employee = Employee.objects.filter(query).order_by('-created_at')
+        # all_employee = all_employee.filter(
+        #     Q(is_active=False,in_active_date__lte=end_date)| Q(is_active=True)
+        #
+        # )
+        # all_employee = all_employee.annotate(
+        #     filtered_in_active_date=Case(
+        #         When(in_active_date__isnull=False,
+        #              then=Case(When(in_active_date__lte=end_date, then=F('in_active_date')))),
+        #         default=Value(end_date),
+        #         output_field=models.DateField(),
+        #     )
+        # )
+
         serialized = WorkingScheduleSerializer(all_employee, many=True, context={'request': request,
                                                                                  'start_date': start_date,
                                                                                  'end_date': end_date,
@@ -1490,17 +1505,19 @@ def update_employee(request):
         current_date = timezone.now().date()
         check_exists = EmployeDailySchedule.objects.filter(
             employee_id=employee.id,
-            created_at__date__gte=current_date
-        )
+            from_date__gte=current_date
+
+        ).exclude(is_holiday=True)
         if check_exists:
             return Response(
                 {
                     'status': True,
                     'status_code': 402,
                     'response': {
-                        'message': 'Active schedule. Adjust or ensure coverage before InActive.',
-                        'error_message': 'Active schedule. Adjust or ensure coverage before InActive.',
-                    }
+                        'message': 'Active schedule1. Adjust or ensure coverage before InActive.',
+                        'error_message': 'Active schedule1. Adjust or ensure coverage before InActive.',
+                    },
+                    'data': Allscedulae(check_exists, many=True).data
                 },
                 status=402
             )
@@ -1529,17 +1546,20 @@ def update_employee(request):
         current_date = timezone.now().date()
         check_exists = EmployeDailySchedule.objects.filter(
             employee_id=employee.id,
-            created_at__date__gte=current_date
-        )
+            from_date__gte=current_date
+        ).exclude(is_holiday=True)
         if check_exists:
+
             return Response(
                 {
                     'status': True,
                     'status_code': 402,
                     'response': {
-                        'message': 'Active schedule. Adjust or ensure coverage before InActive.',
-                        'error_message': 'Active schedule. Adjust or ensure coverage before InActive.',
+                        'message': 'Active schedule2. Adjust or ensure coverage before InActive.',
+                        'error_message': 'Active schedule3. Adjust or ensure coverage before InActive.',
                     }
+                    ,
+                    'data':Allscedulae(check_exists,many=True).data
                 },
                 status=402
             )

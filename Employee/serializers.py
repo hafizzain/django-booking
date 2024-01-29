@@ -29,6 +29,7 @@ from .models import (EmployeDailySchedule, Employee, EmployeeProfessionalInfo,
                      )
 from Authentication.models import AccountType, User
 from django_tenants.utils import tenant_context
+from Business.models import BusinessAddress
 
 
 class VacationDetailsSerializer(serializers.ModelSerializer):
@@ -1002,6 +1003,11 @@ class ScheduleSerializer(serializers.ModelSerializer):
 class HolidaysSerializer(serializers.ModelSerializer):
     class Meta:
         model = Holiday
+        fields = "__all__"
+
+class Allscedulae(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeDailySchedule
         fields = "__all__"
 
 
@@ -2047,15 +2053,27 @@ class GiftCardDetails(serializers.ModelSerializer):
 
 
 class GiftCardSerializerResponse(serializers.ModelSerializer):
-    gift_card_details = GiftCardDetails(many=True, write_only= True)
-    location_currency = serializers.SerializerMethodField(read_only= True)
 
+    gift_card_details = GiftCardDetails(many=True)
+    currency = serializers.SerializerMethodField(read_only=True)
+    currency_code = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = GiftCards
         fields = "__all__"
-    
-    def get_location_currency(self, obj):
-        pass
+
+    def get_currency(self, obj, request):
+        try:
+            currency = BusinessAddress.objects.get(id=request.selected_location)
+            return currency.currency.id
+        except:
+            return None
+        
+    def get_currency_code(self, obj):
+        try:
+            currency = BusinessAddress.objects.get(id=obj.selected_location)
+            return currency.currency.code
+        except:
+            return None
 
 class EmployeDailyScheduleResponse(serializers.ModelSerializer):
     class Meta:
