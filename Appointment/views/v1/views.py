@@ -584,8 +584,6 @@ def get_calendar_appointment(request):
 
     # query = Q(is_deleted=False, is_active=True)
     query = Q(is_deleted=False)
-    # query &= Q(in_active_date__isnull=False, in_active_date__lte=selected_date, is_deleted=False)
-    # in_active_date__lte=selected_date
     if employee_ids != 'All':
         if type(employee_ids) == str:
             employee_ids = employee_ids.replace("'", '"')
@@ -595,7 +593,6 @@ def get_calendar_appointment(request):
 
         employee_ids = [emp['id'] for emp in employee_ids]
         query &= Q(id__in=employee_ids)
-
     if location_id:
         location = BusinessAddress.objects.get(id=location_id)
         query &= Q(location=location)
@@ -610,28 +607,6 @@ def get_calendar_appointment(request):
         )
     )
     all_memebers = all_memebers.filter(filtered_in_active_date__lte=selected_date)
-
-    # all_memebers = Employee.objects.filter(query).order_by('-created_at')
-    # all_memebers = all_memebers.annotate(
-    #     filtered_in_active_date=Case(
-    #         When(in_active_date__isnull=False,
-    #              then=Case(When(in_active_date__lte=selected_date, then=F('in_active_date')))),
-    #         default=Value(selected_date),
-    #         output_field=models.DateField(),
-    #     )
-    # )
-    # all_memebers = all_memebers.filter(Q(in_active_date__lte=selected_date))
-
-    # all_memebers = Employee.objects.filter(query).order_by('-created_at')
-    # all_memebers = all_memebers.filter(Q(is_active=False,in_active_date__lte=selected_date))
-    # all_memebers =all_memebers.annotate(
-    #     filtered_in_active_date=Case(
-    #         When(in_active_date__isnull=False, in_active_date__lte=selected_date, then=F('in_active_date')),
-    #         default=Value(selected_date),
-    #         output_field=models.DateField(),
-    #     )
-    # )
-    # all_memebers = all_memebers.filter(filtered_in_active_date__lte=selected_date)
     serialized = EmployeeAppointmentSerializer(all_memebers, many=True,
                                                context={'request': request, 'selected_date': selected_date})
 
