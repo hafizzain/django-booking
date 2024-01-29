@@ -1332,20 +1332,24 @@ class ServiceClientSaleSerializer(serializers.ModelSerializer):
     service = serializers.SerializerMethodField(read_only=True)
     booked_by = serializers.SerializerMethodField(read_only=True)
     member = serializers.SerializerMethodField(read_only=True)
-
+    booked_user_id = serializers.SerializerMethodField(read_only=True)
+    
     def get_member(self, obj):
         return obj.member.full_name
 
     def get_booked_by(self, obj):
         return f'{obj.user.first_name} {obj.user.last_name}'
+    
+    def get_booked_user_id(self, obj):
+        return f'{obj.user.id}'
 
     def get_service(self, obj):
         return obj.service.name
 
     class Meta:
         model = AppointmentService
-        fields = ['service', 'created_at', 'booked_by', 'duration',
-                  'price', 'appointment_status', 'member', 'is_favourite']
+        fields = ['service', 'created_at', 'booked_by', 'booked_user_id', 'duration',
+                  'price', 'appointment_status', 'member', 'is_favourite',]
 
 
 class CheckoutSerializer(serializers.ModelSerializer):
