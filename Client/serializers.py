@@ -579,13 +579,13 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
         return 'Membership'
     
     def get_membership_price(self, obj):
-        return (obj.current_price)
+        return (obj.price)
     
 
-    def get_employee(self, membership_order):
-        if membership_order.member:
+    def get_employee(self, membership_records):
+        if membership_records.employee:
             return {
-                'full_name' : str(membership_order.member.full_name),
+                'full_name' : str(membership_records.employee.full_name),
             }
         return ''
 
