@@ -19,7 +19,7 @@ class SaleRecordViews(APIView):
                 
                 response_data = {
                         'success': True,
-                        'status_code': 201,
+                        'status_code': 200,
                         'response': {
                             'message': 'Checkout created successfully!',
                             'error_message': None,
