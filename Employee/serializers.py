@@ -2051,30 +2051,31 @@ class GiftCardDetails(serializers.ModelSerializer):
         model = GiftDetail
         fields = "__all__"
 
+class CurrencySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Currency
+        fields = ['id', 'code']
 
 class GiftCardSerializerResponse(serializers.ModelSerializer):
-
-    gift_card_details = GiftCardDetails(many=True)
+    gift_card_details = GiftCardDetails(many=True, write_only=True)
     currency = serializers.SerializerMethodField(read_only=True)
-    currency_code = serializers.SerializerMethodField(read_only=True)
-    class Meta:
-        model = GiftCards
-        fields = "__all__"
-
+    
     def get_currency(self, obj):
         selected_location = self.context.get('selected_location')
         
-        currency = BusinessAddress.objects.get(id=selected_location)
-        return currency.currency.id
-        
-    def get_currency_code(self, obj):
-        selected_location = self.context.get('selected_location')
-        try:
-            currency = BusinessAddress.objects.get(id=selected_location)
-            return currency.currency.code
-        except:
+        business_address = BusinessAddress.objects.get(id=selected_location)
+        currency = business_address.currency
+
+        if currency:
+            currency_data = CurrencySerializer(currency).data
+            return currency_data
+        else:
             return None
 
+    class Meta:
+        model = GiftCards
+        fields = "__all__"
+        
 class EmployeDailyScheduleResponse(serializers.ModelSerializer):
     class Meta:
         model = EmployeDailySchedule
