@@ -123,7 +123,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     def validate(self, data):
         # Validate that there is at least one record in appointment_services, services_records, and products_records
 
-        if not data.get('appointment_services') and not data.get('services_records') and not data.get('products_records' and not data.get('gift_cards_records') and not data.get('vouchers_records') and not data.get('membership_records')):
+        if not data.get('appointment_services') and not data.get('services_records') and not data.get('products_records') and not data.get('gift_cards_records') and not data.get('vouchers_records') and not data.get('membership_records'):
             raise serializers.ValidationError("At least one record is required in appointment_services, services_records, products_records, vouchers_records, membership_records or gift_cards_records")
 
         return data
