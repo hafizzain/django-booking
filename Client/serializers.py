@@ -640,7 +640,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
             'created_at',
             # 'discount_percentage', 
             'membership_price', 
-            # 'discount_type' 
+            'discount_type' 
         ]
 
 
