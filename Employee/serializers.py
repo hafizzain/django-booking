@@ -2060,9 +2060,9 @@ class GiftCardSerializerResponse(serializers.ModelSerializer):
         model = GiftCards
         fields = "__all__"
 
-    def get_currency(self, obj):
+    def get_currency(self, obj, request):
         try:
-            currency = BusinessAddress.objects.get(id=obj.selected_location)
+            currency = BusinessAddress.objects.get(id=request.selected_location)
             return currency.currency.id
         except:
             return None
