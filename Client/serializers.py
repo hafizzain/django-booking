@@ -624,7 +624,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name', 
-            'client', 
+            # 'client', 
             'location',
             # 'status',
             # 'quantity',
