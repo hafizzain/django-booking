@@ -706,7 +706,7 @@ def create_appointment(request):
     )
 
     if is_promotion_availed:
-        appointment.is_promotion = True
+        appointment.is_promotion = Truediscount_type
         appointment.selected_promotion_id = request.data.get('selected_promotion_id', '')
         appointment.selected_promotion_type = request.data.get('selected_promotion_type', '')
         appointment.save()
