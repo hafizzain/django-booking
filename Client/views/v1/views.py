@@ -2881,7 +2881,7 @@ def get_client_all_vouchers(request):
         client_vouchers = SaleRecordVouchers.objects.filter(
             sale_record__client__id=client_id,
             sale_record__location__id = location_id,
-            end_date__gt=datetime.now()
+            # end_date__gt=datetime.now()
         )
 
     except Exception as error:
@@ -2923,8 +2923,8 @@ def get_client_all_memberships(request):
     today_date = today_date.strftime('%Y-%m-%d')
     client_membership = SaleRecordMembership.objects.filter(
         sale_record__location__id=location_id,
-        created_at__lt = F('end_date'),
-        end_date__gte = today_date,
+        # created_at__lt = F('end_date'),
+        # end_date__gte = today_date,
         sale_record__client__id=client_id,
     )
 
