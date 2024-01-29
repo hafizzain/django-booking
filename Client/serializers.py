@@ -625,7 +625,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
             'name', 
             'client', 
             'location',
-            'status',
+            # 'status',
             'quantity',
             'products', 
             'services',
