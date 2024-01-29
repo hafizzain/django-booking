@@ -105,7 +105,7 @@ class SaleTax(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, blank=True, null=True, related_name='tax_records') 
     # Following are the Major Information for Tax Applied
     business_tax_id = models.ForeignKey(BusinessTax, on_delete=models.SET_NULL,  blank=False, null=True) # This will be Tax Instance ID 
-    tax_name = models.CharField(max_length=999, blank=False, null=False) 
+    name = models.CharField(max_length=999, blank=False, null=False) 
     # tax_amount = models.FloatField(default=0, null= True, blank = True)  null = True, blank = True
     tax_percentage = models.FloatField(default = 0,blank=False, null=False) 
     tax_value = models.FloatField(default = 0,blank=False, null=False)

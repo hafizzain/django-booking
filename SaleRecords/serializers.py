@@ -1,6 +1,8 @@
 from rest_framework import serializers
-from SaleRecords.models import *
 from django.db import transaction
+
+from SaleRecords.models import *
+# from Invoices.models import
 
 
 class SaleRecordsAppointmentServicesSerializer(serializers.ModelSerializer):
@@ -191,7 +193,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
 
             # Create records for SaleTax
             SaleTax.objects.bulk_create([
-                SaleTax(sale_order=sale_record, **data) for data in tax_records
+                SaleTax(sale_record=sale_record, **data) for data in tax_records
             ])
 
             # Create records for SaleRecordTip
@@ -227,5 +229,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             AppliedPromotion.objects.bulk_create([
                 AppliedPromotion(sale_record= sale_record, **data) for data in applied_promotions_records
             ])
+            
+            
 
         return sale_record

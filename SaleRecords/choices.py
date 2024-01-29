@@ -13,11 +13,11 @@ class RefundSatus(models.TextChoices):
     CANCEL = 'cancel','Cancel'
 
 class PaymentMethodsChoices(models.TextChoices):
-    CASH = 'cash','Cash Payment'
-    MASTER_CARD = 'mastercard','Master Card Payment'
-    VISA_CARD = 'visa','Visa Payment'
-    PAYPAL = 'paypal','PayPal Payment'
-    GIFT = 'gift','Gift Payment'
+    CASH = 'Cash','Cash Payment'
+    MASTER_CARD = 'Mastercard','Master Card Payment'
+    VISA_CARD = 'Visa','Visa Payment'
+    PAYPAL = 'Paypal','PayPal Payment'
+    # GIFT = 'Gift','Gift Payment'
     
 class CheckoutType(models.TextChoices):
     APPOINTMENT_CHECKOUT = 'appointment_checkout', 'Appointment Checkout'
