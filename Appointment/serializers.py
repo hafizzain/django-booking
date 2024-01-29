@@ -1195,8 +1195,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
 
     def get_user_id(self, obj):
         try:
-            user = Appointment.objects.get(id=obj.appointment)
-            return user.user.id
+            return obj.user.id
         except:
             return None
         
