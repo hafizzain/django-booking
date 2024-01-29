@@ -599,10 +599,10 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
             print(err)
 
     def get_client(self, membership_records):
-        client_instance = membership_records.client
-        if client_instance:
-            return ClientSerializer(client_instance).data
-        return None
+        client_instance = membership_records.client.id
+        # if client_instance:
+        #     return ClientSerializer(client_instance).data
+        return client_instance
 
     
     
