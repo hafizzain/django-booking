@@ -1534,7 +1534,7 @@ def update_employee(request):
                 status=402
             )
         else:
-            pass
+            return Response({"msg":'sda'})
         current_date = timezone.now().date()
         qs = AppointmentService.objects.filter(member_id=employee, created_at__date__gte=current_date)
         if qs:
@@ -1550,7 +1550,7 @@ def update_employee(request):
                 status=402
             )
         else:
-            pass
+            return Response({"msg":'sda1'})
         employee.is_active = False
         employee.in_active_date = timezone.now().date()
 
