@@ -611,7 +611,7 @@ def get_calendar_appointment(request):
     #         output_field=models.DateField(),
     #     )
     # )
-    all_memebers = all_memebers.filter(filtered_in_active_date__lte=selected_date)
+    # all_memebers = all_memebers.filter(filtered_in_active_date__lte=selected_date)
     serialized = EmployeeAppointmentSerializer(all_memebers, many=True,
                                                context={'request': request, 'selected_date': selected_date})
 
