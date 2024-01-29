@@ -633,7 +633,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
             'employee',
             # 'start_date', 
             # 'end_date',
-            'total_price', 
+            # 'total_price', 
             'payment_type', 
             'order_type',
             'price',
