@@ -594,7 +594,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     def get_location(self, membership_records):
         sale_record_instance = membership_records.sale_record
         if sale_record_instance and sale_record_instance.location:
-            return LocationSerializerLoyalty(sale_record_instance.location.id).data
+            return LocationSerializerLoyalty(sale_record_instance.location).data
         return None
 
     def get_client(self, membership_records):
