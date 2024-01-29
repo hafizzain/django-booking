@@ -599,11 +599,11 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
             print(err)
 
     def get_client(self, membership_records):
-        try:
-            serializered_data = ClientSerializer(membership_records.client).data
-            return serializered_data
-        except Exception as err:
-            return None
+        client_instance = membership_records.client
+        if client_instance:
+            return ClientSerializer(client_instance).data
+        return None
+
     
     
     def get_name(self, obj):
