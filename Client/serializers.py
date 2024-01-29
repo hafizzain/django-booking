@@ -590,16 +590,16 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
             }
         return ''
 
-    def get_location(self, obj):
+    def get_location(self, membership_records):
         try:
-            loc = BusinessAddress.objects.get(id = obj.location.id)
+            loc = BusinessAddress.objects.get(id = membership_records.location.id)
             return LocationSerializerLoyalty(loc).data
         except Exception as err:
             print(err)
 
-    def get_client(self, obj):
+    def get_client(self, membership_records):
         try:
-            serializered_data = ClientSerializer(obj.client).data
+            serializered_data = ClientSerializer(membership_records.client).data
             return serializered_data
         except Exception as err:
             return None
@@ -626,10 +626,10 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
             'client', 
             'location',
             # 'status',
-            'quantity',
+            # 'quantity',
             'products', 
             'services',
-            'checkout',
+            # 'checkout',
             'employee',
             'start_date', 
             'end_date',
