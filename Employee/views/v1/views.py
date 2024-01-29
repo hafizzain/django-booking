@@ -706,7 +706,6 @@ def get_workingschedule(request):
     month = request.query_params.get('month', None)
     year = request.query_params.get('year', None)
     # is_vacation = request.query_params.get('is_vacation',None)
-
     if is_weekend is None:
         query = {}
         if location_id:
@@ -718,6 +717,15 @@ def get_workingschedule(request):
 
         all_employee = Employee.objects.filter(is_active=True, is_deleted=False, is_blocked=False, **query).order_by(
             '-created_at')
+        # all_employee = Employee.objects.filter(query).order_by('-created_at')
+        # all_employee = all_employee.annotate(
+        #     filtered_in_active_date=Case(
+        #         When(in_active_date__isnull=False,
+        #              then=Case(When(in_active_date__lte=end_date, then=F('in_active_date')))),
+        #         default=Value(end_date),
+        #         output_field=models.DateField(),
+        #     )
+        # )
         serialized = WorkingScheduleSerializer(all_employee, many=True, context={'request': request,
                                                                                  'start_date': start_date,
                                                                                  'end_date': end_date,
@@ -1541,7 +1549,6 @@ def update_employee(request):
                 },
                 status=402
             )
-
         else:
             pass
         employee.is_active = False
