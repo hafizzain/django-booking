@@ -724,8 +724,7 @@ def get_workingschedule(request):
         # )
         all_employee = Employee.objects.filter(is_deleted=False, is_blocked=False, **query).order_by('-created_at')
         all_employee = all_employee.filter(
-            Q(
-                is_active=False, in_active_date__lte=end_date
+            Q(is_active=False, in_active_date__lte=end_date
             ) | Q(is_active=True)
         )
 

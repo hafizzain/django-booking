@@ -598,14 +598,19 @@ def get_calendar_appointment(request):
         query &= Q(location=location)
 
     all_memebers = Employee.objects.filter(query).order_by('-created_at')
-    all_memebers = all_memebers.annotate(
-        filtered_in_active_date=Case(
-            When(in_active_date__isnull=False,
-                 then=Case(When(in_active_date__lte=selected_date, then=F('in_active_date')))),
-            default=Value(selected_date),
-            output_field=models.DateField(),
-        )
+    # all_memebers = all_memebers.filter(is_deleted=False, is_blocked=False, **query).order_by('-created_at')
+    all_memebers = all_memebers.filter(
+        Q(is_active=False, in_active_date__lte=selected_date
+          ) | Q(is_active=True)
     )
+    # all_memebers = all_memebers.annotate(
+    #     filtered_in_active_date=Case(
+    #         When(in_active_date__isnull=False,
+    #              then=Case(When(in_active_date__lte=selected_date, then=F('in_active_date')))),
+    #         default=Value(selected_date),
+    #         output_field=models.DateField(),
+    #     )
+    # )
     all_memebers = all_memebers.filter(filtered_in_active_date__lte=selected_date)
     serialized = EmployeeAppointmentSerializer(all_memebers, many=True,
                                                context={'request': request, 'selected_date': selected_date})
