@@ -134,6 +134,7 @@ class Employee(models.Model):
 
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
+    is_active_date = models.DateField(null=True)
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(null=True, blank=True)

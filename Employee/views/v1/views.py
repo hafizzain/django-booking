@@ -1,6 +1,7 @@
 import threading
 from rest_framework.decorators import action
-from django.db.models import Count, IntegerField, Sum, FloatField, Q, Subquery, OuterRef, Case, When, F, Value, CharField
+from django.db.models import Count, IntegerField, Sum, FloatField, Q, Subquery, OuterRef, Case, When, F, Value, \
+    CharField
 from django.utils import timezone
 from django.db import models
 from datetime import datetime, timedelta
@@ -1111,6 +1112,7 @@ def create_employee(request):
         employee.to_present = True
     if is_active is not None:
         employee.is_active = True
+        employee.is_active_date = timezone.now().date()
     else:
         employee.is_active = False
 
@@ -1479,8 +1481,6 @@ def update_employee(request):
                 'response': {
                     'message': ' Employee cannot be marked as inactive until all bookings are completed or canceled.',
                     'error_message': 'Employee cannot be marked as inactive until all bookings are completed or canceled.',
-                    # 'Employee': data,
-                    # 'lev_id': lev_id
                 }
             },
             status=402
@@ -1490,17 +1490,6 @@ def update_employee(request):
     current_date = timezone.now().date()
     qs = AppointmentService.objects.filter(member_id=employee, created_at__date__gte=current_date)
     if qs:
-        # return Response(
-        #     {
-        #         'status': False,
-        #         'status_code': 402,
-        #         'response': {
-        #             'message': 'Employee cannot be marked as inactive until all bookings are completed or canceled.',
-        #             'error_message': [],
-        #         }
-        #     },
-        #     status=402
-        # )
         return Response(
             {
                 'status': True,
@@ -1508,8 +1497,6 @@ def update_employee(request):
                 'response': {
                     'message': ' Employee cannot be marked as inactive until all bookings are completed or canceled.',
                     'error_message': 'Employee cannot be marked as inactive until all bookings are completed or canceled.',
-                    # 'Employee': data,
-                    # 'lev_id': lev_id
                 }
             },
             status=402
@@ -1520,6 +1507,7 @@ def update_employee(request):
 
     if is_active is not None:
         employee.is_active = True
+        employee.is_active_date = timezone.now().date()
     else:
         employee.is_active = False
 
@@ -5490,20 +5478,19 @@ def delete_workingschedule(request):
             )
 
 
-
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_leo_day(request):
     schedule_id = request.query_params.get('id', None)
     if schedule_id is not None:
         schedule = EmployeDailySchedule.objects.get(id=schedule_id)
-        schedule.is_leo_day=False
-        schedule.is_vacation=True
+        schedule.is_leo_day = False
+        schedule.is_vacation = True
         schedule.vacation_status = 'accepted'
         schedule.save()
         schedule = EmployeDailySchedule.objects.get(id=schedule_id)
         leave_manage = LeaveManagements.objects.get(employee_id=schedule.employee.id)
-        data = LeaveManagementSerializer(leave_manage , many=False).data
+        data = LeaveManagementSerializer(leave_manage, many=False).data
         if str(schedule.vacation_type) == "casual":
             leave_manage.casual_leave -= 1
             leave_manage.used_casual = leave_manage.used_casual - 1
@@ -5517,11 +5504,10 @@ def delete_leo_day(request):
             leave_manage.used_annual = leave_manage.used_annual - 1
             leave_manage.save()
 
-
         return Response(
             {
-                'data':data,
-                'schedule':str(schedule.vacation_type),
+                'data': data,
+                'schedule': str(schedule.vacation_type),
                 'status': 200,
                 'status_code': '200',
                 'response': {
@@ -5710,7 +5696,7 @@ def update_workingschedule(request):
     end_time = request.data.get('end_time', None)
     schedule_id = request.data.get('schedule_id', None)
     location_id_weekend = request.data.get('location', None)
-    is_vacation = request.data.get('is_vacation',None)
+    is_vacation = request.data.get('is_vacation', None)
     # is_working_schedule = request.data.get('is_working_schedule', None)
     if leo_value is not None:
         check_working_schedule = EmployeDailySchedule.objects.get(
