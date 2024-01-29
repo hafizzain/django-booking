@@ -2054,23 +2054,23 @@ class GiftCardDetails(serializers.ModelSerializer):
 
 class GiftCardSerializerResponse(serializers.ModelSerializer):
     gift_card_details = GiftCardDetails(many=True)
-    crunchy = serializers.SerializerMethodField(read_only=True)
-    crunchy_code = serializers.SerializerMethodField(read_only=True)
+    currency = serializers.SerializerMethodField(read_only=True)
+    currency_code = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = GiftCards
         fields = "__all__"
 
-    def get_crunchy(self, obj):
+    def get_currency(self, obj):
         try:
-            crunchy = BusinessAddress.objects.filter(id=obj.selected_location)
-            return crunchy.currency.id
+            currency = BusinessAddress.objects.get(id=obj.selected_location)
+            return currency.currency.id
         except:
             return None
         
-    def get_crunchy_code(self, obj):
+    def get_currency_code(self, obj):
         try:
-            crunchy = BusinessAddress.objects.filter(id=obj.selected_location)
-            return crunchy.currency.code
+            currency = BusinessAddress.objects.filter(id=obj.selected_location)
+            return currency.currency.code
         except:
             return None
 class EmployeDailyScheduleResponse(serializers.ModelSerializer):
