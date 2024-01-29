@@ -1005,6 +1005,11 @@ class HolidaysSerializer(serializers.ModelSerializer):
         model = Holiday
         fields = "__all__"
 
+class Allscedulae(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeDailySchedule
+        fields = "__all__"
+
 
 class VacationSerializerResponse(serializers.ModelSerializer):
     class Meta:

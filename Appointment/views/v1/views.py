@@ -599,8 +599,13 @@ def get_calendar_appointment(request):
 
     all_memebers = Employee.objects.filter(query).order_by('-created_at')
     # all_memebers = all_memebers.filter(is_deleted=False, is_blocked=False, **query).order_by('-created_at')
+    # all_memebers = all_memebers.filter(
+    #     Q(is_active=False, in_active_date__gte=selected_date
+    #       ) | Q(is_active=True)
+    # )
+    # all_memebers = Employee.objects.filter(is_deleted=False, is_blocked=False, **query).order_by('-created_at')
     all_memebers = all_memebers.filter(
-        Q(is_active=False, in_active_date__lte=selected_date
+        Q(is_active=False, in_active_date__gte=selected_date
           ) | Q(is_active=True)
     )
     # all_memebers = all_memebers.annotate(
