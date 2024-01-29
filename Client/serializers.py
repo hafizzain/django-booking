@@ -631,16 +631,16 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
             'services',
             # 'checkout',
             'employee',
-            'start_date', 
-            'end_date',
+            # 'start_date', 
+            # 'end_date',
             'total_price', 
             'payment_type', 
             'order_type',
             'price',
             'created_at',
-            'discount_percentage', 
+            # 'discount_percentage', 
             'membership_price', 
-            'discount_type' 
+            # 'discount_type' 
         ]
 
 
