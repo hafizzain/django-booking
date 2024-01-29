@@ -584,11 +584,12 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     
 
     def get_employee(self, membership_records):
-        if membership_records.employee:
+        sale_record_instance = membership_records.sale_record
+        if sale_record_instance and sale_record_instance.employee:
             return {
-                'full_name': str(membership_records.employee.full_name),
+                'full_name': str(sale_record_instance.employee.full_name),
             }
-        return ''
+        return None 
 
     def get_location(self, membership_records):
         try:
