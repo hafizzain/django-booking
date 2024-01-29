@@ -2059,7 +2059,6 @@ class CurrencySerializer(serializers.ModelSerializer):
 class GiftCardSerializerResponse(serializers.ModelSerializer):
     gift_card_details = GiftCardDetails(many=True, write_only=True)
     currency = serializers.SerializerMethodField(read_only=True)
-    currency_retail_price = serializers.SerializerMethodField(read_only=True)
     retails_price = serializers.SerializerMethodField(read_only=True)
     
     def get_currency(self, obj):
