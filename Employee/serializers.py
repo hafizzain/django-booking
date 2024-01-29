@@ -2047,7 +2047,7 @@ class GiftCardDetails(serializers.ModelSerializer):
 
 
 class GiftCardSerializerResponse(serializers.ModelSerializer):
-    gift_card_details = GiftCardDetails(many=True)
+    gift_card_details = GiftCardDetails(many=True, write_only= True)
 
     class Meta:
         model = GiftCards

@@ -3,7 +3,7 @@ from django.contrib import admin
 from .models import(CommissionSchemeSetting, EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeePermissionSetting, EmployeeModulePermission, 
                     EmployeeMarketingPermission ,StaffGroup , CategoryCommission,
                     StaffGroupModulePermission , Attendance , 
-                    Payroll, Asset, AssetDocument, EmployeeSelectedService, Vacation, EmployeeCommission, GiftCards )
+                    Payroll, Asset, AssetDocument, EmployeeSelectedService, Vacation, EmployeeCommission, GiftCards, GiftDetail )
 # Register your models here.
 
 @admin.register(Vacation)
@@ -193,7 +193,12 @@ class CategoryCommissionAdmin(admin.ModelAdmin):
 @admin.register(GiftCards)
 class GiftCardsAdmin(admin.ModelAdmin):
     list_display = ['id']
-
+    
+    
+    
+@admin.register(GiftDetail)
+class GiftCardsAdmin(admin.ModelAdmin):
+    list_display = ['id']
 # from django.db.migrations.recorder import MigrationRecorder
 # @admin.register(MigrationRecorder.Migration)
 # class MigrationRecorderAdmin(admin.ModelAdmin):
