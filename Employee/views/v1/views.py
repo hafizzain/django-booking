@@ -727,11 +727,11 @@ def get_workingschedule(request):
         #     )
         # )
         # all_employee = all_employee.filter(filtered_in_active_date__lte=selected_date)
-        all_employee = Employee.objects.filter(query).order_by('-created_at')
-        all_employee = all_employee.filter(
-            Q(is_active=False,in_active_date__lte=end_date)| Q(is_active=True)
-            
-        )
+        # all_employee = Employee.objects.filter(query).order_by('-created_at')
+        # all_employee = all_employee.filter(
+        #     Q(is_active=False,in_active_date__lte=end_date)| Q(is_active=True)
+        #
+        # )
         # all_employee = all_employee.annotate(
         #     filtered_in_active_date=Case(
         #         When(in_active_date__isnull=False,
