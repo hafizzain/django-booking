@@ -2080,7 +2080,7 @@ class GiftCardSerializerResponse(serializers.ModelSerializer):
         business_address = BusinessAddress.objects.get(id=selected_location)
         currency = business_address.currency
         
-        retail = CurrencyRetailPrice.objects.get(currency=currency)
+        retail = CurrencyRetailPrice.objects.filter(currency=currency).filter()
         
         if retail:
             return retail.retail_price
