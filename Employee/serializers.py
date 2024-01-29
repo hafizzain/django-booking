@@ -2053,6 +2053,7 @@ class GiftCardDetails(serializers.ModelSerializer):
 
 
 class GiftCardSerializerResponse(serializers.ModelSerializer):
+
     gift_card_details = GiftCardDetails(many=True)
     currency = serializers.SerializerMethodField(read_only=True)
     currency_code = serializers.SerializerMethodField(read_only=True)
@@ -2073,6 +2074,7 @@ class GiftCardSerializerResponse(serializers.ModelSerializer):
             return currency.currency.code
         except:
             return None
+
 class EmployeDailyScheduleResponse(serializers.ModelSerializer):
     class Meta:
         model = EmployeDailySchedule

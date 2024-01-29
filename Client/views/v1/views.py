@@ -14,6 +14,7 @@ from rest_framework import status
 from django.db.models import Q, F, IntegerField
 from Service.models import Service
 from Business.models import Business, BusinessAddress
+from SaleRecords.models import SaleRecordMembership
 from Product.models import Product
 from Utility.models import Country, Currency, ExceptionRecord, Language, State, City
 from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, \
@@ -2919,13 +2920,11 @@ def get_client_all_memberships(request):
 
     today_date = datetime.now()
     today_date = today_date.strftime('%Y-%m-%d')
-    client_membership = MemberShipOrder.objects.filter(
-
-        location__id=location_id,
+    client_membership = SaleRecordMembership.objects.filter(
+        sale_record__business_address__id=location_id,
         # created_at__lt = F('end_date'),
         # end_date__gte = today_date,
-        client__id=client_id,
-
+        sale_record__client__id=client_id,
     )
 
     # return JsonResponse({'data': client_membership})
