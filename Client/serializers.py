@@ -553,7 +553,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     # membership = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
-    client = serializers.SerializerMethodField(read_only=True)
+    # client = serializers.SerializerMethodField(read_only=True)
     name  = serializers.SerializerMethodField(read_only=True)
     membership_price  = serializers.SerializerMethodField(read_only=True)
     discount_type = serializers.SerializerMethodField(read_only=True)
