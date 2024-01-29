@@ -86,6 +86,8 @@ class SaleRecordsAppointmentServices(CommonField):
 class SaleRecordVouchers(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, blank=True, null=True, related_name='vouchers_records')
     vouchers = models.ForeignKey(Vouchers, on_delete = models.SET_NULL, null = True)
+    start_date = models.DateTimeField(blank=True, null=True)
+    end_date = models.DateTimeField(blank=True, null=True)
     # employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_vouchers_employee')
     
     price = models.FloatField(blank=True, null=True) 
@@ -95,6 +97,8 @@ class SaleRecordVouchers(CommonField):
 class SaleRecordMembership(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, blank=True, null=True, related_name='membership_records')
     membership = models.ForeignKey(Membership, on_delete=models.SET_NULL, null = True)
+    start_date = models.DateTimeField(blank=True, null=True)
+    end_date = models.DateTimeField(blank=True, null=True)
     # employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_membership_employee')
     
     price = models.FloatField(blank=True, null=True) 
