@@ -586,7 +586,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     def get_employee(self, membership_records):
         if membership_records.employee:
             return {
-                'full_name' : str(membership_records.employee.full_name),
+                'full_name': str(membership_records.employee.full_name),
             }
         return ''
 
