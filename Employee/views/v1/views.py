@@ -715,8 +715,19 @@ def get_workingschedule(request):
         # if end_date:
         #     query['employee_employedailyschedule__date__date__lte'] = end_date
 
-        all_employee = Employee.objects.filter(is_active=True, is_deleted=False, is_blocked=False, **query).order_by(
-            '-created_at')
+        # all_employee = Employee.objects.filter(is_deleted=False, is_blocked=False, **query).order_by(
+        #     '-created_at')
+        # all_employee = all_employee.filter(
+        #     Q(
+        #         is_active=False ,is_active_date_lte=end_date
+        #     ) | Q(is_active=True)
+        # )
+        all_employee = Employee.objects.filter(is_deleted=False, is_blocked=False, **query).order_by('-created_at')
+        all_employee = all_employee.filter(
+            Q(
+                is_active=False, is_active_date__lte=end_date
+            ) | Q(is_active=True)
+        )
 
         # all_employee = all_memebers.annotate(
         #     filtered_in_active_date=Case(
