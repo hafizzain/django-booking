@@ -1481,7 +1481,7 @@ def update_employee(request):
         check_exists = EmployeDailySchedule.objects.filter(
             employee_id=employee.id,
             created_at__date__gte=current_date
-        ).exclude(is_holiday=True)
+        )
         if check_exists:
             return Response(
                 {
@@ -1520,7 +1520,7 @@ def update_employee(request):
         check_exists = EmployeDailySchedule.objects.filter(
             employee_id=employee.id,
             created_at__date__gte=current_date
-        ).exclude(is_holiday=True)
+        )
         if check_exists:
             return Response(
                 {
