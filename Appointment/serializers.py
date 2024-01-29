@@ -708,7 +708,6 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     cancel_reason = serializers.SerializerMethodField(read_only=True)
     cancel_note = serializers.SerializerMethodField(read_only=True)
-    booked_user_id = serializers.SerializerMethodField(read_only=True)
 
     def get_cancel_reason(self, obj):
         return obj.appointment.cancel_reason
@@ -741,9 +740,6 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
 
     def get_booked_by(self, obj):
         return f'{obj.user.first_name} {obj.user.last_name}'
-    
-    def get_booked_user_id(self, obj):
-        return f'{obj.user.id}'
 
     def get_booking_id(self, obj):
         id = str(obj.id).split('-')[0:2]
@@ -790,7 +786,7 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
         model = AppointmentService
         fields = ('id', 'service', 'member', 'price', 'client',
                   'appointment_date', 'appointment_time', 'duration', 'member_id',
-                  'booked_by', 'booking_id', 'booked_user_id', 'appointment_type', 'client_can_book', 'slot_availible_for_online',
+                  'booked_by', 'booking_id', 'appointment_type', 'client_can_book', 'slot_availible_for_online',
                   'service_id',
                   'appointment_status', 'location', 'created_at', 'cancel_note', 'cancel_reason')
 
@@ -1179,7 +1175,8 @@ class SingleNoteSerializer(serializers.ModelSerializer):
     client_phone = serializers.SerializerMethodField(read_only=True)
     client_all_appointment = serializers.SerializerMethodField(read_only=True)
     client_all_sales = serializers.SerializerMethodField(read_only=True)
-
+    user_id = serializers.SerializerMethodField(read_only=True)
+    
     def get_appointment_tips(self, obj):
         tips = AppointmentEmployeeTip.objects.filter(
             appointment=obj
@@ -1196,6 +1193,13 @@ class SingleNoteSerializer(serializers.ModelSerializer):
         except:
             return None
 
+    def get_user_id(self, obj):
+        try:
+            user = Appointment.objects.get(id=obj.appointment)
+            return user.user.id
+        except:
+            return None
+        
     def get_notes(self, obj):
         try:
             note = AppointmentNotes.objects.get(appointment=obj)
@@ -1282,7 +1286,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Appointment
-        fields = ['id', 'client', 'client_name', 'client_email', 'client_phone', 'client_all_appointment',
+        fields = ['id', 'client','user_id','client_name', 'client_email', 'client_phone', 'client_all_appointment',
                   'client_all_sales', 'appointment_tips', 'notes', 'business_address',
                   'client_type', 'appointmnet_service', 'customer_note', 'status']
 
