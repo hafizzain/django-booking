@@ -45,7 +45,7 @@ from threading import Thread
 
 from Appointment.models import (Appointment, AppointmentService, AppointmentNotes, AppointmentCheckout,
                                 AppointmentLogs, LogDetails, AppointmentEmployeeTip, ClientMissedOpportunity,
-                                OpportunityEmployeeService, Reversal)
+                                OpportunityEmployeeService, Reversal, AppointmentGroup)
 from Appointment.serializers import (CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer,
                                      ServiceEmployeeSerializer,
                                      SingleAppointmentSerializer, AllAppoinmentSerializer, SingleNoteSerializer,
@@ -637,388 +637,768 @@ def create_appointment(request):
     selected_promotion_type = request.data.get('selected_promotion_type', None)
     selected_promotion_id = request.data.get('selected_promotion_id', None)
     is_promotion_availed = request.data.get('is_promotion_availed', False)
+    all_data = request.data.get('all_data', [])
+    all_appointments = []
 
     Errors = []
     total_price_app = 0
+    if all_data:
+        for data in all_data:
+            business_id = data.get('business', None)
+            appointments = data.get('appointments', None)
+            appointment_date = data.get('appointment_date', None)
+            text = data.get('appointment_notes', None)
+            business_address_id = data.get('business_address', None)
+            member = data.get('member', None)
+            extra_price = data.get('extra_price', None)
+            free_services_quantity = data.get('free_services_quantity', None)
+            client = data.get('client', None)
+            client_type = data.get('client_type', None)
+            payment_method = data.get('payment_method', None)
+            discount_type = data.get('discount_type', None)
 
-    if not all([client_type, appointment_date, business_id]):
-        return Response(
-            {
-                'status': False,
-                'status_code': StatusCodes.MISSING_FIELDS_4001,
-                'status_code_text': 'MISSING_FIELDS_4001',
-                'response': {
-                    'message': 'Invalid Data!',
-                    'error_message': 'All fields are required.',
-                    'fields': [
-                        # 'client',
-                        'client_type',
-                        'member',
-                        'appointment_date',
-                        'business',
-                        'appointments',
-                    ]
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    try:
-        business = Business.objects.get(id=business_id)
-    except Exception as err:
-        return Response(
-            {
-                'status': False,
-                'status_code': StatusCodes.BUSINESS_NOT_FOUND_4015,
-                'response': {
-                    'message': 'Business not found',
-                    'error_message': str(err),
-                }
-            }
+            selected_promotion_type = data.get('selected_promotion_type', None)
+            selected_promotion_id = data.get('selected_promotion_id', None)
+            is_promotion_availed = data.get('is_promotion_availed', False)
+            try:
+                business = Business.objects.get(id=business_id)
+            except Exception as err:
+                return Response(
+                    {
+                        'status': False,
+                        'status_code': StatusCodes.BUSINESS_NOT_FOUND_4015,
+                        'response': {
+                            'message': 'Business not found',
+                            'error_message': str(err),
+                        }
+                    }
 
-        )
+                )
+            if business_address_id is not None:
+                try:
+                    business_address = BusinessAddress.objects.get(id=business_address_id)
+                except Exception as err:
+                    return Response(
+                        {
+                            'status': False,
+                            'status_code': StatusCodes.BUSINESS_NOT_FOUND_4015,
+                            'response': {
+                                'message': 'Business Address not found',
+                            }
+                        }
+                    )
+            try:
+                client = Client.objects.get(id=client)
+            except Exception as err:
+                client = None
 
-    if business_address_id is not None:
+            appointment = Appointment.objects.create(
+                user=user,
+                business=business,
+                client=client,
+                client_type=client_type,
+                payment_method=payment_method,
+                discount_type=discount_type,
+                status=choices.AppointmentStatus.BOOKED
+            )
+
+            if is_promotion_availed:
+                appointment.is_promotion = True
+                appointment.selected_promotion_id = data.get('selected_promotion_id', '')
+                appointment.selected_promotion_type = data.get('selected_promotion_type', '')
+                appointment.save()
+
+            if business_address_id is not None:
+                appointment.business_address = business_address
+                appointment.save()
+
+            if type(appointments) == str:
+                appointments = appointments.replace("'", '"')
+                appointments = json.loads(appointments)
+
+            elif type(appointments) == list:
+                pass
+
+            if text:
+                if type(text) == str:
+                    try:
+                        text = text.replace("'", '"')
+                        text = json.loads(text)
+                    except:
+                        AppointmentNotes.objects.create(
+                            appointment=appointment,
+                            text=text
+                        )
+                elif type(text) == list:
+                    pass
+                    for note in text:
+                        AppointmentNotes.objects.create(
+                            appointment=appointment,
+                            text=note
+                        )
+            active_user_staff = None
+            try:
+                active_user_staff = Employee.objects.filter(
+                    email=request.user.email,
+                    is_deleted=False,
+                    is_active=True,
+                    is_blocked=False
+                ).first()
+            except:
+                pass
+
+            appointment_logs = AppointmentLogs.objects.create(
+                user=request.user,
+                location=business_address,
+                appointment=appointment,
+                log_type='Create',
+                member=active_user_staff
+            )
+
+            all_members = []
+            employee_users = []
+            service_appointments = []
+            for appoinmnt in appointments:
+                member = appoinmnt['member']
+                service = appoinmnt['service']
+                app_duration = appoinmnt['duration']
+                price = appoinmnt.get('price', 0)
+                date_time = appoinmnt['date_time']
+                fav = appoinmnt.get('is_favourite', None)
+                client_can_book = appoinmnt.get('client_can_book', None)
+                slot_availible_for_online = appoinmnt.get('slot_availible_for_online', None)
+                discount_price = appoinmnt.get('discount_price', None)
+                app_date_time = f'2000-01-01 {date_time}'
+
+                duration = DURATION_CHOICES[app_duration]
+                app_date_time = datetime.fromisoformat(app_date_time)
+                datetime_duration = app_date_time + timedelta(minutes=duration)
+                datetime_duration = datetime_duration.strftime('%H:%M:%S')
+                end_time = datetime_duration
+
+                try:
+                    member = Employee.objects.get(id=member)
+                    all_members.append(str(member.id))
+                    temp_user = User.objects.filter(email__icontains=member.email).first()
+                    employee_users.append(temp_user)
+                except Exception as err:
+                    return Response(
+                        {
+                            'status': False,
+                            'status_code': StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
+                            'response': {
+                                'message': 'Employee not found',
+                                'error_message': str(err),
+                            }
+                        }
+                    )
+
+                try:
+                    service = Service.objects.get(id=service)
+                except Exception as err:
+                    return Response(
+                        {
+                            'status': False,
+                            'status_code': StatusCodes.SERVICE_NOT_FOUND_4035,
+                            'response': {
+                                'message': 'Service not found',
+                                'error_message': str(err),
+                            }
+                        }
+                    )
+
+                if selected_promotion_type == 'Complimentary_Discount':
+
+                    try:
+                        complimentary = ComplimentaryDiscount.objects.get(id=selected_promotion_id)
+                        ClientPromotions.objects.create(
+                            user=user,
+                            business=business,
+                            client=client,
+                            complimentary=complimentary,
+                            service=service,
+                            visits=1
+                        )
+                    except Exception as err:
+                        Errors.append(str(err))
+
+                if selected_promotion_type == 'Packages_Discount':
+                    testduration = False
+                    try:
+                        service_duration = ServiceDurationForSpecificTime.objects.get(id=selected_promotion_id)
+                    except:
+                        pass
+
+                    try:
+                        package_dis = PackagesDiscount.objects.get(id=service_duration.package.id)
+                    except:
+                        pass
+
+                    try:
+                        clientpackage = ClientPackageValidation.objects.get(
+                            serviceduration__id=selected_promotion_id,
+                            client=client,
+                            package=package_dis,
+                        )
+                        testduration = True
+                        clientpackage.service.add(service)
+                        clientpackage.save()
+
+                    except Exception as err:
+                        Errors.append(str(err))
+
+                    if testduration == False:
+                        packages = ClientPackageValidation.objects.create(
+                            user=user,
+                            business=business,
+                            client=client,
+                            serviceduration=service_duration,
+                            package=package_dis
+                        )
+                        current_date = date.today()
+                        duration_rectricte = int(service_duration.package_duration)
+
+                        next_3_months = current_date + timedelta(days=duration_rectricte * 30)
+
+                        packages.service.add(service)
+                        packages.due_date = next_3_months
+                        packages.save()
+
+                total_price_app += int(price)
+                service_commission = 0
+                service_commission_type = ''
+                toValue = 0
+
+                appointment_service = AppointmentService.objects.create(
+                    user=user,
+                    business=business,
+                    business_address=business_address,
+                    appointment=appointment,
+                    duration=app_duration,
+                    appointment_time=date_time,
+                    appointment_date=appointment_date,
+                    end_time=end_time,
+                    service=service,
+                    member=member,
+                    discount_price=discount_price,
+                    total_price=price,
+                    slot_availible_for_online=slot_availible_for_online,
+                    client_can_book=client_can_book,
+                    status=choices.AppointmentServiceStatus.BOOKED,
+                )
+                if appointment.client:
+                    appointment_service.client_tag = appointment.client.client_tag
+                    appointment_service.client_type = appointment.client.client_type
+                    appointment_service.save()
+                else:
+                    appointment_service.client_tag = 'No Client'
+                    appointment_service.client_type = 'No Client'
+                    appointment_service.save()
+
+                price_com = 0
+                try:
+                    if extra_price is not None and price == 0:
+                        price = int(extra_price) / int(free_services_quantity)
+
+                    if discount_price is not None:
+                        price_com = discount_price
+                        appointment_service.price = discount_price
+
+                    else:
+                        price_com = price
+                        appointment_service.price = price
+
+                    appointment_service.save()
+
+                    comm, comm_type = calculate_commission(member, price_com)  # int(price))
+                    service_commission += comm
+                    service_commission_type += comm_type
+                    appointment_service.service_commission = service_commission
+                    appointment_service.service_commission_type = service_commission_type
+                    appointment_service.save()
+
+                except Exception as err:
+                    Errors.append(str(err))
+
+                if fav and fav is not None:
+                    appointment_service.is_favourite = True
+                    appointment_service.save()
+
+                if business_address_id is not None:
+                    appointment_service.business_address = business_address
+                    appointment_service.save()
+                    service_appointments.append(appointment_service.id)
+
+                LogDetails.objects.create(
+                    log=appointment_logs,
+                    appointment_service=appointment_service,
+                    start_time=appointment_service.appointment_time,
+                    duration=appointment_service.duration,
+                    member=appointment_service.member
+                )
+
+                # Creating Employee Anatylics Here
+                employee_insight_obj = EmployeeBookingDailyInsights.objects.create(
+                    user=user,
+                    employee=member,
+                    business=business,
+                    service=service,
+                    appointment=appointment,
+                    business_address=business_address,
+                    appointment_service=appointment_service,
+                    booking_time=date_time,
+                )
+                if employee_insight_obj:
+                    employee_insight_obj.set_employee_time(date_time)
+
+            service_commission = 0
+            service_commission_type = ''
+            toValue = 0
+            try:
+                commission = CommissionSchemeSetting.objects.get(employee=str(member))
+                category = CategoryCommission.objects.filter(commission=commission.id)
+                for cat in category:
+                    try:
+                        toValue = int(cat.to_value)
+                    except:
+                        sign = cat.to_value
+                    if cat.category_comission == 'Service':
+                        if (int(cat.from_value) <= total_price_app and total_price_app < toValue) or (
+                                int(cat.from_value) <= total_price_app and sign):
+                            if cat.symbol == '%':
+                                service_commission = price * int(cat.commission_percentage) / 100
+                                service_commission_type = str(service_commission_type) + cat.symbol
+                            else:
+                                service_commission = int(cat.commission_percentage)
+                                service_commission_type = str(service_commission) + cat.symbol
+
+            except Exception as err:
+                Errors.append(str(err))
+
+            appointment.extra_price = total_price_app
+            appointment.service_commission = int(service_commission)
+            appointment.service_commission_type = service_commission_type
+            appointment.save()
+            serialized = AppoinmentSerializer(appointment)
+            try:
+                thrd = Thread(target=Add_appointment, args=[],
+                              kwargs={'appointment': appointment, 'tenant': request.tenant,
+                                      'user': request.user})
+                thrd.start()
+            except Exception as err:
+                pass
+
+            all_memebers = Employee.objects.filter(
+                is_deleted=False,
+                is_active=True,
+                is_blocked=False,
+            ).order_by('-created_at')
+
+            # Send Notification to one or multiple Employee
+            user = employee_users
+            title = "Appointment"
+            body = "New Booking Assigned"
+
+            NotificationProcessor.send_notifications_to_users(user, title, body, request_user=request.user)
+
+            serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request': request})
+            return Response(
+                {
+                    'status': True,
+                    'status_code': 201,
+                    'response': {
+                        'message': 'Appointment Create!',
+                        'error_message': None,
+                        'error': Errors,
+                        'appointment_id': appointment.id,
+                        'appointment_service_id': service_appointments[0],
+                        'appointments': serialized.data,
+                    }
+                },
+                status=status.HTTP_201_CREATED
+            )
+    else:
+        if not all([client_type, appointment_date, business_id]):
+            return Response(
+                {
+                    'status': False,
+                    'status_code': StatusCodes.MISSING_FIELDS_4001,
+                    'status_code_text': 'MISSING_FIELDS_4001',
+                    'response': {
+                        'message': 'Invalid Data!',
+                        'error_message': 'All fields are required.',
+                        'fields': [
+                            # 'client',
+                            'client_type',
+                            'member',
+                            'appointment_date',
+                            'business',
+                            'appointments',
+                        ]
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
         try:
-            business_address = BusinessAddress.objects.get(id=business_address_id)
+            business = Business.objects.get(id=business_id)
         except Exception as err:
             return Response(
                 {
                     'status': False,
                     'status_code': StatusCodes.BUSINESS_NOT_FOUND_4015,
                     'response': {
-                        'message': 'Business Address not found',
+                        'message': 'Business not found',
+                        'error_message': str(err),
                     }
                 }
+
             )
-    try:
-        client = Client.objects.get(id=client)
-    except Exception as err:
-        client = None
 
-    appointment = Appointment.objects.create(
-        user=user,
-        business=business,
-        client=client,
-        client_type=client_type,
-        payment_method=payment_method,
-        discount_type=discount_type,
-        status=choices.AppointmentStatus.BOOKED
-    )
-
-    if is_promotion_availed:
-        appointment.is_promotion = True
-        appointment.selected_promotion_id = request.data.get('selected_promotion_id', '')
-        appointment.selected_promotion_type = request.data.get('selected_promotion_type', '')
-        appointment.save()
-
-    if business_address_id is not None:
-        appointment.business_address = business_address
-        appointment.save()
-
-    if type(appointments) == str:
-        appointments = appointments.replace("'", '"')
-        appointments = json.loads(appointments)
-
-    elif type(appointments) == list:
-        pass
-
-    if text:
-        if type(text) == str:
+        if business_address_id is not None:
             try:
-                text = text.replace("'", '"')
-                text = json.loads(text)
-            except:
-                AppointmentNotes.objects.create(
-                    appointment=appointment,
-                    text=text
+                business_address = BusinessAddress.objects.get(id=business_address_id)
+            except Exception as err:
+                return Response(
+                    {
+                        'status': False,
+                        'status_code': StatusCodes.BUSINESS_NOT_FOUND_4015,
+                        'response': {
+                            'message': 'Business Address not found',
+                        }
+                    }
                 )
-        elif type(text) == list:
+        try:
+            client = Client.objects.get(id=client)
+        except Exception as err:
+            client = None
+
+        appointment = Appointment.objects.create(
+            user=user,
+            business=business,
+            client=client,
+            client_type=client_type,
+            payment_method=payment_method,
+            discount_type=discount_type,
+            status=choices.AppointmentStatus.BOOKED
+        )
+        all_appointments.append(appointment)
+
+        if is_promotion_availed:
+            appointment.is_promotion = True
+            appointment.selected_promotion_id = request.data.get('selected_promotion_id', '')
+            appointment.selected_promotion_type = request.data.get('selected_promotion_type', '')
+            appointment.save()
+
+        if business_address_id is not None:
+            appointment.business_address = business_address
+            appointment.save()
+
+        if type(appointments) == str:
+            appointments = appointments.replace("'", '"')
+            appointments = json.loads(appointments)
+
+        elif type(appointments) == list:
             pass
-            for note in text:
-                AppointmentNotes.objects.create(
-                    appointment=appointment,
-                    text=note
-                )
-    active_user_staff = None
-    try:
-        active_user_staff = Employee.objects.filter(
-            email=request.user.email,
-            is_deleted=False,
-            is_active=True,
-            is_blocked=False
-        ).first()
-    except:
-        pass
 
-    appointment_logs = AppointmentLogs.objects.create(
-        user=request.user,
-        location=business_address,
-        appointment=appointment,
-        log_type='Create',
-        member=active_user_staff
-    )
-
-    all_members = []
-    employee_users = []
-    service_appointments = []
-    for appoinmnt in appointments:
-        member = appoinmnt['member']
-        service = appoinmnt['service']
-        app_duration = appoinmnt['duration']
-        price = appoinmnt.get('price', 0)
-        date_time = appoinmnt['date_time']
-        fav = appoinmnt.get('is_favourite', None)
-        client_can_book = appoinmnt.get('client_can_book', None)
-        slot_availible_for_online = appoinmnt.get('slot_availible_for_online', None)
-        discount_price = appoinmnt.get('discount_price', None)
-        app_date_time = f'2000-01-01 {date_time}'
-
-        duration = DURATION_CHOICES[app_duration]
-        app_date_time = datetime.fromisoformat(app_date_time)
-        datetime_duration = app_date_time + timedelta(minutes=duration)
-        datetime_duration = datetime_duration.strftime('%H:%M:%S')
-        end_time = datetime_duration
-
+        if text:
+            if type(text) == str:
+                try:
+                    text = text.replace("'", '"')
+                    text = json.loads(text)
+                except:
+                    AppointmentNotes.objects.create(
+                        appointment=appointment,
+                        text=text
+                    )
+            elif type(text) == list:
+                pass
+                for note in text:
+                    AppointmentNotes.objects.create(
+                        appointment=appointment,
+                        text=note
+                    )
+        active_user_staff = None
         try:
-            member = Employee.objects.get(id=member)
-            all_members.append(str(member.id))
-            temp_user = User.objects.filter(email__icontains=member.email).first()
-            employee_users.append(temp_user)
-        except Exception as err:
-            return Response(
-                {
-                    'status': False,
-                    'status_code': StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
-                    'response': {
-                        'message': 'Employee not found',
-                        'error_message': str(err),
-                    }
-                }
-            )
+            active_user_staff = Employee.objects.filter(
+                email=request.user.email,
+                is_deleted=False,
+                is_active=True,
+                is_blocked=False
+            ).first()
+        except:
+            pass
 
-        try:
-            service = Service.objects.get(id=service)
-        except Exception as err:
-            return Response(
-                {
-                    'status': False,
-                    'status_code': StatusCodes.SERVICE_NOT_FOUND_4035,
-                    'response': {
-                        'message': 'Service not found',
-                        'error_message': str(err),
-                    }
-                }
-            )
+        appointment_logs = AppointmentLogs.objects.create(
+            user=request.user,
+            location=business_address,
+            appointment=appointment,
+            log_type='Create',
+            member=active_user_staff
+        )
 
-        if selected_promotion_type == 'Complimentary_Discount':
+        all_members = []
+        employee_users = []
+        service_appointments = []
+        for appoinmnt in appointments:
+            member = appoinmnt['member']
+            service = appoinmnt['service']
+            app_duration = appoinmnt['duration']
+            price = appoinmnt.get('price', 0)
+            date_time = appoinmnt['date_time']
+            fav = appoinmnt.get('is_favourite', None)
+            client_can_book = appoinmnt.get('client_can_book', None)
+            slot_availible_for_online = appoinmnt.get('slot_availible_for_online', None)
+            discount_price = appoinmnt.get('discount_price', None)
+            app_date_time = f'2000-01-01 {date_time}'
+
+            duration = DURATION_CHOICES[app_duration]
+            app_date_time = datetime.fromisoformat(app_date_time)
+            datetime_duration = app_date_time + timedelta(minutes=duration)
+            datetime_duration = datetime_duration.strftime('%H:%M:%S')
+            end_time = datetime_duration
 
             try:
-                complimentary = ComplimentaryDiscount.objects.get(id=selected_promotion_id)
-                ClientPromotions.objects.create(
-                    user=user,
-                    business=business,
-                    client=client,
-                    complimentary=complimentary,
-                    service=service,
-                    visits=1
+                member = Employee.objects.get(id=member)
+                all_members.append(str(member.id))
+                temp_user = User.objects.filter(email__icontains=member.email).first()
+                employee_users.append(temp_user)
+            except Exception as err:
+                return Response(
+                    {
+                        'status': False,
+                        'status_code': StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
+                        'response': {
+                            'message': 'Employee not found',
+                            'error_message': str(err),
+                        }
+                    }
                 )
+
+            try:
+                service = Service.objects.get(id=service)
+            except Exception as err:
+                return Response(
+                    {
+                        'status': False,
+                        'status_code': StatusCodes.SERVICE_NOT_FOUND_4035,
+                        'response': {
+                            'message': 'Service not found',
+                            'error_message': str(err),
+                        }
+                    }
+                )
+
+            if selected_promotion_type == 'Complimentary_Discount':
+
+                try:
+                    complimentary = ComplimentaryDiscount.objects.get(id=selected_promotion_id)
+                    ClientPromotions.objects.create(
+                        user=user,
+                        business=business,
+                        client=client,
+                        complimentary=complimentary,
+                        service=service,
+                        visits=1
+                    )
+                except Exception as err:
+                    Errors.append(str(err))
+
+            if selected_promotion_type == 'Packages_Discount':
+                testduration = False
+                try:
+                    service_duration = ServiceDurationForSpecificTime.objects.get(id=selected_promotion_id)
+                except:
+                    pass
+
+                try:
+                    package_dis = PackagesDiscount.objects.get(id=service_duration.package.id)
+                except:
+                    pass
+
+                try:
+                    clientpackage = ClientPackageValidation.objects.get(
+                        serviceduration__id=selected_promotion_id,
+                        client=client,
+                        package=package_dis,
+                    )
+                    testduration = True
+                    clientpackage.service.add(service)
+                    clientpackage.save()
+
+                except Exception as err:
+                    Errors.append(str(err))
+
+                if testduration == False:
+                    packages = ClientPackageValidation.objects.create(
+                        user=user,
+                        business=business,
+                        client=client,
+                        serviceduration=service_duration,
+                        package=package_dis
+                    )
+                    current_date = date.today()
+                    duration_rectricte = int(service_duration.package_duration)
+
+                    next_3_months = current_date + timedelta(days=duration_rectricte * 30)
+
+                    packages.service.add(service)
+                    packages.due_date = next_3_months
+                    packages.save()
+
+            total_price_app += int(price)
+            service_commission = 0
+            service_commission_type = ''
+            toValue = 0
+
+            appointment_service = AppointmentService.objects.create(
+                user=user,
+                business=business,
+                business_address=business_address,
+                appointment=appointment,
+                duration=app_duration,
+                appointment_time=date_time,
+                appointment_date=appointment_date,
+                end_time=end_time,
+                service=service,
+                member=member,
+                discount_price=discount_price,
+                total_price=price,
+                slot_availible_for_online=slot_availible_for_online,
+                client_can_book=client_can_book,
+                status=choices.AppointmentServiceStatus.BOOKED,
+            )
+            if appointment.client:
+                appointment_service.client_tag = appointment.client.client_tag
+                appointment_service.client_type = appointment.client.client_type
+                appointment_service.save()
+            else:
+                appointment_service.client_tag = 'No Client'
+                appointment_service.client_type = 'No Client'
+                appointment_service.save()
+
+            price_com = 0
+            try:
+                if extra_price is not None and price == 0:
+                    price = int(extra_price) / int(free_services_quantity)
+
+                if discount_price is not None:
+                    price_com = discount_price
+                    appointment_service.price = discount_price
+
+                else:
+                    price_com = price
+                    appointment_service.price = price
+
+                appointment_service.save()
+
+                comm, comm_type = calculate_commission(member, price_com)  # int(price))
+                service_commission += comm
+                service_commission_type += comm_type
+                appointment_service.service_commission = service_commission
+                appointment_service.service_commission_type = service_commission_type
+                appointment_service.save()
+
             except Exception as err:
                 Errors.append(str(err))
 
-        if selected_promotion_type == 'Packages_Discount':
-            testduration = False
-            try:
-                service_duration = ServiceDurationForSpecificTime.objects.get(id=selected_promotion_id)
-            except:
-                pass
+            if fav and fav is not None:
+                appointment_service.is_favourite = True
+                appointment_service.save()
 
-            try:
-                package_dis = PackagesDiscount.objects.get(id=service_duration.package.id)
-            except:
-                pass
+            if business_address_id is not None:
+                appointment_service.business_address = business_address
+                appointment_service.save()
+                service_appointments.append(appointment_service.id)
 
-            try:
-                clientpackage = ClientPackageValidation.objects.get(
-                    serviceduration__id=selected_promotion_id,
-                    client=client,
-                    package=package_dis,
-                )
-                testduration = True
-                clientpackage.service.add(service)
-                clientpackage.save()
+            LogDetails.objects.create(
+                log=appointment_logs,
+                appointment_service=appointment_service,
+                start_time=appointment_service.appointment_time,
+                duration=appointment_service.duration,
+                member=appointment_service.member
+            )
 
-            except Exception as err:
-                Errors.append(str(err))
+            # Creating Employee Anatylics Here
+            employee_insight_obj = EmployeeBookingDailyInsights.objects.create(
+                user=user,
+                employee=member,
+                business=business,
+                service=service,
+                appointment=appointment,
+                business_address=business_address,
+                appointment_service=appointment_service,
+                booking_time=date_time,
+            )
+            if employee_insight_obj:
+                employee_insight_obj.set_employee_time(date_time)
 
-            if testduration == False:
-                packages = ClientPackageValidation.objects.create(
-                    user=user,
-                    business=business,
-                    client=client,
-                    serviceduration=service_duration,
-                    package=package_dis
-                )
-                current_date = date.today()
-                duration_rectricte = int(service_duration.package_duration)
-
-                next_3_months = current_date + timedelta(days=duration_rectricte * 30)
-
-                packages.service.add(service)
-                packages.due_date = next_3_months
-                packages.save()
-
-        total_price_app += int(price)
         service_commission = 0
         service_commission_type = ''
         toValue = 0
-
-        appointment_service = AppointmentService.objects.create(
-            user=user,
-            business=business,
-            business_address=business_address,
-            appointment=appointment,
-            duration=app_duration,
-            appointment_time=date_time,
-            appointment_date=appointment_date,
-            end_time=end_time,
-            service=service,
-            member=member,
-            discount_price=discount_price,
-            total_price=price,
-            slot_availible_for_online=slot_availible_for_online,
-            client_can_book=client_can_book,
-            status=choices.AppointmentServiceStatus.BOOKED,
-        )
-        if appointment.client:
-            appointment_service.client_tag = appointment.client.client_tag
-            appointment_service.client_type = appointment.client.client_type
-            appointment_service.save()
-        else:
-            appointment_service.client_tag = 'No Client'
-            appointment_service.client_type = 'No Client'
-            appointment_service.save()
-
-        price_com = 0
         try:
-            if extra_price is not None and price == 0:
-                price = int(extra_price) / int(free_services_quantity)
-
-            if discount_price is not None:
-                price_com = discount_price
-                appointment_service.price = discount_price
-
-            else:
-                price_com = price
-                appointment_service.price = price
-
-            appointment_service.save()
-
-            comm, comm_type = calculate_commission(member, price_com)  # int(price))
-            service_commission += comm
-            service_commission_type += comm_type
-            appointment_service.service_commission = service_commission
-            appointment_service.service_commission_type = service_commission_type
-            appointment_service.save()
+            commission = CommissionSchemeSetting.objects.get(employee=str(member))
+            category = CategoryCommission.objects.filter(commission=commission.id)
+            for cat in category:
+                try:
+                    toValue = int(cat.to_value)
+                except:
+                    sign = cat.to_value
+                if cat.category_comission == 'Service':
+                    if (int(cat.from_value) <= total_price_app and total_price_app < toValue) or (
+                            int(cat.from_value) <= total_price_app and sign):
+                        if cat.symbol == '%':
+                            service_commission = price * int(cat.commission_percentage) / 100
+                            service_commission_type = str(service_commission_type) + cat.symbol
+                        else:
+                            service_commission = int(cat.commission_percentage)
+                            service_commission_type = str(service_commission) + cat.symbol
 
         except Exception as err:
             Errors.append(str(err))
 
-        if fav and fav is not None:
-            appointment_service.is_favourite = True
-            appointment_service.save()
+        appointment.extra_price = total_price_app
+        appointment.service_commission = int(service_commission)
+        appointment.service_commission_type = service_commission_type
+        appointment.save()
+        ag = AppointmentGroup.objects.create(group_name='appointment_group')
+        ag.appointment.set(all_appointments)
+        # serialized = AppoinmentSerializer(appointment)
+        try:
+            thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment': appointment, 'tenant': request.tenant,
+                                                                   'user': request.user})
+            thrd.start()
+        except Exception as err:
+            pass
 
-        if business_address_id is not None:
-            appointment_service.business_address = business_address
-            appointment_service.save()
-            service_appointments.append(appointment_service.id)
+        all_memebers = Employee.objects.filter(
+            is_deleted=False,
+            is_active=True,
+            is_blocked=False,
+        ).order_by('-created_at')
 
-        LogDetails.objects.create(
-            log=appointment_logs,
-            appointment_service=appointment_service,
-            start_time=appointment_service.appointment_time,
-            duration=appointment_service.duration,
-            member=appointment_service.member
+        # Send Notification to one or multiple Employee
+        user = employee_users
+        title = "Appointment"
+        body = "New Booking Assigned"
+
+        NotificationProcessor.send_notifications_to_users(user, title, body, request_user=request.user)
+
+        serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request': request})
+        return Response(
+            {
+                'status': True,
+                'status_code': 201,
+                'response': {
+                    'message': 'Appointment Create!',
+                    'error_message': None,
+                    'error': Errors,
+                    'appointment_id': appointment.id,
+                    'appointment_service_id': service_appointments[0],
+                    'appointments': serialized.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
         )
-
-        # Creating Employee Anatylics Here
-        employee_insight_obj = EmployeeBookingDailyInsights.objects.create(
-            user=user,
-            employee=member,
-            business=business,
-            service=service,
-            appointment=appointment,
-            business_address=business_address,
-            appointment_service=appointment_service,
-            booking_time=date_time,
-        )
-        if employee_insight_obj:
-            employee_insight_obj.set_employee_time(date_time)
-
-    service_commission = 0
-    service_commission_type = ''
-    toValue = 0
-    try:
-        commission = CommissionSchemeSetting.objects.get(employee=str(member))
-        category = CategoryCommission.objects.filter(commission=commission.id)
-        for cat in category:
-            try:
-                toValue = int(cat.to_value)
-            except:
-                sign = cat.to_value
-            if cat.category_comission == 'Service':
-                if (int(cat.from_value) <= total_price_app and total_price_app < toValue) or (
-                        int(cat.from_value) <= total_price_app and sign):
-                    if cat.symbol == '%':
-                        service_commission = price * int(cat.commission_percentage) / 100
-                        service_commission_type = str(service_commission_type) + cat.symbol
-                    else:
-                        service_commission = int(cat.commission_percentage)
-                        service_commission_type = str(service_commission) + cat.symbol
-
-    except Exception as err:
-        Errors.append(str(err))
-
-    appointment.extra_price = total_price_app
-    appointment.service_commission = int(service_commission)
-    appointment.service_commission_type = service_commission_type
-    appointment.save()
-    serialized = AppoinmentSerializer(appointment)
-    try:
-        thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment': appointment, 'tenant': request.tenant,
-                                                               'user': request.user})
-        thrd.start()
-    except Exception as err:
-        pass
-
-    all_memebers = Employee.objects.filter(
-        is_deleted=False,
-        is_active=True,
-        is_blocked=False,
-    ).order_by('-created_at')
-
-    # Send Notification to one or multiple Employee
-    user = employee_users
-    title = "Appointment"
-    body = "New Booking Assigned"
-
-    NotificationProcessor.send_notifications_to_users(user, title, body, request_user=request.user)
-
-    serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request': request})
-    return Response(
-        {
-            'status': True,
-            'status_code': 201,
-            'response': {
-                'message': 'Appointment Create!',
-                'error_message': None,
-                'error': Errors,
-                'appointment_id': appointment.id,
-                'appointment_service_id': service_appointments[0],
-                'appointments': serialized.data,
-            }
-        },
-        status=status.HTTP_201_CREATED
-    )
 
 
 @transaction.atomic
@@ -2613,7 +2993,7 @@ def get_client_sale(request):
         )
     images = ClientImages.objects.filter(client_id=client)
     c_images = ClientImagesSerializerResponses(images, many=True,
-                                                  context={'request': request}).data
+                                               context={'request': request}).data
 
     # Product Order---------------------
     product_order = ProductOrder.objects \
@@ -2690,7 +3070,7 @@ def get_client_sale(request):
             'status_code': 201,
             'response': {
                 'message': 'Client Order Sales!',
-                'c_images':c_images,
+                'c_images': c_images,
                 'error_message': None,
                 'product': product.data,
                 'service': services_data.data,
