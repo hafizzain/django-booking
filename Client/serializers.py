@@ -592,11 +592,10 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
         return None 
 
     def get_location(self, membership_records):
-        try:
-            loc = BusinessAddress.objects.get(id = membership_records.location.id)
-            return LocationSerializerLoyalty(loc).data
-        except Exception as err:
-            print(err)
+        sale_record_instance = membership_records.sale_record
+        if sale_record_instance and sale_record_instance.location:
+            return LocationSerializerLoyalty(sale_record_instance.location.id).data
+        return None
 
     def get_client(self, membership_records):
         client_instance = membership_records.client.id
