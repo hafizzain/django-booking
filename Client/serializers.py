@@ -3,7 +3,7 @@ from Business.models import BusinessAddress
 from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
 from Order.models import VoucherOrder, MemberShipOrder, Checkout
-from SaleRecords.models import SaleRecordMembership
+from SaleRecords.models import SaleRecordMembership, SaleRecordVouchers
 from Order.serializers import CreatedAtCheckoutSerializer
 from Product.models import Product
 from Service.models import Service
@@ -493,33 +493,33 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     name  = serializers.SerializerMethodField(read_only=True)
     voucher_price  = serializers.SerializerMethodField(read_only=True)
+    employee = serializers.SerializerMethodField()
         
     def get_order_type(self, obj):
         return 'Voucher'
     
     def get_voucher_price(self, obj):
-        return obj.current_price
+        return obj.price
     
-    employee = serializers.SerializerMethodField()
     
 
-    def get_employee(self, voucher_order):
-        if voucher_order.member:
+    def get_employee(self, vouchers_records):
+        if vouchers_records.sale_record.employee:
             return {
-                'full_name' : str(voucher_order.member.full_name),
+                'full_name' : str(vouchers_records.sale_record.employee.full_name),
             }
         return ''
 
-    def get_location(self, obj):
+    def get_location(self, vouchers_records):
         try:
-            loc = BusinessAddress.objects.get(id = obj.location.id)
+            loc = BusinessAddress.objects.get(id = vouchers_records.sale_record.location)
             return LocationSerializerLoyalty(loc).data
         except Exception as err:
             print(err)
 
-    def get_client(self, obj):
+    def get_client(self, vouchers_records):
         try:
-            serializers = ClientSerializer(obj.client).data
+            serializers = ClientSerializer(vouchers_records.sale_record.client).data
             return serializers
         except Exception as err:
             return None
@@ -543,7 +543,7 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
             return None
 
     class Meta:
-        model = VoucherOrder
+        model = SaleRecordVouchers
         fields = ['id', 'voucher', 'client' , 'location' , 
                   'status','quantity', 'checkout','employee','start_date', 'end_date',
                   'total_price', 'payment_type' , 'order_type','price',
