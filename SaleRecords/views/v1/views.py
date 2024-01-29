@@ -24,7 +24,7 @@ class SaleRecordViews(APIView):
                             'message': 'Checkout created successfully!',
                             'error_message': None,
                             'data': {
-                                'checkout': SaleRecordSerializer(sale_record.instance).data,
+                                'checkout': serializer.data,
                                 # 'coupon': CouponSerializer(coupon_serializer.instance).data,
                                 # 'invoice': SaleInvoiceSerializer(newInvoice).data
                             }

@@ -23,7 +23,7 @@ class SaleRecords(CommonField):
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL,blank=True, null=True, related_name='sale_records_member') 
     business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null = True, related_name='sale_records_business_address') 
     invoice = models.ForeignKey(SaleInvoice, on_delete = models.SET_NULL, null = True, related_name = 'sale_record_invoice') 
-    promotion = models.ForeignKey(Promotion, on_delete = models.SET_NULL,blank=True, null=True, related_name = "sale_record_promotions")
+    
     
     refunds_data = models.ForeignKey(Refund, on_delete = models.SET_NULL, null = True, blank=True, related_name = 'sale_record_refunds') 
     
@@ -37,9 +37,9 @@ class SaleRecords(CommonField):
     status = models.CharField(choices = Status.choices, max_length=50 , default = Status.UN_PAID) 
     
     
-    total_tip = models.FloatField(default = 0)
-    total_tax = models.FloatField(default = 0)
-    total_price = models.FloatField(default = 0) # with tax amount
+    total_tip = models.FloatField(blank=False, null=False)
+    total_tax = models.FloatField(blank=False, null=False)
+    total_price = models.FloatField(blank=False, null=False) # with tax amount
     sub_total = models.FloatField(blank=False, null=False)  # without tax amount
 
     class Meta:
@@ -47,7 +47,7 @@ class SaleRecords(CommonField):
 
 
 class SaleRecordServices(CommonField):
-    sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, blank=True, null=True, related_name = 'sale_services_records')
+    sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, blank=True, null=True, related_name = 'services_records')
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True)
     service = models.ForeignKey(Service, on_delete = models.SET_NULL, null = True)
     
@@ -57,7 +57,7 @@ class SaleRecordServices(CommonField):
     
     
 class SaleRecordsProducts(CommonField):
-    sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, blank=True, null=True, related_name = 'sale_products_records')
+    sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, blank=True, null=True, related_name = 'products_records')
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True)
     product = models.ForeignKey(Product, on_delete = models.SET_NULL, null = True)
     
@@ -67,11 +67,10 @@ class SaleRecordsProducts(CommonField):
     
     
 class SaleRecordsAppointmentServices(CommonField):
-    sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null =True , blank =True , related_name = 'sale_appointment_services_records')
-    appointment = models.ForeignKey(Appointment, on_delete = models.CASCADE)
+    
+    sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null =True , blank =True , related_name = 'appointment_services')
+    appointment = models.ForeignKey(Appointment, on_delete = models.SET_NULL, null = True, related_name = 'sale_appointments_records')
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_appointment_services_employee')
-    
-    
     service = models.ForeignKey(Service, on_delete = models.SET_NULL, null = True)
     appointment_status = models.CharField(choices = AppointmentStatus.choices,max_length = 50, default = AppointmentStatus.BOOKED, blank=False, null=False)
     reason = models.CharField(max_length = 255, blank=True, null=True)
@@ -85,7 +84,7 @@ class SaleRecordsAppointmentServices(CommonField):
     
     
 class SaleRecordVouchers(CommonField):
-    sale_record = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, blank=True, null=True, related_name='sale_vouchers_records')
+    sale_record = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, blank=True, null=True, related_name='vouchers_records')
     vouchers = models.ForeignKey(Vouchers, on_delete = models.SET_NULL, null = True)
     # employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_vouchers_employee')
     
@@ -94,7 +93,7 @@ class SaleRecordVouchers(CommonField):
 
 
 class SaleRecordMembership(CommonField):
-    sale_record = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, blank=True, null=True, related_name='sale_membership_records')
+    sale_record = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, blank=True, null=True, related_name='membership_records')
     membership = models.ForeignKey(Membership, on_delete=models.SET_NULL, null = True)
     # employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_membership_employee')
     
@@ -103,7 +102,7 @@ class SaleRecordMembership(CommonField):
     
 class SaleTax(CommonField):
     
-    sale_record = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, blank=True, null=True, related_name='sale_tax_records') 
+    sale_record = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, blank=True, null=True, related_name='tax_records') 
     # Following are the Major Information for Tax Applied
     business_tax_id = models.ForeignKey(BusinessTax, on_delete=models.SET_NULL,  blank=False, null=True) # This will be Tax Instance ID 
     tax_name = models.CharField(max_length=999, blank=False, null=False) 
@@ -116,7 +115,7 @@ class SaleTax(CommonField):
 
     
 class SaleRecordTip(CommonField):    
-    sale_record = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, null=True, blank=True,related_name='sale_tip_records') 
+    sale_record = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, null=True, blank=True,related_name='tip_records') 
     
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_record_employee_tips') 
     tip_amount = models.FloatField(blank=False, null=False) 
@@ -125,14 +124,14 @@ class SaleRecordTip(CommonField):
         return str(self.id) 
     
 class PaymentMethods(CommonField):
-    sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'sale_payment_methods_records')
+    sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'payment_methods_records')
     
     
     payment_method = models.CharField(choices = PaymentMethodsChoices.choices, max_length = 50 , null = True , blank = False)
     amount = models.FloatField(default  = 0 , blank= False)
     
 class PurchasedGiftCards(CommonField):
-    sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'sale_gift_cards_records')
+    sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'gift_cards_records')
     gift_card = models.ForeignKey(GiftCards, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'sale_gift_cards_records')
     
     price = models.FloatField(default = 0)
@@ -142,7 +141,7 @@ class PurchasedGiftCards(CommonField):
 # ====================================================== Appllied on checkout data ===========================================
     
 class SaleRecordAppliedCoupons(CommonField):
-    sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'sale_applied_coupons_records')
+    sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_coupons_records')
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL,null = True)
     
     coupon_type = models.CharField(choices = CouponType.choices,max_length = 50, default = '', blank=False, null=False)
@@ -150,22 +149,23 @@ class SaleRecordAppliedCoupons(CommonField):
     is_redeemed = models.BooleanField(default = False)
     
 class AppliedMemberships(CommonField):
-    sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'sale_applied_memberships_records')
+    sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_memberships_records')
     membership = models.ForeignKey(Membership, on_delete = models.SET_NULL, blank=True, null=True)
     is_redeemed = models.BooleanField(default = False)
     
 class AppliedVouchers(CommonField):
-    sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'sale_applied_vouchers_records')
+    sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_vouchers_records')
     voucher = models.ForeignKey(Vouchers, on_delete = models.SET_NULL, blank=False, null=True)
     is_redeemed = models.BooleanField(default = False)
     
     
 class AppliedGiftCards(CommonField):
-    sale_record = models.ForeignKey(SaleRecords,  on_delete = models.CASCADE, null = True, blank = True, related_name = 'sale_applied_gift_cards_records')
+    sale_record = models.ForeignKey(SaleRecords,  on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_gift_cards_records')
     gift_card = models.ForeignKey(GiftCards, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'sale_applied_gift_cards_records' )
     is_redeemed = models.BooleanField(default = False)
     
     
     
-    
-    
+class AppliedPromotion(CommonField):
+    sale_record = models.ForeignKey(SaleRecords,  on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_promotions_records')
+    promotion = models.ForeignKey(Promotion, on_delete = models.SET_NULL,blank=True, null=True, related_name = "sale_record_promotions")
