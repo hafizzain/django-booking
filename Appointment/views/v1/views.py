@@ -582,8 +582,10 @@ def get_calendar_appointment(request):
     location_id = request.GET.get('location_id', None)
     employee_ids = request.GET.get('employee', None)
 
-    query = Q(is_deleted=False, is_active=True)
-
+    # query = Q(is_deleted=False, is_active=True)
+    query = Q(is_deleted=False)
+    # query &= Q(in_active_date__isnull=False, in_active_date__lte=selected_date, is_deleted=False)
+    # in_active_date__lte=selected_date
     if employee_ids != 'All':
         if type(employee_ids) == str:
             employee_ids = employee_ids.replace("'", '"')
@@ -599,6 +601,37 @@ def get_calendar_appointment(request):
         query &= Q(location=location)
 
     all_memebers = Employee.objects.filter(query).order_by('-created_at')
+    all_memebers = all_memebers.annotate(
+        filtered_in_active_date=Case(
+            When(in_active_date__isnull=False,
+                 then=Case(When(in_active_date__lte=selected_date, then=F('in_active_date')))),
+            default=Value(selected_date),
+            output_field=models.DateField(),
+        )
+    )
+    all_memebers = all_memebers.filter(filtered_in_active_date__lte=selected_date)
+
+    # all_memebers = Employee.objects.filter(query).order_by('-created_at')
+    # all_memebers = all_memebers.annotate(
+    #     filtered_in_active_date=Case(
+    #         When(in_active_date__isnull=False,
+    #              then=Case(When(in_active_date__lte=selected_date, then=F('in_active_date')))),
+    #         default=Value(selected_date),
+    #         output_field=models.DateField(),
+    #     )
+    # )
+    # all_memebers = all_memebers.filter(Q(in_active_date__lte=selected_date))
+
+    # all_memebers = Employee.objects.filter(query).order_by('-created_at')
+    # all_memebers = all_memebers.filter(Q(is_active=False,in_active_date__lte=selected_date))
+    # all_memebers =all_memebers.annotate(
+    #     filtered_in_active_date=Case(
+    #         When(in_active_date__isnull=False, in_active_date__lte=selected_date, then=F('in_active_date')),
+    #         default=Value(selected_date),
+    #         output_field=models.DateField(),
+    #     )
+    # )
+    # all_memebers = all_memebers.filter(filtered_in_active_date__lte=selected_date)
     serialized = EmployeeAppointmentSerializer(all_memebers, many=True,
                                                context={'request': request, 'selected_date': selected_date})
 

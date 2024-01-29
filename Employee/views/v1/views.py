@@ -1112,9 +1112,9 @@ def create_employee(request):
         employee.to_present = True
     if is_active is not None:
         employee.is_active = True
-        employee.is_active_date = timezone.now().date()
     else:
         employee.is_active = False
+        employee.in_active_date = timezone.now().date()
 
     if email is not None:
         employee.email = email
@@ -1467,7 +1467,6 @@ def update_employee(request):
         employee.mobile_number = None
     if image is not None:
         employee.image = image
-
     current_date = timezone.now().date()
     check_exists = EmployeDailySchedule.objects.filter(
         employee_id=employee.id,
@@ -1507,9 +1506,10 @@ def update_employee(request):
 
     if is_active is not None:
         employee.is_active = True
-        employee.is_active_date = timezone.now().date()
+        employee.in_active_date = None
     else:
         employee.is_active = False
+        employee.in_active_date = timezone.now().date()
 
     employee.can_refunds = can_refund
     employee.save()
