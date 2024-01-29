@@ -2069,7 +2069,7 @@ class GiftCardSerializerResponse(serializers.ModelSerializer):
         
     def get_currency_code(self, obj):
         try:
-            currency = BusinessAddress.objects.filter(id=obj.selected_location)
+            currency = BusinessAddress.objects.get(id=obj.selected_location)
             return currency.currency.code
         except:
             return None
