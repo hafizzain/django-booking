@@ -2055,7 +2055,7 @@ class GiftCardDetails(serializers.ModelSerializer):
 class GiftCardSerializerResponse(serializers.ModelSerializer):
     gift_card_details = GiftCardDetails(many=True)
     crunchy = serializers.SerializerMethodField(read_only=True)
-    currency_code = serializers.SerializerMethodField(read_only=True)
+    crunchy_code = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = GiftCards
         fields = "__all__"
