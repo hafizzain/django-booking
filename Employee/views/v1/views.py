@@ -7323,7 +7323,7 @@ def update_gift_card(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_gift_card(request):
-    selected_location = request.query_params.get('selected_location', None)
+    selected_location = request.query_params.get('selected_location')
     query_set = GiftCards.objects.all()
     search_text = request.query_params.get('search_text', None)
     if search_text:
