@@ -3,6 +3,7 @@ from Business.models import BusinessAddress
 from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
 from Order.models import VoucherOrder, MemberShipOrder, Checkout
+from SaleRecords.models import SaleRecordMembership
 from Order.serializers import CreatedAtCheckoutSerializer
 from Product.models import Product
 from Service.models import Service
@@ -618,7 +619,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
         
     
     class Meta:
-        model = MemberShipOrder
+        model = SaleRecordMembership
         fields = [
             'id',
             'name', 
