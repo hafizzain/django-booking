@@ -708,6 +708,7 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     cancel_reason = serializers.SerializerMethodField(read_only=True)
     cancel_note = serializers.SerializerMethodField(read_only=True)
+    booked_user_id = serializers.SerializerMethodField(read_only=True)
 
     def get_cancel_reason(self, obj):
         return obj.appointment.cancel_reason
@@ -740,6 +741,9 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
 
     def get_booked_by(self, obj):
         return f'{obj.user.first_name} {obj.user.last_name}'
+    
+    def get_booked_user_id(self, obj):
+        return f'{obj.user.id}'
 
     def get_booking_id(self, obj):
         id = str(obj.id).split('-')[0:2]
@@ -786,7 +790,7 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
         model = AppointmentService
         fields = ('id', 'service', 'member', 'price', 'client',
                   'appointment_date', 'appointment_time', 'duration', 'member_id',
-                  'booked_by', 'booking_id', 'appointment_type', 'client_can_book', 'slot_availible_for_online',
+                  'booked_by', 'booking_id', 'get_booked_user_id', 'appointment_type', 'client_can_book', 'slot_availible_for_online',
                   'service_id',
                   'appointment_status', 'location', 'created_at', 'cancel_note', 'cancel_reason')
 
@@ -1332,24 +1336,20 @@ class ServiceClientSaleSerializer(serializers.ModelSerializer):
     service = serializers.SerializerMethodField(read_only=True)
     booked_by = serializers.SerializerMethodField(read_only=True)
     member = serializers.SerializerMethodField(read_only=True)
-    booked_user_id = serializers.SerializerMethodField(read_only=True)
-    
+
     def get_member(self, obj):
         return obj.member.full_name
 
     def get_booked_by(self, obj):
         return f'{obj.user.first_name} {obj.user.last_name}'
-    
-    def get_booked_user_id(self, obj):
-        return f'{obj.user.id}'
 
     def get_service(self, obj):
         return obj.service.name
 
     class Meta:
         model = AppointmentService
-        fields = ['service', 'created_at', 'booked_by', 'booked_user_id', 'duration',
-                  'price', 'appointment_status', 'member', 'is_favourite',]
+        fields = ['service', 'created_at', 'booked_by', 'duration',
+                  'price', 'appointment_status', 'member', 'is_favourite']
 
 
 class CheckoutSerializer(serializers.ModelSerializer):
