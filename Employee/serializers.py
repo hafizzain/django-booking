@@ -29,6 +29,7 @@ from .models import (EmployeDailySchedule, Employee, EmployeeProfessionalInfo,
                      )
 from Authentication.models import AccountType, User
 from django_tenants.utils import tenant_context
+from Business.models import BusinessAddress
 
 
 class VacationDetailsSerializer(serializers.ModelSerializer):
@@ -2048,12 +2049,25 @@ class GiftCardDetails(serializers.ModelSerializer):
 
 class GiftCardSerializerResponse(serializers.ModelSerializer):
     gift_card_details = GiftCardDetails(many=True)
-
+    crunchy = serializers.SerializerMethodField()
+    currency_code = serializers.SerializerMethodField()
     class Meta:
         model = GiftCards
         fields = "__all__"
 
-
+    def get_crunchy(self, obj):
+        try:
+            crunchy = BusinessAddress.objects.filter(id=obj.selected_location)
+            return crunchy.currency.id
+        except:
+            return None
+        
+    def get_crunchy_code(self, obj):
+        try:
+            crunchy = BusinessAddress.objects.filter(id=obj.selected_location)
+            return crunchy.currency.code
+        except:
+            return None
 class EmployeDailyScheduleResponse(serializers.ModelSerializer):
     class Meta:
         model = EmployeDailySchedule
