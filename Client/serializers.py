@@ -553,7 +553,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     # membership = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
-    # client = serializers.SerializerMethodField(read_only=True)
+    client = serializers.SerializerMethodField(read_only=True)
     name  = serializers.SerializerMethodField(read_only=True)
     membership_price  = serializers.SerializerMethodField(read_only=True)
     discount_type = serializers.SerializerMethodField(read_only=True)
@@ -598,10 +598,10 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
         return None
 
     def get_client(self, membership_records):
-        client_instance = membership_records.client.id
-        # if client_instance:
-        #     return ClientSerializer(client_instance).data
-        return client_instance
+        client_instance = membership_records.sale_record.client
+        if client_instance:
+            return ClientSerializer(client_instance).data
+        return None
 
     
     
@@ -623,7 +623,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name', 
-            # 'client', 
+            'client', 
             'location',
             # 'status',
             # 'quantity',
