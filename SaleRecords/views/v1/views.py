@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 
 from SaleRecords.serializers import *
 
+
 class SaleRecordViews(APIView):
     
     def post(self, request, *args, **kwargs):
@@ -17,29 +18,28 @@ class SaleRecordViews(APIView):
             if serializer.is_valid():
                 sale_record = serializer.save()
                 
-                #generate dynamic invoice
                 invoice = SaleInvoice.objects.create(
-                    user = request.user,
-                    client=request.client if request.client else None,
-                    location = request.location if request.location else None,
-                    appointment=request.appointment if request.appointment else None,
-                    appointment_service=request.appointment_service if request.appointment_service else None,
-                    payment_type=request.payment_type if request.payment_type else None,
-                    # payment_methods = request.payment_methods_records if request.payment_methods_records else None,
+                    user=user,
+                    client=sale_record.client,
+                    location=sale_record.location,
+                    appointment=request.data.get('appointment', None),
+                    appointment_service=request.data.get('appointment_service', None),
+                    payment_type=request.data.get('payment_type', None),
+                    # payment_methods=request.data.get('payment_methods_records'),
 
-                    tip = f'{request.tip}' if request.tip else 0,
+                    # tip=f'{request.data.get("tip")}' if request.data.get("tip") else 0,
                     invoice_type='order',
-                    checkout_type=f'{request.checkout_type}' if request.checkout_type else 'sale',
+                    checkout_type=f'{request.data.get("checkout_type")}' if request.data.get("checkout_type") else 'sale',
 
-                    service=f'{request.service}' if request.service else '',
-                    member=f'{request.member}' if request.member else '',
-                    business_address=f'{request.location}' if request.location else '',
-                    gst=f'{request.gst}' if request.gst else '',
-                    gst_price=f'{request.gst_price}' if request.gst_price else '',
-                    service_price=f'{request.service_price}' if request.service_price else 0,
-                    total_price=f'{request.total_price}' if request.total_price else 0,
-                    service_commission=f'{request.service_commission}' if request.service_commission else 0,
-                    service_commission_type=f'{request.service_commission_type}' if request.service_commission_type else '',
+                    service=f'{request.data.get("service")}' if request.data.get("service") else '',
+                    member=f'{request.data.get("member")}' if request.data.get("member") else '',
+                    # business_address=f'{request.data.get("location")}' if request.data.get("location") else '',
+                    gst=f'{request.data.get("gst")}' if request.data.get("gst") else 0,
+                    gst_price=f'{request.data.get("gst_price")}' if request.data.get("gst_price") else 0,
+                    service_price=f'{request.data.get("service_price")}' if request.data.get("service_price") else 0,
+                    total_price=f'{request.data.get("total_price")}' if request.data.get("total_price") else 0,
+                    service_commission=f'{request.data.get("service_commission")}' if request.data.get("service_commission") else 0,
+                    service_commission_type=f'{request.data.get("service_commission_type")}' if request.data.get("service_commission_type") else '',
                     checkout=sale_record.id,
                 )
                 invoice.save()
@@ -51,9 +51,9 @@ class SaleRecordViews(APIView):
                             'message': 'Checkout created successfully!',
                             'error_message': None,
                             'data': {
-                                'checkout': serializer.data,
+                                'checkout': SaleRecordSerializer(sale_record).data,
                                 # 'coupon': CouponSerializer(coupon_serializer.instance).data,
-                                'invoice': InvoiceSerializer(invoice).data
+                                # 'invoice': InvoiceSerializer(invoice).data
                             }
                         }
                     }

@@ -512,13 +512,17 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
         return ''
     
     def get_discount_percentage(self , obj):
-        discount_percentage = obj.voucher.discount_percentage
+        if obj.voucher:
+            discount_percentage = obj.voucher.discount_percentage
+            return discount_percentage 
+        return None
 
     def get_location(self, vouchers_records):
         try:
             loc = BusinessAddress.objects.get(id = vouchers_records.sale_record.location)
             return LocationSerializerLoyalty(loc).data
         except Exception as err:
+            
             print(err)
 
     def get_client(self, vouchers_records):
@@ -531,6 +535,7 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
     def get_voucher(self, obj):
         if obj.voucher:
             return {
+                'id': obj.voucher.id,
                 'voucher_type' : obj.voucher.voucher_type,
                 'name' : obj.voucher.name,
                 'sales': obj.voucher.sales,

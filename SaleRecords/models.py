@@ -25,7 +25,7 @@ class SaleRecords(CommonField):
     invoice = models.ForeignKey(SaleInvoice, on_delete = models.SET_NULL, null = True, related_name = 'sale_record_invoice') 
     
     
-    refunds_data = models.ForeignKey(Refund, on_delete = models.SET_NULL, null = True, blank=True, related_name = 'sale_record_refunds') 
+    # refunds_data = models.ForeignKey(Refund, on_delete = models.SET_NULL, null = True, blank=True, related_name = 'sale_record_refunds') 
     
     checkout_type = models.CharField(choices = CheckoutType.choices, max_length = 50) 
     

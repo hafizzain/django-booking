@@ -17,7 +17,7 @@ from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee,
 , EmployeeMarketingPermission, EmployeeSelectedService, SallarySlipPayrol, StaffGroup
 , StaffGroupModulePermission, Attendance
 , Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation, LeaveManagements, WeekManagement,
-                             VacationDetails, GiftCard, GiftCards, GiftDetails, GiftDetail
+                             VacationDetails, GiftCard, GiftCards, GiftDetails,
                              )
 from Employee.services import annual_vacation_check, check_available_vacation_type
 from HRM.models import Holiday
@@ -39,7 +39,7 @@ from Employee.serializers import (EmployeSerializer, EmployeInformationsSerializ
                                   NewVacationSerializer,
                                   NewAbsenceSerializer, singleEmployeeSerializerOP, Payroll_WorkingScheduleSerializerOP,
                                   WeekendManagementSerializer, LeaveManagementSerializer, ScheduleSerializerOP,
-                                  ScheduleSerializerResponse, GiftCardSerializer, GiftCardSerializerResponse,
+                                  ScheduleSerializerResponse, GiftCardSerializer, GiftCardSerializerResponse,GiftDetail,
                                   EmployeDailyScheduleResponse, VacationDetailsSerializer,
                                   VacationDetailsResponseSerializer, Allscedulae
                                   )
@@ -75,6 +75,7 @@ from Notification.notification_processor import NotificationProcessor
 
 from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
 from Sale.Constants.Custom_pag import CustomPagination
+from Employee.serializers import GiftCardSerializerResponse, SingleGiftCardDetails,GiftCardDetails
 
 
 @transaction.atomic
@@ -7347,16 +7348,81 @@ def get_gift_card(request):
 @permission_classes([AllowAny])
 def get_detail_from_code(request):
     code = request.query_params.get('code', None)
-    if code is not None:
-        query_set = GiftCards.objects.filter(code__contains=code)
-        serializer = GiftCardSerializerResponse(query_set, many=True).data
+    location_id = request.query_params.get('location_id', None)
+
+    if code is not None and location_id is not None:
+        try:
+            # Retrieve the BusinessAddress based on the provided location_id
+            business_address = BusinessAddress.objects.get(id=location_id)
+
+            # Filter GiftCards based on the provided code and BusinessAddress
+            gift_card = GiftCards.objects.get(code=code)
+
+            # Filter GiftDetail based on the retrieved gift_card
+            query = GiftDetail.objects.filter(currencies=business_address.currency)
+
+            # Serialize the retrieved gift_card and gift_detail
+            serializer_gift_card = SingleGiftCardDetails(gift_card).data
+            serializer_gift_detail = GiftCardDetails(query.first()).data
+
+            # Prepare the response data
+            data = {
+                "success": True,
+                "status_code": 200,
+                "response": {
+                    "message": "Gift card details retrieved successfully",
+                    "error_message": None,
+                    "data": serializer_gift_card,
+                    "gift_card": serializer_gift_detail
+                }
+            }
+
+            # Return the response
+            return Response(data, status=status.HTTP_200_OK)
+
+        except GiftCards.DoesNotExist:
+            # If no matching gift card is found
+            data = {
+                "success": False,
+                "status_code": 404,
+                "response": {
+                    "message": "Gift card not found",
+                    "error_message": "No gift card with the provided code and location ID",
+                    "data": None
+                }
+            }
+
+            # Return a 404 Not Found response
+            return Response(data, status=status.HTTP_404_NOT_FOUND)
+
+        except BusinessAddress.DoesNotExist:
+            # If the provided location_id does not exist
+            data = {
+                "success": False,
+                "status_code": 404,
+                "response": {
+                    "message": "Location not found",
+                    "error_message": "No business address with the provided location ID",
+                    "data": None
+                }
+            }
+
+            # Return a 404 Not Found response
+            return Response(data, status=status.HTTP_404_NOT_FOUND)
+
+    else:
+        # If code or location_id is not provided
         data = {
-            "success": True,
-            "status_code": 200,
+            "success": False,
+            "status_code": 400,
             "response": {
-                "message": "gift card get successfully",
-                "error_message": None,
-                "data": serializer
+                "message": "Bad Request",
+                "error_message": "Both 'code' and 'location_id' must be provided",
+                "data": None
             }
         }
-        return Response(data, status=status.HTTP_200_OK)
+
+        # Return a 400 Bad Request response
+        return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+            
