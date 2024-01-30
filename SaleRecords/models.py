@@ -114,8 +114,6 @@ class SaleTax(CommonField):
     tax_percentage = models.FloatField(default = 0,blank=False, null=False) 
     tax_value = models.FloatField(default = 0,blank=False, null=False)
 
-    def __str__(self):
-        return self.tax_name
 
     
 class SaleRecordTip(CommonField):    
@@ -123,9 +121,6 @@ class SaleRecordTip(CommonField):
     
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_record_employee_tips') 
     tip_amount = models.FloatField(blank=False, null=False) 
-    
-    def __str__(self): 
-        return str(self.id) 
     
 class PaymentMethods(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'payment_methods_records')
