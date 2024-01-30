@@ -1,3 +1,4 @@
+import json
 from datetime import timedelta
 from datetime import datetime as dt
 
@@ -348,6 +349,7 @@ def get_sales_record(request):
         retail_target = retail_target.filter(month=month).count()
     if location_id is None and year is None and month is None:
         retail_target = retail_target.count()
+        retail_target = json.loads(retail_target)
     return Response(
         {
             'status': 200,
