@@ -575,15 +575,78 @@ def get_all_appointments_no_pagination(request):
     return paginator.get_paginated_response(serialize.data, 'appointments')
 
 
+# @api_view(['GET'])
+# @permission_classes([AllowAny])
+# def get_calendar_appointment(request):
+#     selected_date = request.GET.get('selected_date', None)
+#     location_id = request.GET.get('location_id', None)
+#     employee_ids = request.GET.get('employee', None)
+#
+#     # query = Q(is_deleted=False, is_active=True)
+#     query = Q(is_deleted=False)
+#     if employee_ids != 'All':
+#         if type(employee_ids) == str:
+#             employee_ids = employee_ids.replace("'", '"')
+#             employee_ids = json.loads(employee_ids)
+#         elif type(employee_ids) == list:
+#             pass
+#
+#         employee_ids = [emp['id'] for emp in employee_ids]
+#         query &= Q(id__in=employee_ids)
+#     if location_id:
+#         location = BusinessAddress.objects.get(id=location_id)
+#         query &= Q(location=location)
+#
+#     all_memebers = Employee.objects.filter(query).order_by('-created_at')
+#     # all_memebers = all_memebers.filter(is_deleted=False, is_blocked=False, **query).order_by('-created_at')
+#     # all_memebers = all_memebers.filter(
+#     #     Q(is_active=False, in_active_date__gte=selected_date
+#     #       ) | Q(is_active=True)
+#     # )
+#     # all_memebers = Employee.objects.filter(is_deleted=False, is_blocked=False, **query).order_by('-created_at')
+#     # all_memebers = all_memebers.filter(
+#     #     Q(is_active=False, in_active_date_isnull=False,in_active_date__gte=selected_date
+#     #       ) | Q(is_active=True)
+#     # )
+#     # all_memebers = all_memebers.filter(
+#     #     Q(is_active=False, in_active_date__isnull=False, in_active_date__gte=selected_date) |
+#     #     Q(is_active=True)
+#     # )
+#
+#     # all_memebers = all_memebers.annotate(
+#     #     filtered_in_active_date=Case(
+#     #         When(in_active_date__isnull=False,
+#     #              then=Case(When(in_active_date__lte=selected_date, then=F('in_active_date')))),
+#     #         default=Value(selected_date),
+#     #         output_field=models.DateField(),
+#     #     )
+#     # )
+#     # all_memebers = all_memebers.filter(filtered_in_active_date__lte=selected_date)
+#     serialized = EmployeeAppointmentSerializer(all_memebers, many=True,
+#                                                context={'request': request, 'selected_date': selected_date})
+#
+#     return Response(
+#         {
+#             'status': 200,
+#             'status_code': '200',
+#             'response': {
+#                 'message': 'Calender Appointment',
+#                 'error_message': None,
+#                 'appointments': serialized.data
+#             }
+#         },
+#         status=status.HTTP_200_OK
+#     )
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_calendar_appointment(request):
+    #master code
     selected_date = request.GET.get('selected_date', None)
     location_id = request.GET.get('location_id', None)
     employee_ids = request.GET.get('employee', None)
 
-    # query = Q(is_deleted=False, is_active=True)
-    query = Q(is_deleted=False)
+    query = Q(is_deleted=False, is_active=True)
+
     if employee_ids != 'All':
         if type(employee_ids) == str:
             employee_ids = employee_ids.replace("'", '"')
@@ -593,35 +656,12 @@ def get_calendar_appointment(request):
 
         employee_ids = [emp['id'] for emp in employee_ids]
         query &= Q(id__in=employee_ids)
+
     if location_id:
         location = BusinessAddress.objects.get(id=location_id)
         query &= Q(location=location)
 
     all_memebers = Employee.objects.filter(query).order_by('-created_at')
-    # all_memebers = all_memebers.filter(is_deleted=False, is_blocked=False, **query).order_by('-created_at')
-    # all_memebers = all_memebers.filter(
-    #     Q(is_active=False, in_active_date__gte=selected_date
-    #       ) | Q(is_active=True)
-    # )
-    # all_memebers = Employee.objects.filter(is_deleted=False, is_blocked=False, **query).order_by('-created_at')
-    # all_memebers = all_memebers.filter(
-    #     Q(is_active=False, in_active_date_isnull=False,in_active_date__gte=selected_date
-    #       ) | Q(is_active=True)
-    # )
-    # all_memebers = all_memebers.filter(
-    #     Q(is_active=False, in_active_date__isnull=False, in_active_date__gte=selected_date) |
-    #     Q(is_active=True)
-    # )
-
-    # all_memebers = all_memebers.annotate(
-    #     filtered_in_active_date=Case(
-    #         When(in_active_date__isnull=False,
-    #              then=Case(When(in_active_date__lte=selected_date, then=F('in_active_date')))),
-    #         default=Value(selected_date),
-    #         output_field=models.DateField(),
-    #     )
-    # )
-    # all_memebers = all_memebers.filter(filtered_in_active_date__lte=selected_date)
     serialized = EmployeeAppointmentSerializer(all_memebers, many=True,
                                                context={'request': request, 'selected_date': selected_date})
 
@@ -637,7 +677,6 @@ def get_calendar_appointment(request):
         },
         status=status.HTTP_200_OK
     )
-
 
 @transaction.atomic
 @api_view(['POST'])
