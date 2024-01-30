@@ -640,7 +640,8 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                     app_service = AppointmentService.objects.get(id=id)
                     # serialized_service = CalanderserializerResponse(app_service,many=False)
                     serialized_service = AppointmentServiceSerializer(app_service , many=False)
-                    loop_return.append(serialized_service.data)
+                    return serialized_service.data
+                    # loop_return.append(serialized_service.data)
                 returned_list.append(loop_return)
 
             returned_list.extend(self.retreive_unavailable_time(obj))
