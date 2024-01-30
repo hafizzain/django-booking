@@ -3,7 +3,7 @@ from django.db import transaction
 from Invoices.models import SaleInvoice
 
 from SaleRecords.models import *
-# from Invoices.models import
+from Invoices.models import SaleInvoice
 
 
 class SaleRecordsAppointmentServicesSerializer(serializers.ModelSerializer):
@@ -111,6 +111,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     vouchers_records = SaleRecordVouchersSerializer(many =True ,write_only = True)
     tax_records = SaleTaxSerializer(many =True, write_only = True)
     tip_records = SaleOrderTipSerializer(many = True, write_only = True)
+    invoice = serializers.SerializerMethodField(read_only = True)
     
     # ================================================================   Applied Items  ==========================================
     applied_coupons_records = SaleRecordAppliedCouponsSerializer(many = True, write_only = True)
@@ -119,13 +120,16 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     applied_gift_cards_records = AppliedGiftCardsSerializer(many = True, write_only = True)
     applied_promotions_records = AppliedPromotionSerializer(many = True, write_only = True)
     
+    def get_invoice(self, obj):
+        invoice = SaleInvoice.objects.get(checkout = obj.id)
+        return SaleInvoiceSerializer(invoice).data
     
     
     
     class Meta:
         model = SaleRecords
-        # fields = '__all__'
-        exclude = ['updated_at','is_deleted','is_blocked','is_active']
+        fields = ['id','location','checkout_type','client','client_type','status','total_tip','total_tax','total_price','sub_total','invoice']
+        # exclude = ['updated_at','is_deleted','is_blocked','is_active']
     
     def validate(self, data):
         # Validate that there is at least one record in appointment_services, services_records, and products_records
@@ -134,7 +138,9 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("At least one record is required in appointment_services, services_records, products_records, vouchers_records, membership_records or gift_cards_records")
 
         return data
-        
+    
+    
+    
     def create(self, validated_data):
         
         appointment_services = validated_data.pop('appointment_services', [])
