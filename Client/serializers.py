@@ -535,6 +535,7 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
     def get_voucher(self, obj):
         if obj.voucher:
             return {
+                'id': obj.voucher.id,
                 'voucher_type' : obj.voucher.voucher_type,
                 'name' : obj.voucher.name,
                 'sales': obj.voucher.sales,
