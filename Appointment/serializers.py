@@ -210,6 +210,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     appointment_status = serializers.SerializerMethodField(read_only=True)
 
+
     client_info = serializers.SerializerMethodField(read_only=True)
     is_favourite = serializers.BooleanField()
 
@@ -384,164 +385,11 @@ class BlockSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+
 class CalanderserializerResponse(serializers.ModelSerializer):
-    client = serializers.SerializerMethodField(read_only=True)
-    service = serializers.SerializerMethodField(read_only=True)
-    appointment_id = serializers.SerializerMethodField(read_only=True)
-    client_type = serializers.SerializerMethodField(read_only=True)
-    end_time = serializers.SerializerMethodField(read_only=True)
-    price = serializers.SerializerMethodField(read_only=True)
-    currency = serializers.SerializerMethodField(read_only=True)
-    location = serializers.SerializerMethodField(read_only=True)
-    appointment_status = serializers.SerializerMethodField(read_only=True)
-
-    client_info = serializers.SerializerMethodField(read_only=True)
-    is_favourite = serializers.BooleanField()
-
-    def get_client_info(self, obj):
-        tag = obj.client_tag
-        client_type = obj.client_type
-        # else:
-        #     if obj.appointment.client:
-        #         last_appointment = AppointmentService.objects.filter(
-        #             appointment__client = obj.appointment.client,
-        #             status = choices.AppointmentServiceStatus.FINISHED,
-        #         ).order_by('created_at').last()
-
-        #         if last_appointment:
-        #             tag = last_appointment.client_tag
-        #             client_type = last_appointment.client_type
-        #         else:
-        #             tag = 'No last appointment'
-        #             client_type = 'No last appointment'
-        #     else:
-        #         tag = 'No Client'
-        #         client_type = 'No Client'
-
-        return {
-            'tag': tag,
-            'client_type': client_type,
-        }
-        # try:
-        #     if not obj.appointment:
-        #         return {}
-        #     client = obj.appointment.client
-
-        #     client_f_month = int(client.created_at.strftime('%m'))
-        #     first_appointment = None
-        #     if client:
-        #         client_appointments = Appointment.objects.filter(
-        #             client = client,
-        #             status__in = [choices.AppointmentStatus.DONE, choices.AppointmentStatus.FINISHED]
-        #         )
-
-        #         if len(client_appointments) > 0:
-        #             total_spend = AppointmentCheckout.objects.filter(appointment__client=client)
-        #             price = 0
-        #             for ck in total_spend:
-        #                 price = price + ck.total_price
-
-        #             last_app = client_appointments.order_by('created_at').last()
-        #             last_month = int(last_app.created_at.strftime('%m'))
-
-        #             months = max(client_f_month - last_month, 1)
-        #             monthly_spending = 0Appointment_Booked
-        #             tag = ''
-
-        #             if client_appointments.count() >= months:
-        #                 tag = 'Most Visitor'
-        #             else:
-        #                 tag = 'Least Visitor'
-
-        #             client_type = None
-        #             monthly_spending = price / months
-        #             if monthly_spending >= 100:
-        #                 client_type = 'Most Spender'
-
-        #             return {
-        #                 'months': months,
-        #                 'tag': tag,
-        #                 'client_type': client_type,
-        #             }
-        #         else:
-        #             return {}
-        #     else:
-        #         return {}
-        # except Exception as err:
-        #     return {
-        #         'error': str(err)
-        #     }
-
-    def get_appointment_status(self, obj):
-        if obj.appointment:
-            return obj.appointment.status
-        return None
-
-    def get_location(self, obj):
-        try:
-            loc = BusinessAddress.objects.get(id=str(obj.business_address))
-            return LocationSerializer(loc).data
-        # return obj.appointment.business_address.address
-        except Exception as err:
-            print(err)
-
-    def get_currency(self, obj):
-        return 'AED'
-
-    def get_price(self, obj):
-        try:
-            return obj.price
-        except Exception as err:
-            None
-
-    def get_end_time(self, obj):
-        app_date_time = f'2000-01-01 {obj.appointment_time}'
-
-        try:
-            duration = DURATION_CHOICES_DATA[obj.duration]
-            app_date_time = datetime.fromisoformat(app_date_time)
-            datetime_duration = app_date_time + timedelta(minutes=duration)
-            datetime_duration = datetime_duration.strftime('%H:%M:%S')
-            return datetime_duration
-        except Exception as err:
-            return None
-
-    def get_client_type(self, obj):
-        try:
-            return obj.appointment.client_type
-        except Exception as err:
-            None
-
-    def get_appointment_id(self, obj):
-        try:
-            return obj.appointment.id
-        except Exception as err:
-            None
-
-    def get_service(self, obj):
-        try:
-            return ServiceAppointmentSerializer(obj.service).data
-        except Exception:
-            return None
-
-    def get_client(self, obj):
-        if obj.appointment and obj.appointment.client:
-            return ClientAppointmentSerializer(obj.appointment.client).data
-        else:
-            return None
-
     class Meta:
         model = AppointmentService
-        fields = ['id',
-                  'appointment_id', 'appointment_date', 'appointment_status',
-                  'price', 'total_price', 'discount_price',
-                  'appointment_time',
-                  'end_time',
-                  'client_type', 'duration', 'currency', 'created_at', 'service', 'client', 'location', 'is_blocked',
-                  'details',
-                  'status', 'appointment_status', 'is_favourite',
-                  ]
-
+        fields = '__all__'
 
 class EmployeeAppointmentSerializer(serializers.ModelSerializer):
     employee = serializers.SerializerMethodField()
@@ -790,7 +638,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 loop_return = []
                 for id in data['ids']:
                     app_service = AppointmentService.objects.get(id=id)
-                    serialized_service = CalanderserializerResponse(app_service, many=False)
+                    serialized_service = CalanderserializerResponse(app_service,many=False)
                     # serialized_service = AppointmentServiceSerializer(app_service , many=False)
                     loop_return.append(serialized_service.data)
                 returned_list.append(loop_return)
@@ -1200,12 +1048,11 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
                   'appointment_status', 'location', 'created_at', 'cancel_note', 'cancel_reason')
 
 
+
 class ServiceReversal(serializers.ModelSerializer):
     class Meta:
         model = Reversal
-        fields = ['id', 'request_status']
-
-
+        fields= ['id','request_status']
 class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     avaliable_service_group = serializers.SerializerMethodField(read_only=True)
@@ -1361,13 +1208,12 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AppointmentService
-        fields = (
-        'id', 'reversal_status', 'service', 'avaliable_service_group', 'member', 'price', 'client', 'designation',
-        'appointment_date', 'appointment_time', 'duration', 'srv_name', 'status',
-        'booked_by', 'booking_id', 'appointment_type', 'client_can_book', 'slot_availible_for_online',
-        'appointment_status', 'location', 'employee_list', 'created_at', 'is_deleted',
-        'appointment_service_member',
-        'service_start_time', 'service_end_time', 'is_favourite',)
+        fields = ('id','reversal_status', 'service', 'avaliable_service_group', 'member', 'price', 'client', 'designation',
+                  'appointment_date', 'appointment_time', 'duration', 'srv_name', 'status',
+                  'booked_by', 'booking_id', 'appointment_type', 'client_can_book', 'slot_availible_for_online',
+                  'appointment_status', 'location', 'employee_list', 'created_at', 'is_deleted',
+                  'appointment_service_member',
+                  'service_start_time', 'service_end_time', 'is_favourite',)
 
 
 class SingleAppointmentSerializer(serializers.ModelSerializer):
@@ -1696,7 +1542,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Appointment
-        fields = ['id', 'client', 'user_id', 'client_name', 'client_email', 'client_phone', 'client_all_appointment',
+        fields = ['id', 'client','user_id','client_name', 'client_email', 'client_phone', 'client_all_appointment',
                   'client_all_sales', 'appointment_tips', 'notes', 'business_address',
                   'client_type', 'appointmnet_service', 'customer_note', 'status']
 
@@ -1904,6 +1750,7 @@ class MissedOpportunityBasicSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientMissedOpportunity
         fields = ['id', 'client_name', 'client_type', 'note', 'date_time', 'services', 'dependency']
+
 
 
 class ClientImagesSerializerResponse(serializers.ModelSerializer):
