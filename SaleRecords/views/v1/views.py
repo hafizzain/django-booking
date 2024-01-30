@@ -65,7 +65,8 @@ class SaleRecordViews(APIView):
                 if invoice_serializer.is_valid():
                     invoice_serializer.save()
                     sale_record.invoice = invoice_serializer.instance
-                    sale_record.save()
+                    
+                new_sale = sale_record.save()
                 
                 
                 response_data = {
@@ -75,7 +76,7 @@ class SaleRecordViews(APIView):
                             'message': 'Checkout created successfully!',
                             'error_message': None,
                             'data': {
-                                'checkout': SaleRecordSerializer(sale_record).data,
+                                'checkout': SaleRecordSerializer(new_sale).data,
                                 # 'coupon': CouponSerializer(coupon_serializer.instance).data,
                                 # 'invoice': InvoiceSerializer(invoice).data
                             }
