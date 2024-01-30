@@ -12,7 +12,7 @@ from Employee.models import Employee, GiftCards
 from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs
 from Finance.models import Refund
 from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip , Appointment
-from Invoices.models import SaleInvoice
+# from Invoices.models import SaleInvoice
 
 # from Business.models import
 
@@ -22,7 +22,7 @@ class SaleRecords(CommonField):
     user = models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True, related_name='sale_records_user') 
     # employee = models.ForeignKey(Employee, on_delete=models.SET_NULL,blank=True, null=True, related_name='sale_records_member') 
     location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null = True, related_name='sale_records_business_address') 
-    invoice = models.ForeignKey(SaleInvoice, on_delete = models.SET_NULL, null = True, related_name = 'sale_record_invoice') 
+    # invoice = models.ForeignKey(SaleInvoice, on_delete = models.SET_NULL, null = True, related_name = 'sale_record_invoice') 
     
     
     # refunds_data = models.ForeignKey(Refund, on_delete = models.SET_NULL, null = True, blank=True, related_name = 'sale_record_refunds') 
