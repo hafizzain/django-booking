@@ -17,10 +17,9 @@ class SaleRecordViews(APIView):
             if serializer.is_valid():
                 sale_record = serializer.save()
                 
-                
                 invoice = SaleInvoice.objects.create(
                     user=user,
-                    client=request.data.get('client', None),
+                    client=sale_record.client,
                     location=request.data.get('location', None),
                     appointment=request.data.get('appointment', None),
                     appointment_service=request.data.get('appointment_service', None),
