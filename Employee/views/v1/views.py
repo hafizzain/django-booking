@@ -75,7 +75,7 @@ from Notification.notification_processor import NotificationProcessor
 
 from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
 from Sale.Constants.Custom_pag import CustomPagination
-from Employee.serializers import GiftCardDetails
+from Employee.serializers import GiftCardSerializerResponse, SingleGiftCardDetails,GiftCardDetails
 
 
 @transaction.atomic
@@ -7362,8 +7362,8 @@ def get_detail_from_code(request):
             query = GiftDetail.objects.filter(currencies=business_address.currency)
 
             # Serialize the retrieved gift_card and gift_detail
-            serializer_gift_card = GiftCardSerializerResponse(gift_card).data
-            serializer_gift_detail = GiftCardDetails(query.all(), many=True).data
+            serializer_gift_card = SingleGiftCardDetails(gift_card).data
+            serializer_gift_detail = GiftCardDetails(query.first(), many=True).data
 
             # Prepare the response data
             data = {
