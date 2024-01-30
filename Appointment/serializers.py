@@ -385,10 +385,285 @@ class BlockSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+# class EmployeeAppointmentSerializer(serializers.ModelSerializer):
+#     employee = serializers.SerializerMethodField()
+#     appointments = serializers.SerializerMethodField()
+# 
+#     # unavailable_time = serializers.SerializerMethodField()
+# 
+#     def get_appointment_id(self, obj):
+#         return None
+# 
+#     # def get_unavailable_time(self, employee_instance):
+#     #     return self.retreive_unavailable_time(employee_instance)
+# 
+#     def retreive_unavailable_time(self, employee_instance):
+#         errors = []
+#         selected_date = self.context.get('selected_date', None)
+#         if not selected_date:
+#             return []
+# 
+#         data = []
+# 
+#         exluded_times = []
+#         try:
+#             employee_working_schedule = EmployeDailySchedule.objects.get(
+#                 Q(employee=employee_instance,
+#                   date=selected_date,
+#                   is_holiday=False,
+#                   is_working_schedule=True,
+#                   is_weekend=False,
+#                   is_vacation=False) |
+#                 Q(is_leo_day=True,
+#                   employee=employee_instance,
+#                   date=selected_date
+#                   # is_holiday = False,
+#                   # is_working_schedule = False,
+#                   # is_weekend = False,
+#                   # is_vacation = False
+# 
+#                   )
+# 
+#                 # is_leo_day=True
+#             )
+#             qs = employee_working_schedule
+#             # employee_working_schedule = EmployeDailySchedule.objects.get(
+#             #     Q(employee=employee_instance,
+#             #       date=selected_date,
+#             #       is_holiday=False,
+#             #       is_weekend=False,
+#             #       is_vacation=False) &
+#             #     (Q(is_working_schedule=True) | Q(is_leo_day=True))
+#             # )
+#             if employee_working_schedule.is_leave:
+#                 raise Exception('Employee on Leave')
+# 
+#             if employee_working_schedule.is_vacation:
+#                 raise Exception('Employee on Vacation')
+# 
+#         except Exception as err:
+#             errors.append(str(err))
+#             exluded_times.append({
+#                 'start_time': "00:00:00",
+#                 'end_time': "00:00:00",
+#             })
+#         else:
+#             first_shift = [employee_working_schedule.start_time, employee_working_schedule.end_time]
+#             second_shift = [employee_working_schedule.start_time_shift,
+#                             employee_working_schedule.end_time_shift] if employee_working_schedule.start_time_shift else None
+# 
+#             if not first_shift[0] or not first_shift[1]:
+#                 return []
+# 
+#             if employee_working_schedule.start_time.strftime('%H:%M:%S') == "00:00:00":
+#                 if employee_working_schedule.end_time.strftime('%H:%M:%S') == '00:00:00':
+#                     pass
+#                 else:
+#                     start_time = employee_working_schedule.end_time.strftime('%H:%M:%S')
+#                     end_time = "00:00:00"
+#                     if employee_working_schedule.start_time_shift:
+#                         end_time = None
+# 
+#                         if employee_working_schedule.end_time.strftime(
+#                                 '%H:%M:%S') == employee_working_schedule.start_time_shift.strftime('%H:%M:%S'):
+#                             if employee_working_schedule.end_time_shift.strftime('%H:%M:%S') == "00:00:00":
+#                                 start_time = None
+#                                 end_time = None
+#                             else:
+#                                 start_time = employee_working_schedule.end_time_shift.strftime('%H:%M:%S')
+#                                 end_time = '00:00:00'
+# 
+#                     if start_time and end_time:
+#                         exluded_times.append({
+#                             'start_time': start_time,
+#                             'end_time': end_time,
+#                         })
+#             else:
+#                 start_time = "00:00:00"
+#                 end_time = employee_working_schedule.start_time.strftime('%H:%M:%S')
+#                 exluded_times.append({
+#                     'start_time': start_time,
+#                     'end_time': end_time,
+#                 })
+# 
+#                 start_time = employee_working_schedule.end_time.strftime('%H:%M:%S')
+#                 end_time = None
+# 
+#                 if employee_working_schedule.end_time_shift:
+#                     if employee_working_schedule.end_time.strftime(
+#                             '%H:%M:%S') == employee_working_schedule.start_time_shift.strftime('%H:%M:%S'):
+#                         start_time = None
+#                         end_time = None
+#                         if employee_working_schedule.end_time_shift.strftime('%H:%M:%S') == "00:00:00":
+#                             pass
+#                         else:
+#                             start_time = employee_working_schedule.end_time_shift.strftime('%H:%M:%S')
+#                             end_time = "00:00:00"
+#                             exluded_times.append({
+#                                 'start_time': start_time,
+#                                 'end_time': end_time,
+#                             })
+#                     else:
+#                         end_time = employee_working_schedule.start_time_shift.strftime('%H:%M:%S')
+#                         exluded_times.append({
+#                             'start_time': start_time,
+#                             'end_time': end_time,
+#                         })
+#                         start_time = None
+#                         end_time = None
+# 
+#                         if employee_working_schedule.end_time_shift.strftime('%H:%M:%S') == "00:00:00":
+#                             pass
+#                         else:
+#                             start_time = employee_working_schedule.end_time_shift.strftime('%H:%M:%S')
+#                             end_time = "00:00:00"
+#                             exluded_times.append({
+#                                 'start_time': start_time,
+#                                 'end_time': end_time,
+#                             })
+#                 else:
+#                     end_time = "00:00:00"
+#                     exluded_times.append({
+#                         'start_time': start_time,
+#                         'end_time': end_time,
+#                     })
+#         for exl_time in exluded_times:
+#             start_time = exl_time['start_time']
+#             end_time = exl_time['end_time']
+#             if start_time and end_time:
+#                 start_time_f = datetime.strptime(start_time, '%H:%M:%S')
+#                 end_time_f = datetime.strptime('23:59:59' if end_time == '00:00:00' else end_time, '%H:%M:%S')
+#                 difference = end_time_f - start_time_f
+#                 seconds = difference.seconds
+#                 minutes = seconds // 60
+#                 hours = minutes // 60
+#                 remaining_minutes = minutes % 60
+# 
+#                 remaining_time = remaining_minutes // 5
+#                 remaining_time = remaining_time * 5
+# 
+#                 # remianing_time_less_than_five = remaining_minutes % 5
+#                 # if remianing_time_less_than_five > 2:
+#                 #     remianing_time = remianing_time + 5
+# 
+#                 data.append([
+#                     {
+#                         "appointment_id": "51479f52-7943-44d1-b3b5-12e0125ca307",
+#                         "appointment_date": selected_date,
+#                         "appointment_time": start_time,
+#                         "end_time": end_time,
+#                         # 'difference' : f'{difference}min',
+#                         # "duration": "35min",
+#                         "duration": f'{hours}h {remaining_time}min',
+#                         "created_at": "2023-05-29T06:45:38.035196Z",
+#                         "is_blocked": True,
+#                         "is_unavailable": True,
+#                         'errors': errors,
+#                         'exluded_times': exluded_times
+#                     }
+#                 ])
+#         return data
+# 
+#         # single_data = {
+#         #     "id": "51479f52-7943-44d1-b3b5-12e0125ca307",
+#         #     "appointment_id": "51479f52-7943-44d1-b3b5-12e0125ca307",
+#         #     "appointment_date": "2023-05-29",appointment_service_status_update
+#         #     "appointment_time": "00:00:00",
+#         #     "end_time": "00:00:00",
+#         #     "duration": "35min",
+#         #     "created_at": "2023-05-29T06:45:38.035196Z",
+#         #     "is_blocked": True,
+#         # }
+# 
+#         # data.append(single_data)
+#         # return data
+# 
+#     def get_appointments(self, obj):
+#         selected_date = self.context.get('selected_date', None)
+#         if not selected_date:
+#             return []
+#         appoint_services = AppointmentService.objects.filter(
+#             member=obj,
+#             is_active=True,
+#             is_deleted=False,
+#             # is_blocked = False
+#             appointment_date=selected_date
+#         ).exclude(appointment__status=choices.AppointmentStatus.CANCELLED).distinct()
+# 
+#         try:
+#             # sort the appointments by start time
+#             sorted_appointments = sorted(appoint_services, key=lambda a: a.appointment_time)
+# 
+#             selected_data = []
+#             for appointment in sorted_appointments:
+#                 app_id = appointment.id
+#                 appointment_time = appointment.appointment_time
+#                 app_duration = appointment.duration
+#                 app_date = appointment.appointment_date
+#                 app_date_time = datetime.combine(app_date, appointment_time)
+# 
+#                 # calculate the end time
+#                 duration = DURATION_CHOICES[app_duration.lower()]
+#                 end_time = (app_date_time + timedelta(minutes=duration)).time()
+# 
+#                 # check for overlaps
+#                 overlap = False
+#                 for data in selected_data:
+#                     if data['date'] == app_date:
+#                         if appointment_time < data['range_end'] and end_time > data['range_start']:
+#                             overlap = True
+#                             data['ids'].append(app_id)
+#                             data['range_start'] = min(data['range_start'], appointment_time)
+#                             data['range_end'] = max(data['range_end'], end_time)
+#                             break
+# 
+#                 # add a new entry if there is no overlap
+#                 if not overlap:
+#                     selected_data.append({
+#                         'date': app_date,
+#                         'range_start': appointment_time,
+#                         'range_end': end_time,
+#                         'ids': [app_id],
+#                         'is_favourite': appointment.is_favourite,
+#                     })
+# 
+#             # serialize the data
+#             returned_list = []
+#             for data in selected_data:
+#                 loop_return = []
+#                 for id in data['ids']:
+#                     app_service = AppointmentService.objects.get(id=id)
+#                     serialized_service = AppointmentServiceSerializer(app_service)
+#                     loop_return.append(serialized_service.data)
+#                 returned_list.append(loop_return)
+# 
+#             returned_list.extend(self.retreive_unavailable_time(obj))
+#             return returned_list
+# 
+#         except Exception as err:
+#             ExceptionRecord.objects.create(
+#                 text=f'errors happen on appointment {str(err)}'
+#             )
+# 
+#     def get_employee(self, obj):
+#         try:
+#             return EmployeAppoinmentSerializer(obj, context=self.context).data
+#         except:
+#             return None
+# 
+#     class Meta:
+#         model = Employee
+#         fields = [
+#             'employee',
+#             # 'unavailable_time',
+#             'appointments',
+#         ]
+
+
 class EmployeeAppointmentSerializer(serializers.ModelSerializer):
+    # master code
     employee = serializers.SerializerMethodField()
     appointments = serializers.SerializerMethodField()
-
     # unavailable_time = serializers.SerializerMethodField()
 
     def get_appointment_id(self, obj):
@@ -408,33 +683,9 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
         exluded_times = []
         try:
             employee_working_schedule = EmployeDailySchedule.objects.get(
-                Q(employee=employee_instance,
-                  date=selected_date,
-                  is_holiday=False,
-                  is_working_schedule=True,
-                  is_weekend=False,
-                  is_vacation=False) |
-                Q(is_leo_day=True,
-                  employee=employee_instance,
-                  date=selected_date
-                  # is_holiday = False,
-                  # is_working_schedule = False,
-                  # is_weekend = False,
-                  # is_vacation = False
-
-                  )
-
-                # is_leo_day=True
+                employee=employee_instance,
+                date=selected_date,
             )
-            qs = employee_working_schedule
-            # employee_working_schedule = EmployeDailySchedule.objects.get(
-            #     Q(employee=employee_instance,
-            #       date=selected_date,
-            #       is_holiday=False,
-            #       is_weekend=False,
-            #       is_vacation=False) &
-            #     (Q(is_working_schedule=True) | Q(is_leo_day=True))
-            # )
             if employee_working_schedule.is_leave:
                 raise Exception('Employee on Leave')
 
@@ -533,6 +784,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             if start_time and end_time:
                 start_time_f = datetime.strptime(start_time, '%H:%M:%S')
                 end_time_f = datetime.strptime('23:59:59' if end_time == '00:00:00' else end_time, '%H:%M:%S')
+
                 difference = end_time_f - start_time_f
                 seconds = difference.seconds
                 minutes = seconds // 60
@@ -567,7 +819,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
         # single_data = {
         #     "id": "51479f52-7943-44d1-b3b5-12e0125ca307",
         #     "appointment_id": "51479f52-7943-44d1-b3b5-12e0125ca307",
-        #     "appointment_date": "2023-05-29",appointment_service_status_update
+        #     "appointment_date": "2023-05-29",
         #     "appointment_time": "00:00:00",
         #     "end_time": "00:00:00",
         #     "duration": "35min",
@@ -576,7 +828,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
         # }
 
         # data.append(single_data)
-        # return data
+        return data
 
     def get_appointments(self, obj):
         selected_date = self.context.get('selected_date', None)
@@ -658,7 +910,6 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             # 'unavailable_time',
             'appointments',
         ]
-
 
 class AppointmentSerializerDashboard(serializers.ModelSerializer):
     member = serializers.SerializerMethodField(read_only=True)
