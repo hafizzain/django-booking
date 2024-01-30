@@ -329,3 +329,24 @@ def get_promotions_and_discounts_sales_list(request):
     paginated_data = paginator.paginate_queryset(data, request)
 
     return paginator.get_paginated_response(paginated_data, 'sales')
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_sales_record(request):
+    location_id = request.GET.get('location_id', None)
+    range_start = request.GET.get('range_start', None)
+    year = request.GET.get('year', None)
+    range_end = request.GET.get('range_end', None)
+
+    return Response(
+        {
+            'status': 200,
+            'status_code': '200',
+            'response': {
+                'message': 'I am simply returning',
+                'error_message': None,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
