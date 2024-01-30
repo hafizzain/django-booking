@@ -7427,5 +7427,3 @@ def get_detail_from_code(request):
 
         # Return a 400 Bad Request response
         return Response(data, status=status.HTTP_400_BAD_REQUEST)
-
-            
