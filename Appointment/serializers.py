@@ -632,9 +632,10 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 loop_return = []
                 for id in data['ids']:
                     app_service = AppointmentService.objects.get(id=id)
+                    return app_service
                     # return str(app_service)
-                    serialized_service = AppointmentServiceSerializer(app_service,many=False)
-                    return str(serialized_service.data)
+                    # serialized_service = AppointmentServiceSerializer(app_service,many=False)
+                    # return str(serialized_service.data)
                     # loop_return.append(serialized_service.data)
                 returned_list.append(loop_return)
 
