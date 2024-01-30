@@ -17,6 +17,7 @@ class SaleRecordViews(APIView):
             if serializer.is_valid():
                 sale_record = serializer.save()
                 
+                #generate dynamic invoice
                 invoice = SaleInvoice.objects.create(
                     user = request.user,
                     client=request.client if request.client else None,
