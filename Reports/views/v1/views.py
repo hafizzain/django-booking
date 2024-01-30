@@ -344,19 +344,17 @@ def get_sales_record(request):
     if location_id:
         retail_target = retail_target.filter(location=location_id)
     if year:
-        retail_target = retail_target.filter(year__year=year).count()
+        retail_target = retail_target.filter(year__year=year)
     if month:
-        retail_target = retail_target.filter(month=month).count()
-    if location_id is None and year is None and month is None:
-        retail_target = retail_target.count()
-        retail_target = json.loads(retail_target)
+        retail_target = retail_target.filter(month=month)
+    retail_target = retail_target.count()
     return Response(
         {
             'status': 200,
             'status_code': '200',
             'response': {
                 'message': 'Successfully retrieve the record',
-                'retail_target': str(retail_target)
+                'retail_target': retail_target
             }
         },
         status=status.HTTP_200_OK
