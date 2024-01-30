@@ -7349,36 +7349,26 @@ def get_detail_from_code(request):
     code = request.query_params.get('code', None)
     location_id = request.query_params.get('location_id', None)
     if code is not None and location_id is not None:
-        try:
-            # Retrieve the BusinessAddress based on the provided location_id
-            business_address = BusinessAddress.objects.get(id=location_id)
-            
-            # Filter GiftCards based on the provided code and BusinessAddress
-            gift_card = GiftCards.objects.get(code=code)
-            
-            query = GiftDetail.objects.filter(currencies=business_address.currency)
-            # Serialize the retrieved gift_card using GiftCardSerializerResponse
-            serializer = GiftCardSerializerResponse(query).data
-            
-            # Prepare the response data
-            data = {
-                "success": True,
-                "status_code": 200,
-                "response": {
-                    "message": "Gift card details retrieved successfully",
-                    "error_message": None,
-                    "data": serializer
-                }
+        
+        # Retrieve the BusinessAddress based on the provided location_id
+        business_address = BusinessAddress.objects.get(id=location_id)
+        
+        # Filter GiftCards based on the provided code and BusinessAddress
+        gift_card = GiftCards.objects.get(code=code)
+        
+        query = GiftDetail.objects.filter(currencies=business_address.currency)
+        # Serialize the retrieved gift_card using GiftCardSerializerResponse
+        serializer = GiftCardSerializerResponse(query).data
+        
+        # Prepare the response data
+        data = {
+            "success": True,
+            "status_code": 200,
+            "response": {
+                "message": "Gift card details retrieved successfully",
+                "error_message": None,
+                "data": serializer.data
             }
-        except GiftCards.DoesNotExist:
-            # Handle the case when the gift card is not found
-            data = {
-                "success": False,
-                "status_code": 404,
-                "response": {
-                    "message": "Gift card not found",
-                    "error_message": "The specified gift card does not exist.",
-                    "data": None
-                }
-            }
-            return Response(data, status=status.HTTP_404_NOT_FOUND)
+        }
+        return Response(data, status=status.HTTP_200_OK)
+            
