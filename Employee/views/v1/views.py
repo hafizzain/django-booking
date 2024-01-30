@@ -7347,8 +7347,11 @@ def get_gift_card(request):
 @permission_classes([AllowAny])
 def get_detail_from_code(request):
     code = request.query_params.get('code', None)
-    if code is not None:
-        query_set = GiftCards.objects.filter(code__contains=code)
+    location = request.query_params.get('location_id', None)
+    if code and location is not None:
+        business_address = BusinessAddress.objects.get(id=location)
+        currency = business_address.currency
+        query_set = GiftCards.objects.filter(code__contains=code, currencies=currency)
         serializer = GiftCardSerializerResponse(query_set, many=True).data
         data = {
             "success": True,
