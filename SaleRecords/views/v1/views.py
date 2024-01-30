@@ -9,7 +9,27 @@ from SaleRecords.serializers import *
 
 
 class SaleRecordViews(APIView):
-    
+    def get(self, request, *args, **kwargs):
+        try:
+            sale_record = SaleRecords.objects.all()
+            response = {
+                'success': True,
+                'status_code': 200,
+                'response': {
+                            'message': 'Checkout created successfully!',
+                            'error_message': None,
+                            'data': {
+                                'checkout': SaleRecordSerializer(sale_record).data,
+                                # 'coupon': CouponSerializer(coupon_serializer.instance).data,
+                                # 'invoice': InvoiceSerializer(invoice).data
+                            }
+                        }
+            }
+            return Response(response)
+        except Exception as e:
+            return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        
     def post(self, request, *args, **kwargs):
         try:
             user = request.user
