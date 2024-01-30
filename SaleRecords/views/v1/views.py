@@ -53,7 +53,7 @@ class SaleRecordViews(APIView):
                             'data': {
                                 'checkout': SaleRecordSerializer(sale_record).data,
                                 # 'coupon': CouponSerializer(coupon_serializer.instance).data,
-                                'invoice': InvoiceSerializer(invoice).data
+                                # 'invoice': InvoiceSerializer(invoice).data
                             }
                         }
                     }
