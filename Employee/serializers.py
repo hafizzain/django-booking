@@ -2077,7 +2077,7 @@ class GiftCardSerializerResponse(serializers.ModelSerializer):
         else:
             currency = Currency.objects.all()
 
-            currency_data = CurrencySerializer(currency).data
+            currency_data = CurrencySerializer(currency, many=True).data
             
             return currency_data
         
