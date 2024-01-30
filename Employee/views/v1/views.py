@@ -17,7 +17,7 @@ from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee,
 , EmployeeMarketingPermission, EmployeeSelectedService, SallarySlipPayrol, StaffGroup
 , StaffGroupModulePermission, Attendance
 , Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation, LeaveManagements, WeekManagement,
-                             VacationDetails, GiftCard, GiftCards, GiftDetails, GiftDetail
+                             VacationDetails, GiftCard, GiftCards, GiftDetails,GiftCardDetails,
                              )
 from Employee.services import annual_vacation_check, check_available_vacation_type
 from HRM.models import Holiday
@@ -39,7 +39,7 @@ from Employee.serializers import (EmployeSerializer, EmployeInformationsSerializ
                                   NewVacationSerializer,
                                   NewAbsenceSerializer, singleEmployeeSerializerOP, Payroll_WorkingScheduleSerializerOP,
                                   WeekendManagementSerializer, LeaveManagementSerializer, ScheduleSerializerOP,
-                                  ScheduleSerializerResponse, GiftCardSerializer, GiftCardSerializerResponse,
+                                  ScheduleSerializerResponse, GiftCardSerializer, GiftCardSerializerResponse,GiftDetail,
                                   EmployeDailyScheduleResponse, VacationDetailsSerializer,
                                   VacationDetailsResponseSerializer, Allscedulae
                                   )
@@ -7358,7 +7358,7 @@ def get_detail_from_code(request):
         
         query = GiftDetail.objects.filter(currencies=business_address.currency)
         # Serialize the retrieved gift_card using GiftCardSerializerResponse
-        serializer = GiftCardSerializerResponse(query).data
+        serializer = GiftCardSerializerResponse(gift_card).data
         
         # Prepare the response data
         data = {
@@ -7367,7 +7367,8 @@ def get_detail_from_code(request):
             "response": {
                 "message": "Gift card details retrieved successfully",
                 "error_message": None,
-                "data": serializer.data
+                "data": serializer.data,
+                "gift_card": GiftCardDetails(query).data
             }
         }
         return Response(data, status=status.HTTP_200_OK)
