@@ -348,7 +348,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AppointmentService
-        fields = ['id',
+        fields = ['id','client_info',
                   'appointment_id', 'appointment_date', 'appointment_status',
                   'price', 'total_price', 'discount_price',
                   'appointment_time',
@@ -644,7 +644,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 returned_list.append(loop_return)
 
             returned_list.extend(self.retreive_unavailable_time(obj))
-            return 'uzaifa'
+            return returned_list
 
         except Exception as err:
             ExceptionRecord.objects.create(
