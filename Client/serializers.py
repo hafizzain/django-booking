@@ -512,7 +512,7 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
         return ''
     
     def get_discount_percentage(self , obj):
-        discount_percentage = obj.voucher.
+        discount_percentage = obj.voucher.discount_percentage
 
     def get_location(self, vouchers_records):
         try:
