@@ -4,6 +4,7 @@ from Invoices.models import SaleInvoice
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
 from SaleRecords.serializers import *
 
 
@@ -61,12 +62,8 @@ class SaleRecordViews(APIView):
                     service_commission_type=f'{request.data.get("service_commission_type")}' if request.data.get("service_commission_type") else '',
                     checkout=sale_record.id,
                 )
-                invoice_serializer = SaleInvoiceSerializer(data=invoice)
-                if invoice_serializer.is_valid():
-                    invoice_serializer.save()
-                    sale_record.invoice = invoice_serializer.instance
-                    
-                new_sale = sale_record.save()
+                sale_record.invoice = invoice.save()
+                sale_record = sale_record.save()
                 
                 
                 response_data = {
@@ -76,7 +73,7 @@ class SaleRecordViews(APIView):
                             'message': 'Checkout created successfully!',
                             'error_message': None,
                             'data': {
-                                'checkout': SaleRecordSerializer(new_sale).data,
+                                'checkout': SaleRecordSerializer(sale_record).data,
                                 # 'coupon': CouponSerializer(coupon_serializer.instance).data,
                                 # 'invoice': InvoiceSerializer(invoice).data
                             }
