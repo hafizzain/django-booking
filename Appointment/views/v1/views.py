@@ -608,10 +608,10 @@ def get_calendar_appointment(request):
     #     Q(is_active=False, in_active_date_isnull=False,in_active_date__gte=selected_date
     #       ) | Q(is_active=True)
     # )
-    all_memebers = all_memebers.filter(
-        Q(is_active=False, in_active_date__isnull=False, in_active_date__gte=selected_date) |
-        Q(is_active=True)
-    )
+    # all_memebers = all_memebers.filter(
+    #     Q(is_active=False, in_active_date__isnull=False, in_active_date__gte=selected_date) |
+    #     Q(is_active=True)
+    # )
 
     # all_memebers = all_memebers.annotate(
     #     filtered_in_active_date=Case(
