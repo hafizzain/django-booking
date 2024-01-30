@@ -62,8 +62,8 @@ class SaleRecordViews(APIView):
                     service_commission_type=f'{request.data.get("service_commission_type")}' if request.data.get("service_commission_type") else '',
                     checkout=sale_record.id,
                 )
-                sale_record.invoice = invoice.save()
-                sale_record = sale_record.save()
+                invoice.save()
+                
                 
                 
                 response_data = {
