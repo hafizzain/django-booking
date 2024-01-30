@@ -2117,3 +2117,19 @@ class SingleGiftCardDetails(serializers.ModelSerializer):
             return currency_data
         else:
             return None
+        
+class GiftCardDetailsabc(serializers.ModelSerializer):
+    currency_code = serializers.CharField(source='currencies.code')
+    currency = serializers.CharField(source='currencies.id')
+    
+    retail_price=serializers.CharField(read_only=True)
+    class Meta:
+        model = GiftDetail
+        fields = ['currency_code','retail_price','currency']
+        
+    # def get_currency_and_retail_price(self):
+    #     return {
+    #         'currency_id': self.currency.id,
+    #         'currency_code': self.currency.code,
+    #         'retail_price': self.retail_price,
+    #     }
