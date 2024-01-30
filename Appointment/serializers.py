@@ -402,31 +402,31 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
         selected_date = self.context.get('selected_date', None)
         if not selected_date:
             return []
-
         data = []
 
         exluded_times = []
         try:
-            employee_working_schedule = EmployeDailySchedule.objects.get(
-                Q(employee=employee_instance,
-                  date=selected_date,
-                  is_holiday=False,
-                  is_working_schedule=True,
-                  is_weekend=False,
-                  is_vacation=False) |
-                Q(is_leo_day=True,
-                  employee=employee_instance,
-                  date=selected_date
-                  # is_holiday = False,
-                  # is_working_schedule = False,
-                  # is_weekend = False,
-                  # is_vacation = False
-
-                  )
-
-                # is_leo_day=True
-            )
-            qs = employee_working_schedule
+            employee_working_schedule = EmployeDailySchedule.objects.get(employee=employee_instance)
+            # employee_working_schedule = EmployeDailySchedule.objects.get(
+            #     Q(employee=employee_instance,
+            #       date=selected_date,
+            #       is_holiday=False,
+            #       is_working_schedule=True,
+            #       is_weekend=False,
+            #       is_vacation=False) |
+            #     Q(is_leo_day=True,
+            #       employee=employee_instance,
+            #       date=selected_date
+            #       # is_holiday = False,
+            #       # is_working_schedule = False,
+            #       # is_weekend = False,
+            #       # is_vacation = False
+            #
+            #       )
+            #
+            #     # is_leo_day=True
+            # )
+            # qs = employee_working_schedule
             # employee_working_schedule = EmployeDailySchedule.objects.get(
             #     Q(employee=employee_instance,
             #       date=selected_date,
@@ -589,61 +589,61 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             # is_blocked = False
             appointment_date=selected_date
         ).exclude(appointment__status=choices.AppointmentStatus.CANCELLED).distinct()
-        return str(appoint_services)
-        # try:
-        #     # sort the appointments by start time
-        #     sorted_appointments = sorted(appoint_services, key=lambda a: a.appointment_time)
-        #
-        #     selected_data = []
-        #     for appointment in sorted_appointments:
-        #         app_id = appointment.id
-        #         appointment_time = appointment.appointment_time
-        #         app_duration = appointment.duration
-        #         app_date = appointment.appointment_date
-        #         app_date_time = datetime.combine(app_date, appointment_time)
-        #
-        #         # calculate the end time
-        #         duration = DURATION_CHOICES[app_duration.lower()]
-        #         end_time = (app_date_time + timedelta(minutes=duration)).time()
-        #
-        #         # check for overlaps
-        #         overlap = False
-        #         for data in selected_data:
-        #             if data['date'] == app_date:
-        #                 if appointment_time < data['range_end'] and end_time > data['range_start']:
-        #                     overlap = True
-        #                     data['ids'].append(app_id)
-        #                     data['range_start'] = min(data['range_start'], appointment_time)
-        #                     data['range_end'] = max(data['range_end'], end_time)
-        #                     break
-        #
-        #         # add a new entry if there is no overlap
-        #         if not overlap:
-        #             selected_data.append({
-        #                 'date': app_date,
-        #                 'range_start': appointment_time,
-        #                 'range_end': end_time,
-        #                 'ids': [app_id],
-        #                 'is_favourite': appointment.is_favourite,
-        #             })
-        #
-        #     # serialize the data
-        #     returned_list = []
-        #     for data in selected_data:
-        #         loop_return = []
-        #         for id in data['ids']:
-        #             app_service = AppointmentService.objects.get(id=id)
-        #             serialized_service = AppointmentServiceSerializer(app_service)
-        #             loop_return.append(serialized_service.data)
-        #         returned_list.append(loop_return)
-        #
-        #     returned_list.extend(self.retreive_unavailable_time(obj))
-        #     return returned_list
-        #
-        # except Exception as err:
-        #     ExceptionRecord.objects.create(
-        #         text=f'errors happen on appointment {str(err)}'
-        #     )
+        # return str(appoint_services)
+        try:
+            # sort the appointments by start time
+            sorted_appointments = sorted(appoint_services, key=lambda a: a.appointment_time)
+
+            selected_data = []
+            for appointment in sorted_appointments:
+                app_id = appointment.id
+                appointment_time = appointment.appointment_time
+                app_duration = appointment.duration
+                app_date = appointment.appointment_date
+                app_date_time = datetime.combine(app_date, appointment_time)
+
+                # calculate the end time
+                duration = DURATION_CHOICES[app_duration.lower()]
+                end_time = (app_date_time + timedelta(minutes=duration)).time()
+
+                # check for overlaps
+                overlap = False
+                for data in selected_data:
+                    if data['date'] == app_date:
+                        if appointment_time < data['range_end'] and end_time > data['range_start']:
+                            overlap = True
+                            data['ids'].append(app_id)
+                            data['range_start'] = min(data['range_start'], appointment_time)
+                            data['range_end'] = max(data['range_end'], end_time)
+                            break
+
+                # add a new entry if there is no overlap
+                if not overlap:
+                    selected_data.append({
+                        'date': app_date,
+                        'range_start': appointment_time,
+                        'range_end': end_time,
+                        'ids': [app_id],
+                        'is_favourite': appointment.is_favourite,
+                    })
+
+            # serialize the data
+            returned_list = []
+            for data in selected_data:
+                loop_return = []
+                for id in data['ids']:
+                    app_service = AppointmentService.objects.get(id=id)
+                    serialized_service = AppointmentServiceSerializer(app_service)
+                    loop_return.append(serialized_service.data)
+                returned_list.append(loop_return)
+
+            returned_list.extend(self.retreive_unavailable_time(obj))
+            return returned_list
+
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text=f'errors happen on appointment {str(err)}'
+            )
 
     def get_employee(self, obj):
         try:
