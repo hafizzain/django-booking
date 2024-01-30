@@ -42,6 +42,7 @@ class SaleRecordViews(APIView):
                     service_commission_type=f'{request.service_commission_type}' if request.service_commission_type else '',
                     checkout=sale_record.id,
                 )
+                invoice.save()
                 response_data = {
                         'success': True,
                         'status_code': 200,
