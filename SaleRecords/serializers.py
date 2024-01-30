@@ -134,7 +134,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         return data
     class Meta:
         model = SaleRecords
-        fields = "__all__"
+        fields = ['id','user','client','client_type','location','status','total_tip','total_tax','total_price','sub_total']
         read_only_fields = ['invoice']
         
         
