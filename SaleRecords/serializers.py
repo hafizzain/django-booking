@@ -104,8 +104,8 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     gift_cards_records = PurchasedGiftCardsSerilizer(many = True,write_only = True)
     membership_records = SaleRecordMembershipSerializer(many = True,write_only = True )
     vouchers_records = SaleRecordVouchersSerializer(many =True ,write_only = True)
-    tax_records = SaleTaxSerializer(many =True)
-    tip_records = SaleOrderTipSerializer(many = True)
+    tax_records = SaleTaxSerializer(many =True, write_only = True)
+    tip_records = SaleOrderTipSerializer(many = True, write_only = True)
     
     # ================================================================   Applied Items  ==========================================
     applied_coupons_records = SaleRecordAppliedCouponsSerializer(many = True, write_only = True)
