@@ -2109,17 +2109,11 @@ class SingleGiftCardDetails(serializers.ModelSerializer):
         fields = "__all__"
         
     def get_currency(self, obj):
-        selected_location = self.context.get('location_id')
+        currency = self.context.get('currency')
         
-        if selected_location:
-            business_address = BusinessAddress.objects.get(id=selected_location)
-            currency = business_address.currency
-
-            if currency:
-                currency_data = CurrencySerializer(currency).data
-            
-                return currency_data
-            else:
-                return None
+        if currency:
+            currency_data = CurrencySerializer(currency).data
+        
+            return currency_data
         else:
             return None
