@@ -20,7 +20,7 @@ class SaleRecordViews(APIView):
                 
                 invoice = SaleInvoice.objects.create(
                     user=user,
-                    client=sale_record.client else None,
+                    client=sale_record.client,
                     location=sale_record.location,
                     appointment=request.data.get('appointment', None),
                     appointment_service=request.data.get('appointment_service', None),
