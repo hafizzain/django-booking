@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 
 from SaleRecords.serializers import *
 
+
 class SaleRecordViews(APIView):
     
     def post(self, request, *args, **kwargs):
@@ -19,8 +20,8 @@ class SaleRecordViews(APIView):
                 
                 invoice = SaleInvoice.objects.create(
                     user=user,
-                    client=sale_record.client,
-                    location=request.data.get('location', None),
+                    client=sale_record.client else None,
+                    location=sale_record.location,
                     appointment=request.data.get('appointment', None),
                     appointment_service=request.data.get('appointment_service', None),
                     payment_type=request.data.get('payment_type', None),
