@@ -635,7 +635,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                     # return str(app_service)
                     serialized_service = AppointmentServiceSerializer(app_service)
                     return serialized_service
-                    loop_return.append(serialized_service.data)
+                    # loop_return.append(serialized_service.data)
                 returned_list.append(loop_return)
 
             returned_list.extend(self.retreive_unavailable_time(obj))
