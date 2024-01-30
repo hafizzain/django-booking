@@ -11,6 +11,8 @@ from Reports.serializers import (BusinesAddressReportSerializer, ComissionReport
                                 ReportBrandSerializer, ReportsEmployeSerializer, ServiceGroupReport,
                                 EmployeeCommissionReportsSerializer)
 from Sale.Constants.Custom_pag import CustomPagination
+from TragetControl.models import StaffTarget, RetailTarget
+from TragetControl.serializers import RetailTargetSerializers
 from Utility.Constants.Data.months import MONTHS
 from NStyle.Constants import StatusCodes
 
@@ -334,17 +336,37 @@ def get_promotions_and_discounts_sales_list(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_sales_record(request):
-    location_id = request.GET.get('location_id', None)
-    range_start = request.GET.get('range_start', None)
-    year = request.GET.get('year', None)
-    range_end = request.GET.get('range_end', None)
+    search_text = request.query_params.get('search_text', None)
+    no_pagination = request.query_params.get('no_pagination', None)
+    month = request.query_params.get('month', None)
+    year = request.query_params.get('year', None)
+    location_id = request.query_params.get('location_id', None)
+    retail_target = RetailTarget.objects.all().order_by('-created_at').distinct()
 
+    if location_id:
+        location = BusinessAddress.objects.get(id=str(location_id))
+        retail_target = retail_target.filter(location=location)
+    if year:
+        retail_target = retail_target.filter(year__year=year)
+    if month:
+        retail_target = retail_target.filter(month=month)
+
+    if search_text:
+        retail_target = retail_target.filter(brand__name__icontains=search_text)
+
+    serialized = list(RetailTargetSerializers(retail_target, many=True, context={'request': request}).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'retailtarget')
     return Response(
         {
             'status': 200,
             'status_code': '200',
             'response': {
-                'message': 'Successfully retrieve the record'
+                'message': 'Successfully retrieve the record',
+                'response':response
             }
         },
         status=status.HTTP_200_OK
