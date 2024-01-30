@@ -637,7 +637,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 returned_list.append(loop_return)
 
             returned_list.extend(self.retreive_unavailable_time(obj))
-            return ['adasdasd']
+            return returned_list
 
         except Exception as err:
             ExceptionRecord.objects.create(
