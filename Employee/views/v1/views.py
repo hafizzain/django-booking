@@ -7381,9 +7381,9 @@ def get_detail_from_code(request):
                         "gift_card": serializer_gift_card,
                         "gift_detail": serializer_gift_detail,
                         "gift_card_retail" : gift_card_retail,
-                    }
+                    },
                 }
-
+            }
             # Return the response
             return Response(data, status=status.HTTP_200_OK)
 
