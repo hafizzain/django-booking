@@ -519,6 +519,7 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
             loc = BusinessAddress.objects.get(id = vouchers_records.sale_record.location)
             return LocationSerializerLoyalty(loc).data
         except Exception as err:
+            
             print(err)
 
     def get_client(self, vouchers_records):
