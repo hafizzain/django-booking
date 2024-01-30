@@ -3557,7 +3557,7 @@ def get_comment(request):
     user_id = request.query_params.get('user_id', None)
     if user_id:
         comment = Comments.objects.filter(user_id=user_id)
-        client_data = ClientResponse(comment, many=False).data
+        client_data = ClientResponse(comment, many=True).data
         return Response(
             {
                 'status': True,

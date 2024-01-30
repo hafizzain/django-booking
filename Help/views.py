@@ -131,7 +131,6 @@ def edit_topic_content(request):
 @permission_classes([AllowAny])
 def get_comment(request):
     search = request.GET.get('search', None)
-
     if search:
             try:
                 all_comments = HelpContent.objects.filter(is_parent = True, parent_comment__isnull = True, content__icontains = search)

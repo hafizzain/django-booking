@@ -210,9 +210,9 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     appointment_status = serializers.SerializerMethodField(read_only=True)
 
-    
+
     client_info = serializers.SerializerMethodField(read_only=True)
-    # is_favourite = serializers.BooleanField()
+    is_favourite = serializers.BooleanField()
 
     def get_client_info(self, obj):
         tag = obj.client_tag
@@ -355,7 +355,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                   'end_time',
                   'client_type', 'duration', 'currency', 'created_at', 'service', 'client', 'location', 'is_blocked',
                   'details',
-                  'status', 'appointment_status',
+                  'status', 'appointment_status', 'is_favourite',
                   ]
 
 
@@ -633,7 +633,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 for id in data['ids']:
                     app_service = AppointmentService.objects.get(id=id)
                     serialized_service = BlockSerializer(app_service,many=False)
-                    # serialized_service = AppointmentServiceSerializer(app_service , many=False)
+                    serialized_service = AppointmentServiceSerializer(app_service , many=False)
                     loop_return.append(serialized_service.data)
                 returned_list.append(loop_return)
 
