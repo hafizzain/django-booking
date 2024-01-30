@@ -7377,11 +7377,12 @@ def get_detail_from_code(request):
                 "response": {
                     "message": "Gift card details retrieved successfully",
                     "error_message": None,
-                    "data": serializer_gift_card,
-                    "gift_card": serializer_gift_detail,
-                    "gift_card_retail" : gift_card_retail
+                    "data": {
+                        "gift_card": serializer_gift_card,
+                        "gift_detail": serializer_gift_detail,
+                        "gift_card_retail" : gift_card_retail,
+                    }
                 }
-            }
 
             # Return the response
             return Response(data, status=status.HTTP_200_OK)
