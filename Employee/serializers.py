@@ -2059,7 +2059,7 @@ class CurrencySerializer(serializers.ModelSerializer):
 class GiftCardSerializerResponse(serializers.ModelSerializer):
     gift_card_details = GiftCardDetails(many=True, write_only=True)
     currency = serializers.SerializerMethodField(read_only=True)
-    retails_price = serializers.SerializerMethodField(read_only=True)
+    # retails_price = serializers.SerializerMethodField(read_only=True)
     
     def get_currency(self, obj):
         selected_location = self.context.get('selected_location')
@@ -2074,18 +2074,18 @@ class GiftCardSerializerResponse(serializers.ModelSerializer):
         else:
             return None
         
-    def get_retails_price(self, obj):
-        selected_location = self.context.get('selected_location')
+    # def get_retails_price(self, obj):
+    #     selected_location = self.context.get('selected_location')
         
-        business_address = BusinessAddress.objects.get(id=selected_location)
-        currency = business_address.currency
+    #     business_address = BusinessAddress.objects.get(id=selected_location)
+    #     currency = business_address.currency
         
-        retail = CurrencyRetailPrice.objects.filter(currency=currency).first()
+    #     retail = CurrencyRetailPrice.objects.filter(currency=currency).first()
         
-        if retail:
-            return retail.retail_price
-        else:
-            return None
+    #     if retail:
+    #         return retail.retail_price
+    #     else:
+    #         return None
     class Meta:
         model = GiftCards
         fields = "__all__"
