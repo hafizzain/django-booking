@@ -120,6 +120,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = SaleRecords
         fields = '__all__'
+        read_only_fields = ['updated_at','is_deleted','is_blocked','is_active','employee']
     
     def validate(self, data):
         # Validate that there is at least one record in appointment_services, services_records, and products_records
