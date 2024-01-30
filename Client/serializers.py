@@ -444,7 +444,7 @@ class VoucherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Vouchers
-        fields = ['id', 'name', 'arabic_name', 'user','business','voucher_type',
+        fields = ['id', 'name', 'arabic_name', 'user','business','voucher_type', 'end_date',
                 'validity','sales','is_deleted','is_active','created_at','currency_voucher','discount_percentage', 'voucher_count']
         read_only_fields = ['arabic_name']
 
@@ -510,6 +510,9 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
                 'full_name' : str(vouchers_records.sale_record.employee.full_name),
             }
         return ''
+    
+    def get_discount_percentage(self , obj):
+        discount_percentage = obj.voucher.
 
     def get_location(self, vouchers_records):
         try:
