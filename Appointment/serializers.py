@@ -296,7 +296,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     def get_location(self, obj):
         try:
             loc = BusinessAddress.objects.get(id=str(obj.business_address))
-            return LocationSerializer(loc, ).data
+            return LocationSerializer(loc).data
         # return obj.appointment.business_address.address
         except Exception as err:
             print(err)
@@ -632,7 +632,8 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 loop_return = []
                 for id in data['ids']:
                     app_service = AppointmentService.objects.get(id=id)
-                    serialized_service = BlockSerializer(app_service,many=False)
+                    # serialized_service = BlockSerializer(app_service,many=False)
+                    serialized_service = AppointmentServiceSerializer(app_service,many=False)
                     loop_return.append(serialized_service.data)
                 returned_list.append(loop_return)
 
