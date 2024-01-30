@@ -12,6 +12,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q, F, IntegerField
+from Client.helpers import calculate_validity
 from Service.models import Service
 from Business.models import Business, BusinessAddress
 from SaleRecords.models import SaleRecordMembership , SaleRecordVouchers
@@ -2379,6 +2380,8 @@ def create_vouchers(request):
     # valid_for = request.data.get('valid_for', None)
 
     validity = request.data.get('validity', None)
+    expiry_date = calculate_validity(validity)
+    
     # validity = "5 Min"
 
     sales = request.data.get('sales', None)
@@ -2432,6 +2435,7 @@ def create_vouchers(request):
         validity=validity,
         voucher_type=voucher_type,
         sales=sales,
+        end_data = expiry_date,
         discount_percentage=discount_percentage,
     )
     if currency_voucher_price is not None:

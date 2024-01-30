@@ -368,6 +368,8 @@ class Vouchers(models.Model):
 
     sales = models.FloatField(default=0)
     price = models.FloatField(default=0)
+    
+    end_date = models.DateField(blank=True, null=True)
 
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
