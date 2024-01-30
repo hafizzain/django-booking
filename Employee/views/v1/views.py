@@ -7369,7 +7369,7 @@ def get_detail_from_code(request):
                     "data": serializer
                 }
             }
-         except GiftCards.DoesNotExist:
+        except GiftCards.DoesNotExist:
             # Handle the case when the gift card is not found
             data = {
                 "success": False,
