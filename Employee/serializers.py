@@ -2075,7 +2075,11 @@ class GiftCardSerializerResponse(serializers.ModelSerializer):
             else:
                 return None
         else:
-            return None
+            currency = Currency.objects.all()
+
+            currency_data = CurrencySerializer(currency).data
+            
+            return currency_data
         
     # def get_retails_price(self, obj):
     #     selected_location = self.context.get('selected_location')
