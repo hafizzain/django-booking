@@ -352,7 +352,7 @@ def get_sales_record(request):
             'status_code': '200',
             'response': {
                 'message': 'Successfully retrieve the record',
-                'retail_target': retail_target
+                'retail_target': str(retail_target)
             }
         },
         status=status.HTTP_200_OK
