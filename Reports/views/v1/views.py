@@ -344,8 +344,7 @@ def get_sales_record(request):
             'status': 200,
             'status_code': '200',
             'response': {
-                'message': 'I am simply returning',
-                'error_message': None,
+                'message': 'Successfully retrieve the record'
             }
         },
         status=status.HTTP_200_OK
