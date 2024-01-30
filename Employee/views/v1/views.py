@@ -7363,7 +7363,7 @@ def get_detail_from_code(request):
 
             # Serialize the retrieved gift_card and gift_detail
             serializer_gift_card = SingleGiftCardDetails(gift_card).data
-            serializer_gift_detail = GiftCardDetails(query.first(), context={'location_id': business_address}).data
+            serializer_gift_detail = GiftCardDetails(query.first(), context={'location_id': location_id}).data
 
             # Prepare the response data
             data = {

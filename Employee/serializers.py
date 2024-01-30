@@ -2122,4 +2122,4 @@ class SingleGiftCardDetails(serializers.ModelSerializer):
             else:
                 return None
         else:
-            return None
+            return True
