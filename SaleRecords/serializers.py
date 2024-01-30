@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.db import transaction
-from Invoices.models import SaleInvoice
+# from Invoices.models import SaleInvoicee
 
 from SaleRecords.models import *
 # from Invoices.models import
@@ -235,8 +235,3 @@ class SaleRecordSerializer(serializers.ModelSerializer):
 
         return sale_record
     
-class InvoiceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SaleInvoice
-        fields = '__all__'
-        
