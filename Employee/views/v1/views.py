@@ -7369,3 +7369,15 @@ def get_detail_from_code(request):
                     "data": serializer
                 }
             }
+         except GiftCards.DoesNotExist:
+            # Handle the case when the gift card is not found
+            data = {
+                "success": False,
+                "status_code": 404,
+                "response": {
+                    "message": "Gift card not found",
+                    "error_message": "The specified gift card does not exist.",
+                    "data": None
+                }
+            }
+            return Response(data, status=status.HTTP_404_NOT_FOUND)
