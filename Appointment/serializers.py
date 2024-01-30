@@ -406,27 +406,26 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
 
         exluded_times = []
         try:
-            employee_working_schedule = EmployeDailySchedule.objects.get(employee=employee_instance)
-            # employee_working_schedule = EmployeDailySchedule.objects.get(
-            #     Q(employee=employee_instance,
-            #       date=selected_date,
-            #       is_holiday=False,
-            #       is_working_schedule=True,
-            #       is_weekend=False,
-            #       is_vacation=False) |
-            #     Q(is_leo_day=True,
-            #       employee=employee_instance,
-            #       date=selected_date
-            #       # is_holiday = False,
-            #       # is_working_schedule = False,
-            #       # is_weekend = False,
-            #       # is_vacation = False
-            #
-            #       )
-            #
-            #     # is_leo_day=True
-            # )
-            # qs = employee_working_schedule
+            employee_working_schedule = EmployeDailySchedule.objects.get(
+                Q(employee=employee_instance,
+                  date=selected_date,
+                  is_holiday=False,
+                  is_working_schedule=True,
+                  is_weekend=False,
+                  is_vacation=False) |
+                Q(is_leo_day=True,
+                  employee=employee_instance,
+                  date=selected_date
+                  # is_holiday = False,
+                  # is_working_schedule = False,
+                  # is_weekend = False,
+                  # is_vacation = False
+
+                  )
+
+                # is_leo_day=True
+            )
+            qs = employee_working_schedule
             # employee_working_schedule = EmployeDailySchedule.objects.get(
             #     Q(employee=employee_instance,
             #       date=selected_date,
@@ -562,6 +561,8 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                         'exluded_times': exluded_times
                     }
                 ])
+            else:
+                return "L"
         return data
 
         # single_data = {
