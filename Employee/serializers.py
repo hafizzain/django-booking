@@ -2101,3 +2101,8 @@ class EmployeDailyScheduleResponse(serializers.ModelSerializer):
     class Meta:
         model = EmployeDailySchedule
         fields = "__all__"
+
+class SingleGiftCardDetails(serializers.ModelSerializer):
+    class Meta:
+        model = GiftCards
+        fields = "__all__"
