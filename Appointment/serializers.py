@@ -584,7 +584,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             return []
         appoint_services = AppointmentService.objects.filter(
             member=obj,
-            is_active=True,
+            # is_active=True,
             is_deleted=False,
             # is_blocked = False
             appointment_date=selected_date
