@@ -2103,22 +2103,17 @@ class EmployeDailyScheduleResponse(serializers.ModelSerializer):
         fields = "__all__"
 
 class SingleGiftCardDetails(serializers.ModelSerializer):
-    currency = serializers.SerializerMethodField(read_only=True)
+    gift_card_currency_retail = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = GiftCards
         fields = "__all__"
         
-    def get_currency(self, obj):
-        currency = self.context.get('currency')
+    def get_gift_card_currency_retail(self, obj):
+        query= GiftCards.objects.all()
+        gift_card_currency_retail = GiftCardCurrencyRetailSerializer(query).data
+        return gift_card_currency_retail
         
-        if currency:
-            currency_data = CurrencySerializer(currency).data
-        
-            return currency_data
-        else:
-            return None
-        
-class GiftCardDetailsabc(serializers.ModelSerializer):
+class GiftCardCurrencyRetailSerializer(serializers.ModelSerializer):
     currency_code = serializers.CharField(source='currencies.code')
     currency = serializers.CharField(source='currencies.id')
     
@@ -2127,9 +2122,3 @@ class GiftCardDetailsabc(serializers.ModelSerializer):
         model = GiftDetail
         fields = ['currency_code','retail_price','currency']
         
-    # def get_currency_and_retail_price(self):
-    #     return {
-    #         'currency_id': self.currency.id,
-    #         'currency_code': self.currency.code,
-    #         'retail_price': self.retail_price,
-    #     }
