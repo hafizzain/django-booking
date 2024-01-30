@@ -489,10 +489,10 @@ class ClientLoyaltyPointSerializer(serializers.ModelSerializer):
 class ClientVouchersSerializer(serializers.ModelSerializer):
     voucher = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
-    order_type  = serializers.SerializerMethodField(read_only=True)
+    # order_type  = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
     name  = serializers.SerializerMethodField(read_only=True)
-    voucher_price  = serializers.SerializerMethodField(read_only=True)
+    # voucher_price  = serializers.SerializerMethodField(read_only=True)
     employee = serializers.SerializerMethodField()
         
     def get_order_type(self, obj):
