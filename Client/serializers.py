@@ -3,6 +3,7 @@ from Business.models import BusinessAddress
 from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
 from Order.models import VoucherOrder, MemberShipOrder, Checkout
+from SaleRecords.models import SaleRecordMembership, SaleRecordVouchers
 from Order.serializers import CreatedAtCheckoutSerializer
 from Product.models import Product
 from Service.models import Service
@@ -488,37 +489,37 @@ class ClientLoyaltyPointSerializer(serializers.ModelSerializer):
 class ClientVouchersSerializer(serializers.ModelSerializer):
     voucher = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
-    order_type  = serializers.SerializerMethodField(read_only=True)
+    # order_type  = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
     name  = serializers.SerializerMethodField(read_only=True)
-    voucher_price  = serializers.SerializerMethodField(read_only=True)
+    # voucher_price  = serializers.SerializerMethodField(read_only=True)
+    employee = serializers.SerializerMethodField()
         
     def get_order_type(self, obj):
         return 'Voucher'
     
     def get_voucher_price(self, obj):
-        return obj.current_price
+        return obj.price
     
-    employee = serializers.SerializerMethodField()
     
 
-    def get_employee(self, voucher_order):
-        if voucher_order.member:
+    def get_employee(self, vouchers_records):
+        if vouchers_records.sale_record.employee:
             return {
-                'full_name' : str(voucher_order.member.full_name),
+                'full_name' : str(vouchers_records.sale_record.employee.full_name),
             }
         return ''
 
-    def get_location(self, obj):
+    def get_location(self, vouchers_records):
         try:
-            loc = BusinessAddress.objects.get(id = obj.location.id)
+            loc = BusinessAddress.objects.get(id = vouchers_records.sale_record.location)
             return LocationSerializerLoyalty(loc).data
         except Exception as err:
             print(err)
 
-    def get_client(self, obj):
+    def get_client(self, vouchers_records):
         try:
-            serializers = ClientSerializer(obj.client).data
+            serializers = ClientSerializer(vouchers_records.sale_record.client).data
             return serializers
         except Exception as err:
             return None
@@ -542,11 +543,27 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
             return None
 
     class Meta:
-        model = VoucherOrder
-        fields = ['id', 'voucher', 'client' , 'location' , 
-                  'status','quantity', 'checkout','employee','start_date', 'end_date',
-                  'total_price', 'payment_type' , 'order_type','price',
-                  'name','created_at','discount_percentage', 'voucher_price', 'max_sales']
+        model = SaleRecordVouchers
+        fields = ['id',
+                  'voucher',
+                  'client' ,
+                  'location' , 
+                #   'status',
+                  'qty',
+                #   'checkout',
+                  'employee',
+                  'start_date',
+                  'end_date',
+                #   'total_price',
+                #   'payment_type' ,
+                #   'order_type',
+                  'price',
+                  'name',
+                  'created_at',
+                #   'discount_percentage',
+                #   'voucher_price',
+                #   'max_sales'
+                ]
 
 class ClientMembershipsSerializer(serializers.ModelSerializer):
     # membership = serializers.SerializerMethodField(read_only=True)
@@ -579,29 +596,29 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
         return 'Membership'
     
     def get_membership_price(self, obj):
-        return (obj.current_price)
+        return (obj.price)
     
 
-    def get_employee(self, membership_order):
-        if membership_order.member:
+    def get_employee(self, membership_records):
+        sale_record_instance = membership_records.sale_record
+        if sale_record_instance and sale_record_instance.employee:
             return {
-                'full_name' : str(membership_order.member.full_name),
+                'full_name': str(sale_record_instance.employee.full_name),
             }
-        return ''
+        return None 
 
-    def get_location(self, obj):
-        try:
-            loc = BusinessAddress.objects.get(id = obj.location.id)
-            return LocationSerializerLoyalty(loc).data
-        except Exception as err:
-            print(err)
+    def get_location(self, membership_records):
+        sale_record_instance = membership_records.sale_record
+        if sale_record_instance and sale_record_instance.location:
+            return LocationSerializerLoyalty(sale_record_instance.location).data
+        return None
 
-    def get_client(self, obj):
-        try:
-            serializered_data = ClientSerializer(obj.client).data
-            return serializered_data
-        except Exception as err:
-            return None
+    def get_client(self, membership_records):
+        client_instance = membership_records.sale_record.client
+        if client_instance:
+            return ClientSerializer(client_instance).data
+        return None
+
     
     
     def get_name(self, obj):
@@ -618,26 +635,26 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
         
     
     class Meta:
-        model = MemberShipOrder
+        model = SaleRecordMembership
         fields = [
             'id',
             'name', 
             'client', 
             'location',
-            'status',
-            'quantity',
+            # 'status',
+            'qty',
             'products', 
             'services',
-            'checkout',
+            # 'checkout',
             'employee',
-            'start_date', 
-            'end_date',
-            'total_price', 
-            'payment_type', 
+            # 'start_date', 
+            # 'end_date',
+            # 'total_price', 
+            # 'payment_type', 
             'order_type',
             'price',
             'created_at',
-            'discount_percentage', 
+            # 'discount_percentage', 
             'membership_price', 
             'discount_type' 
         ]

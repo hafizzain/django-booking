@@ -29,7 +29,8 @@ from .models import (EmployeDailySchedule, Employee, EmployeeProfessionalInfo,
                      )
 from Authentication.models import AccountType, User
 from django_tenants.utils import tenant_context
-
+from Business.models import BusinessAddress
+from Product.models import CurrencyRetailPrice
 
 class VacationDetailsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -2050,15 +2051,45 @@ class GiftCardDetails(serializers.ModelSerializer):
         model = GiftDetail
         fields = "__all__"
 
+class CurrencySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Currency
+        fields = ['id', 'code']
 
 class GiftCardSerializerResponse(serializers.ModelSerializer):
-    gift_card_details = GiftCardDetails(many=True, write_only= True)
+    gift_card_details = GiftCardDetails(many=True, write_only=True)
+    currency = serializers.SerializerMethodField(read_only=True)
+    retails_price = serializers.SerializerMethodField(read_only=True)
+    
+    def get_currency(self, obj):
+        selected_location = self.context.get('selected_location')
+        
+        business_address = BusinessAddress.objects.get(id=selected_location)
+        currency = business_address.currency
 
+        if currency:
+            currency_data = CurrencySerializer(currency).data
+            
+            return currency_data
+        else:
+            return None
+        
+    def get_retails_price(self, obj):
+        selected_location = self.context.get('selected_location')
+        
+        business_address = BusinessAddress.objects.get(id=selected_location)
+        currency = business_address.currency
+        
+        retail = CurrencyRetailPrice.objects.filter(currency=currency).first()
+        
+        if retail:
+            return retail.retail_price
+        else:
+            return None
     class Meta:
         model = GiftCards
         fields = "__all__"
-
-
+        
 class EmployeDailyScheduleResponse(serializers.ModelSerializer):
     class Meta:
         model = EmployeDailySchedule
