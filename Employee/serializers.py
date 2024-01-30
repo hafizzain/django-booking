@@ -2103,6 +2103,23 @@ class EmployeDailyScheduleResponse(serializers.ModelSerializer):
         fields = "__all__"
 
 class SingleGiftCardDetails(serializers.ModelSerializer):
+    currency = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = GiftCards
         fields = "__all__"
+        
+    def get_currency(self, obj):
+        selected_location = self.context.get('location_id')
+        
+        if selected_location:
+            business_address = BusinessAddress.objects.get(id=selected_location)
+            currency = business_address.currency
+
+            if currency:
+                currency_data = CurrencySerializer(currency).data
+            
+                return currency_data
+            else:
+                return None
+        else:
+            return None
