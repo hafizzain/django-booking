@@ -7362,8 +7362,9 @@ def get_detail_from_code(request):
             query = GiftDetail.objects.filter(currencies=business_address.currency)
 
             # Serialize the retrieved gift_card and gift_detail
-            serializer_gift_card = SingleGiftCardDetails(gift_card).data
-            serializer_gift_detail = GiftCardDetails(query.first(), context={'location_id': location_id}).data
+            serializer_gift_card = SingleGiftCardDetails(gift_card, context={'location_id': location_id}).data
+            
+            serializer_gift_detail = GiftCardDetails(query.first()).data
 
             # Prepare the response data
             data = {
