@@ -342,7 +342,6 @@ def get_sales_record(request):
     year = request.query_params.get('year', None)
     location_id = request.query_params.get('location_id', None)
     retail_target = RetailTarget.objects.all().order_by('-created_at').distinct()
-
     if location_id:
         location = BusinessAddress.objects.get(id=str(location_id))
         retail_target = retail_target.filter(location=location)
@@ -355,7 +354,6 @@ def get_sales_record(request):
         retail_target = retail_target.filter(brand__name__icontains=search_text)
 
     serialized = list(RetailTargetSerializers(retail_target, many=True, context={'request': request}).data)
-
     paginator = CustomPagination()
     paginator.page_size = 100000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
@@ -366,7 +364,7 @@ def get_sales_record(request):
             'status_code': '200',
             'response': {
                 'message': 'Successfully retrieve the record',
-                'response':response
+                'response':str(response)
             }
         },
         status=status.HTTP_200_OK
