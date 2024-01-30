@@ -640,17 +640,17 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                     app_service = AppointmentService.objects.get(id=id)
                     # serialized_service = CalanderserializerResponse(app_service,many=False)
                     serialized_service = AppointmentServiceSerializer(app_service , many=False)
-                    return 'uzaifa'
                     # loop_return.append(serialized_service.data)
                 returned_list.append(loop_return)
 
             returned_list.extend(self.retreive_unavailable_time(obj))
-            return returned_list
+            return 'uzaifa'
 
         except Exception as err:
             ExceptionRecord.objects.create(
                 text=f'errors happen on appointment {str(err)}'
             )
+            return str(err)
 
     def get_employee(self, obj):
         try:
