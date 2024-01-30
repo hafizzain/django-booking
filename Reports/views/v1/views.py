@@ -358,14 +358,15 @@ def get_sales_record(request):
     paginator.page_size = 100000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
     response = paginator.get_paginated_response(paginated_data, 'retailtarget')
-    return Response(
-        {
-            'status': 200,
-            'status_code': '200',
-            'response': {
-                'message': 'Successfully retrieve the record',
-                'response':str(response)
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    return response
+    # return Response(
+    #     {
+    #         'status': 200,
+    #         'status_code': '200',
+    #         'response': {
+    #             'message': 'Successfully retrieve the record',
+    #             'response':str(response)
+    #         }
+    #     },
+    #     status=status.HTTP_200_OK
+    # )
