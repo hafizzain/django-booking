@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.db import transaction
-# from Invoices.models import SaleInvoicee
+from Invoices.models import SaleInvoice
 
 from SaleRecords.models import *
 # from Invoices.models import
@@ -94,6 +94,11 @@ class AppliedPromotionSerializer(serializers.ModelSerializer):
         model = AppliedPromotion
         fields = "__all__"
 
+
+class SaleInvoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SaleInvoice
+        fields = "__all__"
 
 class SaleRecordSerializer(serializers.ModelSerializer):
     
