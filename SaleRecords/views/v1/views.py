@@ -27,7 +27,7 @@ class SaleRecordViews(APIView):
                     payment_type=request.data.get('payment_type', None),
                     # payment_methods=request.data.get('payment_methods_records'),
 
-                    tip=f'{request.data.get("tip")}' if request.data.get("tip") else 0,
+                    # tip=f'{request.data.get("tip")}' if request.data.get("tip") else 0,
                     invoice_type='order',
                     checkout_type=f'{request.data.get("checkout_type")}' if request.data.get("checkout_type") else 'sale',
 
