@@ -589,7 +589,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             # is_blocked = False
             appointment_date=selected_date
         ).exclude(appointment__status=choices.AppointmentStatus.CANCELLED).distinct()
-
+        return appoint_services
         try:
             # sort the appointments by start time
             sorted_appointments = sorted(appoint_services, key=lambda a: a.appointment_time)
