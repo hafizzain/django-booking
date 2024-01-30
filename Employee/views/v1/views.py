@@ -7354,16 +7354,16 @@ def get_detail_from_code(request):
         try:
             # Retrieve the BusinessAddress based on the provided location_id
             business_address = BusinessAddress.objects.get(id=location_id)
-
+            currency=business_address.currency
             # Filter GiftCards based on the provided code and BusinessAddress
             gift_card = GiftCards.objects.get(code=code)
 
             # Filter GiftDetail based on the retrieved gift_card
-            query = GiftDetail.objects.filter(currencies=business_address.currency) \
+            query = GiftDetail.objects.filter(currencies=currency) \
                                     .filter(gift_card=gift_card)
 
             # Serialize the retrieved gift_card and gift_detail
-            serializer_gift_card = SingleGiftCardDetails(gift_card, context={'location_id': location_id}).data
+            serializer_gift_card = SingleGiftCardDetails(gift_card,context={'currency':currency}).data
             
             #erializer the gift card details
             serializer_gift_detail = GiftCardDetails(query.all() ,many=True).data
