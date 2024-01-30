@@ -7347,19 +7347,25 @@ def get_gift_card(request):
 @permission_classes([AllowAny])
 def get_detail_from_code(request):
     code = request.query_params.get('code', None)
-    location = request.query_params.get('location_id', None)
-    if code and location is not None:
-        business_address = BusinessAddress.objects.get(id=location)
-        currency = business_address.currency
-        query_set = GiftCards.objects.filter(code__contains=code, currencies=currency)
-        serializer = GiftCardSerializerResponse(query_set, many=True).data
-        data = {
-            "success": True,
-            "status_code": 200,
-            "response": {
-                "message": "gift card get successfully",
-                "error_message": None,
-                "data": serializer
+    location_id = request.query_params.get('location_id', None)
+    if code is not None and location_id is not None:
+        try:
+            # Retrieve the BusinessAddress based on the provided location_id
+            business_address = BusinessAddress.objects.get(id=location_id)
+            
+            # Filter GiftCards based on the provided code and BusinessAddress
+            gift_card = GiftCards.objects.get(code=code, location=business_address)
+            
+            # Serialize the retrieved gift_card using GiftCardSerializerResponse
+            serializer = GiftCardSerializerResponse(gift_card).data
+            
+            # Prepare the response data
+            data = {
+                "success": True,
+                "status_code": 200,
+                "response": {
+                    "message": "Gift card details retrieved successfully",
+                    "error_message": None,
+                    "data": serializer
+                }
             }
-        }
-        return Response(data, status=status.HTTP_200_OK)
