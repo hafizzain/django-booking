@@ -16,6 +16,7 @@ class SaleRecordViews(APIView):
             serializer = SaleRecordSerializer(data=request.data, context = {'request': request})
             if serializer.is_valid():
                 sale_record = serializer.save()
+                
                 invoice = SaleInvoice.objects.create(
                     user = request.user,
                     client=request.client if request.client else None,
@@ -26,8 +27,6 @@ class SaleRecordViews(APIView):
                     # payment_methods = request.payment_methods_records if request.payment_methods_records else None,
 
                     tip = f'{request.tip}' if request.tip else 0,
-                    # Added new fields
-
                     invoice_type='order',
                     checkout_type=f'{request.checkout_type}' if request.checkout_type else 'sale',
 
@@ -42,6 +41,8 @@ class SaleRecordViews(APIView):
                     service_commission_type=f'{request.service_commission_type}' if request.service_commission_type else '',
                     checkout=sale_record.id,
                 )
+                invoice.save()
+                
                 response_data = {
                         'success': True,
                         'status_code': 200,
