@@ -7369,7 +7369,7 @@ def get_detail_from_code(request):
                 "message": "Gift card details retrieved successfully",
                 "error_message": None,
                 "data": serializer.data,
-                "gift_card": GiftCardDetails(query).data
+                "gift_card": GiftCardDetails(query.all(), many=True).data
             }
         }
         return Response(data, status=status.HTTP_200_OK)
