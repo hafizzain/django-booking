@@ -534,8 +534,8 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
                 'voucher_type' : obj.voucher.voucher_type,
                 'name' : obj.voucher.name,
                 'sales': obj.voucher.sales,
-                'start_date' : f'{obj.start_date}',
-                'end_date' : f'{obj.end_date}',
+                'start_date' : f'{obj.voucher.created_at}',
+                'end_date' : f'{obj.voucher.end_date}',
             }
         
         return {}
