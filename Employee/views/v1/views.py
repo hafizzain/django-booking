@@ -7354,10 +7354,11 @@ def get_detail_from_code(request):
             business_address = BusinessAddress.objects.get(id=location_id)
             
             # Filter GiftCards based on the provided code and BusinessAddress
-            gift_card = GiftCards.objects.get(code=code, location=business_address)
+            gift_card = GiftCards.objects.get(code=code)
             
+            query = GiftDetail.objects.filter(currencies=business_address.currency)
             # Serialize the retrieved gift_card using GiftCardSerializerResponse
-            serializer = GiftCardSerializerResponse(gift_card).data
+            serializer = GiftCardSerializerResponse(query).data
             
             # Prepare the response data
             data = {
