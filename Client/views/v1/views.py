@@ -2435,7 +2435,7 @@ def create_vouchers(request):
         validity=validity,
         voucher_type=voucher_type,
         sales=sales,
-        end_data = expiry_date,
+        end_date = expiry_date,
         discount_percentage=discount_percentage,
     )
     if currency_voucher_price is not None:
