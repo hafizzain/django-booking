@@ -1,11 +1,11 @@
 from SaleRecords.models import SaleRecords
+from Invoices.models import SaleInvoice
 
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from SaleRecords.serializers import SaleRecordSerializer
-
+from SaleRecords.serializers import *
 
 class SaleRecordViews(APIView):
     
@@ -16,7 +16,32 @@ class SaleRecordViews(APIView):
             serializer = SaleRecordSerializer(data=request.data, context = {'request': request})
             if serializer.is_valid():
                 sale_record = serializer.save()
-                
+                invoice = SaleInvoice.objects.create(
+                    user = request.user,
+                    client=request.client if request.client else None,
+                    location = request.location if request.location else None,
+                    appointment=request.appointment if request.appointment else None,
+                    appointment_service=request.appointment_service if request.appointment_service else None,
+                    payment_type=request.payment_type if request.payment_type else None,
+                    # payment_methods = request.payment_methods_records if request.payment_methods_records else None,
+
+                    tip = f'{request.tip}' if request.tip else 0,
+                    # Added new fields
+
+                    invoice_type='order',
+                    checkout_type=f'{request.checkout_type}' if request.checkout_type else 'sale',
+
+                    service=f'{request.service}' if request.service else '',
+                    member=f'{request.member}' if request.member else '',
+                    business_address=f'{request.location}' if request.location else '',
+                    gst=f'{request.gst}' if request.gst else '',
+                    gst_price=f'{request.gst_price}' if request.gst_price else '',
+                    service_price=f'{request.service_price}' if request.service_price else 0,
+                    total_price=f'{request.total_price}' if request.total_price else 0,
+                    service_commission=f'{request.service_commission}' if request.service_commission else 0,
+                    service_commission_type=f'{request.service_commission_type}' if request.service_commission_type else '',
+                    checkout=sale_record.id,
+                )
                 response_data = {
                         'success': True,
                         'status_code': 200,
@@ -26,7 +51,7 @@ class SaleRecordViews(APIView):
                             'data': {
                                 'checkout': serializer.data,
                                 # 'coupon': CouponSerializer(coupon_serializer.instance).data,
-                                # 'invoice': SaleInvoiceSerializer(newInvoice).data
+                                'invoice': InvoiceSerializer(invoice).data
                             }
                         }
                     }

@@ -18,7 +18,7 @@ from Appointment.models import Appointment, AppointmentCheckout, AppointmentServ
 from Utility.models import ExceptionRecord
 from MultiLanguage.models import InvoiceTranslation
 from MultiLanguage.serializers import InvoiceTransSerializer
-
+# from SaleRecords.models import PaymentMethods
 
 
 class SaleInvoice(models.Model):
@@ -102,6 +102,7 @@ class SaleInvoice(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(null=True, blank=True)
+    
     
     def __str__(self):
         return str(self.id)
