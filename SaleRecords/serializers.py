@@ -115,7 +115,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     
     # ================================================================   Applied Items  ==========================================
     applied_coupons_records = SaleRecordAppliedCouponsSerializer(many = True, write_only = True)
-    applied_memberships_records = AppliedMembershipsSerializer(many = True,write_only = True)
+    applied_memberships_records = AppliedMembershipsSerializer(many = True, write_only = True)
     applied_vouchers_records = AppliedVouchersSerializer(many = True, write_only = True)
     applied_gift_cards_records = AppliedGiftCardsSerializer(many = True, write_only = True)
     applied_promotions_records = AppliedPromotionSerializer(many = True, write_only = True)
@@ -124,11 +124,10 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         invoice = SaleInvoice.objects.get(checkout = obj.id)
         return SaleInvoiceSerializer(invoice).data
     
-    
-    
     class Meta:
         model = SaleRecords
         fields = ['id','location','checkout_type','client','client_type','status','total_tip','total_tax','total_price','sub_total','invoice']
+        
         # exclude = ['updated_at','is_deleted','is_blocked','is_active']
     
     def validate(self, data):
