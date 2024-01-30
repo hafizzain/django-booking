@@ -632,8 +632,9 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 loop_return = []
                 for id in data['ids']:
                     app_service = AppointmentService.objects.get(id=id)
-                    serialized_service = AppointmentServiceSerializer(app_service)
-                    loop_return.append(serialized_service.data)
+                    return str(app_service)
+                    # serialized_service = AppointmentServiceSerializer(app_service)
+                    # loop_return.append(serialized_service.data)
                 returned_list.append(loop_return)
 
             returned_list.extend(self.retreive_unavailable_time(obj))
