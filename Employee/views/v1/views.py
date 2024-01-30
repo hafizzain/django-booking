@@ -7360,7 +7360,7 @@ def get_detail_from_code(request):
 
             # Filter GiftDetail based on the retrieved gift_card
             query = GiftDetail.objects.filter(currencies=business_address.currency) \
-                                    .filter(gift_card__code=code)
+                                    .filter(gift_card=gift_card)
 
             # Serialize the retrieved gift_card and gift_detail
             serializer_gift_card = SingleGiftCardDetails(gift_card, context={'location_id': location_id}).data
