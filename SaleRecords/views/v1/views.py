@@ -17,7 +17,7 @@ class SaleRecordViews(APIView):
             if serializer.is_valid():
                 sale_record = serializer.save()
                 
-
+                
                 invoice = SaleInvoice.objects.create(
                     user=user,
                     client=request.data.get('client', None),
@@ -27,13 +27,13 @@ class SaleRecordViews(APIView):
                     payment_type=request.data.get('payment_type', None),
                     # payment_methods=request.data.get('payment_methods_records'),
 
-                    tip=f'{request.data.get("tip")}' if request.data.get("tip") else 0,
+                    # tip=f'{request.data.get("tip")}' if request.data.get("tip") else 0,
                     invoice_type='order',
                     checkout_type=f'{request.data.get("checkout_type")}' if request.data.get("checkout_type") else 'sale',
 
                     service=f'{request.data.get("service")}' if request.data.get("service") else '',
                     member=f'{request.data.get("member")}' if request.data.get("member") else '',
-                    business_address=f'{request.data.get("location")}' if request.data.get("location") else '',
+                    # business_address=f'{request.data.get("location")}' if request.data.get("location") else '',
                     gst=f'{request.data.get("gst")}' if request.data.get("gst") else '',
                     gst_price=f'{request.data.get("gst_price")}' if request.data.get("gst_price") else '',
                     service_price=f'{request.data.get("service_price")}' if request.data.get("service_price") else 0,
