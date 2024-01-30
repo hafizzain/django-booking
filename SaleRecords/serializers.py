@@ -119,7 +119,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = SaleRecords
-        fields = '__all__'
+        # fields = '__all__'
         exclude = ['updated_at','is_deleted','is_blocked','is_active','employee']
     
     def validate(self, data):
