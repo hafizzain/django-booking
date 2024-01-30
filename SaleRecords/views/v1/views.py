@@ -13,10 +13,6 @@ class SaleRecordViews(APIView):
         try:
             user = request.user
             request.data['user'] = user.id
-            # client_id = request.data.get('client')  # Ensure 'client' is present in request data
-            # if not client_id:
-            #     return Response({"error": "'client' is required in the request data."}, status=status.HTTP_400_BAD_REQUEST)
-            # return Response({'success':'Yeaaahhhhhh'})
             serializer = SaleRecordSerializer(data=request.data, context = {'request': request})
             if serializer.is_valid():
                 sale_record = serializer.save()
