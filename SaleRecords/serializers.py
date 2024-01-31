@@ -37,9 +37,8 @@ class PurchasedGiftCardsSerilizer(serializers.ModelSerializer):
     def get_gift_card_detail(self, obj):
         if obj.gift_card:
             
-            return f"{'title': obj.gift_card.title,\
-                    'code': obj.gift_card.title,\
-            }"
+            return {'title': f"{obj.gift_card.title}",
+                    'code': f"{obj.gift_card.title}"}
     class Meta:
         model = PurchasedGiftCards
         fields = "__all__"
