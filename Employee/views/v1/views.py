@@ -7354,34 +7354,19 @@ def get_detail_from_code(request):
 
     if code is not None and location_id is not None:
         try:
-            # Retrieve the BusinessAddress based on the provided location_id
-            # business_address = BusinessAddress.objects.get(id=location_id)
-            # currency=business_address.currency
+            
             # Filter GiftCards based on the provided code and BusinessAddress
             gift_card = GiftCards.objects.get(code=code)
-
-            # Filter GiftDetail based on the retrieved gift_card
-            # query = GiftDetail.objects.filter(currencies=currency) \
-                                    # .filter(gift_card=gift_card)
-
-            # Serialize the retrieved gift_card and gift_detail
-            serializer_gift_card = SingleGiftCardDetails(gift_card, context={'location_id':location_id}).data
+            serializer_gift_card = SingleGiftCardDetails(gift_card,
+                                                        context={'location_id':location_id}).data
             
-            # #erializer the gift card details
-            # serializer_gift_detail = GiftCardDetails(query, many=True).data
-            
-            # gift_card_retail = GiftCardRetailPriceSerializer(query, many=True).data
-            # Prepare the response data
             data = {
                 "success": True,
                 "status_code": 200,
                 "response": {
                     "message": "Gift card details retrieved successfully",
                     "error_message": None,
-                    "data": {
-                        "gift_card": serializer_gift_card,
-                        # "gift_card_retail_price": gift_card_retail,
-                    },
+                    "gift_card": serializer_gift_card,
                 }
             }
             # Return the response

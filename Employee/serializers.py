@@ -2112,13 +2112,14 @@ class SingleGiftCardDetails(serializers.ModelSerializer):
         
     def get_gift_card_details(self, obj):
         location_id = self.context.get('location_id')
+        # Retrieve the BusinessAddress based on the provided location_id
         business_address = BusinessAddress.objects.get(id=location_id)
         currency=business_address.currency
 
         query = GiftDetail.objects.filter(currencies=currency) \
-                                    .filter(gift_card=obj.gift_card)
-
-        gift_card_details = GiftCardDetails(query, many=True).data
+                                    .filter(gift_card=obj)
+        
+        gift_card_details = GiftCardRetailPriceSerializer(query, many=True).data
         return gift_card_details
 class GiftCardRetailPriceSerializer(serializers.ModelSerializer):
     currency_code = serializers.CharField(source='currencies.code')
@@ -2128,9 +2129,3 @@ class GiftCardRetailPriceSerializer(serializers.ModelSerializer):
         model = GiftDetail
         fields = ['currency_code','retail_price','currency','price']
         
-    # def get_currency_and_retail_price(self):
-    #     return {
-    #         'currency_id': self.currency.id,
-    #         'currency_code': self.currency.code,
-    #         'retail_price': self.retail_price,
-    #     }
