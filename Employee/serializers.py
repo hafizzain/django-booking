@@ -1005,6 +1005,7 @@ class HolidaysSerializer(serializers.ModelSerializer):
         model = Holiday
         fields = "__all__"
 
+
 class Allscedulae(serializers.ModelSerializer):
     class Meta:
         model = EmployeDailySchedule
@@ -1014,7 +1015,9 @@ class Allscedulae(serializers.ModelSerializer):
 class VacationSerializerResponse(serializers.ModelSerializer):
     class Meta:
         model = Vacation
-        fields= ['id','vacation_type']
+        fields = ['id', 'vacation_type']
+
+
 class ScheduleSerializerOP(serializers.ModelSerializer):
     is_holidays = serializers.SerializerMethodField(read_only=True)
     vacation = VacationSerializerResponse()
@@ -1133,7 +1136,8 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
 
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'vacation','is_leo_day', 'is_holidays', 'is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date',
+        fields = ['id', 'vacation', 'is_leo_day', 'is_holidays', 'is_holiday', 'date', 'is_vacation', 'is_leave',
+                  'from_date',
                   'is_working_schedule',
                   'day', 'end_time_shift', 'end_time', 'is_weekend', 'vacation_status', 'note',
                   'start_time']
@@ -1164,7 +1168,7 @@ class ScheduleSerializerResponse(serializers.ModelSerializer):
 
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'title', 'date', 'employee','is_weekend','vacation','from_date']
+        fields = ['id', 'title', 'date', 'employee', 'is_weekend', 'vacation', 'from_date']
 
 
 class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
@@ -1265,7 +1269,8 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'business', 'employee', 'day', 'vacation', 'start_time', 'end_time',
                   'start_time_shift', 'end_time_shift', 'from_date', 'to_date', 'total_hours', 'note',
                   'date', 'is_leave', 'is_off', 'is_vacation', 'is_active', 'created_at', 'updated_at',
-                  'total_hours_dummy', 'is_leo_day', 'is_holiday', 'is_working_schedule', 'is_weekend','vacation_status']
+                  'total_hours_dummy', 'is_leo_day', 'is_holiday', 'is_working_schedule', 'is_weekend',
+                  'vacation_status']
 
 
 class WorkingScheduleSerializer(serializers.ModelSerializer):
@@ -1342,6 +1347,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         #     Q(is_vacation=True, vacation_status='accepted'),
         #     **query
         # )
+        # qs = EmployeDailySchedule.objects.filter(employee=obj, **query)
         qs = EmployeDailySchedule.objects.filter(employee=obj)
         qs = qs.exclude(vacation_status='pending')
         # qs = qs.annotate(
@@ -2042,7 +2048,7 @@ class GiftCardSerializer(serializers.ModelSerializer):
 class Currencyresponse(serializers.ModelSerializer):
     class Meta:
         model = Currency
-        fields = ['id','code']
+        fields = ['id', 'code']
 
 
 class GiftCardDetails(serializers.ModelSerializer):
@@ -2051,26 +2057,29 @@ class GiftCardDetails(serializers.ModelSerializer):
         model = GiftDetail
         fields = "__all__"
 
+
 class CurrencySerializer(serializers.ModelSerializer):
     class Meta:
         model = Currency
         fields = ['id', 'code']
 
+
 class GiftCardSerializerResponse(serializers.ModelSerializer):
     gift_card_details = GiftCardDetails(many=True)
     currency = serializers.SerializerMethodField(read_only=True)
+
     # retails_price = serializers.SerializerMethodField(read_only=True)
-    
+
     def get_currency(self, obj):
         selected_location = self.context.get('selected_location')
-        
+
         if selected_location:
             business_address = BusinessAddress.objects.get(id=selected_location)
             currency = business_address.currency
 
             if currency:
                 currency_data = CurrencySerializer(currency).data
-            
+
                 return currency_data
             else:
                 return None
@@ -2078,17 +2087,17 @@ class GiftCardSerializerResponse(serializers.ModelSerializer):
             currency = Currency.objects.all()
 
             currency_data = CurrencySerializer(currency, many=True).data
-            
+
             return currency_data
-        
+
     # def get_retails_price(self, obj):
     #     selected_location = self.context.get('selected_location')
-        
+
     #     business_address = BusinessAddress.objects.get(id=selected_location)
     #     currency = business_address.currency
-        
+
     #     retail = CurrencyRetailPrice.objects.filter(currency=currency).first()
-        
+
     #     if retail:
     #         return retail.retail_price
     #     else:
@@ -2096,28 +2105,32 @@ class GiftCardSerializerResponse(serializers.ModelSerializer):
     class Meta:
         model = GiftCards
         fields = "__all__"
-        
+
+
 class EmployeDailyScheduleResponse(serializers.ModelSerializer):
     class Meta:
         model = EmployeDailySchedule
         fields = "__all__"
 
+
 class SingleGiftCardDetails(serializers.ModelSerializer):
     currency = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = GiftCards
         fields = "__all__"
-        
+
     def get_currency(self, obj):
         currency = self.context.get('currency')
-        
+
         if currency:
             currency_data = CurrencySerializer(currency).data
-        
+
             return currency_data
         else:
             return None
-        
+
+
 class GiftCardDetailsabc(serializers.ModelSerializer):
     currency_code = serializers.CharField(source='currencies.code')
     currency = serializers.CharField(source='currencies.id')
