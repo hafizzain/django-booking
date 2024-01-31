@@ -26,15 +26,15 @@ def matching_records(location=None, range_start=None, range_end=None, services=N
             search_text = search_text.replace('#', '')
             invoice_checkout_ids = list(
                 SaleInvoice.objects.filter(id__icontains=search_text).values_list('checkout', flat=True))
-            sale_queries &= Q(id__in=invoice_checkout_ids) | Q(client__full_name__icontains=search_text)
-            app_queries &= Q(id__in=invoice_checkout_ids) | Q(appointment__client__full_name__icontains=search_text)
+            filters &= Q(id__in=invoice_checkout_ids) | Q(client__full_name__icontains=search_text)
+            
+            # app_queries &= Q(id__in=invoice_checkout_ids) | Q(appointment__client__full_name__icontains=search_text)
 
         # Fetch records based on the constructed filters
-            return matching_records = SaleRecords.objects.filter(filters)
+            return SaleRecords.objects.filter(filters)
         else:
-            return matching_records = SaleRecords.objects.all()
+            return  SaleRecords.objects.all()
         
-        return matching_records
         
     except Exception as e:
         
