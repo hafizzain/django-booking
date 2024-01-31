@@ -2121,7 +2121,7 @@ class SingleGiftCardDetails(serializers.ModelSerializer):
                                     .filter(gift_card=obj)
         
         #Serialize the GiftDetail
-        return GiftCardRetailPriceSerializer(query, many=True)
+        return GiftCardRetailPriceSerializer(query, many=True).data
 class GiftCardRetailPriceSerializer(serializers.ModelSerializer):
     currency_code = serializers.CharField(source='currencies.code')
     currency = serializers.CharField(source='currencies.id')
