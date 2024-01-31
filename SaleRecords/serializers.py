@@ -38,7 +38,7 @@ class PurchasedGiftCardsSerilizer(serializers.ModelSerializer):
         if obj.gift_card:
             
             return {'title': f"{obj.gift_card.title}",
-                    'code': f"{obj.gift_card.title}"}
+                    'code': f"{obj.gift_card.code}"}
     class Meta:
         model = PurchasedGiftCards
         fields = "__all__"
