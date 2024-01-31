@@ -849,7 +849,7 @@ class ClientImageSerializer(serializers.ModelSerializer):
 class UserSerializerResponse(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = "__all__"
+        fields = ['id','full_name','email']
 
 class ClientResponse(serializers.ModelSerializer):
     user = UserSerializerResponse()
