@@ -4,22 +4,37 @@ from Invoices.models import SaleInvoice
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
 
 from SaleRecords.serializers import *
 
 
 class SaleRecordViews(APIView):
+    pagination_class = PageNumberPagination
+    page_size = 10
     def get(self, request, *args, **kwargs):
         try:
             sale_record = SaleRecords.objects.all()
+            
+            #Apply Pagination
+            paginator = self.pagination_class()
+            result_page = paginator.paginate_queryset(sale_record, request)
+            serializer = SaleRecordSerializer(result_page, many=True)
             response = {
+                'count': paginator.page.paginator.count,
+                'next': paginator.get_next_link(),
+                'previous': paginator.get_previous_link(),
+                'current_page': paginator.page.number,
+                'per_page': self.page_size,
+                'total_pages': paginator.page.paginator.num_pages,
                 'success': True,
                 'status_code': 200,
                 'response': {
                             'message': 'Record fetched successfully!',
                             'error_message': None,
                             'data': {
-                                'checkout': SaleRecordSerializer(sale_record, many = True).data,
+                                'checkout': serializer.data,
+                                # 'checkout': SaleRecordSerializer(sale_record, many = True).data,
                                 # 'coupon': CouponSerializer(coupon_serializer.instance).data,
                                 # 'invoice': InvoiceSerializer(invoice).data
                             }
