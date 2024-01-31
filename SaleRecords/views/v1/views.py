@@ -16,13 +16,13 @@ class SaleRecordViews(APIView):
     
     def get(self, request, *args, **kwargs):
         try:
-            location = request.GET.get('location')
-            range_start = request.GET.get('range_start')
-            range_end = request.GET.get('range_end')
-            client = request.GET.get('client')
-            search_text = request.GET.get('search_text')
-            service = request.GET.get('service')
-            search_text = request.GET.get('search_text')
+            location = request.GET.get('location', None)
+            range_start = request.GET.get('range_start', None)
+            range_end = request.GET.get('range_end', None)
+            client = request.GET.get('client',None)
+            search_text = request.GET.get('search_text', None)
+            service = request.GET.get('service', None)
+            search_text = request.GET.get('search_text', None)
             
             sale_record = matching_records(location= location,
                                             range_start = range_start,

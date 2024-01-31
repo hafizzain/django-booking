@@ -1,5 +1,4 @@
 from .models import SaleRecords
-from Invoices.models import SaleInvoice
 from django.db.models import Q
 
 
@@ -21,20 +20,10 @@ def matching_records(location=None, range_start=None, range_end=None, services=N
 
         if client is not None:
             filters &= Q(client=client)
-            
-        if search_text is not None:
-            search_text = search_text.replace('#', '')
-            invoice_checkout_ids = list(
-                SaleInvoice.objects.filter(id__icontains=search_text).values_list('checkout', flat=True))
-            filters &= Q(id__in=invoice_checkout_ids) | Q(client__full_name__icontains=search_text)
-            
-            # app_queries &= Q(id__in=invoice_checkout_ids) | Q(appointment__client__full_name__icontains=search_text)
 
         # Fetch records based on the constructed filters
-            return SaleRecords.objects.filter(filters)
-        else:
-            return  SaleRecords.objects.all()
-        
+        matching_records = SaleRecords.objects.filter(filters)
+        return matching_records
         
     except Exception as e:
         
