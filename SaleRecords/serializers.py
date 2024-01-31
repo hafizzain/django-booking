@@ -134,7 +134,8 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         return data
     class Meta:
         model = SaleRecords
-        exclude = ['is_active','is_blocked','is_deleted']
+        fields = "__all__"
+        # exclude = ['is_active','is_blocked','is_deleted']
         read_only_fields = ['invoice']
         
         
