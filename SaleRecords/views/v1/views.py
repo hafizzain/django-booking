@@ -28,7 +28,7 @@ class SaleRecordViews(APIView):
                                             range_start = range_start,
                                             range_end = range_end,
                                             client = client,
-                                            service = service,
+                                            services = service,
                                             search_text = search_text
                                         )
             #Apply Pagination
