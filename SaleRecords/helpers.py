@@ -30,7 +30,10 @@ def matching_records(location=None, range_start=None, range_end=None, services=N
             app_queries &= Q(id__in=invoice_checkout_ids) | Q(appointment__client__full_name__icontains=search_text)
 
         # Fetch records based on the constructed filters
-        matching_records = SaleRecords.objects.filter(filters)
+            matching_records = SaleRecords.objects.filter(filters)
+        else:
+            matching_records = SaleRecords.objects.all()
+        
         return matching_records
         
     except Exception as e:
