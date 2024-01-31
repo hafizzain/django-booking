@@ -5034,26 +5034,26 @@ def create_workingschedule(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        working_schedule, created = EmployeDailySchedule.objects.get_or_create(
-            user=user,
-            business=business,
-            employee=employee_id,
-            date=date,
-        )
-        working_schedule.day = day
-        working_schedule.start_time = start_time
-        working_schedule.end_time = end_time
-        working_schedule.start_time_shift = start_time
-        working_schedule.end_time_shift = end_time
-        working_schedule.from_date = date
-        working_schedule.to_date = to_date
-        working_schedule.note = note
-        working_schedule.is_leo_day = True
-        working_schedule.is_vacation = False
-        working_schedule.is_weekend = False
-        working_schedule.vacation_status = None
-        working_schedule.save()
+        EmployeDailySchedule.objects.filter(id=id_to_maintain).update(is_leo_day=True)
+        # working_schedule, created = EmployeDailySchedule.objects.get_or_create(
+        #     user=user,
+        #     business=business,
+        #     employee=employee_id,
+        #     date=date,
+        # )
+        # working_schedule.day = day
+        # working_schedule.start_time = start_time
+        # working_schedule.end_time = end_time
+        # working_schedule.start_time_shift = start_time
+        # working_schedule.end_time_shift = end_time
+        # working_schedule.from_date = date
+        # working_schedule.to_date = to_date
+        # working_schedule.note = note
+        # working_schedule.is_leo_day = True
+        # working_schedule.is_vacation = False
+        # working_schedule.is_weekend = False
+        # working_schedule.vacation_status = None
+        # working_schedule.save()
         if type_of_sceduale == 'vacation':
             try:
                 leave_object = LeaveManagements.objects.get(employee_id=employee_id.id)
