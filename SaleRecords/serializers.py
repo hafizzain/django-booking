@@ -4,6 +4,7 @@ from Invoices.models import SaleInvoice
 
 from SaleRecords.models import *
 from Invoices.models import SaleInvoice
+from Client.helpers import calculate_validity
 
 
 class SaleRecordsAppointmentServicesSerializer(serializers.ModelSerializer):
@@ -216,7 +217,13 @@ class SaleRecordSerializer(serializers.ModelSerializer):
 
             # Create records for SaleRecordVouchers
             SaleRecordVouchers.objects.bulk_create([
-                SaleRecordVouchers(sale_record=sale_record, **data) for data in vouchers_records
+                SaleRecordVouchers(
+                    sale_record=sale_record, 
+                    voucher = data['voucher'],
+                    price = data['price'],
+                    quantity = data['quantity'],
+                    expiry_date = calculate_validity(data['validity_date'])
+                                ) for data in vouchers_records
             ])
 
             # Create records for PurchasedGiftCards

@@ -88,6 +88,7 @@ class SaleRecordVouchers(CommonField):
     voucher = models.ForeignKey(Vouchers, on_delete = models.SET_NULL, null = True)
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
+    expiry_date = models.DateTimeField(blank=True, null=True)
     # employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_vouchers_employee')
     
     price = models.FloatField(blank=True, null=True) 
@@ -99,6 +100,7 @@ class SaleRecordMembership(CommonField):
     membership = models.ForeignKey(Membership, on_delete=models.SET_NULL, null = True)
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
+    expiry_date = models.DateTimeField(blank=True, null=True)
     # employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_membership_employee')
     
     price = models.FloatField(blank=True, null=True) 
@@ -136,6 +138,7 @@ class PurchasedGiftCards(CommonField):
     price = models.FloatField(default = 0)
     spend_amount = models.FloatField(default = 0)
     quantity = models.SmallIntegerField(default = 0)
+    expiry_date = models.DateTimeField(blank=True, null=True)
     
     
 # ====================================================== Appllied on checkout data ===========================================
@@ -152,6 +155,7 @@ class AppliedMemberships(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_memberships_records')
     membership = models.ForeignKey(Membership, on_delete = models.SET_NULL, blank=True, null=True)
     is_redeemed = models.BooleanField(default = False)
+    
     
 class AppliedVouchers(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_vouchers_records')

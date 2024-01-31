@@ -2878,7 +2878,7 @@ def get_client_available_loyalty_points(request):
     )
 
 
-
+# new api added
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_client_all_gift_cards(request):
