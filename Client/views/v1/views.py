@@ -3559,6 +3559,7 @@ def get_comment(request):
     paginator.page_size = 10
     if user_id:
         comment = Comments.objects.filter(user_id=user_id)
+        comment = paginator.paginate_queryset(comment, request)
         client_data = ClientResponse(comment, many=True).data
         data = {
             'status': True,
@@ -3580,6 +3581,7 @@ def get_comment(request):
 
     else:
         comment = Comments.objects.all()
+        comment = paginator.paginate_queryset(comment, request)
         client_data = ClientResponse(comment, many=True).data
         data = {
             'status': True,
