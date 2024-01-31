@@ -1,4 +1,5 @@
 # from Appointment.serializers import ClientImagesSerializerResponse
+from Authentication.models import User
 from Business.models import BusinessAddress
 from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
@@ -848,7 +849,7 @@ class ClientImageSerializer(serializers.ModelSerializer):
 class UserSerializerResponse(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields =['id',]
+        fields = "__all__"
 
 class ClientResponse(serializers.ModelSerializer):
     class Meta:
