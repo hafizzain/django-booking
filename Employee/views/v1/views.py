@@ -7384,30 +7384,14 @@ def get_detail_from_code(request):
                 "success": False,
                 "status_code": 404,
                 "response": {
-                    "message": "Gift card not found",
+                    "message": "Enter a valid gift card",
                     "error_message": "No gift card with the provided code and location ID",
                     "data": None
                 }
             }
 
             # Return a 404 Not Found response
-            return Response(data, status=status.HTTP_404_NOT_FOUND)
-
-        except BusinessAddress.DoesNotExist:
-            # If the provided location_id does not exist
-            data = {
-                "success": False,
-                "status_code": 404,
-                "response": {
-                    "message": "Location not found",
-                    "error_message": "No business address with the provided location ID",
-                    "data": None
-                }
-            }
-
-            # Return a 404 Not Found response
-            return Response(data, status=status.HTTP_404_NOT_FOUND)
-
+            return Response(data, status=status.HTTP_200_OK)
     else:
         # If code or location_id is not provided
         data = {
