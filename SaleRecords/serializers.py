@@ -32,6 +32,14 @@ class SaleRecordVouchersSerializer(serializers.ModelSerializer):
         read_only_fields = ['sale_record']
 
 class PurchasedGiftCardsSerilizer(serializers.ModelSerializer):
+    gift_card_detail = serializers.SerializerMethodField(read_only = True)
+    
+    def get_gift_card_detail(self, obj):
+        if obj.gift_card:
+            
+            return f"{'title': obj.gift_card.title,\
+                    'code': obj.gift_card.title,\
+            }"
     class Meta:
         model = PurchasedGiftCards
         fields = "__all__"
