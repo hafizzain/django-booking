@@ -710,7 +710,7 @@ class GiftCards(models.Model):
     # name = models.TextField(null=True, blank=True)
     title = models.TextField(null=True, blank=True)
     gift_card_value = models.FloatField(default=0, null=True)
-    retail_price = models.FloatField(default=0, null=True)
+
     expire_date = models.DateField(auto_now_add=now, null=True)
     start_date = models.DateField(null=True)
     end_date = models.DateField(null=True)
@@ -725,7 +725,7 @@ class GiftCards(models.Model):
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)
     custom_card = models.TextField(null=True)
-    price = models.FloatField(default=0, null=True)
+   
     # retail_price = models.FloatField(default=0, null=True)
 
 
@@ -733,16 +733,16 @@ class GiftDetail(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     gift_card = models.ForeignKey(GiftCards, on_delete=models.CASCADE, null=True,related_name='gift_card_details')
     price = models.FloatField(default=0, null=True)
-    retail_price = models.FloatField(default=0, null=True)
+    spend_amount = models.FloatField(default=0, null=True)
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)
     currency = models.TextField(null=True)
     currencies = models.ForeignKey(Currency , on_delete=models.CASCADE , null=True,related_name='gift_detail_currencies')
 
 
-class GiftDetails(models.Model):
-    gift_card = models.ForeignKey(GiftCards, on_delete=models.CASCADE, null=True)
-    price = models.FloatField(default=0, null=True)
-    retail_price = models.FloatField(default=0, null=True)
-    created_at = models.DateTimeField(auto_now_add=now, null=True)
-    updated_at = models.DateTimeField(null=True, blank=True)
+# class GiftDetails(models.Model):
+#     gift_card = models.ForeignKey(GiftCards, on_delete=models.CASCADE, null=True)
+#     price = models.FloatField(default=0, null=True)
+#     retail_price = models.FloatField(default=0, null=True)
+#     created_at = models.DateTimeField(auto_now_add=now, null=True)
+#     updated_at = models.DateTimeField(null=True, blank=True)
