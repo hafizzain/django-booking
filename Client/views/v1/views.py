@@ -34,7 +34,7 @@ from Client.serializers import (SingleClientSerializer, ClientSerializer, Client
 from Business.serializers.v1_serializers import BusinessAddressSerilaizer
 from Utility.models import NstyleFile
 
-from Sale.Constants.Custom_pag import CustomPagination
+from Sale.Constants.Custom_pag import CustomPagination, AppointmentsPagination
 
 import json
 from NStyle.Constants import StatusCodes
@@ -3555,33 +3555,46 @@ def create_comment(request):
 @permission_classes([AllowAny])
 def get_comment(request):
     user_id = request.query_params.get('user_id', None)
+    paginator = AppointmentsPagination()
+    paginator.page_size = 10
     if user_id:
         comment = Comments.objects.filter(user_id=user_id)
         client_data = ClientResponse(comment, many=True).data
-        return Response(
-            {
-                'status': True,
-                'status_code': 200,
-                'response': {
-                    'message': 'Comment added successfully',
-                    'error_message': [],
-                    'data': client_data
-                }
-            },
-            status=status.HTTP_201_CREATED
-        )
+        data = {
+            'status': True,
+            'status_code': 200,
+            'status_code_text': '200',
+            "response": {
+                "message": "Comment get Successfully",
+                "error_message": None,
+                "data": client_data,
+                'count': paginator.page.paginator.count,
+                'next': paginator.get_next_link(),
+                'previous': paginator.get_previous_link(),
+                'current_page': paginator.page.number,
+                'per_page': paginator.page_size,
+                'total_pages': paginator.page.paginator.num_pages,
+            }
+        }
+        return Response(data, status=201)
+
     else:
         comment = Comments.objects.all()
         client_data = ClientResponse(comment, many=True).data
-        return Response(
-            {
-                'status': True,
-                'status_code': 200,
-                'response': {
-                    'message': 'Comment added successfully',
-                    'error_message': [],
-                    'data': client_data
-                }
-            },
-            status=status.HTTP_201_CREATED
-        )
+        data = {
+            'status': True,
+            'status_code': 200,
+            'status_code_text': '200',
+            "response": {
+                "message": "Comment get Successfully",
+                "error_message": None,
+                "data": client_data,
+                'count': paginator.page.paginator.count,
+                'next': paginator.get_next_link(),
+                'previous': paginator.get_previous_link(),
+                'current_page': paginator.page.number,
+                'per_page': paginator.page_size,
+                'total_pages': paginator.page.paginator.num_pages,
+            }
+        }
+        return Response(data, status=201)
