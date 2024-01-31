@@ -77,8 +77,6 @@ class SaleRecordViews(APIView):
                 )
                 invoice.save()
                 
-                
-                
                 response_data = {
                         'success': True,
                         'status_code': 200,

@@ -17,7 +17,7 @@ from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee,
 , EmployeeMarketingPermission, EmployeeSelectedService, SallarySlipPayrol, StaffGroup
 , StaffGroupModulePermission, Attendance
 , Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation, LeaveManagements, WeekManagement,
-                             VacationDetails, GiftCard, GiftCards, GiftDetails,
+                             VacationDetails, GiftCard, GiftCards,
                              )
 from Employee.services import annual_vacation_check, check_available_vacation_type
 from HRM.models import Holiday
