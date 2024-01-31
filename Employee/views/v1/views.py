@@ -75,7 +75,7 @@ from Notification.notification_processor import NotificationProcessor
 
 from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
 from Sale.Constants.Custom_pag import CustomPagination
-from Employee.serializers import GiftCardSerializerResponse, SingleGiftCardDetails,GiftCardDetails,GiftCardDetailsabc
+from Employee.serializers import *
 
 
 @transaction.atomic
@@ -7363,13 +7363,12 @@ def get_detail_from_code(request):
                                     .filter(gift_card=gift_card)
 
             # Serialize the retrieved gift_card and gift_detail
-            serializer_gift_card = SingleGiftCardDetails(gift_card,context={'currency':currency}).data
+            serializer_gift_card = SingleGiftCardDetails(gift_card, context={'currency':currency}).data
             
             #erializer the gift card details
-            serializer_gift_detail = GiftCardDetails(query.all() ,many=True).data
+            serializer_gift_detail = GiftCardDetails(query, many=True).data
             
-            
-            gift_card_retail = GiftCardDetailsabc(query.all() ,many=True).data
+            gift_card_retail = GiftCardRetailPriceSerializer(query, many=True).data
             # Prepare the response data
             data = {
                 "success": True,
@@ -7379,8 +7378,8 @@ def get_detail_from_code(request):
                     "error_message": None,
                     "data": {
                         "gift_card": serializer_gift_card,
-                        "gift_detail": serializer_gift_detail,
-                        "gift_card_retail" : gift_card_retail,
+                        "gift_card_details": serializer_gift_detail,
+                        "gift_card_retail_price": gift_card_retail,
                     },
                 }
             }
