@@ -14,8 +14,8 @@ class SaleRecordViews(APIView):
     page_size = 10
     def get(self, request, *args, **kwargs):
         try:
-            sale_record = SaleRecords.objects.all()
-            
+            sale_record = SaleRecords.objects.select_related('client', 'location', 'user')
+                    
             #Apply Pagination
             paginator = self.pagination_class()
             result_page = paginator.paginate_queryset(sale_record, request)
