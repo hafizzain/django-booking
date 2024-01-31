@@ -2108,10 +2108,9 @@ class SingleGiftCardDetails(serializers.ModelSerializer):
         fields = "__all__"
         
         
-class GiftCardDetailsabc(serializers.ModelSerializer):
+class GiftCardRetailPriceSerializer(serializers.ModelSerializer):
     currency_code = serializers.CharField(source='currencies.code')
     currency = serializers.CharField(source='currencies.id')
-    
     retail_price=serializers.CharField(read_only=True)
     class Meta:
         model = GiftDetail
