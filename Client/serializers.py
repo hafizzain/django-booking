@@ -845,6 +845,11 @@ class ClientImageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class UserSerializerResponse(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields =['id',]
+
 class ClientResponse(serializers.ModelSerializer):
     class Meta:
         model = Comments
