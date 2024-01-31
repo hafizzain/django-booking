@@ -5036,6 +5036,7 @@ def create_workingschedule(request):
             )
         # EmployeDailySchedule.objects.filter(id=id_to_maintain).update(is_leo_day=True)
         working_schedule = EmployeDailySchedule.objects.filter(id=id_to_maintain)
+        serializers = ScheduleSerializer(working_schedule, context={'request': request})
         # working_schedule, created = EmployeDailySchedule.objects.get_or_create(
         #     user=user,
         #     business=business,
