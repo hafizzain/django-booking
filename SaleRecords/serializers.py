@@ -125,6 +125,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     applied_promotions_records = AppliedPromotionSerializer(many = True, write_only = True)
     
     invoice = serializers.SerializerMethodField(read_only = True)
+    client = serializers.SerializerMethodField(read_only = True)
     
     def get_invoice(self, obj):
         invoice = SaleInvoice.objects.get(checkout = obj.id)
@@ -145,7 +146,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         model = SaleRecords
         fields = "__all__"
         # exclude = ['is_active','is_blocked','is_deleted']
-        read_only_fields = ['invoice']
+        read_only_fields = ['invoice','client']
         
         
         # exclude = ['updated_at','is_deleted','is_blocked','is_active']
