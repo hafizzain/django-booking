@@ -115,7 +115,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     membership_records = SaleRecordMembershipSerializer(many = True ,write_only = True)
     vouchers_records = SaleRecordVouchersSerializer(many =True , write_only = True)
     tax_records = SaleTaxSerializer(many =True, write_only = True)
-    tip_records = SaleOrderTipSerializer(many = True)
+    tip_records = SaleOrderTipSerializer(many = True, write_only = True)
     
     # ================================================================   Applied Items  ==========================================
     applied_coupons_records = SaleRecordAppliedCouponsSerializer(many = True, write_only = True)
@@ -128,8 +128,15 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only = True)
     
     def get_invoice(self, obj):
-        invoice = SaleInvoice.objects.get(checkout = obj.id)
-        return SaleInvoiceSerializer(invoice).data
+        try:
+            invoice = SaleInvoice.objects.get(checkout=obj.id)
+            return SaleInvoiceSerializer(invoice).data
+        except SaleInvoice.DoesNotExist:
+            return None
+        except Exception as e:
+        # Handle other exceptions if necessary
+            return ValueError(f"An error occurred while getting invoice: {str(e)}")
+            # return None
     
     def get_client(self, obj):
         client = Client.objects.get(id = obj.client.id)
