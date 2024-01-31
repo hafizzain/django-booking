@@ -5,12 +5,10 @@ from datetime import datetime, timedelta
 def calculate_validity(validaty):
     current_date = datetime.now()
 
-    # Parse duration string
     parts = validaty.split()
     num = int(parts[0])
     unit = parts[1].lower()
 
-    # Define conversion factors
     unit_factors = {
         'day': 1,
         'days': 1,
