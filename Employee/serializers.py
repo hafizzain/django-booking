@@ -1005,7 +1005,6 @@ class HolidaysSerializer(serializers.ModelSerializer):
         model = Holiday
         fields = "__all__"
 
-
 class Allscedulae(serializers.ModelSerializer):
     class Meta:
         model = EmployeDailySchedule
@@ -1015,9 +1014,7 @@ class Allscedulae(serializers.ModelSerializer):
 class VacationSerializerResponse(serializers.ModelSerializer):
     class Meta:
         model = Vacation
-        fields = ['id', 'vacation_type']
-
-
+        fields= ['id','vacation_type']
 class ScheduleSerializerOP(serializers.ModelSerializer):
     is_holidays = serializers.SerializerMethodField(read_only=True)
     vacation = VacationSerializerResponse()
