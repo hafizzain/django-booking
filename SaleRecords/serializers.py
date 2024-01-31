@@ -212,7 +212,13 @@ class SaleRecordSerializer(serializers.ModelSerializer):
 
             # Create records for SaleRecordMembership
             SaleRecordMembership.objects.bulk_create([
-                SaleRecordMembership(sale_record=sale_record, **data) for data in membership_records
+                SaleRecordMembership(
+                    sale_record=sale_record, 
+                    membership = data['membership'],
+                    price = float(data['price'] * data['quantity']),
+                    quantity = data['quantity'],
+                    expiry_date = calculate_validity(data['validity_date'])
+                    ) for data in membership_records
             ])
 
             # Create records for SaleRecordVouchers
@@ -220,7 +226,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                 SaleRecordVouchers(
                     sale_record=sale_record, 
                     voucher = data['voucher'],
-                    price = data['price'],
+                    price = float(data['price'] * data['quantity']),
                     quantity = data['quantity'],
                     expiry_date = calculate_validity(data['validity_date'])
                                 ) for data in vouchers_records
@@ -228,7 +234,14 @@ class SaleRecordSerializer(serializers.ModelSerializer):
 
             # Create records for PurchasedGiftCards
             PurchasedGiftCards.objects.bulk_create([
-                PurchasedGiftCards(sale_record=sale_record, **data) for data in gift_cards_records
+                PurchasedGiftCards(
+                    sale_record=sale_record,
+                    gift_card = data['gift_card'],
+                    price = float(data['price'] * data['quantity']),
+                    spend_amount = data['spend_amount'],
+                    quantity = data['quantity'],
+                    expiry_date = calculate_validity(data['validity_date'])
+                                ) for data in gift_cards_records
             ])
 
             # Create records for SaleTax
