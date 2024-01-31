@@ -125,7 +125,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     applied_promotions_records = AppliedPromotionSerializer(many = True, write_only = True)
     
     invoice = serializers.SerializerMethodField(read_only = True)
-    # client = serializers.SerializerMethodField(read_only = True)
+    client = serializers.SerializerMethodField()
     
     def get_invoice(self, obj):
         try:
@@ -138,9 +138,13 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             return ValueError(f"An error occurred while getting invoice: {str(e)}")
             # return None
     
-    # def get_client(self, obj):
-    #     client = Client.objects.get(id = obj.client.id)
-    #     return ClientSerializer(client).data
+    def get_client(self, obj):
+        if self.context['request'].method == 'POST':
+            # If it's a write operation (POST), return the client ID from the payload
+            return obj.client.id if obj.client else None
+        else:
+            # If it's a read operation (GET), return the serialized client data
+            return ClientSerializer(obj.client).data if obj.client else None
     
     def validate(self, data):
         # Validate that there is at least one record in appointment_services, services_records, and products_records
