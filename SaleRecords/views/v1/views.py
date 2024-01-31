@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
+from SaleRecords.helpers import matching_records
 
 from SaleRecords.serializers import *
 
@@ -12,9 +13,26 @@ from SaleRecords.serializers import *
 class SaleRecordViews(APIView):
     pagination_class = PageNumberPagination
     page_size = 10
+    
     def get(self, request, *args, **kwargs):
         try:
-            sale_record = SaleRecords.objects.select_related('client', 'location', 'user')
+            location = request.GET.get('location')
+            range_start = request.GET.get('range_start')
+            range_end = request.GET.get('range_end')
+            client = request.GET.get('client')
+            search_text = request.GET.get('search_text')
+            service = request.GET.get('service')
+            search_text = request.GET.get('search_text')
+            
+            sale_record = matching_records(location= location,
+                                            range_start = range_start,
+                                            range_end = range_end,
+                                            client = client,
+                                            service = service,
+                                            search_text = search_text
+                                        )
+            
+            
                     
             #Apply Pagination
             paginator = self.pagination_class()
