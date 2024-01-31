@@ -99,6 +99,11 @@ class SaleInvoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = SaleInvoice
         fields = "__all__"
+        
+class ClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Client
+        fields = ['id','full_name']
 
 class SaleRecordSerializer(serializers.ModelSerializer):
     
@@ -124,6 +129,10 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     def get_invoice(self, obj):
         invoice = SaleInvoice.objects.get(checkout = obj.id)
         return SaleInvoiceSerializer(invoice).data
+    
+    def get_client(self, obj):
+        client = Client.objects.get(id = obj.client.id)
+        return ClientSerializer(client).data
     
     def validate(self, data):
         # Validate that there is at least one record in appointment_services, services_records, and products_records
