@@ -7442,7 +7442,7 @@ def get_detail_from_code(request):
             "status_code": 400,
             "response": {
                 "message": "Bad Request",
-                "error_message": "Both 'code' and 'location_id' must be provided",
+                "error_message": "Both 'client' and 'location_id' must be provided",
                 "data": None
             }
         }
