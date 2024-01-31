@@ -5037,6 +5037,19 @@ def create_workingschedule(request):
         # EmployeDailySchedule.objects.filter(id=id_to_maintain).update(is_leo_day=True)
         working_schedule = EmployeDailySchedule.objects.filter(id=id_to_maintain)
         serializers = ScheduleSerializer(working_schedule, context={'request': request})
+        return Response(
+            {
+                'status': True,
+                'status_code': 201,
+                'response': {
+                    'message': 'Working Schedule Created Successfully!',
+                    'error_message': None,
+                    'schedule': serializers.data,
+                    'leo_value': leo_value
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
         # working_schedule, created = EmployeDailySchedule.objects.get_or_create(
         #     user=user,
         #     business=business,
