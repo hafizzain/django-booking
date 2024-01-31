@@ -2112,6 +2112,7 @@ class SingleGiftCardDetails(serializers.ModelSerializer):
         
     def get_gift_card_details(self, obj):
         location_id = self.context.get('location_id')
+        # Retrieve the BusinessAddress based on the provided location_id
         business_address = BusinessAddress.objects.get(id=location_id)
         currency=business_address.currency
 
