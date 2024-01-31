@@ -7400,52 +7400,52 @@ def get_detail_from_code(request):
             # Return a 404 Not Found response
             return Response(data, status=status.HTTP_200_OK)
         
-    if client is not None and location_id is not None:
-        try:
+    # if client is not None and location_id is not None:
+    #     try:
             
-            # Filter GiftCards based on the provided code and BusinessAddress
-            purchase = PurchasedGiftCards.objects.filter(sale_record__client=client)
-            gift_card = GiftCards.objects.filter(gift_card=purchase.gift_card)
-            serializer_gift_card = SingleGiftCardDetails(gift_card,
-                                                        context={'location_id':location_id}).data
+    #         # Filter GiftCards based on the provided code and BusinessAddress
+    #         purchase = PurchasedGiftCards.objects.filter(sale_record__client=client)
+    #         gift_card = GiftCards.objects.filter(gift_card=purchase.gift_card)
+    #         serializer_gift_card = SingleGiftCardDetails(gift_card,
+    #                                                     context={'location_id':location_id}).data
             
-            data = {
-                "success": True,
-                "status_code": 200,
-                "response": {
-                    "message": "Gift card details retrieved successfully",
-                    "error_message": None,
-                    "gift_card": serializer_gift_card,
-                }
-            }
-            # Return the response
-            return Response(data, status=status.HTTP_200_OK)
+    #         data = {
+    #             "success": True,
+    #             "status_code": 200,
+    #             "response": {
+    #                 "message": "Gift card details retrieved successfully",
+    #                 "error_message": None,
+    #                 "gift_card": serializer_gift_card,
+    #             }
+    #         }
+    #         # Return the response
+    #         return Response(data, status=status.HTTP_200_OK)
 
-        except GiftCards.DoesNotExist:
-            # If no matching gift card is found
-            data = {
-                "success": False,
-                "status_code": 404,
-                "response": {
-                    "message": "Enter a valid gift card",
-                    "error_message": "No gift card with the provided code and location ID",
-                    "data": None
-                }
-            }
+    #     except GiftCards.DoesNotExist:
+    #         # If no matching gift card is found
+    #         data = {
+    #             "success": False,
+    #             "status_code": 404,
+    #             "response": {
+    #                 "message": "Enter a valid gift card",
+    #                 "error_message": "No gift card with the provided code and location ID",
+    #                 "data": None
+    #             }
+    #         }
 
-            # Return a 404 Not Found response
-            return Response(data, status=status.HTTP_200_OK)
-    else:
-        # If code or location_id is not provided
-        data = {
-            "success": False,
-            "status_code": 400,
-            "response": {
-                "message": "Bad Request",
-                "error_message": "Both 'client' and 'location_id' must be provided",
-                "data": None
-            }
-        }
+    #         # Return a 404 Not Found response
+    #         return Response(data, status=status.HTTP_200_OK)
+    # else:
+    #     # If code or location_id is not provided
+    #     data = {
+    #         "success": False,
+    #         "status_code": 400,
+    #         "response": {
+    #             "message": "Bad Request",
+    #             "error_message": "Both 'client' and 'location_id' must be provided",
+    #             "data": None
+    #         }
+    #     }
 
-        # Return a 400 Bad Request response
-        return Response(data, status=status.HTTP_400_BAD_REQUEST)
+    #     # Return a 400 Bad Request response
+    #     return Response(data, status=status.HTTP_400_BAD_REQUEST)
