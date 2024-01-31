@@ -2885,7 +2885,7 @@ def get_client_all_vouchers(request):
         client_vouchers = SaleRecordVouchers.objects.filter(
             sale_record__client__id=client_id,
             sale_record__location__id = location_id,
-            voucher__end_date__gt=datetime.now()
+            # voucher__end_date__gt=datetime.now()
         )
 
     except Exception as error:
