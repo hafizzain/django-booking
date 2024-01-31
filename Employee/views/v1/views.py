@@ -5043,6 +5043,8 @@ def create_workingschedule(request):
         working_schedule.is_vacation=False
         working_schedule.start_time_shift = start_time
         working_schedule.end_time_shift = end_time
+        working_schedule.start_time = start_time
+        working_schedule.end_time = end_time
         working_schedule.save()
         # working_schedule, created = EmployeDailySchedule.objects.get_or_create(
         #     user=user,
