@@ -102,7 +102,7 @@ class SaleRecordMembership(CommonField):
     # employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_membership_employee')
     
     price = models.FloatField(blank=True, null=True) 
-    qty = models.PositiveSmallIntegerField(blank=True, null=True)
+    quantity = models.PositiveSmallIntegerField(blank=True, null=True)
     
 class SaleTax(CommonField):
     
