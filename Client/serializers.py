@@ -852,6 +852,7 @@ class UserSerializerResponse(serializers.ModelSerializer):
         fields = "__all__"
 
 class ClientResponse(serializers.ModelSerializer):
+    user = UserSerializerResponse()
     class Meta:
         model = Comments
-        fields = "__all__"
+        fields = ["id","user","comment",'employee']
