@@ -7405,7 +7405,8 @@ def get_detail_from_code(request):
             
             # Filter GiftCards based on the provided code and BusinessAddress
             purchase = PurchasedGiftCards.objects.filter(sale_record__client=client)
-            gift_card = GiftCards.objects.filter(gift_card=purchase)
+            gift_card = GiftCards.objects.filter(id=purchase.gift_card_id)
+            
             serializer_gift_card = SingleGiftCardDetails(gift_card,
                                                         context={'location_id':location_id}).data
             
