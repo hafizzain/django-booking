@@ -115,7 +115,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     membership_records = SaleRecordMembershipSerializer(many = True ,write_only = True)
     vouchers_records = SaleRecordVouchersSerializer(many =True , write_only = True)
     tax_records = SaleTaxSerializer(many =True, write_only = True)
-    tip_records = SaleOrderTipSerializer(many = True, write_only = True)
+    tip_records = SaleOrderTipSerializer(many = True)
     
     # ================================================================   Applied Items  ==========================================
     applied_coupons_records = SaleRecordAppliedCouponsSerializer(many = True, write_only = True)
@@ -125,34 +125,18 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     applied_promotions_records = AppliedPromotionSerializer(many = True, write_only = True)
     
     invoice = serializers.SerializerMethodField(read_only = True)
-    client = serializers.SerializerMethodField()
+    
+    client_data = serializers.SerializerMethodField(read_only = True)
     
     def get_invoice(self, obj):
-        try:
-            invoice = SaleInvoice.objects.get(checkout=obj.id)
-            return SaleInvoiceSerializer(invoice).data
-        except SaleInvoice.DoesNotExist:
-            return None
-        except Exception as e:
-        # Handle other exceptions if necessary
-            return ValueError(f"An error occurred while getting invoice: {str(e)}")
-            # return None
+        invoice = SaleInvoice.objects.get(checkout = obj.id)
+        return SaleInvoiceSerializer(invoice).data
     
-    def get_client(self, obj):
-        try:
-            request = self.context.get('request')
-            if request and request.method == 'POST':
-                # For write operation (POST), get client ID from the payload
-                client_id = self.initial_data.get('client')
-                return client_id if client_id else None
-            elif obj.client:
-                # For read operation (GET), return serialized client data if client is not None
-                return ClientSerializer(obj.client).data
-            else:
-                return None
-        except Exception as e:
-            return f"Error in get_client: {str(e)}"
-    
+    def get_client_data(self, obj):
+        if obj.client:
+            client = Client.object.get(obj.client.id)
+            return ClientSerializer(client).data
+        return None
     
     def validate(self, data):
         # Validate that there is at least one record in appointment_services, services_records, and products_records
@@ -169,9 +153,6 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         
         
         # exclude = ['updated_at','is_deleted','is_blocked','is_active']
-    
-    
-    
     
     def create(self, validated_data):
         
