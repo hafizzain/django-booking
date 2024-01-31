@@ -125,7 +125,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     applied_promotions_records = AppliedPromotionSerializer(many = True, write_only = True)
     
     invoice = serializers.SerializerMethodField(read_only = True)
-    client = serializers.SerializerMethodField(read_only = True)
+    # client = serializers.SerializerMethodField(read_only = True)
     
     def get_invoice(self, obj):
         try:
@@ -138,9 +138,9 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             return ValueError(f"An error occurred while getting invoice: {str(e)}")
             # return None
     
-    def get_client(self, obj):
-        client = Client.objects.get(id = obj.client.id)
-        return ClientSerializer(client).data
+    # def get_client(self, obj):
+    #     client = Client.objects.get(id = obj.client.id)
+    #     return ClientSerializer(client).data
     
     def validate(self, data):
         # Validate that there is at least one record in appointment_services, services_records, and products_records
@@ -153,7 +153,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         model = SaleRecords
         fields = "__all__"
         # exclude = ['is_active','is_blocked','is_deleted']
-        read_only_fields = ['invoice','client']
+        read_only_fields = ['invoice']
         
         
         # exclude = ['updated_at','is_deleted','is_blocked','is_active']
