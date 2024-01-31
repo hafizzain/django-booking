@@ -10,10 +10,10 @@ def matching_records(location=None, range_start=None, range_end=None, services=N
             filters &= Q(location_id=location)
 
         if range_start is not None:
-            filters &= Q(date__gte=range_start)
+            filters &= Q(created_at__gte=range_start)
 
         if range_end is not None:
-            filters &= Q(date__lte=range_end)
+            filters &= Q(created_at__lte=range_end)
 
         if services is not None:
             filters &= Q(services=services)
