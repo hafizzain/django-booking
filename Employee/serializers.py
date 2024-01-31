@@ -1133,7 +1133,8 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
 
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'vacation','is_leo_day', 'is_holidays', 'is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date',
+        fields = ['id', 'vacation', 'is_leo_day', 'is_holidays', 'is_holiday', 'date', 'is_vacation', 'is_leave',
+                  'from_date',
                   'is_working_schedule',
                   'day', 'end_time_shift', 'end_time', 'is_weekend', 'vacation_status', 'note',
                   'start_time']
@@ -1164,7 +1165,7 @@ class ScheduleSerializerResponse(serializers.ModelSerializer):
 
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'title', 'date', 'employee','is_weekend','vacation','from_date']
+        fields = ['id', 'title', 'date', 'employee', 'is_weekend', 'vacation', 'from_date']
 
 
 class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
@@ -1342,6 +1343,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         #     Q(is_vacation=True, vacation_status='accepted'),
         #     **query
         # )
+        # qs = EmployeDailySchedule.objects.filter(employee=obj, **query)
         qs = EmployeDailySchedule.objects.filter(employee=obj)
         qs = qs.exclude(vacation_status='pending')
         # qs = qs.annotate(
@@ -2112,12 +2114,12 @@ class SingleGiftCardDetails(serializers.ModelSerializer):
         location_id = self.context.get('location_id')
         business_address = BusinessAddress.objects.get(id=location_id)
         currency=business_address.currency
-            
+
         query = GiftDetail.objects.filter(currencies=currency) \
                                     .filter(gift_card=obj)
         
         gift_card_details = GiftCardDetails(query, many=True).data
-        return gift_card_details    
+        return gift_card_details
 class GiftCardRetailPriceSerializer(serializers.ModelSerializer):
     currency_code = serializers.CharField(source='currencies.code')
     currency = serializers.CharField(source='currencies.id')

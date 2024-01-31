@@ -4496,7 +4496,11 @@ def create_vacation_emp(request):
     )
     try:
         for i in range(days + 1):
-            current_date = from_date + timedelta(days=i)
+            if i == 0:
+                current_date = from_date
+            else:
+                current_date = from_date + timedelta(days=i)
+            # current_date = from_date + timedelta(days=i)
             working_sch = EmployeDailySchedule.objects.filter(employee=employee_id, date=current_date).first()
             if working_sch:
                 working_sch.is_vacation = True
@@ -4529,7 +4533,6 @@ def create_vacation_emp(request):
                     working_schedule.vacation = empl_vacation
                 else:
                     working_schedule.is_vacation = False
-
                 working_schedule.is_leave = is_leave if is_leave is not None else False
                 working_schedule.is_off = is_off if is_off is not None else False
                 working_schedule.save()
@@ -5577,7 +5580,6 @@ def delete_leo_day(request):
             leave_manage.annual_leave -= 1
             leave_manage.used_annual = leave_manage.used_annual - 1
             leave_manage.save()
-
         return Response(
             {
                 'data': data,
