@@ -31,9 +31,6 @@ class SaleRecordViews(APIView):
                                             service = service,
                                             search_text = search_text
                                         )
-            
-            
-                    
             #Apply Pagination
             paginator = self.pagination_class()
             result_page = paginator.paginate_queryset(sale_record, request)
