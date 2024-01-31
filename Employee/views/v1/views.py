@@ -76,7 +76,7 @@ from Notification.notification_processor import NotificationProcessor
 from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
 from Sale.Constants.Custom_pag import CustomPagination
 from Employee.serializers import *
-
+from SaleRecords.models import *
 
 @transaction.atomic
 @api_view(['POST'])
@@ -7363,12 +7363,49 @@ def get_gift_card(request):
 def get_detail_from_code(request):
     code = request.query_params.get('code', None)
     location_id = request.query_params.get('location_id', None)
+    client = request.query_params.get('client', None)
 
     if code is not None and location_id is not None:
         try:
             
             # Filter GiftCards based on the provided code and BusinessAddress
             gift_card = GiftCards.objects.get(code=code)
+            serializer_gift_card = SingleGiftCardDetails(gift_card,
+                                                        context={'location_id':location_id}).data
+            
+            data = {
+                "success": True,
+                "status_code": 200,
+                "response": {
+                    "message": "Gift card details retrieved successfully",
+                    "error_message": None,
+                    "gift_card": serializer_gift_card,
+                }
+            }
+            # Return the response
+            return Response(data, status=status.HTTP_200_OK)
+
+        except GiftCards.DoesNotExist:
+            # If no matching gift card is found
+            data = {
+                "success": False,
+                "status_code": 404,
+                "response": {
+                    "message": "Enter a valid gift card",
+                    "error_message": "No gift card with the provided code and location ID",
+                    "data": None
+                }
+            }
+
+            # Return a 404 Not Found response
+            return Response(data, status=status.HTTP_200_OK)
+        
+    if client is not None and location_id is not None:
+        try:
+            
+            # Filter GiftCards based on the provided code and BusinessAddress
+            purchase = PurchasedGiftCards.objects.filter(sale_record__client=client)
+            gift_card = GiftCards.objects.filter(gift_card=purchase.gift_card)
             serializer_gift_card = SingleGiftCardDetails(gift_card,
                                                         context={'location_id':location_id}).data
             
@@ -7405,7 +7442,7 @@ def get_detail_from_code(request):
             "status_code": 400,
             "response": {
                 "message": "Bad Request",
-                "error_message": "Both 'code' and 'location_id' must be provided",
+                "error_message": "Both 'client' and 'location_id' must be provided",
                 "data": None
             }
         }
