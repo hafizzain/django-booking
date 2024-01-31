@@ -120,7 +120,7 @@ class SaleRecordTip(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, null=True, blank=True,related_name='tip_records') 
     
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_record_employee_tips') 
-    tip_amount = models.FloatField(blank=False, null=False) 
+    tip = models.FloatField(blank=False, null=False) 
     
 class PaymentMethods(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'payment_methods_records')
