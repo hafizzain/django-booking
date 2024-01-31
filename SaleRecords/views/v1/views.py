@@ -32,12 +32,10 @@ class SaleRecordViews(APIView):
                 'response': {
                             'message': 'Record fetched successfully!',
                             'error_message': None,
-                            'data': {
-                                'checkout': serializer.data,
-                                # 'checkout': SaleRecordSerializer(sale_record, many = True).data,
-                                # 'coupon': CouponSerializer(coupon_serializer.instance).data,
-                                # 'invoice': InvoiceSerializer(invoice).data
-                            }
+                            'sales': serializer.data,
+                            # 'checkout': SaleRecordSerializer(sale_record, many = True).data,
+                            # 'coupon': CouponSerializer(coupon_serializer.instance).data,
+                            # 'invoice': InvoiceSerializer(invoice).data
                         }
             }
             return Response(response)
