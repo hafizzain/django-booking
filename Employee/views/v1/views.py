@@ -5037,6 +5037,7 @@ def create_workingschedule(request):
         # EmployeDailySchedule.objects.filter(id=id_to_maintain).update(is_leo_day=True)
         working_schedule = EmployeDailySchedule.objects.get(id=id_to_maintain)
         working_schedule.is_leo_day=True
+        working_schedule.is_holiday = False # while debugiing we done this False
         working_schedule.is_weekend=False
         working_schedule.vacation_status=None
         working_schedule.is_vacation=False
