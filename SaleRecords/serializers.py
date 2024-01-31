@@ -134,7 +134,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     
     def get_client_data(self, obj):
         if obj.client:
-            client = Client.object.get(obj.client.id)
+            client = Client.objects.get(obj.client.id)
             return ClientSerializer(client).data
         return None
     
