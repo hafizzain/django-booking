@@ -51,7 +51,7 @@ class SaleRecordServices(CommonField):
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True)
     service = models.ForeignKey(Service, on_delete = models.SET_NULL, null = True)
     
-    qty = models.PositiveIntegerField(blank=True, null=True)
+    quantity = models.PositiveIntegerField(blank=True, null=True)
     price = models.FloatField(default = 0, blank=True, null=True)
     discounted_price = models.FloatField(default = 0, blank=True, null=True)
     
@@ -61,7 +61,7 @@ class SaleRecordsProducts(CommonField):
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True)
     product = models.ForeignKey(Product, on_delete = models.SET_NULL, null = True)
     
-    qty = models.PositiveIntegerField(blank=True, null=True)
+    quantity = models.PositiveIntegerField(blank=True, null=True)
     price = models.FloatField(blank=True, null=True)
     discounted_price = models.FloatField(default = 0, blank=True, null=True)
     
@@ -74,7 +74,7 @@ class SaleRecordsAppointmentServices(CommonField):
     service = models.ForeignKey(Service, on_delete = models.SET_NULL, null = True)
     appointment_status = models.CharField(choices = AppointmentStatus.choices,max_length = 50, default = AppointmentStatus.BOOKED, blank=False, null=False)
     reason = models.CharField(max_length = 255, blank=True, null=True)
-    qty = models.PositiveIntegerField(blank=True, null=True)
+    quantity = models.PositiveIntegerField(blank=True, null=True)
     start_time = models.DateTimeField(blank=True, null=True)
     end_time = models.DateTimeField(blank=True, null=True)
     duration = models.PositiveIntegerField(blank=True, null=True)
@@ -91,7 +91,7 @@ class SaleRecordVouchers(CommonField):
     # employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_vouchers_employee')
     
     price = models.FloatField(blank=True, null=True) 
-    qty = models.PositiveSmallIntegerField(blank=True, null=True)
+    quantity = models.PositiveSmallIntegerField(blank=True, null=True)
 
 
 class SaleRecordMembership(CommonField):
@@ -134,7 +134,7 @@ class PurchasedGiftCards(CommonField):
     gift_card = models.ForeignKey(GiftCards, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'sale_gift_cards_records')
     
     price = models.FloatField(default = 0)
-    qty = models.FloatField
+    quantity = models.FloatField
     
     
 # ====================================================== Appllied on checkout data ===========================================
