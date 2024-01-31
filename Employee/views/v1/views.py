@@ -7367,7 +7367,6 @@ def get_detail_from_code(request):
                     "message": "Gift card details retrieved successfully",
                     "error_message": None,
                     "gift_card": serializer_gift_card,
-                    # "gift_card_retail_price": gift_card_retail,
                 }
             }
             # Return the response
