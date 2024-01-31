@@ -140,11 +140,14 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     
     def get_client(self, obj):
         if self.context['request'].method == 'POST':
-            # If it's a write operation (POST), return the client ID from the payload
-            return obj.client.id if obj.client else None
+            # For write operation (POST), get client ID from the payload
+            client_id = self.initial_data.get('client')
+            return client_id if client_id else None
         else:
-            # If it's a read operation (GET), return the serialized client data
-            return ClientSerializer(obj.client).data if obj.client else None
+            # For read operation (GET), return serialized client data if client is not None
+            client = obj.client
+            return ClientSerializer(client).data if client else None
+    
     
     def validate(self, data):
         # Validate that there is at least one record in appointment_services, services_records, and products_records
