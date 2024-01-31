@@ -5035,6 +5035,7 @@ def create_workingschedule(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
         EmployeDailySchedule.objects.filter(id=id_to_maintain).update(is_leo_day=True)
+        working_schedule = EmployeDailySchedule.objects.filter(id=id_to_maintain)
         # working_schedule, created = EmployeDailySchedule.objects.get_or_create(
         #     user=user,
         #     business=business,
