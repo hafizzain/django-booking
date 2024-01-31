@@ -2118,7 +2118,7 @@ class SingleGiftCardDetails(serializers.ModelSerializer):
         query = GiftDetail.objects.filter(currencies=currency) \
                                     .filter(gift_card=obj)
         
-        gift_card_details = GiftCardDetails(query, many=True).data
+        gift_card_details = GiftCardRetailPriceSerializer(query, many=True).data
         return gift_card_details
 class GiftCardRetailPriceSerializer(serializers.ModelSerializer):
     currency_code = serializers.CharField(source='currencies.code')
