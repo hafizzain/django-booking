@@ -7378,7 +7378,7 @@ def get_detail_from_code(request):
                 "success": False,
                 "status_code": 404,
                 "response": {
-                    "message": "Gift card not found",
+                    "message": "Enter a valid gift card",
                     "error_message": "No gift card with the provided code and location ID",
                     "data": None
                 }
