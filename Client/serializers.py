@@ -495,7 +495,7 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     name  = serializers.SerializerMethodField(read_only=True)
     voucher_price  = serializers.SerializerMethodField(read_only=True)
-    employee = serializers.SerializerMethodField()
+    # employee = serializers.SerializerMethodField()
         
     def get_order_type(self, obj):
         return 'Voucher'
@@ -559,9 +559,9 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
                   'client' ,
                   'location' , 
                 #   'status',
-                  'qty',
+                  'quantity',
                 #   'checkout',
-                  'employee',
+                #   'employee',
                   'start_date',
                   'end_date',
                 #   'total_price',
@@ -585,7 +585,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     discount_type = serializers.SerializerMethodField(read_only=True)
     products = serializers.SerializerMethodField()
     services = serializers.SerializerMethodField()
-    employee = serializers.SerializerMethodField()
+    # employee = serializers.SerializerMethodField()
 
     def get_products(self, obj):
         try:
@@ -609,13 +609,13 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
         return (obj.price)
     
 
-    def get_employee(self, membership_records):
-        sale_record_instance = membership_records.sale_record
-        if sale_record_instance and sale_record_instance.employee:
-            return {
-                'full_name': str(sale_record_instance.employee.full_name),
-            }
-        return None 
+    # def get_employee(self, membership_records):
+    #     sale_record_instance = membership_records.sale_record
+    #     if sale_record_instance and sale_record_instance.employee:
+    #         return {
+    #             'full_name': str(sale_record_instance.employee.full_name),
+    #         }
+    #     return None 
 
     def get_location(self, membership_records):
         sale_record_instance = membership_records.sale_record
@@ -652,11 +652,11 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
             'client', 
             'location',
             # 'status',
-            'qty',
+            'quantity',
             'products', 
             'services',
             # 'checkout',
-            'employee',
+            # 'employee',
             # 'start_date', 
             # 'end_date',
             # 'total_price', 

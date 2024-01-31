@@ -102,7 +102,7 @@ class SaleRecordMembership(CommonField):
     # employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_membership_employee')
     
     price = models.FloatField(blank=True, null=True) 
-    qty = models.PositiveSmallIntegerField(blank=True, null=True)
+    quantity = models.PositiveSmallIntegerField(blank=True, null=True)
     
 class SaleTax(CommonField):
     
@@ -134,7 +134,8 @@ class PurchasedGiftCards(CommonField):
     gift_card = models.ForeignKey(GiftCards, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'sale_gift_cards_records')
     
     price = models.FloatField(default = 0)
-    quantity = models.FloatField
+    spend_amount = models.FloatField(default = 0)
+    quantity = models.SmallIntegerField(default = 0)
     
     
 # ====================================================== Appllied on checkout data ===========================================
