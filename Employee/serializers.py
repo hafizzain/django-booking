@@ -1266,8 +1266,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'business', 'employee', 'day', 'vacation', 'start_time', 'end_time',
                   'start_time_shift', 'end_time_shift', 'from_date', 'to_date', 'total_hours', 'note',
                   'date', 'is_leave', 'is_off', 'is_vacation', 'is_active', 'created_at', 'updated_at',
-                  'total_hours_dummy', 'is_leo_day', 'is_holiday', 'is_working_schedule', 'is_weekend',
-                  'vacation_status']
+                  'total_hours_dummy', 'is_leo_day', 'is_holiday', 'is_working_schedule', 'is_weekend','vacation_status']
 
 
 class WorkingScheduleSerializer(serializers.ModelSerializer):
@@ -2045,7 +2044,7 @@ class GiftCardSerializer(serializers.ModelSerializer):
 class Currencyresponse(serializers.ModelSerializer):
     class Meta:
         model = Currency
-        fields = ['id', 'code']
+        fields = ['id','code']
 
 
 class GiftCardDetails(serializers.ModelSerializer):
@@ -2054,29 +2053,26 @@ class GiftCardDetails(serializers.ModelSerializer):
         model = GiftDetail
         fields = "__all__"
 
-
 class CurrencySerializer(serializers.ModelSerializer):
     class Meta:
         model = Currency
         fields = ['id', 'code']
 
-
 class GiftCardSerializerResponse(serializers.ModelSerializer):
     gift_card_details = GiftCardDetails(many=True)
     currency = serializers.SerializerMethodField(read_only=True)
-
     # retails_price = serializers.SerializerMethodField(read_only=True)
-
+    
     def get_currency(self, obj):
         selected_location = self.context.get('selected_location')
-
+        
         if selected_location:
             business_address = BusinessAddress.objects.get(id=selected_location)
             currency = business_address.currency
 
             if currency:
                 currency_data = CurrencySerializer(currency).data
-
+            
                 return currency_data
             else:
                 return None
@@ -2084,17 +2080,17 @@ class GiftCardSerializerResponse(serializers.ModelSerializer):
             currency = Currency.objects.all()
 
             currency_data = CurrencySerializer(currency, many=True).data
-
+            
             return currency_data
-
+        
     # def get_retails_price(self, obj):
     #     selected_location = self.context.get('selected_location')
-
+        
     #     business_address = BusinessAddress.objects.get(id=selected_location)
     #     currency = business_address.currency
-
+        
     #     retail = CurrencyRetailPrice.objects.filter(currency=currency).first()
-
+        
     #     if retail:
     #         return retail.retail_price
     #     else:
@@ -2102,40 +2098,35 @@ class GiftCardSerializerResponse(serializers.ModelSerializer):
     class Meta:
         model = GiftCards
         fields = "__all__"
-
-
+        
 class EmployeDailyScheduleResponse(serializers.ModelSerializer):
     class Meta:
         model = EmployeDailySchedule
         fields = "__all__"
 
-
 class SingleGiftCardDetails(serializers.ModelSerializer):
-    currency = serializers.SerializerMethodField(read_only=True)
-
+    gift_card_details = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = GiftCards
         fields = "__all__"
+        
+    def get_gift_card_details(self, obj):
+        location_id = self.context.get('location_id')
+        business_address = BusinessAddress.objects.get(id=location_id)
+        currency=business_address.currency
 
-    def get_currency(self, obj):
-        currency = self.context.get('currency')
+        query = GiftDetail.objects.filter(currencies=currency) \
+                                    .filter(gift_card=obj.gift_card)
 
-        if currency:
-            currency_data = CurrencySerializer(currency).data
-
-            return currency_data
-        else:
-            return None
-
-
-class GiftCardDetailsabc(serializers.ModelSerializer):
+        gift_card_details = GiftCardDetails(query, many=True).data
+        return gift_card_details
+class GiftCardRetailPriceSerializer(serializers.ModelSerializer):
     currency_code = serializers.CharField(source='currencies.code')
     currency = serializers.CharField(source='currencies.id')
-    
     retail_price=serializers.CharField(read_only=True)
     class Meta:
         model = GiftDetail
-        fields = ['currency_code','retail_price','currency']
+        fields = ['currency_code','retail_price','currency','price']
         
     # def get_currency_and_retail_price(self):
     #     return {
