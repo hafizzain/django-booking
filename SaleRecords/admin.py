@@ -41,6 +41,10 @@ class SaleTaxAdmin(admin.ModelAdmin):
 class PaymentMethodsAdmin(admin.ModelAdmin):
     list_display = ['id']
     
+@admin.register(PurchasedGiftCards)
+class PUrchasedGiftCard(admin.ModelAdmin):
+    list_display = ['id']
+    
 # ============================================= Redeemed Items Records ====================================
     
 @admin.register(AppliedMemberships)
