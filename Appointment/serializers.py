@@ -1417,7 +1417,7 @@ class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
     
     def get_appointment_services(self, obj):
         # appointment_services = AppointmentCheckout.objects.filter('appointment_service__service').all()
-        appointment_services = AppointmentService.objects.all()
+        appointment_services = AppointmentService.objects.filter(appointment=obj.appointment)
         
         return AppointmentServiceSerializer(appointment_services, many=True).data
 
