@@ -1382,7 +1382,7 @@ class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
         fields = ['id', 'booking_id', 'client_name', 'booking_date', 'subtotal', 'payment_status', 'payment_date']
 
 class AppointmentServiceSerializer(serializers.ModelSerializer):
-    class meta:
+    class Meta:
         model = AppointmentService
         fields = ['service',]
 class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
