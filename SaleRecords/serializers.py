@@ -162,16 +162,20 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("At least one record is required in appointment_services, services_records, products_records, vouchers_records, membership_records or gift_cards_records")
 
         return data
+        
+        
+        
     class Meta:
         model = SaleRecords
         fields = "__all__"
         # exclude = ['is_active','is_blocked','is_deleted']
         read_only_fields = ['invoice']
         
-        
         # exclude = ['updated_at','is_deleted','is_blocked','is_active']
     
     def create(self, validated_data):
+        request = self.context.get('request')
+    location = request.data.get('location')
         
         appointment_services = validated_data.pop('appointment_services', [])
         services_records = validated_data.pop('services_records', [])
@@ -189,13 +193,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         applied_gift_cards_records = validated_data.pop('applied_gift_cards_records', [])
         applied_promotions_records = validated_data.pop('applied_promotions_records',[])
         
-        # if not any('valid_till' in record for record in gift_cards_records):
-        #     raise ValueError('gift card is not present not present')
-        # raise ValueError('present')
-        # for d in gift_cards_records:
-        #     expiry = calculate_validity(d['valid_till'])
-        #     raise ValueError(str(expiry))
-        # raise ValueError('Not present')
+        
         
         
         
