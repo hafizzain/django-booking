@@ -5,7 +5,7 @@ from Invoices.models import SaleInvoice
 from SaleRecords.models import *
 from Invoices.models import SaleInvoice
 from Client.helpers import calculate_validity
-
+from Employee.models import *
 
 class SaleRecordsAppointmentServicesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -32,25 +32,31 @@ class SaleRecordVouchersSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['sale_record']
 
+class GiftCardDetails(serializers.ModelSerializer):
+    # currencies = Currencyresponse()
+    class Meta:
+        model = GiftDetail
+        fields = "__all__"
 class PurchasedGiftCardsSerilizer(serializers.ModelSerializer):
-    gift_card_detail = serializers.SerializerMethodField(read_only = True)
+    # gift_card_detail = serializers.SerializerMethodField(read_only = True)
     valid_till = serializers.CharField(write_only=True, required=True)
+    gift_card_details = GiftCardDetails(many=True)
     
-    def get_gift_card_detail(self, obj):
-        if obj.gift_card:
+    # def get_gift_card_detail(self, obj):
+    #     if obj.gift_card:
             
-            return {'title': f"{obj.gift_card.title}",
 
+    #         return {'title': f"{obj.gift_card.title}",
+    #                 'code': f"{obj.gift_card.code}",
+    #                 'spend_amount': f"{obj.spend_amount}",
+    #                 'price': f"{obj.price}",
+    #                 }
 
-                    'code': f"{obj.gift_card.code}",
-                    'spend_amount': f"{obj.spend_amount}",
-                    'price': f"{obj.price}",
-                    }
 
     class Meta:
         model = PurchasedGiftCards
         fields = "__all__"
-        read_only_fields = ['sale_record']
+        read_only_fields = ['sale_record','gift_card_details']
         
         
 class SaleRecordMembershipSerializer(serializers.ModelSerializer):
