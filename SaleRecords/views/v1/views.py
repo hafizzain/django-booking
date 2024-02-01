@@ -62,7 +62,7 @@ class SaleRecordViews(APIView):
         try:
             user = request.user
             request.data['user'] = user.id
-            validity = request.data['gift_cards_records'][5]
+            validity = request.data['gift_cards_records'][4]
             return Response(validity)
             # return Response({'data': validity})
             serializer = SaleRecordSerializer(data=request.data, context = {'request': request})
