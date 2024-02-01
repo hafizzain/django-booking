@@ -217,7 +217,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     membership = data['membership'],
                     price = float(data['price'] * data['quantity']),
                     quantity = data['quantity'],
-                    expiry_date = calculate_validity(data['validity_date'])
+                    expiry = calculate_validity(data['validity_date'])
                     ) for data in membership_records
             ])
 
@@ -228,7 +228,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     voucher = data['voucher'],
                     price = float(data['price'] * data['quantity']),
                     quantity = data['quantity'],
-                    expiry_date = calculate_validity(data['validity_date'])
+                    expiry = calculate_validity(data['validity_date'])
                                 ) for data in vouchers_records
             ])
 
@@ -240,7 +240,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     price = float(data['price'] * data['quantity']),
                     spend_amount = data['spend_amount'],
                     quantity = data['quantity'],
-                    expiry_date = calculate_validity(data['validity_date'])
+                    expiry = calculate_validity(data['validity_date'])
                                 ) for data in gift_cards_records
             ])
 
