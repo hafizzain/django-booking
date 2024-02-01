@@ -2083,18 +2083,6 @@ class GiftCardSerializerResponse(serializers.ModelSerializer):
             
             return currency_data
         
-    # def get_retails_price(self, obj):
-    #     selected_location = self.context.get('selected_location')
-        
-    #     business_address = BusinessAddress.objects.get(id=selected_location)
-    #     currency = business_address.currency
-        
-    #     retail = CurrencyRetailPrice.objects.filter(currency=currency).first()
-        
-    #     if retail:
-    #         return retail.retail_price
-    #     else:
-    #         return None
     class Meta:
         model = GiftCards
         fields = "__all__"
