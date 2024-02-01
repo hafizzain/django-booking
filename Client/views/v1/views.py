@@ -2893,7 +2893,7 @@ def get_client_all_gift_cards(request):
             'response': {
                 'message': 'Gift cards fetched successfully',
                 'error_message': None,
-                'client_loyalty_points': serializer.data
+                'client_gift_cards': serializer.data
             }
         
     })
