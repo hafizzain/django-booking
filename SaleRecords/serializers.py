@@ -180,9 +180,13 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         applied_gift_cards_records = validated_data.pop('applied_gift_cards_records', [])
         applied_promotions_records = validated_data.pop('applied_promotions_records',[])
         
-        # if not any('gift_card' in record for record in gift_cards_records):
-        #     raise ValueError('gift card is not present not present')
-        # raise ValueError('Present')
+        if not any('gift_card' in record for record in gift_cards_records):
+            raise ValueError('gift card is not present not present')
+        for d in gift_cards_records:
+            expiry = calculate_validity(d['valid'])
+            raise ValueError(str(expiry))
+        raise ValueError('Present')
+        
         
         
         # =================================================== Checkout Records ========================================================

@@ -2,10 +2,10 @@
 from datetime import datetime, timedelta
 
 
-def calculate_validity(validaty):
+def calculate_validity(validity):
     current_date = datetime.now()
 
-    parts = validaty.split()
+    parts = validity.split()
     num = int(parts[0])
     unit = parts[1].lower()
 
@@ -20,7 +20,8 @@ def calculate_validity(validaty):
 
     # Calculate expiry date
     expiry_date = current_date + timedelta(days=num * unit_factors.get(unit, 0))
-    
+
+    # Format the expiry date as a string
     formatted_expiry = expiry_date.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
     return formatted_expiry
