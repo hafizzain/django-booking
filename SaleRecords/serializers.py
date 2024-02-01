@@ -180,9 +180,9 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         applied_gift_cards_records = validated_data.pop('applied_gift_cards_records', [])
         applied_promotions_records = validated_data.pop('applied_promotions_records',[])
         
-        if not any('gift_card' in record for record in gift_cards_records):
-            raise ValueError('gift card is not present not present')
-        raise ValueError('Present')
+        # if not any('gift_card' in record for record in gift_cards_records):
+        #     raise ValueError('gift card is not present not present')
+        # raise ValueError('Present')
         
         
         # =================================================== Checkout Records ========================================================
@@ -221,7 +221,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     membership = data['membership'],
                     price = float(data['price'] * data['quantity']),
                     quantity = data['quantity'],
-                    expiry = calculate_validity(data['valid_till']),
+                    expiry = calculate_validity(data['expiry']),
                     ) for data in membership_records
             ])
 
@@ -232,7 +232,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     voucher = data['voucher'],
                     price = float(data['price'] * data['quantity']),
                     quantity = data['quantity'],
-                    expiry = calculate_validity(data['valid_till']),
+                    expiry = calculate_validity(data['expiry']),
                             ) for data in vouchers_records
             ])
 
@@ -244,7 +244,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     price = float(data['price'] * data['quantity']),
                     spend_amount = data['spend_amount'],
                     quantity = data['quantity'],
-                    expiry = calculate_validity(data['valid_till']),
+                    expiry = calculate_validity(data['expiry']),
                             ) for data in gift_cards_records
             ])
 
