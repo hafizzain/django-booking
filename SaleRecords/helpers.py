@@ -24,9 +24,10 @@ def matching_records(is_quick_sale = None,location=None, range_start=None, range
         if is_quick_sale == True:
             matching_records = SaleRecords.objects.filter(filters).order_by('-created_at')[:5]
             return matching_records
+        else:
             # Fetch records based on the constructed filters
-        matching_records = SaleRecords.objects.filter(filters)
-        return matching_records
+            matching_records = SaleRecords.objects.filter(filters)
+            return matching_records
         
     except Exception as e:
         
