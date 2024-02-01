@@ -244,11 +244,12 @@ def get_reversal(request):
 @permission_classes([AllowAny])
 def get_appointments_service(request):
     appointment_id = request.GET.get('appointment_group_id', None)
+    
     total_sale = 0
+    voucher_total_price = 0
     voucher_membership = []
     
     if not all([appointment_id]):
-        
         return Response(
             {
                 'status': False,
@@ -282,8 +283,10 @@ def get_appointments_service(request):
 
     serialized = SingleNoteSerializer(appointment)
     
+    # Calculate Total Sale of Client---------------------
     client = appointment.client
-    # Product Order---------------------
+    
+    # Client All Product Order---------------------
     product_order = ProductOrder.objects \
         .filter(checkout__client=client) \
         .select_related('product', 'member') \
@@ -291,7 +294,7 @@ def get_appointments_service(request):
     product_total = product_order.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += product_total if product_total else 0
     
-    # Service Orders----------------------
+    # Client All Service Orders----------------------
     service_orders = ServiceOrder.objects \
         .filter(checkout__client=client) \
         .select_related('service', 'user', 'member') \
@@ -299,15 +302,18 @@ def get_appointments_service(request):
     service_total = service_orders.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += service_total if service_total else 0
     
-    # Voucher & Membership Orders -----------------------
+    # Client All Voucher & Membership Orders -----------------------
     voucher_order = VoucherOrder.objects \
                         .filter(checkout__client=client) \
                         .select_related('voucher', 'member', 'user') \
                         .order_by('-created_at')[:5]
+    
+    # Client All Membership Orders -----------------------                    
     membership_order = MemberShipOrder.objects \
-                           .filter(checkout__client=client) \
-                           .select_related('membership', 'user', 'member') \
-                           .order_by('-created_at')[:5]
+                            .filter(checkout__client=client) \
+                            .select_related('membership', 'user', 'member') \
+                            .order_by('-created_at')[:5]
+                            
     voucher_total = voucher_order.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += voucher_total if voucher_total else 0
     
@@ -317,21 +323,21 @@ def get_appointments_service(request):
     voucher_membership.extend(voucher.data)
     voucher_membership.extend(membership.data)
     
-    # Appointment Orders ------------------------------
+    # Client All Appointment Orders ------------------------------
     appointment_checkout_all = AppointmentService.objects \
         .filter(
         appointment__client=client,
         appointment_status__in=['Done', 'Paid']
-    ) \
+        ) \
         .select_related('member', 'user', 'service') \
         .order_by('-created_at')
-    appointment_checkout_5 = appointment_checkout_all
+    
+    #Now Calculate Total Sale    
     appointment_total = appointment_checkout_all.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += appointment_total if appointment_total else 0
     product = POSerializerForClientSale(product_order, many=True, context={'request': request, })
     
     price_values = sum(item.get('price', 0) for item in product.data)
-    voucher_total_price = 0
     voucher_total_price = sum(item.get('price', 0) for item in voucher.data)
     total_sale = total_sale + price_values + voucher_total_price
     
