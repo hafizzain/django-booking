@@ -106,6 +106,23 @@ class SaleRecordMembership(CommonField):
     price = models.FloatField(blank=True, null=True) 
     quantity = models.PositiveSmallIntegerField(blank=True, null=True)
     
+class PaymentMethods(CommonField):
+    sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'payment_methods_records')
+    
+    
+    payment_method = models.CharField(choices = PaymentMethodsChoices.choices, max_length = 50 , null = True , blank = False)
+    amount = models.FloatField(default  = 0 , blank= False)
+    
+class PurchasedGiftCards(CommonField):
+    sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'gift_cards_records')
+    gift_card = models.ForeignKey(GiftCards, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'sale_gift_cards_records')
+    
+    price = models.FloatField(default = 0)
+    spend_amount = models.FloatField(default = 0)
+    quantity = models.SmallIntegerField(default = 0)
+    expiry_date = models.DateTimeField(blank=True, null=True)
+    
+    
 class SaleTax(CommonField):
     
     sale_record = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, blank=True, null=True, related_name='tax_records') 
@@ -123,23 +140,6 @@ class SaleRecordTip(CommonField):
     
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_record_employee_tips') 
     tip = models.FloatField(blank=False, null=False) 
-    
-class PaymentMethods(CommonField):
-    sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'payment_methods_records')
-    
-    
-    payment_method = models.CharField(choices = PaymentMethodsChoices.choices, max_length = 50 , null = True , blank = False)
-    amount = models.FloatField(default  = 0 , blank= False)
-    
-class PurchasedGiftCards(CommonField):
-    sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'gift_cards_records')
-    gift_card = models.ForeignKey(GiftCards, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'sale_gift_cards_records')
-    
-    price = models.FloatField(default = 0)
-    spend_amount = models.FloatField(default = 0)
-    quantity = models.SmallIntegerField(default = 0)
-    expiry_date = models.DateTimeField(blank=True, null=True)
-    
     
 # ====================================================== Appllied on checkout data ===========================================
     
