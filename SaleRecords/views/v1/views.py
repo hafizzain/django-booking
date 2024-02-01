@@ -62,9 +62,8 @@ class SaleRecordViews(APIView):
         try:
             user = request.user
             request.data['user'] = user.id
-            validity = request.data['gift_cards_records'][0]['valid_till']
-            # validity.get('valid_till')
-            return Response(validity)
+            # validity = request.data['gift_cards_records']
+            # validity.get('valid_till'
             # return Response({'data': validity})
             serializer = SaleRecordSerializer(data=request.data, context = {'request': request})
             if serializer.is_valid():
