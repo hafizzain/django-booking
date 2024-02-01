@@ -1408,7 +1408,7 @@ class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentCheckout
         fields = ['id', 'booking_id', 'client_name', 'booking_date', 'subtotal', 'payment_status',
-                  'payment_date', 'gst_price', 'gst_price1', 'total_price', 'total_tax','service']
+                  'payment_date', 'gst_price', 'gst_price1', 'total_price', 'total_tax','appointment_service']
 
 
 class NoteSerializer(serializers.ModelSerializer):
