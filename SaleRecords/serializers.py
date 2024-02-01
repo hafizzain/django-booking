@@ -41,6 +41,7 @@ class PurchasedGiftCardsSerilizer(serializers.ModelSerializer):
             
             return {'title': f"{obj.gift_card.title}",
 
+
                     'code': f"{obj.gift_card.code}",
                     'spend_amount': f"{obj.spend_amount}",
                     'price': f"{obj.price}",
