@@ -30,6 +30,7 @@ class SaleRecordServicesSerializer(serializers.ModelSerializer):
         read_only_fields = ['sale_record']
         
 class SaleRecordVouchersSerializer(serializers.ModelSerializer):
+    valid_till = serializers.CharField(write_only=True, required=True)
     class Meta:
         model = SaleRecordVouchers
         fields = '__all__'
@@ -59,6 +60,7 @@ class PurchasedGiftCardsSerializer(serializers.ModelSerializer):
         
         
 class SaleRecordMembershipSerializer(serializers.ModelSerializer):
+    valid_till = serializers.CharField(write_only=True, required=True)
     class Meta:
         model = SaleRecordMembership
         fields = "__all__"
