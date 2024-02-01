@@ -2886,7 +2886,15 @@ def get_client_all_gift_cards(request):
     client = request.GET.get('client', None)
     code = request.GET.get('code', None)
     
-    client_gift_cards = PurchasedGiftCards.objects.filter(sale_record__client__id = client, sale_record__location__id = location, gift_card__code = code)
+    query &= Q(sale_record__location__id = location)
+    
+    if client is not None:
+        query &= Q(sale_record__client__id = client)
+        
+    if code is not None:
+        query &= Q(gift_card__code = code)
+    
+    client_gift_cards = PurchasedGiftCards.objects.filter(query)
     if not client_gift_cards.exists():
         return Response({
             'status': True,
