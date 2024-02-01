@@ -23,7 +23,7 @@ from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPr
     LoyaltyPointLogs, VoucherCurrencyPrice, ClientImages, Comments
     
 from SaleRecords.models import PurchasedGiftCards
-from SaleRecords.serializers import PurchasedGiftCardsSerilizer
+from SaleRecords.serializers import PurchasedGiftCardsSerializer
 from Client.serializers import (SingleClientSerializer, ClientSerializer, ClientGroupSerializer,
                                 LoyaltyPointsSerializer,
                                 SubscriptionSerializer, RewardSerializer, PromotionSerializer, MembershipSerializer,
@@ -2886,7 +2886,7 @@ def get_client_all_gift_cards(request):
     client = request.GET.get('client')
     
     client_gift_cards = PurchasedGiftCards.objects.filter(sale_record__client__id = client, sale_record__location__id = location)
-    serializer = PurchasedGiftCardsSerilizer(client_gift_cards, many = True)
+    serializer = PurchasedGiftCardsSerializer(client_gift_cards, many = True)
     return Response({
         'status': True,
             'status_code': 200,
