@@ -97,10 +97,16 @@ class AppliedGiftCardsSerializer(serializers.ModelSerializer):
         fields = "__all__"
         read_only_fields = ['sale_record']
     
-    def validate(self, data):
-        valid_till = data.pop('valid_till', None)
+    def validate(self, obj):
+        valid_till = obj.pop('valid_till', None)
         if valid_till:
-            data = calculate_validity(valid_till)
+            raise ValueError('Comming here')
+        raise ValueError('Not com here')
+            # Perform any necessary validation or calculations here
+            # For example, you can convert the 'valid_till' string to a date
+            # and then validate it or use it in calculations.
+            # Ensure that you add the 'valid_till' value back to the data dictionary if needed.
+
         return data
 
 
@@ -243,7 +249,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     voucher = data['voucher'],
                     price = float(data['price'] * data['quantity']),
                     quantity = data['quantity'],
-                    expiry = data['expiry'],
+                    expiry = calculate_validity(data['expiry']),
                             ) for data in vouchers_records
             ])
 
@@ -255,7 +261,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     price = float(data['price'] * data['quantity']),
                     spend_amount = data['spend_amount'],
                     quantity = data['quantity'],
-                    expiry = data['valid_till'],
+                    expiry = calculate_validity(data['expiry']),
                             ) for data in gift_cards_records
             ])
 
