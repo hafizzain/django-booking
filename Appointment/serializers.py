@@ -1411,7 +1411,7 @@ class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
     def get_appointment_services(self, obj):
         appointment_services = AppointmentService.objects.filter(appointment=obj.appointment).first()
         
-        return AppointmentServiceSerializer(appointment_services, many=True).data
+        return AppointmentServiceSerializer(appointment_services).data
 
     class Meta:
         model = AppointmentCheckout
