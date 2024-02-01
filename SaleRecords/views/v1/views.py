@@ -63,7 +63,7 @@ class SaleRecordViews(APIView):
             user = request.user
             request.data['user'] = user.id
             validity = request.data['gift_cards_records']
-            return Response({'data': validity})
+            # return Response({'data': validity})
             serializer = SaleRecordSerializer(data=request.data, context = {'request': request})
             if serializer.is_valid():
                 sale_record = serializer.save()

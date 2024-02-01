@@ -229,7 +229,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     price = float(data['price'] * data['quantity']),
                     quantity = data['quantity'],
                     expiry = calculate_validity(data['validity_date'])
-                                ) for data in vouchers_records
+                            ) for data in vouchers_records
             ])
 
             # Create records for PurchasedGiftCards
@@ -241,7 +241,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     spend_amount = data['spend_amount'],
                     quantity = data['quantity'],
                     expiry = calculate_validity(data['validity_date'])
-                                ) for data in gift_cards_records
+                            ) for data in gift_cards_records
             ])
 
             # Create records for SaleTax
