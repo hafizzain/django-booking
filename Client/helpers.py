@@ -20,5 +20,7 @@ def calculate_validity(validaty):
 
     # Calculate expiry date
     expiry_date = current_date + timedelta(days=num * unit_factors.get(unit, 0))
+    
+    formatted_expiry = expiry_date.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
-    return expiry_date
+    return formatted_expiry
