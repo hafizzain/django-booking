@@ -62,7 +62,8 @@ class SaleRecordViews(APIView):
         try:
             user = request.user
             request.data['user'] = user.id
-            validity = request.data['gift_cards_records']
+            validity = request.data['gift_cards_records']['valid_till']
+            return Response(validity)
             # return Response({'data': validity})
             serializer = SaleRecordSerializer(data=request.data, context = {'request': request})
             if serializer.is_valid():
@@ -111,6 +112,7 @@ class SaleRecordViews(APIView):
                         }
                     }
                 return Response(response_data, status=status.HTTP_201_CREATED)
+            
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e), 'First Try':'Error in first Try'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
