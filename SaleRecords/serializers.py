@@ -195,6 +195,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         
         if not any('valid_till' in record for record in gift_cards_records):
             raise ValueError('gift card is not present not present')
+        raise ValueError('present')
         # for d in gift_cards_records:
         #     expiry = calculate_validity(d['valid_till'])
         #     raise ValueError(str(expiry))
