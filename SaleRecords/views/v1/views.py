@@ -16,6 +16,7 @@ class SaleRecordViews(APIView):
     
     def get(self, request, *args, **kwargs):
         try:
+            
             location = request.GET.get('location', None)
             range_start = request.GET.get('range_start', None)
             range_end = request.GET.get('range_end', None)
@@ -23,13 +24,15 @@ class SaleRecordViews(APIView):
             search_text = request.GET.get('search_text', None)
             service = request.GET.get('service', None)
             search_text = request.GET.get('search_text', None)
+            is_quick_sale = request.GET.get('is_quick_sale', None)
             
             sale_record = matching_records(location= location,
                                             range_start = range_start,
                                             range_end = range_end,
                                             client = client,
                                             services = service,
-                                            search_text = search_text
+                                            search_text = search_text,
+                                            is_quick_sale = is_quick_sale
                                         )
             #Apply Pagination
             paginator = self.pagination_class()
@@ -60,6 +63,7 @@ class SaleRecordViews(APIView):
         
     def post(self, request, *args, **kwargs):
         try:
+            
             user = request.user
             request.data['user'] = user.id
             # validity = request.data['gift_cards_records']

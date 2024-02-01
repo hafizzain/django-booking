@@ -21,7 +21,7 @@ def matching_records(is_quick_sale = None,location=None, range_start=None, range
         if client is not None:
             filters &= Q(client=client)
         
-        if is_quick_sale:
+        if is_quick_sale == True:
             matching_records = SaleRecords.objects.filter(filters).order_by('-created_at')[:5]
             return matching_records
             # Fetch records based on the constructed filters
