@@ -151,6 +151,9 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             return ClientSerializer(client).data
         return None
     
+    def product_stock_update(self):
+        pass
+    
     def validate(self, data):
         # Validate that there is at least one record in appointment_services, services_records, and products_records
 
@@ -171,8 +174,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         request = self.context.get('request')
-    location = request.data.get('location')
-        
+        location = request.data.get('location')
         appointment_services = validated_data.pop('appointment_services', [])
         services_records = validated_data.pop('services_records', [])
         products_records = validated_data.pop('products_records', [])
