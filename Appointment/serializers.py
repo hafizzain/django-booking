@@ -1381,7 +1381,10 @@ class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
         model = Appointment
         fields = ['id', 'booking_id', 'client_name', 'booking_date', 'subtotal', 'payment_status', 'payment_date']
 
-
+class AppointmentServiceSerializer(serializers.ModelSerializer):
+    class meta:
+        model = AppointmentService
+        fields = ['service',]
 class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
     # just_services_price_inside = serializers.FloatField()
     # just_services_price = serializers.FloatField()
@@ -1405,17 +1408,18 @@ class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
     def get_booking_date(self, obj):
         return obj.appointment.created_at
     
-    def get_appointment_services(self, obj):
-        # Retrieve the related AppointmentService objects for the specific AppointmentCheckout instance
-        appointment_services = obj.appointment.appointment_services.all()
-
-        # Return a list of dictionaries with the desired structure
-        return [{'service': service.service} for service in appointment_services if service]
-    
     # def get_appointment_services(self, obj):
-    #     appointment_services = AppointmentCheckout.objects.values('appointment_service__service').all()
+    #     # Retrieve the related AppointmentService objects for the specific AppointmentCheckout instance
+    #     appointment_services = obj.appointment.appointment_services.all()
+
+    #     # Return a list of dictionaries with the desired structure
+    #     return [{'service': service.service} for service in appointment_services if service]
+    
+    def get_appointment_services(self, obj):
+        # appointment_services = AppointmentCheckout.objects.filter('appointment_service__service').all()
+        appointment_services = AppointmentService.objects.all()
         
-    #     return appointment_services
+        return AppointmentServiceSerializer(appointment_services, many=True).data
 
     class Meta:
         model = AppointmentCheckout
