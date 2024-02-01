@@ -2882,8 +2882,8 @@ def get_client_available_loyalty_points(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_client_all_gift_cards(request):
-    location = request.GET.get('location')
-    client = request.GET.get('client', None)
+    location = request.GET.get('location_id')
+    client = request.GET.get('client_id', None)
     code = request.GET.get('code', None)
     
     query = Q(sale_record__location__id = location)
