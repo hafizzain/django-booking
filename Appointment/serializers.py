@@ -1400,7 +1400,7 @@ class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
     payment_date = serializers.DateTimeField()
     booking_id = serializers.SerializerMethodField()
     booking_date = serializers.SerializerMethodField()
-    appointment_services = serializers.SerializerMethodField(read_only=True)
+    # appointment_services = serializers.SerializerMethodField(read_only=True)
 
     def get_booking_id(self, obj):
         return obj.appointment.get_booking_id()
@@ -1408,15 +1408,15 @@ class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
     def get_booking_date(self, obj):
         return obj.appointment.created_at
     
-    def get_appointment_services(self, obj):
-        appointment_services = AppointmentService.objects.filter(appointment=obj.appointment).first()
+    # def get_appointment_services(self, obj):
+    #     appointment_services = AppointmentService.objects.filter(appointment=obj.appointment).first()
         
-        return AppointmentServiceSerializer(appointment_services).data
+    #     return AppointmentServiceSerializer(appointment_services).data
 
     class Meta:
         model = AppointmentCheckout
-        fields = ['id', 'booking_id', 'client_name', 'booking_date', 'subtotal', 'payment_status',
-                  'payment_date', 'gst_price', 'gst_price1', 'total_price', 'total_tax','appointment_services']
+        fields = ['id', 'appointment', 'appointment_service', 'booking_id', 'client_name', 'booking_date', 'subtotal', 'payment_status',
+                  'payment_date', 'gst_price', 'gst_price1', 'total_price', 'total_tax',]
 
 
 class NoteSerializer(serializers.ModelSerializer):
