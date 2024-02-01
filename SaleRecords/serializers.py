@@ -180,6 +180,9 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         applied_gift_cards_records = validated_data.pop('applied_gift_cards_records', [])
         applied_promotions_records = validated_data.pop('applied_promotions_records',[])
         
+        if 'valid_till' not in gift_cards_records:
+            raise ValueError('gift card is not present not present')
+        
         
         # =================================================== Checkout Records ========================================================
         '''
