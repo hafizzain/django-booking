@@ -2886,9 +2886,15 @@ def get_client_all_gift_cards(request):
     client = request.GET.get('client')
     
     client_gift_cards = PurchasedGiftCards.objects.filter(sale_record__client__id = client, sale_record__location__id = location)
-    serilizer = PurchasedGiftCardsSerilizer(client_gift_cards, many = True)
+    serializer = PurchasedGiftCardsSerilizer(client_gift_cards, many = True)
     return Response({
-        'data': serilizer.data
+        'status': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Gift cards fetched successfully',
+                'error_message': None,
+                'client_loyalty_points': serializer.data
+            }
         
     })
     
