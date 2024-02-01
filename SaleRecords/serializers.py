@@ -45,8 +45,9 @@ class PurchasedGiftCardsSerilizer(serializers.ModelSerializer):
     def validate(self, obj):
         valid_till = obj.pop('valid_till', None)
         if valid_till:
-            raise ValueError('Comming here')
-        raise ValueError('Not com here')
+            expiry = calculate_validity(valid_till)
+            return expiry
+        return None
     class Meta:
         model = PurchasedGiftCards
         fields = "__all__"
@@ -187,9 +188,9 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         applied_gift_cards_records = validated_data.pop('applied_gift_cards_records', [])
         applied_promotions_records = validated_data.pop('applied_promotions_records',[])
         
-        if not any('valid_till' in record for record in gift_cards_records):
-            raise ValueError('gift card is not present not present')
-        raise ValueError('present')
+        # if not any('valid_till' in record for record in gift_cards_records):
+        #     raise ValueError('gift card is not present not present')
+        # raise ValueError('present')
         # for d in gift_cards_records:
         #     expiry = calculate_validity(d['valid_till'])
         #     raise ValueError(str(expiry))
@@ -233,7 +234,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     membership = data['membership'],
                     price = float(data['price'] * data['quantity']),
                     quantity = data['quantity'],
-                    expiry = calculate_validity(data['expiry']),
+                    expiry = calculate_validity(data['valid_till']),
                     ) for data in membership_records
             ])
 
@@ -244,7 +245,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     voucher = data['voucher'],
                     price = float(data['price'] * data['quantity']),
                     quantity = data['quantity'],
-                    expiry = calculate_validity(data['expiry']),
+                    expiry = calculate_validity(data['valid_till']),
                             ) for data in vouchers_records
             ])
 
