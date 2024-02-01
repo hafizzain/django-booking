@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from django.db import transaction
+from django.db.models import F ,Q
+
 from Invoices.models import SaleInvoice
+from Product.models import ProductStock
 
 from SaleRecords.models import *
 from Invoices.models import SaleInvoice
@@ -151,8 +154,15 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             return ClientSerializer(client).data
         return None
     
-    def product_stock_update(self):
-        pass
+    def product_stock_update(self, location, products):
+        for data in products:
+            ProductStock.objects.filter(location = location, product = data['product']).update(
+                sold_quantity =  F('sold_quantity') + data['refunded_quantity'],
+                available_quantity=F('available_quantity') - data['quantity'],
+                consumed_quantity = F('consumed_quantity') + data['quantity']
+                
+            )
+            
     
     def validate(self, data):
         # Validate that there is at least one record in appointment_services, services_records, and products_records
