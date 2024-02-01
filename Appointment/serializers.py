@@ -1407,10 +1407,10 @@ class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
     
     def get_appointment_services(self, obj):
         # Retrieve the related AppointmentService objects for the specific AppointmentCheckout instance
-        appointment_services = obj.appointment_service.service.all()
+        appointment_services = obj.appointment.appointment_services.all()
 
         # Return a list of dictionaries with the desired structure
-        return [{'service': service.service} for service in appointment_services]
+        return [{'service': service.service} for service in appointment_services if service]
     
     # def get_appointment_services(self, obj):
     #     appointment_services = AppointmentCheckout.objects.values('appointment_service__service').all()
