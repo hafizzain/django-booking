@@ -2883,9 +2883,20 @@ def get_client_available_loyalty_points(request):
 @permission_classes([AllowAny])
 def get_client_all_gift_cards(request):
     location = request.GET.get('location')
-    client = request.GET.get('client')
+    client = request.GET.get('client', None)
+    code = request.GET.get('code', None)
     
-    client_gift_cards = PurchasedGiftCards.objects.filter(sale_record__client__id = client, sale_record__location__id = location)
+    client_gift_cards = PurchasedGiftCards.objects.filter(sale_record__client__id = client, sale_record__location__id = location, gift_card__code = code)
+    if not client_gift_cards.exists():
+        return Response({
+            'status': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Gift cards not found!',
+                'error_message': None,
+                'client_gift_cards': None
+            }
+        })
     serializer = PurchasedGiftCardsSerializer(client_gift_cards, many = True)
     return Response({
         'status': True,
@@ -2895,11 +2906,7 @@ def get_client_all_gift_cards(request):
                 'error_message': None,
                 'client_gift_cards': serializer.data
             }
-        
     })
-    
-    
-    
 
 
 
