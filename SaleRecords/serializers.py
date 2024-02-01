@@ -91,10 +91,17 @@ class AppliedVouchersSerializer(serializers.ModelSerializer):
         read_only_fields = ['sale_record']
         
 class AppliedGiftCardsSerializer(serializers.ModelSerializer):
+    valid_till = serializers.CharField(write_only=True, required=True)
     class Meta:
         model = AppliedGiftCards
         fields = "__all__"
         read_only_fields = ['sale_record']
+    
+    def validate(self, data):
+        valid_till = data.pop('valid_till', None)
+        if valid_till:
+            data = calculate_validity(valid_till)
+        return data
 
 
 class AppliedPromotionSerializer(serializers.ModelSerializer):
@@ -182,10 +189,10 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         
         # if not any('valid_till' in record for record in gift_cards_records):
         #     raise ValueError('gift card is not present not present')
-        for d in gift_cards_records:
-            expiry = calculate_validity(d['valid_till'])
-            raise ValueError(str(expiry))
-        raise ValueError('Not Present')
+        # for d in gift_cards_records:
+        #     expiry = calculate_validity(d['valid_till'])
+        #     raise ValueError(str(expiry))
+        # raise ValueError('Not present')
         
         
         
