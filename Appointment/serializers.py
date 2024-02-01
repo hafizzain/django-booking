@@ -1397,7 +1397,7 @@ class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
     payment_date = serializers.DateTimeField()
     booking_id = serializers.SerializerMethodField()
     booking_date = serializers.SerializerMethodField()
-    service = serializers.CharField(source='appointment_service.service')
+    appointment_services = serializers.CharField(source='appointment_service.service')
 
     def get_booking_id(self, obj):
         return obj.appointment.get_booking_id()
@@ -1408,7 +1408,7 @@ class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentCheckout
         fields = ['id', 'booking_id', 'client_name', 'booking_date', 'subtotal', 'payment_status',
-                  'payment_date', 'gst_price', 'gst_price1', 'total_price', 'total_tax','service']
+                  'payment_date', 'gst_price', 'gst_price1', 'total_price', 'total_tax','appointment_services']
 
 
 class NoteSerializer(serializers.ModelSerializer):
