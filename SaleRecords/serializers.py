@@ -37,10 +37,14 @@ class GiftCardDetails(serializers.ModelSerializer):
     class Meta:
         model = GiftDetail
         fields = "__all__"
-class PurchasedGiftCardsSerilizer(serializers.ModelSerializer):
+class PurchasedGiftCardsSerializer(serializers.ModelSerializer):
     # gift_card_detail = serializers.SerializerMethodField(read_only = True)
     valid_till = serializers.CharField(write_only=True, required=True)
-    gift_card_details = GiftCardDetails(many=True)
+    gift_card_details = serializers.SerializerMethodField(read_only = True)
+    
+    
+    def get_gift_card_details(self, obj):
+        return GiftCardDetails(obj.gift_card).data
     
     # def get_gift_card_detail(self, obj):
     #     if obj.gift_card:
@@ -132,7 +136,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     services_records = SaleRecordServicesSerializer(many= True, write_only = True)
     products_records = SaleRecordProductsSerializer(many= True, write_only = True)
     payment_methods_records = PaymentMethodsSerializer(many = True, write_only = True)
-    gift_cards_records = PurchasedGiftCardsSerilizer(many = True, write_only = True)
+    gift_cards_records = PurchasedGiftCardsSerializer(many = True, write_only = True)
     membership_records = SaleRecordMembershipSerializer(many = True ,write_only = True)
     vouchers_records = SaleRecordVouchersSerializer(many =True , write_only = True)
     tax_records = SaleTaxSerializer(many =True, write_only = True)
