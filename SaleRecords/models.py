@@ -88,7 +88,7 @@ class SaleRecordVouchers(CommonField):
     voucher = models.ForeignKey(Vouchers, on_delete = models.SET_NULL, null = True)
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
-    expiry_date = models.DateTimeField(blank=True, null=True)
+    expiry = models.DateTimeField(blank=True, null=True)
     # employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_vouchers_employee')
     
     price = models.FloatField(blank=True, null=True) 
@@ -100,18 +100,11 @@ class SaleRecordMembership(CommonField):
     membership = models.ForeignKey(Membership, on_delete=models.SET_NULL, null = True)
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
-    expiry_date = models.DateTimeField(blank=True, null=True)
+    expiry = models.DateTimeField(blank=True, null=True)
     # employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_membership_employee')
     
     price = models.FloatField(blank=True, null=True) 
     quantity = models.PositiveSmallIntegerField(blank=True, null=True)
-    
-class PaymentMethods(CommonField):
-    sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'payment_methods_records')
-    
-    
-    payment_method = models.CharField(choices = PaymentMethodsChoices.choices, max_length = 50 , null = True , blank = False)
-    amount = models.FloatField(default  = 0 , blank= False)
     
 class PurchasedGiftCards(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'gift_cards_records')
@@ -120,7 +113,14 @@ class PurchasedGiftCards(CommonField):
     price = models.FloatField(default = 0)
     spend_amount = models.FloatField(default = 0)
     quantity = models.SmallIntegerField(default = 0)
-    expiry_date = models.DateTimeField(blank=True, null=True)
+    expiry = models.DateTimeField(blank=True, null=True)
+class PaymentMethods(CommonField):
+    sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'payment_methods_records')
+    
+    
+    payment_method = models.CharField(choices = PaymentMethodsChoices.choices, max_length = 50 , null = True , blank = False)
+    amount = models.FloatField(default  = 0 , blank= False)
+    
     
     
 class SaleTax(CommonField):

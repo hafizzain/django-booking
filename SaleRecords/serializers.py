@@ -34,15 +34,18 @@ class SaleRecordVouchersSerializer(serializers.ModelSerializer):
 
 class PurchasedGiftCardsSerilizer(serializers.ModelSerializer):
     gift_card_detail = serializers.SerializerMethodField(read_only = True)
+    valid_till = serializers.CharField(write_only=True, required=True)
     
     def get_gift_card_detail(self, obj):
         if obj.gift_card:
             
             return {'title': f"{obj.gift_card.title}",
+
                     'code': f"{obj.gift_card.code}",
                     'spend_amount': f"{obj.spend_amount}",
                     'price': f"{obj.price}",
                     }
+
     class Meta:
         model = PurchasedGiftCards
         fields = "__all__"
@@ -94,11 +97,11 @@ class AppliedVouchersSerializer(serializers.ModelSerializer):
         read_only_fields = ['sale_record']
         
 class AppliedGiftCardsSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = AppliedGiftCards
         fields = "__all__"
         read_only_fields = ['sale_record']
-
 
 class AppliedPromotionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -183,6 +186,15 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         applied_gift_cards_records = validated_data.pop('applied_gift_cards_records', [])
         applied_promotions_records = validated_data.pop('applied_promotions_records',[])
         
+        # if not any('valid_till' in record for record in gift_cards_records):
+        #     raise ValueError('gift card is not present not present')
+        # raise ValueError('present')
+        # for d in gift_cards_records:
+        #     expiry = calculate_validity(d['valid_till'])
+        #     raise ValueError(str(expiry))
+        # raise ValueError('Not present')
+        
+        
         
         # =================================================== Checkout Records ========================================================
         '''
@@ -220,7 +232,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     membership = data['membership'],
                     price = float(data['price'] * data['quantity']),
                     quantity = data['quantity'],
-                    expiry_date = calculate_validity(data['validity_date'])
+                    expiry = calculate_validity(data['valid_till']),
                     ) for data in membership_records
             ])
 
@@ -231,8 +243,8 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     voucher = data['voucher'],
                     price = float(data['price'] * data['quantity']),
                     quantity = data['quantity'],
-                    expiry_date = calculate_validity(data['validity_date'])
-                                ) for data in vouchers_records
+                    expiry = calculate_validity(data['valid_till']),
+                            ) for data in vouchers_records
             ])
 
             # Create records for PurchasedGiftCards
@@ -243,8 +255,8 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     price = float(data['price'] * data['quantity']),
                     spend_amount = data['spend_amount'],
                     quantity = data['quantity'],
-                    expiry_date = calculate_validity(data['validity_date'])
-                                ) for data in gift_cards_records
+                    expiry = calculate_validity(data['valid_till']),
+                            ) for data in gift_cards_records
             ])
 
             # Create records for SaleTax
