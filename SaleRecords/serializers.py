@@ -193,8 +193,8 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         applied_gift_cards_records = validated_data.pop('applied_gift_cards_records', [])
         applied_promotions_records = validated_data.pop('applied_promotions_records',[])
         
-        # if not any('valid_till' in record for record in gift_cards_records):
-        #     raise ValueError('gift card is not present not present')
+        if not any('valid_till' in record for record in gift_cards_records):
+            raise ValueError('gift card is not present not present')
         # for d in gift_cards_records:
         #     expiry = calculate_validity(d['valid_till'])
         #     raise ValueError(str(expiry))
@@ -261,7 +261,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     price = float(data['price'] * data['quantity']),
                     spend_amount = data['spend_amount'],
                     quantity = data['quantity'],
-                    expiry = calculate_validity(data['expiry']),
+                    expiry = calculate_validity(data['valid_till']),
                             ) for data in gift_cards_records
             ])
 
