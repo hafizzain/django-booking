@@ -34,12 +34,19 @@ class SaleRecordVouchersSerializer(serializers.ModelSerializer):
 
 class PurchasedGiftCardsSerilizer(serializers.ModelSerializer):
     gift_card_detail = serializers.SerializerMethodField(read_only = True)
+    valid_till = serializers.CharField(write_only=True, required=True)
     
     def get_gift_card_detail(self, obj):
         if obj.gift_card:
             
             return {'title': f"{obj.gift_card.title}",
                     'code': f"{obj.gift_card.code}"}
+            
+    def validate(self, obj):
+        valid_till = obj.pop('valid_till', None)
+        if valid_till:
+            raise ValueError('Comming here')
+        raise ValueError('Not com here')
     class Meta:
         model = PurchasedGiftCards
         fields = "__all__"
@@ -91,24 +98,11 @@ class AppliedVouchersSerializer(serializers.ModelSerializer):
         read_only_fields = ['sale_record']
         
 class AppliedGiftCardsSerializer(serializers.ModelSerializer):
-    valid_till = serializers.CharField(write_only=True, required=True)
+    
     class Meta:
         model = AppliedGiftCards
         fields = "__all__"
         read_only_fields = ['sale_record']
-    
-    def validate(self, obj):
-        valid_till = obj.pop('valid_till', None)
-        if valid_till:
-            raise ValueError('Comming here')
-        raise ValueError('Not com here')
-            # Perform any necessary validation or calculations here
-            # For example, you can convert the 'valid_till' string to a date
-            # and then validate it or use it in calculations.
-            # Ensure that you add the 'valid_till' value back to the data dictionary if needed.
-
-        return data
-
 
 class AppliedPromotionSerializer(serializers.ModelSerializer):
     class Meta:
