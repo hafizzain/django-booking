@@ -40,13 +40,13 @@ class PurchasedGiftCardsSerilizer(serializers.ModelSerializer):
         if obj.gift_card:
             
             return {'title': f"{obj.gift_card.title}",
-                    'code': f"{obj.gift_card.code}"}
-            
-    # def validate(self, obj):
-    #     valid_till = obj.pop('valid_till', None)
-    #     if not valid_till:
-    #         raise ValueError('Valid_till is required field')
-    #     return None
+
+
+                    'code': f"{obj.gift_card.code}",
+                    'spend_amount': f"{obj.spend_amount}",
+                    'price': f"{obj.price}",
+                    }
+
     class Meta:
         model = PurchasedGiftCards
         fields = "__all__"
