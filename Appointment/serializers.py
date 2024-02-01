@@ -1397,13 +1397,25 @@ class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
     payment_date = serializers.DateTimeField()
     booking_id = serializers.SerializerMethodField()
     booking_date = serializers.SerializerMethodField()
-    appointment_services = serializers.CharField(source='appointment_service.service')
+    appointment_services = serializers.SerializerMethodField(read_only=True)
 
     def get_booking_id(self, obj):
         return obj.appointment.get_booking_id()
 
     def get_booking_date(self, obj):
         return obj.appointment.created_at
+    
+    def get_appointment_services(self, obj):
+        # Retrieve the related AppointmentService objects for the specific AppointmentCheckout instance
+        appointment_services = obj.appointment_service.services.all()
+
+        # Return a list of dictionaries with the desired structure
+        return [{'service': service.service} for service in appointment_services]
+    
+    # def get_appointment_services(self, obj):
+    #     appointment_services = AppointmentCheckout.objects.values('appointment_service__service').all()
+        
+    #     return appointment_services
 
     class Meta:
         model = AppointmentCheckout
