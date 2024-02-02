@@ -316,9 +316,10 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         #     )
         # =============================== Optimized Code with less hits to the database ========================
         updates = []
+        location_instance = BusinessAddress.objects.get(id = location)
         for data in products:
             update_instance = ProductStock(
-                location=location,
+                location=location_instance,
                 product=data['product'],
                 sold_quantity=F('sold_quantity') + data['quantity'],
                 available_quantity=F('available_quantity') - data['quantity'],
