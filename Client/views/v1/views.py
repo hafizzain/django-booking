@@ -2889,7 +2889,7 @@ def get_client_all_gift_cards(request):
     query = Q(sale_record__location = location,
             price__gte=0,
             expiry__lte=datetime.now(),
-            gift_card__is_custom_card=False)
+            gift_card__is_custom_card=False) 
     
     if client is not None:
         query &= Q(sale_record__client = client)
