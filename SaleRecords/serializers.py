@@ -326,13 +326,13 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                         updates.append(update_instance)
 
                         # Collect data for ProductOrderStockReport
-                        available_qty = ProductStock.objects.get(location=location, product=data['product'])
+                        product = ProductStock.objects.get(location=location, product=data['product'])
                         stock_reports.append(ProductOrderStockReport(
                             report_choice='Sold',
                             product=data['product'],
                             user=user,
                             location=data['location'],
-                            before_quantity=available_qty.available_quantity
+                            before_quantity=product.available_quantity
                         ))
 
                     # Bulk update ProductStock instances
@@ -392,7 +392,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     )
             except Exception as e:
                 raise ValidationError(str(e))
-        # Check if any records were updated
+            # Check if any records were updated
             if update_query is None or update_query == 0:
                 raise ValidationError("Cannot update spend_amount to be less than partial_price.")
         else:
