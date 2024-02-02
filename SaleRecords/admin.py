@@ -44,6 +44,7 @@ class PaymentMethodsAdmin(admin.ModelAdmin):
 @admin.register(PurchasedGiftCards)
 class PUrchasedGiftCard(admin.ModelAdmin):
     list_display = ['id']
+    ordering = ['-created_at']
     
 # ============================================= Redeemed Items Records ====================================
     
