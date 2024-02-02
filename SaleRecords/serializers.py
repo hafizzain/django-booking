@@ -316,10 +316,11 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     def product_stock_update(self, location = None, products= None, user = None):
         
         if location and products and user:
-            raise ValidationError(f"location: {location}")
+            
             updates = []
             stock_reports = []
             location_instance = BusinessAddress.objects.get(id = location)
+            raise ValidationError(f"Code Working")
             with transaction.atomic():
                 try:
                     for data in products:
