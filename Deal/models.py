@@ -23,8 +23,8 @@ class Deal(models.Model):
     )
 
     AUDIENCE_CHOICES = (
-        ('Public', 'public'),
-        ('Pre Set Customer', 'pre-set-users'),
+        ('public', 'public'),
+        ('pre-set-users', 'pre-set-users'),
     )
 
     CODE_CHOICES = (
@@ -46,10 +46,10 @@ class Deal(models.Model):
     )
 
     VALIDITY_CHOICES = (
-        ("From deal start date to end date" , "from-start-to-end-date"),
-        ("Days from deal activation date" , "days-from-start-date"),
-        ("Months from deal activation date" , "months-from-start-date"),
-        ("Years from deal activation date" , "years-from-start-date"),
+        ("from-start-to-end-date" , "from-start-to-end-date"),
+        ("days-from-start-date" , "days-from-start-date"),
+        ("months-from-start-date" , "months-from-start-date"),
+        ("years-from-start-date" , "years-from-start-date"),
     )
 
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
