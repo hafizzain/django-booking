@@ -40,14 +40,70 @@ def get_deal_validity(request):
 @api_view(['GET'])
 def get_deal_type_choices(request):
     return Response({'data' : [
-        {'name' : 'Fixed Amount Discount Deal', 'id' : 'Fixed Amount Discount Deal'},
-        {'name' : 'Percentage Discount Deal', 'id' : 'Percentage Discount Deal'},
-        {'name' : 'Buy one or more item get one or more free/discount', 'id' : 'Buy one or more item get one or more free/discount'},
-        {'name' : 'Complimentary Voucher', 'id' : 'Complimentary Voucher'},
-        {'name' : 'Custom Package', 'id' : 'Custom Package'},
-        {'name' : 'Get free item when user purchase specific items in given period', 'id' : 'Get free item when user purchase specific items in given period'},
-        {'name' : 'Spend some amount and get some item free', 'id' : 'Spend some amount and get some item free'},
-        {'name' : 'Fixed price items deal', 'id' : 'Fixed price items deal'},
+        # {'name' : 'Fixed Amount Discount Deal', 'id' : 'Fixed Amount Discount Deal'},
+        # {'name' : 'Percentage Discount Deal', 'id' : 'Percentage Discount Deal'},
+        # {'name' : 'Buy one or more item get one or more free/discount', 'id' : 'Buy one or more item get one or more free/discount'},
+        # {'name' : 'Complimentary Voucher', 'id' : 'Complimentary Voucher'},
+        # {'name' : 'Custom Package', 'id' : 'Custom Package'},
+        # {'name' : 'Get free item when user purchase specific items in given period', 'id' : 'Get free item when user purchase specific items in given period'},
+        # {'name' : 'Spend some amount and get some item free', 'id' : 'Spend some amount and get some item free'},
+        # {'name' : 'Fixed price items deal', 'id' : 'Fixed price items deal'},
+        {
+            "typeId": "Fixed Amount Discount Deal",
+            "name": "Fixed Amount Discount Deal",
+            "displayName": "Fixed Amount Discount Deal",
+            "status": "Active",
+            "settingsPageUrlSlug": "fixed-amount-discount-deal"
+        },
+        {
+            "typeId": "Percentage Discount Deal",
+            "name": "Percentage Discount Deal",
+            "displayName": "Percentage Discount Deal",
+            "status": "Active",
+            "settingsPageUrlSlug": "percentage-discount-deal"
+        },
+        {
+            "typeId": "Buy one or more item get one or more free/discount",
+            "name": "Buy one or more item get one or more free/discount",
+            "displayName": "Buy one or more item get some reward",
+            "status": "Active",
+            "settingsPageUrlSlug": "buy-some-get-some-free-or-discount"
+        },
+        {
+            "typeId": "Complimentary Voucher",
+            "name": "Complimentary Voucher",
+            "displayName": "Complimentary Voucher",
+            "status": "Active",
+            "settingsPageUrlSlug": "complimentary-voucher"
+        },
+        {
+            "typeId": "Custom Package",
+            "name": "Custom Package",
+            "displayName": "Package Deal",
+            "status": "Active",
+            "settingsPageUrlSlug": "package"
+        },
+        {
+            "typeId": "Get free item when user purchase specific items in given period",
+            "name": "Get free item when user purchase specific items in given period",
+            "displayName": "Get free item upon purchasing specific items",
+            "status": "Active",
+            "settingsPageUrlSlug": "get-free-on-purchasing-specific-items"
+        },
+        {
+            "typeId": "Spend some amount and get some item free",
+            "name": "Spend some amount and get some item free",
+            "displayName": "Spend some amount and get some item free",
+            "status": "Active",
+            "settingsPageUrlSlug": "spend-some-amount-get-some-reward"
+        },
+        {
+            "typeId": "Fixed price items deal",
+            "name": "Fixed price items deal",
+            "displayName": "Fixed price items deal",
+            "status": "Active",
+            "settingsPageUrlSlug": "fixed-price-items-deal"
+        }
     ]})
 
 @api_view(['GET'])
