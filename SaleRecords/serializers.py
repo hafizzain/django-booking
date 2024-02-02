@@ -332,6 +332,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                             product=data['product'],
                             user=user,
                             location=data['location'],
+                            
                             before_quantity=product.available_quantity
                         ))
 
