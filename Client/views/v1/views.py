@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from django.utils import timezone
 from threading import Thread
 from django.http import JsonResponse
 from Appointment.models import Appointment, AppointmentCheckout
@@ -2886,14 +2887,18 @@ def get_client_all_gift_cards(request):
     client = request.GET.get('client_id', None)
     code = request.GET.get('code', None)
     
-    query = Q(sale_record__location = location, price__gte=0, expiry__lte=datetime.now())
-    
+
+    query = Q(sale_record__location = location,
+            spend_amount__gt=0,
+            # expiry__lte=timezone.now(),
+            gift_card__is_custom_card=False) 
+
     if client is not None:
         query &= Q(sale_record__client = client)
         
     if code is not None:
         query &= Q(gift_card__code = code)
-    
+        
     client_gift_cards = PurchasedGiftCards.objects.filter(query)
     
     
