@@ -309,9 +309,9 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     def product_stock_update(self, location, products):
         for data in products:
             ProductStock.objects.filter(location = location, product = data['product']).update(
-                sold_quantity =  F('sold_quantity') + data['quantity'],
-                available_quantity=F('available_quantity') - data['quantity'],
-                consumed_quantity = F('consumed_quantity') + data['quantity']
+                sold_quantity =  ExpressionWrapper(F('sold_quantity') + data['quantity']),
+                available_quantity=ExpressionWrapper(F('available_quantity') - data['quantity']),
+                consumed_quantity = ExpressionWrapper(F('consumed_quantity') + data['quantity'])
                 
             )
         # =============================== Optimized Code with less hits to the database ========================
