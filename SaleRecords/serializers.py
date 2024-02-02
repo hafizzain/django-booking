@@ -333,14 +333,14 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                             consumed_quantity=ExpressionWrapper(F('consumed_quantity') + data['quantity'], output_field=IntegerField())
                         )
                         updates.append(update_instance)
-                        raise ValidationError(f"Code Working")
+                        
                         # Collect data for ProductOrderStockReport
                         product = ProductStock.objects.get(location=location_instance, product=data['product'])
                         stock_reports.append(ProductOrderStockReport(
                             report_choice='Sold',
                             product=data['product'],
                             user=user,
-                            location=data['location'],
+                            location=location_instance,
                             
                             before_quantity=product.available_quantity
                         ))
