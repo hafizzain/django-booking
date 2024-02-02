@@ -172,4 +172,4 @@ def get_single_deal(request, deal_id):
         }, status.HTTP_404_NOT_FOUND)
 
     data = DealSerializer(deal).data
-    return Response(**data)
+    return Response({**data})
