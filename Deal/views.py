@@ -49,56 +49,56 @@ def get_deal_type_choices(request):
         # {'name' : 'Spend some amount and get some item free', 'id' : 'Spend some amount and get some item free'},
         # {'name' : 'Fixed price items deal', 'id' : 'Fixed price items deal'},
         {
-            "typeId": "Fixed Amount Discount Deal",
+            "typeId": "A0AAC170420559558891",
             "name": "Fixed Amount Discount Deal",
             "displayName": "Fixed Amount Discount Deal",
             "status": "Active",
             "settingsPageUrlSlug": "fixed-amount-discount-deal"
         },
         {
-            "typeId": "Percentage Discount Deal",
+            "typeId": "A0AAC170490484113323",
             "name": "Percentage Discount Deal",
             "displayName": "Percentage Discount Deal",
             "status": "Active",
             "settingsPageUrlSlug": "percentage-discount-deal"
         },
         {
-            "typeId": "Buy one or more item get one or more free/discount",
+            "typeId": "A0AAC170490489535155",
             "name": "Buy one or more item get one or more free/discount",
             "displayName": "Buy one or more item get some reward",
             "status": "Active",
             "settingsPageUrlSlug": "buy-some-get-some-free-or-discount"
         },
         {
-            "typeId": "Complimentary Voucher",
+            "typeId": "A0AAC170490490810243",
             "name": "Complimentary Voucher",
             "displayName": "Complimentary Voucher",
             "status": "Active",
             "settingsPageUrlSlug": "complimentary-voucher"
         },
         {
-            "typeId": "Custom Package",
+            "typeId": "A0AAC170490492936083",
             "name": "Custom Package",
             "displayName": "Package Deal",
             "status": "Active",
             "settingsPageUrlSlug": "package"
         },
         {
-            "typeId": "Get free item when user purchase specific items in given period",
+            "typeId": "A0AAC170490503141048",
             "name": "Get free item when user purchase specific items in given period",
             "displayName": "Get free item upon purchasing specific items",
             "status": "Active",
             "settingsPageUrlSlug": "get-free-on-purchasing-specific-items"
         },
         {
-            "typeId": "Spend some amount and get some item free",
+            "typeId": "A0AAC170490506207590",
             "name": "Spend some amount and get some item free",
             "displayName": "Spend some amount and get some item free",
             "status": "Active",
             "settingsPageUrlSlug": "spend-some-amount-get-some-reward"
         },
         {
-            "typeId": "Fixed price items deal",
+            "typeId": "A0AAC170490509349974",
             "name": "Fixed price items deal",
             "displayName": "Fixed price items deal",
             "status": "Active",
