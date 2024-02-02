@@ -2886,10 +2886,10 @@ def get_client_all_gift_cards(request):
     client = request.GET.get('client_id', None)
     code = request.GET.get('code', None)
     
-    query = Q(sale_record__location__id = location)
+    query = Q(sale_record__location = location)
     
     if client is not None:
-        query &= Q(sale_record__client__id = client)
+        query &= Q(sale_record__client = client)
         
     if code is not None:
         query &= Q(gift_card__code = code)
