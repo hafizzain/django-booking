@@ -224,7 +224,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             SaleRecordsProducts.objects.bulk_create([
                 SaleRecordsProducts(sale_record=sale_record, **data) for data in products_records
             ])
-            self.product_stock_update(location_id, products_records, user)
+            self.product_stock_update("73f662bd-9720-4af7-bcef-6aec2888d1de", products_records, user)
 
             # Create records for PaymentMethods
             PaymentMethods.objects.bulk_create([
