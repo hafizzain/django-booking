@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.db import transaction
-from django.db.models import F ,Q, Case, When, Value, FloatField
+from django.db.models import F ,Q, Case, When, Value, FloatField, ExpressionWrapper
 from django.core.exceptions import ValidationError
 
 from Invoices.models import SaleInvoice
@@ -334,17 +334,19 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     def update_gift_card_record(self, location, gift_cards):
         for data in gift_cards:
             update_query = PurchasedGiftCards.objects.filter(
-            sale_record__location=location,
-            id=data['purchased_gift_card_id'].id,
-            spend_amount__gte=data['partial_price']  # Ensure spend_amount is greater than or equal to partial_price
-                ).update(
-            spend_amount=Case(
-                When(spend_amount__gte=data['partial_price'], 
-                    then=F('spend_amount') - data['partial_price']),
-                default=Value(F('spend_amount')),  # Keep the original value if spend_amount < partial_price
-                output_field=FloatField()
+                sale_record__location=location,
+                id=data['purchased_gift_card_id'].id,
+                spend_amount__gte=data['partial_price']  # Ensure spend_amount is greater than or equal to partial_price
+            ).update(
+                spend_amount=Case(
+                    When(
+                        spend_amount__gte=data['partial_price'],
+                        then=ExpressionWrapper(F('spend_amount') - data['partial_price'], output_field=FloatField())
+                    ),
+                    default=F('spend_amount'),  # Keep the original value if spend_amount < partial_price
+                    output_field=FloatField()
+                )
             )
-        )
     # Check if any records were updated
         if update_query == 0:
             raise ValidationError("Cannot update spend_amount to be less than partial_price.")
