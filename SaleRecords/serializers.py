@@ -335,7 +335,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         for data in gift_cards:
             update_query = PurchasedGiftCards.objects.filter(
             sale_record__location=location,
-            id=data['purchased_gift_card_id'],
+            id=data['purchased_gift_card_id'].id,
             spend_amount__gte=data['partial_price']  # Ensure spend_amount is greater than or equal to partial_price
                 ).update(
             spend_amount=Case(
