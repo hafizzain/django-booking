@@ -181,7 +181,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         user = request.data.get('user')
         location_id = request.data.get('location')
-        raise ValidationError(f"{location_id} and user:{user}")
+        # raise ValidationError(f"{location_id} and user:{user}")
         
         
         
