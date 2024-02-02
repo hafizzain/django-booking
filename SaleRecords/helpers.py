@@ -1,6 +1,6 @@
 from .models import SaleRecords
 from django.db.models import Q
-
+from Client.models import LoyaltyPoints, LoyaltyPointLogs, ClientLoyaltyPoint
 
 def matching_records(is_quick_sale = None,location=None, range_start=None, range_end=None, services=None, client=None , search_text = None):
     try:
@@ -32,3 +32,12 @@ def matching_records(is_quick_sale = None,location=None, range_start=None, range
     except Exception as e:
         
         raise ValueError(f"Error processing matching_records: {str(e)}")
+    
+    
+def calculate_voucher_commission(voucher = []):
+    pass
+
+def calculate_loyalty_points():
+    pass
+
+
