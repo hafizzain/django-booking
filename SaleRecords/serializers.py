@@ -4,7 +4,7 @@ from django.db.models import F ,Q, Case, When, Value, FloatField,IntegerField, E
 from django.core.exceptions import ValidationError
 
 from Invoices.models import SaleInvoice
-from Product.models import ProductStock
+from Product.models import ProductStock, ProductOrderStockReport
 
 from SaleRecords.models import *
 from Invoices.models import SaleInvoice
@@ -220,7 +220,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             SaleRecordsProducts.objects.bulk_create([
                 SaleRecordsProducts(sale_record=sale_record, **data) for data in products_records
             ])
-            self.product_stock_update(location , products_records, user)
+            self.product_stock_update(location, products_records, user)
 
             # Create records for PaymentMethods
             PaymentMethods.objects.bulk_create([
@@ -307,14 +307,44 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     
     # Class Methods 
     
-    def product_stock_update(self, location, products):
-        for data in products:
-            ProductStock.objects.filter(location = location, product = data['product']).update(
-                sold_quantity =  ExpressionWrapper(F('sold_quantity') + data['quantity'],  output_field=IntegerField()),
-                available_quantity=ExpressionWrapper(F('available_quantity') - data['quantity'], output_field=IntegerField()),
-                consumed_quantity = ExpressionWrapper(F('consumed_quantity') + data['quantity'], output_field=IntegerField())
-                
-            )
+    def product_stock_update(self, location = None, products= None, user = None):
+        if location and products and user:
+            updates = []
+            stock_reports = []
+
+            with transaction.atomic():
+                try:
+                    for data in products:
+                        
+                        update_instance = ProductStock(
+                            location=location,
+                            product=data['product'],
+                            sold_quantity=ExpressionWrapper(F('sold_quantity') + data['quantity'], output_field=IntegerField()),
+                            available_quantity=ExpressionWrapper(F('available_quantity') - data['quantity'], output_field=IntegerField()),
+                            consumed_quantity=ExpressionWrapper(F('consumed_quantity') + data['quantity'], output_field=IntegerField())
+                        )
+                        updates.append(update_instance)
+
+                        # Collect data for ProductOrderStockReport
+                        available_qty = ProductStock.objects.get(location=location, product=data['product'])
+                        stock_reports.append(ProductOrderStockReport(
+                            report_choice='Sold',
+                            product=data['product'],
+                            user=user,
+                            location=data['location'],
+                            before_quantity=available_qty.available_quantity
+                        ))
+
+                    # Bulk update ProductStock instances
+                    ProductStock.objects.bulk_update(updates, fields=['sold_quantity', 'available_quantity', 'consumed_quantity'])
+
+                    # Bulk create ProductOrderStockReport instances
+                    ProductOrderStockReport.objects.bulk_create(stock_reports)
+                except Exception as e:
+                    raise ValidationError(str(e))
+        else:
+            pass
+            
         # =============================== Optimized Code with less hits to the database ========================
         # updates = []
         # location_instance = BusinessAddress.objects.get(id = location)
@@ -340,24 +370,32 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         # ], batch_size=len(updates))
         
         
-    def update_gift_card_record(self, location, gift_cards):
-        for data in gift_cards:
-            update_query = PurchasedGiftCards.objects.filter(
-                sale_record__location=location,
-                id=data['purchased_gift_card_id'].id,
-                spend_amount__gte=data['partial_price']  # Ensure spend_amount is greater than or equal to partial_price
-            ).update(
-                spend_amount=Case(
-                    When(
-                        spend_amount__gte=data['partial_price'],
-                        then=ExpressionWrapper(F('spend_amount') - data['partial_price'], output_field=FloatField())
-                    ),
-                    default=F('spend_amount'),  # Keep the original value if spend_amount < partial_price
-                    output_field=FloatField()
-                )
-            )
-    # Check if any records were updated
-        if update_query == 0:
-            raise ValidationError("Cannot update spend_amount to be less than partial_price.")
+    def update_gift_card_record(self, location = None, gift_cards = None):
+        update_query = None
+        if location and gift_cards:
+            try:
+                for data in gift_cards:
+                    
+                    update_query = PurchasedGiftCards.objects.filter(
+                        sale_record__location=location,
+                        id=data['purchased_gift_card_id'].id,
+                        spend_amount__gte=data['partial_price']  # Ensure spend_amount is greater than or equal to partial_price
+                    ).update(
+                        spend_amount=Case(
+                            When(
+                                spend_amount__gte=data['partial_price'],
+                                then=ExpressionWrapper(F('spend_amount') - data['partial_price'], output_field=FloatField())
+                            ),
+                            default=F('spend_amount'),  # Keep the original value if spend_amount < partial_price
+                            output_field=FloatField()
+                        )
+                    )
+            except Exception as e:
+                raise ValidationError(str(e))
+        # Check if any records were updated
+            if update_query is None or update_query == 0:
+                raise ValidationError("Cannot update spend_amount to be less than partial_price.")
+        else:
+            pass
             
     

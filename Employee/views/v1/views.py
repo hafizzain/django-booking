@@ -7363,7 +7363,7 @@ def get_gift_card(request):
 def get_detail_from_code(request):
     code = request.query_params.get('code', None)
     location_id = request.query_params.get('location_id', None)
-    client = request.query_params.get('client', None)
+
 
     if code is not None and location_id is not None:
         try:
