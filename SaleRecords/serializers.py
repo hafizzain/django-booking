@@ -312,32 +312,35 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         stock_reports = []
 
         with transaction.atomic():
-            for data in products:
-                update_instance = ProductStock(
-                    location=location,
-                    product=data['product'],
-                    sold_quantity=ExpressionWrapper(F('sold_quantity') + data['quantity'], output_field=IntegerField()),
-                    available_quantity=ExpressionWrapper(F('available_quantity') - data['quantity'], output_field=IntegerField()),
-                    consumed_quantity=ExpressionWrapper(F('consumed_quantity') + data['quantity'], output_field=IntegerField())
-                )
-                updates.append(update_instance)
+            try:
+                for data in products:
+                    
+                    update_instance = ProductStock(
+                        location=location,
+                        product=data['product'],
+                        sold_quantity=ExpressionWrapper(F('sold_quantity') + data['quantity'], output_field=IntegerField()),
+                        available_quantity=ExpressionWrapper(F('available_quantity') - data['quantity'], output_field=IntegerField()),
+                        consumed_quantity=ExpressionWrapper(F('consumed_quantity') + data['quantity'], output_field=IntegerField())
+                    )
+                    updates.append(update_instance)
 
-                # Collect data for ProductOrderStockReport
-                available_qty = ProductStock.objects.get(location=location, product=data['product'])
-                stock_reports.append(ProductOrderStockReport(
-                    report_choice='Sold',
-                    product=data['product'],
-                    user=user,
-                    location=data['location'],
-                    before_quantity=available_qty.available_quantity
-                ))
+                    # Collect data for ProductOrderStockReport
+                    available_qty = ProductStock.objects.get(location=location, product=data['product'])
+                    stock_reports.append(ProductOrderStockReport(
+                        report_choice='Sold',
+                        product=data['product'],
+                        user=user,
+                        location=data['location'],
+                        before_quantity=available_qty.available_quantity
+                    ))
 
-            # Bulk update ProductStock instances
-            ProductStock.objects.bulk_update(updates, fields=['sold_quantity', 'available_quantity', 'consumed_quantity'])
+                # Bulk update ProductStock instances
+                ProductStock.objects.bulk_update(updates, fields=['sold_quantity', 'available_quantity', 'consumed_quantity'])
 
-            # Bulk create ProductOrderStockReport instances
-            ProductOrderStockReport.objects.bulk_create(stock_reports)
-            
+                # Bulk create ProductOrderStockReport instances
+                ProductOrderStockReport.objects.bulk_create(stock_reports)
+            except Exception as e:
+                raise ValidationError(str(e))
             
         # =============================== Optimized Code with less hits to the database ========================
         # updates = []
@@ -365,23 +368,28 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         
         
     def update_gift_card_record(self, location, gift_cards):
-        for data in gift_cards:
-            update_query = PurchasedGiftCards.objects.filter(
-                sale_record__location=location,
-                id=data['purchased_gift_card_id'].id,
-                spend_amount__gte=data['partial_price']  # Ensure spend_amount is greater than or equal to partial_price
-            ).update(
-                spend_amount=Case(
-                    When(
-                        spend_amount__gte=data['partial_price'],
-                        then=ExpressionWrapper(F('spend_amount') - data['partial_price'], output_field=FloatField())
-                    ),
-                    default=F('spend_amount'),  # Keep the original value if spend_amount < partial_price
-                    output_field=FloatField()
+        update_query = None
+        try:
+            for data in gift_cards:
+                
+                update_query = PurchasedGiftCards.objects.filter(
+                    sale_record__location=location,
+                    id=data['purchased_gift_card_id'].id,
+                    spend_amount__gte=data['partial_price']  # Ensure spend_amount is greater than or equal to partial_price
+                ).update(
+                    spend_amount=Case(
+                        When(
+                            spend_amount__gte=data['partial_price'],
+                            then=ExpressionWrapper(F('spend_amount') - data['partial_price'], output_field=FloatField())
+                        ),
+                        default=F('spend_amount'),  # Keep the original value if spend_amount < partial_price
+                        output_field=FloatField()
+                    )
                 )
-            )
+        except Exception as e:
+            raise ValidationError(str(e))
     # Check if any records were updated
-        if update_query == 0:
+        if update_query is None or update_query == 0:
             raise ValidationError("Cannot update spend_amount to be less than partial_price.")
             
     
