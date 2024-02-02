@@ -57,4 +57,7 @@ class SaleRecordAppliedCouponsAdmin(admin.ModelAdmin):
 @admin.register(AppliedVouchers)
 class AppliedMembershipsAdmin(admin.ModelAdmin):
     list_display = ['id']
-    
+
+@admin.register(AppliedPromotion)
+class AppliedPromotionAdmin(admin.ModelAdmin):
+    list_display = ['id']
