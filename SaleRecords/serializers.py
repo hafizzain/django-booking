@@ -180,7 +180,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get('request')
         user = request.data.get('user')
-        location = request.data.get('location')
+        location_id = request.data.get('location')
         appointment_services = validated_data.pop('appointment_services', [])
         services_records = validated_data.pop('services_records', [])
         products_records = validated_data.pop('products_records', [])
@@ -220,7 +220,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             SaleRecordsProducts.objects.bulk_create([
                 SaleRecordsProducts(sale_record=sale_record, **data) for data in products_records
             ])
-            self.product_stock_update(location, products_records, user)
+            self.product_stock_update(location_id, products_records, user)
 
             # Create records for PaymentMethods
             PaymentMethods.objects.bulk_create([
@@ -296,7 +296,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             AppliedGiftCards.objects.bulk_create([
                 AppliedGiftCards(sale_record=sale_record, **data) for data in applied_gift_cards_records
             ])
-            self.update_gift_card_record(location, applied_gift_cards_records)
+            self.update_gift_card_record(location_id, applied_gift_cards_records)
             
             AppliedPromotion.objects.bulk_create([
                 AppliedPromotion(sale_record= sale_record, **data) for data in applied_promotions_records
@@ -312,13 +312,13 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         if location and products and user:
             updates = []
             stock_reports = []
-
+            location_instance = BusinessAddress.objects.get(id = location)
             with transaction.atomic():
                 try:
                     for data in products:
                         
                         update_instance = ProductStock(
-                            location=location,
+                            location=location_instance,
                             product=data['product'],
                             sold_quantity=ExpressionWrapper(F('sold_quantity') + data['quantity'], output_field=IntegerField()),
                             available_quantity=ExpressionWrapper(F('available_quantity') - data['quantity'], output_field=IntegerField()),
@@ -327,7 +327,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                         updates.append(update_instance)
 
                         # Collect data for ProductOrderStockReport
-                        product = ProductStock.objects.get(location=location, product=data['product'])
+                        product = ProductStock.objects.get(location=location_instance, product=data['product'])
                         stock_reports.append(ProductOrderStockReport(
                             report_choice='Sold',
                             product=data['product'],

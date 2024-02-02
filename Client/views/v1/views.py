@@ -2890,16 +2890,15 @@ def get_client_all_gift_cards(request):
 
     query = Q(sale_record__location = location,
             spend_amount__gt=0,
-            expiry__lte=timezone.now(),
+            expiry__gte=timezone.now(),
             gift_card__is_custom_card=False) 
 
     if client is not None:
         query &= Q(sale_record__client = client)
         
     if code is not None:
-        
-        query &= Q(gift_card__code = code)
-        if not query.exists():
+        # query &= Q(gift_card__code = code)
+        # if not query.exists():
             query &= Q(sale_code = code)
         
     client_gift_cards = PurchasedGiftCards.objects.filter(query)
@@ -2912,6 +2911,7 @@ def get_client_all_gift_cards(request):
             'response': {
                 "message": "Enter a valid gift card",
                 'error_message': "No gift card with the provided code and location ID",
+                'status': 404,
                 'client_gift_cards': None
             }
         })
@@ -2923,6 +2923,7 @@ def get_client_all_gift_cards(request):
             'response': {
                 "message": "Gift card details retrieved successfully",
                 'error_message': None,
+                'status': 200,
                 'client_gift_cards': serializer.data
             }
     })
