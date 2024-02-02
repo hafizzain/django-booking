@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.db import transaction
-from django.db.models import F ,Q
+from django.db.models import F ,Q, Case, When, Value, FloatField
+from django.core.exceptions import ValidationError
 
 from Invoices.models import SaleInvoice
 from Product.models import ProductStock
@@ -158,32 +159,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         if obj.client:
             client = Client.objects.get(id = obj.client.id)
             return ClientSerializer(client).data
-        return None
-    
-    def product_stock_update(self, location, products):
-        # for data in products:
-        #     ProductStock.objects.filter(location = location, product = data['product']).update(
-        #         sold_quantity =  F('sold_quantity') + data['refunded_quantity'],
-        #         available_quantity=F('available_quantity') - data['quantity'],
-        #         consumed_quantity = F('consumed_quantity') + data['quantity']
-                
-        #     )
-        # =============================== Optimized Code with less hits to the database ========================
-        updates = []
-        for data in products:
-            update_instance = ProductStock(
-                location=location,
-                product=data['product'],
-                sold_quantity=F('sold_quantity') + data['refunded_quantity'],
-                available_quantity=F('available_quantity') - data['quantity'],
-                consumed_quantity=F('consumed_quantity') + data['quantity']
-            )
-            updates.append(update_instance)
-
-        ProductStock.objects.bulk_update(updates, fields=[
-            'sold_quantity', 'available_quantity', 'consumed_quantity'
-        ], batch_size=len(updates))
-            
+        return None        
     
     def validate(self, data):
         # Validate that there is at least one record in appointment_services, services_records, and products_records
@@ -192,8 +168,6 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("At least one record is required in appointment_services, services_records, products_records, vouchers_records, membership_records or gift_cards_records")
 
         return data
-        
-        
         
     class Meta:
         model = SaleRecords
@@ -222,10 +196,6 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         applied_gift_cards_records = validated_data.pop('applied_gift_cards_records', [])
         applied_promotions_records = validated_data.pop('applied_promotions_records',[])
         
-        
-        
-        
-        
         # =================================================== Checkout Records ========================================================
         '''
             Checkout records are being created here
@@ -249,6 +219,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             SaleRecordsProducts.objects.bulk_create([
                 SaleRecordsProducts(sale_record=sale_record, **data) for data in products_records
             ])
+            self.product_stock_update(location , products_records)
 
             # Create records for PaymentMethods
             PaymentMethods.objects.bulk_create([
@@ -288,7 +259,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     expiry = calculate_validity(data['valid_till']),
                             ) for data in gift_cards_records
             ])
-
+            
             # Create records for SaleTax
             SaleTax.objects.bulk_create([
                 SaleTax(sale_record=sale_record, **data) for data in tax_records
@@ -323,6 +294,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             AppliedGiftCards.objects.bulk_create([
                 AppliedGiftCards(sale_record=sale_record, **data) for data in applied_gift_cards_records
             ])
+            self.update_gift_card_record(location, applied_gift_cards_records)
             
             AppliedPromotion.objects.bulk_create([
                 AppliedPromotion(sale_record= sale_record, **data) for data in applied_promotions_records
@@ -331,4 +303,48 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             
 
         return sale_record
+    
+    # Class Methods 
+    
+    def product_stock_update(self, location, products):
+        # for data in products:
+        #     ProductStock.objects.filter(location = location, product = data['product']).update(
+        #         sold_quantity =  F('sold_quantity') + data['refunded_quantity'],
+        #         available_quantity=F('available_quantity') - data['quantity'],
+        #         consumed_quantity = F('consumed_quantity') + data['quantity']
+                
+        #     )
+        # =============================== Optimized Code with less hits to the database ========================
+        updates = []
+        for data in products:
+            update_instance = ProductStock(
+                location=location,
+                product=data['product'],
+                sold_quantity=F('sold_quantity') + data['refunded_quantity'],
+                available_quantity=F('available_quantity') - data['quantity'],
+                consumed_quantity=F('consumed_quantity') + data['quantity']
+            )
+            updates.append(update_instance)
+
+        ProductStock.objects.bulk_update(updates, fields=[
+            'sold_quantity', 'available_quantity', 'consumed_quantity'
+        ], batch_size=len(updates))
+        
+    def update_gift_card_record(self, location, gift_cards):
+        for data in gift_cards:
+            update_query = PurchasedGiftCards.objects.filter(
+            sale_record__location=location,
+            id=data['purchased_gift_card_id'],
+            spend_amount__gte=data['partial_amount']  # Ensure spend_amount is greater than or equal to partial_amount
+                ).update(
+            spend_amount=Case(
+                When(spend_amount__gte=data['partial_amount'], then=F('spend_amount') - data['partial_amount']),
+                default=Value(F('spend_amount')),  # Keep the original value if spend_amount < partial_amount
+                output_field=FloatField()
+            )
+        )
+    # Check if any records were updated
+        if update_query == 0:
+            raise ValidationError("Cannot update spend_amount to be less than partial_amount.")
+            
     
