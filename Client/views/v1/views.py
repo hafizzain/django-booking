@@ -2901,7 +2901,6 @@ def get_client_all_gift_cards(request):
     
     client_gift_cards = PurchasedGiftCards.objects.filter(query)
     
-    
     if not client_gift_cards.exists():
         return Response({
             'status': True,
