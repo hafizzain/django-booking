@@ -270,6 +270,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             SaleTax.objects.bulk_create([
                 SaleTax(sale_record=sale_record, **data) for data in tax_records
             ])
+            
 
             # Create records for SaleRecordTip
             SaleRecordTip.objects.bulk_create([
