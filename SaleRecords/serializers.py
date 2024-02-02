@@ -312,7 +312,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         if location and products and user:
             updates = []
             stock_reports = []
-
+            location = BusinessAddress.objects.get(id = location)
             with transaction.atomic():
                 try:
                     for data in products:
