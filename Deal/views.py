@@ -136,7 +136,7 @@ def create_deal(request):
     serialized = DealSerializer(data=request.data)
     if serialized.is_valid():
         serialized.save()
-        return Response(serialized.data, status.HTTP_201_CREATED)
+        return Response({'message' : 'Deal created sucessfully', **serialized.data}, status.HTTP_201_CREATED)
 
     return Response({
         'message' : 'Invalid Data',
