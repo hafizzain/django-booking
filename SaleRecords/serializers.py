@@ -320,7 +320,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             updates = []
             stock_reports = []
             location_instance = BusinessAddress.objects.get(id = location)
-            raise ValidationError(f"Code Working")
+            
             with transaction.atomic():
                 try:
                     for data in products:
@@ -333,7 +333,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                             consumed_quantity=ExpressionWrapper(F('consumed_quantity') + data['quantity'], output_field=IntegerField())
                         )
                         updates.append(update_instance)
-
+                        raise ValidationError(f"Code Working")
                         # Collect data for ProductOrderStockReport
                         product = ProductStock.objects.get(location=location_instance, product=data['product'])
                         stock_reports.append(ProductOrderStockReport(
