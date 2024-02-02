@@ -4,7 +4,7 @@ from django.db.models import F ,Q, Case, When, Value, FloatField,IntegerField, E
 from django.core.exceptions import ValidationError
 
 from Invoices.models import SaleInvoice
-from Product.models import ProductStock
+from Product.models import ProductStock, ProductOrderStockReport
 
 from SaleRecords.models import *
 from Invoices.models import SaleInvoice
@@ -307,14 +307,38 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     
     # Class Methods 
     
-    def product_stock_update(self, location, products):
-        for data in products:
-            ProductStock.objects.filter(location = location, product = data['product']).update(
-                sold_quantity =  ExpressionWrapper(F('sold_quantity') + data['quantity'],  output_field=IntegerField()),
-                available_quantity=ExpressionWrapper(F('available_quantity') - data['quantity'], output_field=IntegerField()),
-                consumed_quantity = ExpressionWrapper(F('consumed_quantity') + data['quantity'], output_field=IntegerField())
-                
-            )
+    def product_stock_update(self, location, products, user):
+        updates = []
+        stock_reports = []
+
+        with transaction.atomic():
+            for data in products:
+                update_instance = ProductStock(
+                    location=location,
+                    product=data['product'],
+                    sold_quantity=ExpressionWrapper(F('sold_quantity') + data['quantity'], output_field=IntegerField()),
+                    available_quantity=ExpressionWrapper(F('available_quantity') - data['quantity'], output_field=IntegerField()),
+                    consumed_quantity=ExpressionWrapper(F('consumed_quantity') + data['quantity'], output_field=IntegerField())
+                )
+                updates.append(update_instance)
+
+                # Collect data for ProductOrderStockReport
+                available_qty = ProductStock.objects.get(location=location, product=data['product'])
+                stock_reports.append(ProductOrderStockReport(
+                    report_choice='Sold',
+                    product=data['product'],
+                    user=user,
+                    location=data['location'],
+                    before_quantity=available_qty.available_quantity
+                ))
+
+            # Bulk update ProductStock instances
+            ProductStock.objects.bulk_update(updates, fields=['sold_quantity', 'available_quantity', 'consumed_quantity'])
+
+            # Bulk create ProductOrderStockReport instances
+            ProductOrderStockReport.objects.bulk_create(stock_reports)
+            
+            
         # =============================== Optimized Code with less hits to the database ========================
         # updates = []
         # location_instance = BusinessAddress.objects.get(id = location)
