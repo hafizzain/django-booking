@@ -314,6 +314,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     # Class Methods 
     
     def product_stock_update(self, location = None, products= None, user = None):
+        raise ValidationError(f"location: {location}")
         if location and products and user:
             updates = []
             stock_reports = []
