@@ -2886,15 +2886,15 @@ def get_client_all_gift_cards(request):
     client = request.GET.get('client_id', None)
     code = request.GET.get('code', None)
     
-    # query = Q(sale_record__location = location)
+    query = Q(sale_record__location = location)
     
-    # if client is not None:
-    #     query &= Q(sale_record__client = client)
+    if client is not None:
+        query &= Q(sale_record__client = client)
         
-    # if code is not None:
-    #     query &= Q(gift_card__code = 'F4G2HI')
+    if code is not None:
+        query &= Q(gift_card__code = 'F4G2HI')
     
-    client_gift_cards = PurchasedGiftCards.objects.filter(sale_record__location=location)
+    client_gift_cards = PurchasedGiftCards.objects.filter(query)
     
     
     
