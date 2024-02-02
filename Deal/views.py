@@ -11,12 +11,13 @@ from Deal.models import Deal, DealCategory
 from Deal.serializers import DealSerializer
 
 
+@api_view(['GET'])
 def get_deal_audience_choices(request):
     return Response([
         {'name' : 'Public', 'id' : 'public'},
         {'name' : 'Pre Set Customer', 'id' : 'pre-set-users'},
     ])
-
+@api_view(['GET'])
 def get_deal_validity(request):
     return Response([
         {
@@ -36,7 +37,7 @@ def get_deal_validity(request):
             "name": "Years from deal activation date"
         }
     ])
-
+@api_view(['GET'])
 def get_deal_type_choices(request):
     return Response([
         {'name' : 'Fixed Amount Discount Deal', 'id' : 'Fixed Amount Discount Deal'},
@@ -49,12 +50,13 @@ def get_deal_type_choices(request):
         {'name' : 'Fixed price items deal', 'id' : 'Fixed price items deal'},
     ])
 
+@api_view(['GET'])
 def get_deal_category(request):
     categories = DealCategory.objects.all().values('id', 'name')
     return Response({
         'data' : list(categories)
     })
-
+@api_view(['POST'])
 def create_deal(request):
 
     serialized = DealSerializer(data=request.data)
