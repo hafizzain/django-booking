@@ -335,6 +335,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                         updates.append(update_instance)
                         
                         # Collect data for ProductOrderStockReport
+                        user = User.objects.get(id = user)
                         product = ProductStock.objects.get(location=location_instance, product=data['product'])
                         stock_reports.append(ProductOrderStockReport(
                             report_choice='Sold',
