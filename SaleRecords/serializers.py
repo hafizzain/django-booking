@@ -256,6 +256,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     gift_card = data['gift_card'],
                     price = float(data['price'] * data['quantity']),
                     spend_amount = data['spend_amount'],
+                    sale_code = data['sale_code'],
                     quantity = data['quantity'],
                     expiry = calculate_validity(data['valid_till']),
                             ) for data in gift_cards_records
