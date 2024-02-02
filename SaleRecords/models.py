@@ -153,19 +153,20 @@ class SaleRecordAppliedCoupons(CommonField):
     
 class AppliedMemberships(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_memberships_records')
-    membership = models.ForeignKey(Membership, on_delete = models.SET_NULL, blank=True, null=True)
+    membership = models.ForeignKey(SaleRecordMembership, on_delete = models.SET_NULL, blank=True, null=True)
     is_redeemed = models.BooleanField(default = False)
     
     
 class AppliedVouchers(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_vouchers_records')
-    voucher = models.ForeignKey(Vouchers, on_delete = models.SET_NULL, blank=False, null=True)
+    # voucher = models.ForeignKey(Vouchers, on_delete = models.SET_NULL, blank=False, null=True)
+    voucher = models.ForeignKey(SaleRecordVouchers, on_delete = models.SET_NULL , blank=False, null=True)
     is_redeemed = models.BooleanField(default = False)
     
     
 class AppliedGiftCards(CommonField):
     sale_record = models.ForeignKey(SaleRecords,  on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_gift_cards_records')
-    gift_card = models.ForeignKey(GiftCards, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'sale_applied_gift_cards_records' )
+    # gift_card = models.ForeignKey(GiftCards, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'sale_applied_gift_cards_records' )
     purchased_gift_card_id = models.ForeignKey(PurchasedGiftCards, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'puchased_gift_card')
     partial_price = models.FloatField(blank=True, null=True)
     # is_redeemed = models.BooleanField(default = False)
