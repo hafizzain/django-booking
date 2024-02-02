@@ -320,7 +320,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             update_instance = ProductStock(
                 location=location,
                 product=data['product'],
-                sold_quantity=F('sold_quantity') + data['refunded_quantity'],
+                sold_quantity=F('sold_quantity') + data['quantity'],
                 available_quantity=F('available_quantity') - data['quantity'],
                 consumed_quantity=F('consumed_quantity') + data['quantity']
             )
