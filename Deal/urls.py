@@ -10,6 +10,7 @@ urlpatterns = [
 
     path('get_deal_audience_choices/', views.get_deal_audience_choices),
     path('get_deal_type_choices/', views.get_deal_type_choices),
+    path('get_redeemable_channels/', views.get_redeemable_channels),
     path('get_deal_validity/', views.get_deal_validity),
 
     

@@ -105,6 +105,24 @@ def get_deal_type_choices(request):
             "settingsPageUrlSlug": "fixed-price-items-deal"
         }
     ]})
+@api_view(['GET'])
+def get_redeemable_channels(request):
+    return Response({'data' : 
+    [
+        {
+        "channelId": "pos",
+        "name": "POS"
+        },
+        {
+        "channelId": "mobile-app",
+        "name": "Mobile App"
+        },
+        {
+        "channelId": "online",
+        "name": "Online"
+        }
+        ]
+    })
 
 @api_view(['GET'])
 def get_deal_category(request):
