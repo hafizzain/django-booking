@@ -725,7 +725,7 @@ class GiftCards(models.Model):
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)
     custom_card = models.TextField(null=True)
-   
+    is_custom_card = models.BooleanField(default=False)
     # retail_price = models.FloatField(default=0, null=True)
 
 
