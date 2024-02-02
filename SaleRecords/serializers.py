@@ -181,6 +181,10 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         user = request.data.get('user')
         location_id = request.data.get('location')
+        raise ValidationError(f"{location_id} and user:{user}")
+        
+        
+        
         appointment_services = validated_data.pop('appointment_services', [])
         services_records = validated_data.pop('services_records', [])
         products_records = validated_data.pop('products_records', [])
@@ -220,7 +224,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             SaleRecordsProducts.objects.bulk_create([
                 SaleRecordsProducts(sale_record=sale_record, **data) for data in products_records
             ])
-            # self.product_stock_update(location_id, products_records, user)
+            self.product_stock_update(location_id, products_records, user)
 
             # Create records for PaymentMethods
             PaymentMethods.objects.bulk_create([
