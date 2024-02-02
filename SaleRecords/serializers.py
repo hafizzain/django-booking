@@ -336,16 +336,17 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             update_query = PurchasedGiftCards.objects.filter(
             sale_record__location=location,
             id=data['purchased_gift_card_id'],
-            spend_amount__gte=data['partial_amount']  # Ensure spend_amount is greater than or equal to partial_amount
+            spend_amount__gte=data['partial_price']  # Ensure spend_amount is greater than or equal to partial_price
                 ).update(
             spend_amount=Case(
-                When(spend_amount__gte=data['partial_amount'], then=F('spend_amount') - data['partial_amount']),
-                default=Value(F('spend_amount')),  # Keep the original value if spend_amount < partial_amount
+                When(spend_amount__gte=data['partial_price'], 
+                    then=F('spend_amount') - data['partial_price']),
+                default=Value(F('spend_amount')),  # Keep the original value if spend_amount < partial_price
                 output_field=FloatField()
             )
         )
     # Check if any records were updated
         if update_query == 0:
-            raise ValidationError("Cannot update spend_amount to be less than partial_amount.")
+            raise ValidationError("Cannot update spend_amount to be less than partial_price.")
             
     
