@@ -132,6 +132,14 @@ def get_deal_category(request):
     })
 @api_view(['POST'])
 def create_deal(request):
+    try:
+        deal = Deal.objects.get(code =request.data.get('code'))
+    except:
+        pass
+    else:
+        return Response({
+            'message' : 'Deal already exist with this code',
+        }, status.HTTP_400_BAD_REQUEST)
 
     serialized = DealSerializer(data=request.data)
     if serialized.is_valid():
