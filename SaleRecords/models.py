@@ -111,7 +111,7 @@ class PurchasedGiftCards(CommonField):
     gift_card = models.ForeignKey(GiftCards, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'sale_gift_cards_records')
     
     price = models.FloatField(default = 0)
-    sale_code  = models.CharField(max_length = 150, blank=True, null=True)
+    sale_code  = models.CharField(max_length = 150,blank=False, null=True)
     spend_amount = models.FloatField(default = 0)
     quantity = models.SmallIntegerField(default = 0)
     expiry = models.DateTimeField(blank=True, null=True)
