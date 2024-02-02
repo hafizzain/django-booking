@@ -89,7 +89,7 @@ class SaleRecordVouchers(CommonField):
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
     expiry = models.DateTimeField(blank=True, null=True)
-    # employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_vouchers_employee')
+    employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_vouchers_employee')
     
     price = models.FloatField(blank=True, null=True) 
     quantity = models.PositiveSmallIntegerField(blank=True, null=True)
@@ -98,13 +98,13 @@ class SaleRecordVouchers(CommonField):
 class SaleRecordMembership(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete=models.CASCADE, blank=True, null=True, related_name='membership_records')
     membership = models.ForeignKey(Membership, on_delete=models.SET_NULL, null = True)
-    # start_date = models.DateTimeField(blank=True, null=True)
-    # end_date = models.DateTimeField(blank=True, null=True)
+    start_date = models.DateTimeField(blank=True, null=True)
+    end_date = models.DateTimeField(blank=True, null=True)
     expiry = models.DateTimeField(blank=True, null=True)
     # employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_membership_employee')
     
     price = models.FloatField(blank=True, null=True) 
-    quantity = models.PositiveSmallIntegerField(blank=True, null=True)
+    quantity = models.PositiveSmallIntegerField(blank=True, null=True) 
     
 class PurchasedGiftCards(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'gift_cards_records')
@@ -172,4 +172,7 @@ class AppliedGiftCards(CommonField):
     
 class AppliedPromotion(CommonField):
     sale_record = models.ForeignKey(SaleRecords,  on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_promotions_records')
-    promotion = models.ForeignKey(Promotion, on_delete = models.SET_NULL,blank=True, null=True, related_name = "sale_record_promotions")
+    # promotion = models.ForeignKey(Promotion, on_delete = models.SET_NULL,blank=True, null=True, related_name = "sale_record_promotions")
+    promotion = models.CharField(max_length = 150 , blank=True, null=True)
+    promotion_type = models.CharField(max_length = 255 , blank=True, null=True)
+    
