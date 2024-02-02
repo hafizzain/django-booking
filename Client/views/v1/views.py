@@ -2911,6 +2911,7 @@ def get_client_all_gift_cards(request):
             'response': {
                 "message": "Enter a valid gift card",
                 'error_message': "No gift card with the provided code and location ID",
+                'status': 404,
                 'client_gift_cards': None
             }
         })
@@ -2922,6 +2923,7 @@ def get_client_all_gift_cards(request):
             'response': {
                 "message": "Gift card details retrieved successfully",
                 'error_message': None,
+                'status': 200,
                 'client_gift_cards': serializer.data
             }
     })
