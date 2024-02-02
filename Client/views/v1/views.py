@@ -2892,10 +2892,9 @@ def get_client_all_gift_cards(request):
         query &= Q(sale_record__client = client)
         
     if code is not None:
-        query &= Q(gift_card__code = 'F4G2HI')
+        query &= Q(gift_card__code = code)
     
     client_gift_cards = PurchasedGiftCards.objects.filter(query)
-    
     
     
     if not client_gift_cards.exists():
