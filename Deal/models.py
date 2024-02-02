@@ -73,7 +73,7 @@ class Deal(models.Model):
     status = models.CharField(default='', max_length=999)
 
     startDate = models.DateTimeField()
-    endDate = models.DateTimeField()
+    endDate = models.DateTimeField(null=True)
 
     # "usagePerCustomer": null,
     # "redeemableChannelIds": [
