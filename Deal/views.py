@@ -58,6 +58,11 @@ def get_deal_category(request):
 def create_deal(request):
 
     serialized = DealSerializer(data=request.data)
+    if serialized.is_valid():
+        serialized.save()
+        return Response(serialized.data, status.HTTP_201_CREATED)
+
     return Response({
-        'message' : 'Invalid Data'
+        'message' : 'Invalid Data',
+        'error_messages' : serialized.errors
     }, status.HTTP_400_BAD_REQUEST)
