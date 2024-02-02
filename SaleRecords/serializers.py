@@ -307,29 +307,29 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     # Class Methods 
     
     def product_stock_update(self, location, products):
-        # for data in products:
-        #     ProductStock.objects.filter(location = location, product = data['product']).update(
-        #         sold_quantity =  F('sold_quantity') + data['refunded_quantity'],
-        #         available_quantity=F('available_quantity') - data['quantity'],
-        #         consumed_quantity = F('consumed_quantity') + data['quantity']
-                
-        #     )
-        # =============================== Optimized Code with less hits to the database ========================
-        updates = []
-        location_instance = BusinessAddress.objects.get(id = location)
         for data in products:
-            update_instance = ProductStock(
-                location=location_instance,
-                product=data['product'],
-                sold_quantity=F('sold_quantity') + data['quantity'],
+            ProductStock.objects.filter(location = location, product = data['product']).update(
+                sold_quantity =  F('sold_quantity') + data['refunded_quantity'],
                 available_quantity=F('available_quantity') - data['quantity'],
-                consumed_quantity=F('consumed_quantity') + data['quantity']
+                consumed_quantity = F('consumed_quantity') + data['quantity']
+                
             )
-            updates.append(update_instance)
+        # =============================== Optimized Code with less hits to the database ========================
+        # updates = []
+        # location_instance = BusinessAddress.objects.get(id = location)
+        # for data in products:
+        #     update_instance = ProductStock(
+        #         location=location_instance,
+        #         product=data['product'],
+        #         sold_quantity=F('sold_quantity') + data['quantity'],
+        #         available_quantity=F('available_quantity') - data['quantity'],
+        #         consumed_quantity=F('consumed_quantity') + data['quantity']
+        #     )
+        #     updates.append(update_instance)
 
-        ProductStock.objects.bulk_update(updates, fields=[
-            'sold_quantity', 'available_quantity', 'consumed_quantity'
-        ], batch_size=len(updates))
+        # ProductStock.objects.bulk_update(updates, fields=[
+        #     'sold_quantity', 'available_quantity', 'consumed_quantity'
+        # ], batch_size=len(updates))
         
     def update_gift_card_record(self, location, gift_cards):
         for data in gift_cards:
