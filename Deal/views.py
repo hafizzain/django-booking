@@ -160,3 +160,16 @@ def get_all_deals(request):
     return Response({
         'data' : data,
     })
+
+@api_view(['GET'])
+def get_single_deal(request, deal_id):
+
+    try:
+        deal = Deal.objects.get(id = deal_id)
+    except:
+        return Response({
+            'message' : 'Deal not found',
+        }, status.HTTP_404_NOT_FOUND)
+
+    data = DealSerializer(deal).data
+    return Response(**data)
