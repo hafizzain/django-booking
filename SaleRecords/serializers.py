@@ -181,7 +181,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         user = request.data.get('user')
         location_id = request.data.get('location')
-        raise ValidationError(f"{location_id} and user:{user}")
+        # raise ValidationError(f"{location_id} and user:{user}")
         
         
         
@@ -270,6 +270,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             SaleTax.objects.bulk_create([
                 SaleTax(sale_record=sale_record, **data) for data in tax_records
             ])
+            
 
             # Create records for SaleRecordTip
             SaleRecordTip.objects.bulk_create([
