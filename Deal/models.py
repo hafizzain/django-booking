@@ -72,6 +72,11 @@ class Deal(models.Model):
     redeemableChannels = models.ManyToManyField(RedeemableChannel)
 
     minimumSpend = models.PositiveIntegerField(default=0)
+    minimumSpendOn = models.CharField(default='all', max_length=999)
+
+    typeId = models.CharField(default='', max_length=999)
+    validPeriod = models.PositiveIntegerField(default=0)
+    usagePerCustomer = models.PositiveIntegerField(default=0)
 
     description = models.TextField()
     code = models.CharField(default='', max_length=999)
@@ -80,5 +85,5 @@ class Deal(models.Model):
     startDate = models.DateTimeField()
     endDate = models.DateTimeField(null=True)
 
+
     # "usagePerCustomer": null,
-    # "minimumSpendOn": "all",
