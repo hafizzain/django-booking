@@ -141,11 +141,11 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     tip_records = SaleOrderTipSerializer(many = True)
     
     # ================================================================   Applied Items  ==========================================
-    applied_coupons_records = SaleRecordAppliedCouponsSerializer(many = True, write_only = True)
-    applied_memberships_records = AppliedMembershipsSerializer(many = True, write_only = True)
-    applied_vouchers_records = AppliedVouchersSerializer(many = True, write_only = True)
-    applied_gift_cards_records = AppliedGiftCardsSerializer(many = True, write_only = True)
-    applied_promotions_records = AppliedPromotionSerializer(many = True, write_only = True)
+    applied_coupons_records = SaleRecordAppliedCouponsSerializer(many = True)
+    applied_memberships_records = AppliedMembershipsSerializer(many = True)
+    applied_vouchers_records = AppliedVouchersSerializer(many = True)
+    applied_gift_cards_records = AppliedGiftCardsSerializer(many = True)
+    applied_promotions_records = AppliedPromotionSerializer(many = True)
     
     invoice = serializers.SerializerMethodField(read_only = True)
     
