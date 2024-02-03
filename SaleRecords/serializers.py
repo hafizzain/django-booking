@@ -130,15 +130,15 @@ class ClientSerializer(serializers.ModelSerializer):
 
 class SaleRecordSerializer(serializers.ModelSerializer):
     
-    appointment_services = SaleRecordsAppointmentServicesSerializer(many= True, write_only = True)
-    services_records = SaleRecordServicesSerializer(many= True, write_only = True)
-    products_records = SaleRecordProductsSerializer(many= True, write_only = True)
-    payment_methods_records = PaymentMethodsSerializer(many = True, write_only = True)
-    gift_cards_records = PurchasedGiftCardsSerializer(many = True, write_only = True)
-    membership_records = SaleRecordMembershipSerializer(many = True ,write_only = True)
-    vouchers_records = SaleRecordVouchersSerializer(many =True , write_only = True)
-    tax_records = SaleTaxSerializer(many =True, write_only = True)
-    tip_records = SaleOrderTipSerializer(many = True, write_only = True)
+    appointment_services = SaleRecordsAppointmentServicesSerializer(many= True)
+    services_records = SaleRecordServicesSerializer(many= True)
+    products_records = SaleRecordProductsSerializer(many= True)
+    payment_methods_records = PaymentMethodsSerializer(many = True)
+    gift_cards_records = PurchasedGiftCardsSerializer(many = True)
+    membership_records = SaleRecordMembershipSerializer(many = True)
+    vouchers_records = SaleRecordVouchersSerializer(many =True)
+    tax_records = SaleTaxSerializer(many =True)
+    tip_records = SaleOrderTipSerializer(many = True)
     
     # ================================================================   Applied Items  ==========================================
     applied_coupons_records = SaleRecordAppliedCouponsSerializer(many = True, write_only = True)
@@ -224,7 +224,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             SaleRecordsProducts.objects.bulk_create([
                 SaleRecordsProducts(sale_record=sale_record, **data) for data in products_records
             ])
-            self.product_stock_update("73f662bd-9720-4af7-bcef-6aec2888d1de", products_records, user)
+            self.product_stock_update(location_id, products_records, user)
 
             # Create records for PaymentMethods
             PaymentMethods.objects.bulk_create([
