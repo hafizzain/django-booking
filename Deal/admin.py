@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Deal, DealCategory
+from .models import Deal, DealCategory, RedeemableChannel
 # Register your models here.
 
 
@@ -15,4 +15,10 @@ class DealAdmin(admin.ModelAdmin):
 class DealCategoryAdmin(admin.ModelAdmin):
     list_display = [
         'id'
+    ]
+@admin.register(RedeemableChannel)
+class RedeemableChannelAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'name'
     ]
