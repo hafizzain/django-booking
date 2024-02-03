@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 # Create your views here.
 
-from Deal.models import Deal, DealCategory
+from Deal.models import Deal, DealCategory, RedeemableChannel
 from Deal.serializers import DealSerializer
 
 
@@ -107,22 +107,26 @@ def get_deal_type_choices(request):
     ]})
 @api_view(['GET'])
 def get_redeemable_channels(request):
-    return Response({'data' : 
-    [
-        {
-        "channelId": "pos",
-        "name": "POS"
-        },
-        {
-        "channelId": "mobile-app",
-        "name": "Mobile App"
-        },
-        {
-        "channelId": "online",
-        "name": "Online"
-        }
-        ]
-    })
+    channels = RedeemableChannel.objects.all()
+    channels = [{"channelId" : channel.id, "name" : channel.name} for channel in channels]
+
+    return Response({'data' : channels})
+    # return Response({'data' : 
+    # [
+    #     {
+    #     "channelId": "pos",
+    #     "name": "POS"
+    #     },
+    #     {
+    #     "channelId": "mobile-app",
+    #     "name": "Mobile App"
+    #     },
+    #     {
+    #     "channelId": "online",
+    #     "name": "Online"
+    #     }
+    #     ]
+    # })
 
 @api_view(['GET'])
 def get_deal_category(request):
