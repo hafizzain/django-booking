@@ -9,6 +9,10 @@ class DealCategory(models.Model):
     name = models.CharField(default='', max_length=999)
 
 
+class RedeemableChannel(models.Model):
+    name = models.CharField(default='', max_length=999)
+
+
 class Deal(models.Model):
 
     DEAL_TYPE_CHOICES = (
@@ -65,6 +69,7 @@ class Deal(models.Model):
     validityPeriodType = models.CharField(default='from-start-to-end-date', max_length=999, choices=VALIDITY_CHOICES)
 
     brand = models.ManyToManyField(Brand)
+    redeemableChannels = models.ManyToManyField(RedeemableChannel)
 
     minimumSpend = models.PositiveIntegerField(default=0)
 
@@ -76,7 +81,4 @@ class Deal(models.Model):
     endDate = models.DateTimeField(null=True)
 
     # "usagePerCustomer": null,
-    # "redeemableChannelIds": [
-    #     "pos"
-    # ],
     # "minimumSpendOn": "all",
