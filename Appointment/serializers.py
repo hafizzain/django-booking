@@ -1463,7 +1463,7 @@ class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
 class AppointmentServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentService
-        fields = ['id','service']
+        fields = ['id','service','name',]
 class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
     # just_services_price_inside = serializers.FloatField()
     # just_services_price = serializers.FloatField()
