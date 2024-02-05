@@ -228,17 +228,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             
             # Create records for SaleRecordsAppointmentServices
             SaleRecordsAppointmentServices.objects.bulk_create([
-                SaleRecordsAppointmentServices(
-                    sale_record=sale_record, 
-                    appointment = Appointment.objects.get(id = data['appointment']),
-                    employee = data['employee'],
-                    service_status = data['service_status'],
-                    service_start_time = data['service_start_time'],
-                    service_end_time = data['service_end_time'],
-                    duration = data['duration'],
-                    price = data['price'],
-                    is_favourite = data['is_favourite']
-                    ) for data in appointment_services
+                SaleRecordsAppointmentServices(sale_record=sale_record, **data) for data in appointment_services
             ])
 
             # Create records for SaleRecordServices
