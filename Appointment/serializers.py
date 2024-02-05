@@ -1057,6 +1057,7 @@ class ServiceReversal(serializers.ModelSerializer):
 class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
     appointment = serializers.CharField(source = 'appointment.id')
     client = serializers.SerializerMethodField(read_only=True)
+    client_id = serializers.SerializerMethodField(read_only=True)
     avaliable_service_group = serializers.SerializerMethodField(read_only=True)
     booked_by = serializers.SerializerMethodField(read_only=True)
     booking_id = serializers.SerializerMethodField(read_only=True)
@@ -1169,6 +1170,12 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
             return obj.appointment.client.full_name
         except Exception as err:
             return None
+        
+    def get_client_id(self, obj):
+        try:
+            return obj.appointment.client.id
+        except Exception as err:
+            return None
 
     def get_member(self, obj):
         try:
@@ -1210,7 +1217,7 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AppointmentService
-        fields = ('id','appointment','reversal_status', 'service', 'avaliable_service_group', 'member', 'price', 'client', 'designation',
+        fields = ('id','appointment','reversal_status', 'service', 'avaliable_service_group', 'member', 'price', 'client','client_id', 'designation',
                   'appointment_date', 'appointment_time', 'duration', 'srv_name', 'status',
                   'booked_by', 'booking_id', 'appointment_type', 'client_can_book', 'slot_availible_for_online',
                   'appointment_status', 'location', 'employee_list', 'created_at', 'is_deleted',
