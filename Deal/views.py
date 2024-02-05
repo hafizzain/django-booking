@@ -220,7 +220,6 @@ def get_products(request):
     paginator = PageNumberPagination()
     paginator.page_size = 10
     result_page = paginator.paginate_queryset(products, request)
-    return paginator.get_paginated_response(result_page)
 
     return Response({
         "data" : dict(paginator.get_paginated_response(result_page)),
@@ -229,7 +228,7 @@ def get_products(request):
             "statusCode": 200,
             "message": "10 records found",
             "data": {
-                "page": 0,
+                "page": request.GET.get('page', 0) or 0,
                 "totalRecords": products.count(),
                 "totalPageCount": products.count() / 10,
                 "recordsPerPage": 10,
