@@ -80,7 +80,7 @@ class SaleRecordViews(APIView):
                         user=user,
                         client=sale_record.client,
                         location=sale_record.location,
-                        appointment=request.data.get('appointment', None),
+                        appointment=Appointment.objects.get(id = request.data.get('appointment', None)),
                         appointment_service=request.data.get('appointment_service', None),
                         payment_type=request.data.get('payment_type', None),
                         # payment_methods=request.data.get('payment_methods_records'),
