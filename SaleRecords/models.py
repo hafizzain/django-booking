@@ -9,7 +9,7 @@ from Promotions.models import Coupon
 from Product.models import Product
 from Service.models import Service
 from Employee.models import Employee, GiftCards
-from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs
+from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs, LoyaltyPoints, ClientLoyaltyPoint
 from Finance.models import Refund
 from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip , Appointment
 # from Invoices.models import SaleInvoice
@@ -179,4 +179,10 @@ class AppliedPromotion(CommonField):
     # promotion = models.ForeignKey(Promotion, on_delete = models.SET_NULL,blank=True, null=True, related_name = "sale_record_promotions")
     promotion = models.CharField(max_length = 150 , blank=True, null=True)
     promotion_type = models.CharField(max_length = 255 , blank=True, null=True)
+    
+    
+class RedeemedLoyaltyPoints(CommonField):
+    sale_record = models.ForeignKey(SaleRecords,  on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_loyalty_points_records')
+    clinet_loyalty_point = models.ForeignKey(ClientLoyaltyPoint, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'loyalty_points_records')
+    redeemed_points = models.PositiveSmallIntegerField(default = 0 , blank=True, null=True)
     

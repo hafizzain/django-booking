@@ -2775,6 +2775,7 @@ def new_create_sale_order(request):
                 ExceptionRecord.objects.create(text=f'LOYALTY : {err}')
                 pass
             else:
+                # updating the already present loyalty_points for the client
                 client_points.points_redeemed = float(client_points.points_redeemed) + float(loyalty_points_redeemed)
                 client_points.save()
 

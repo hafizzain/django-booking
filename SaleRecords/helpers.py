@@ -37,7 +37,27 @@ def matching_records(is_quick_sale = None,location=None, range_start=None, range
 def calculate_voucher_commission(voucher = []):
     pass
 
-def calculate_loyalty_points():
-    pass
+
+def calculate_loyalty_points(client_bill, amount_spent, points_per_amount, every_point, reward_amount_per_point):
+    """
+    Calculate loyalty points and the corresponding reward amount.
+
+    Parameters:
+    - amount_spent: The total amount spent by the client.
+    - points_per_amount: The number of loyalty points awarded per unit of currency spent.
+    - reward_amount_per_point: The reward amount for each loyalty point.
+
+    Returns:
+    A tuple containing the total loyalty points and the corresponding reward amount.
+    """
+    
+    amount_for_calcluating_point = client_bill/amount_spent
+    eard_points = amount_for_calcluating_point*points_per_amount
+    wallet_reward_amount = reward_amount_per_point * every_point
+    
+    
+    
+
+    return amount_for_calcluating_point, eard_points, wallet_reward_amount
 
 
