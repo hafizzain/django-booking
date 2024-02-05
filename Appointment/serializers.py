@@ -1125,16 +1125,12 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
 
 
 
-class AppointmentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Appointment
-        fields = '__all__'
 class ServiceReversal(serializers.ModelSerializer):
     class Meta:
         model = Reversal
         fields= ['id','request_status']
 class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
-    appointment = serializers.SerializerMethodField(read_only=True)
+    appointment = serializers.CharField(source = 'appointment.id')
     client = serializers.SerializerMethodField(read_only=True)
     client_id = serializers.SerializerMethodField(read_only=True)
     avaliable_service_group = serializers.SerializerMethodField(read_only=True)
@@ -1169,11 +1165,7 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
                 'level': f'{level}',
             }
         return {}
-    
-    def get_appointment(self, obj):
-        appointment = Appointment.objects.get(id=obj.appointment.id)
-        return AppointmentSerializer(appointment).data
-    
+
     def get_designation(self, obj):
         try:
             designation = EmployeeProfessionalInfo.objects.get(employee=obj.member.id)
