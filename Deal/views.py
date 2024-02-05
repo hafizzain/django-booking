@@ -210,7 +210,7 @@ def get_single_deal(request, deal_id):
 
 
 @api_view(['GET'])
-def get_products(request, deal_id):
+def get_products(request):
 
     products = Product.objects.filter(is_active=True, is_deleted=False, is_blocked=False).values('id', 'name')
 
