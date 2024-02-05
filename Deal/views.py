@@ -241,7 +241,7 @@ def get_products(request):
 @api_view(['GET'])
 def get_services(request):
     search_text = request.GET.get('search_text', '')
-    services = Service.objects.filter(is_active=True, is_deleted=False, is_blocked=False, name__icontains=search_text).values('id', 'name')
+    services = Service.objects.filter(is_deleted=False, is_blocked=False, name__icontains=search_text).values('id', 'name')
     
 
     paginator = PageNumberPagination()
