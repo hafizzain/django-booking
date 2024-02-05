@@ -387,14 +387,18 @@ class BlockSerializer(serializers.ModelSerializer):
 
 
 class CalanderserializerResponse(serializers.ModelSerializer):
+    service = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = AppointmentService
         fields = '__all__'
 
+    def get_service(self, obj):
+        return ServiceAppointmentSerializer(obj.service).data
 class EmployeeAppointmentSerializer(serializers.ModelSerializer):
     employee = serializers.SerializerMethodField()
     appointments = serializers.SerializerMethodField()
-    service = serializers.SerializerMethodField()
+    appointments_service = serializers.SerializerMethodField()
+    
 
     # unavailable_time = serializers.SerializerMethodField()
 
@@ -653,7 +657,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             )
             return str(err)
     
-    def get_service(self, obj):
+    def get_appointments_service(self, obj):
         selected_date = self.context.get('selected_date', None)
         if not selected_date:
             return []
@@ -734,7 +738,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             'employee',
             # 'unavailable_time',
             'appointments',
-            'service',
+            'appointments_service',
         ]
 
 
@@ -1461,10 +1465,9 @@ class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
         fields = ['id', 'booking_id', 'client_name', 'booking_date', 'subtotal', 'payment_status', 'payment_date']
 
 class AppointmentServiceSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(source='service.name')
     class Meta:
         model = AppointmentService
-        fields = ['id','service','name',]
+        fields = ['id','service']
 class PaidUnpaidAppointmentCheckoutSerializer(serializers.ModelSerializer):
     # just_services_price_inside = serializers.FloatField()
     # just_services_price = serializers.FloatField()
