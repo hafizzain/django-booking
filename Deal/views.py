@@ -215,13 +215,17 @@ def get_single_deal(request, deal_id):
 @api_view(['GET'])
 def get_products(request):
     search_text = request.GET.get('search_text', '')
+    page = request.GET.get('page', None)
 
     products = Product.objects.filter(is_active=True, is_deleted=False, is_blocked=False, name__icontains=search_text).values('id', 'name')
     
 
-    paginator = PageNumberPagination()
-    paginator.page_size = 10
-    result_page = paginator.paginate_queryset(products, request)
+    if page:
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+        data = paginator.paginate_queryset(products, request)
+    else:
+        data = products
 
     return Response({
         "response" : {
@@ -229,11 +233,11 @@ def get_products(request):
             "statusCode": 200,
             "message": "10 records found",
             "data": {
-                "page": request.GET.get('page', 1) or 1,
+                "page": page or 1,
                 "totalRecords": products.count(),
                 "totalPageCount": products.count() / 10,
-                "recordsPerPage": 10,
-                "list": result_page
+                "recordsPerPage": len(data),
+                "list": data
             }
         }
     })
