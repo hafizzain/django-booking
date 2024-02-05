@@ -119,10 +119,11 @@ class AppliedPromotionSerializer(serializers.ModelSerializer):
         read_only_fields = ['sale_record']
 
 class RedeemedLoyaltyPointsSerializer(serializers.ModelSerializer):
-    model = RedeemedLoyaltyPoints
-    fields = "__all__"
+    class Meta:
+        model = RedeemedLoyaltyPoints
+        fields = "__all__"
 
-    read_only_fields = ['sale_record']
+        read_only_fields = ['sale_record']
     
 
 class SaleInvoiceSerializer(serializers.ModelSerializer):
