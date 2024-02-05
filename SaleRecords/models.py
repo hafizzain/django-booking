@@ -148,7 +148,7 @@ class SaleRecordAppliedCoupons(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_coupons_records')
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL,null = True)
     
-    coupon_type = models.CharField(choices = CouponType.choices,max_length = 50, default = '', blank=False, null=False)
+    coupon_type = models.CharField(max_length = 100, default = '', blank=False, null=False)
     coupon_discounted_price = models.FloatField(default =0, blank=False, null=False) 
     is_redeemed = models.BooleanField(default = False)
     
