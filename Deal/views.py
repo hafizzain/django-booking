@@ -5,6 +5,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
+
 # Create your views here.
 
 from Deal.models import Deal, DealCategory, RedeemableChannel
@@ -213,7 +215,11 @@ def get_single_deal(request, deal_id):
 def get_products(request):
 
     products = Product.objects.filter(is_active=True, is_deleted=False, is_blocked=False).values('id', 'name')
+    
 
+    paginator = PageNumberPagination()
+    paginator.page_size = 10
+    result_page = paginator.paginate_queryset(products, request)
     return Response({
         "response" : {
             "status": "result-found",
@@ -224,7 +230,7 @@ def get_products(request):
                 "totalRecords": products.count(),
                 "totalPageCount": products.count() / 10,
                 "recordsPerPage": 10,
-                "list": products
+                "list": paginator.get_paginated_response(result_page)
             }
         }
     })
