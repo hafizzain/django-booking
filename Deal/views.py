@@ -214,7 +214,6 @@ def get_products(request):
 
     products = Product.objects.filter(is_active=True, is_deleted=False, is_blocked=False).values('id', 'name')
 
-    data = DealSerializer(deal).data
     return Response({
         "response" : {
             "status": "result-found",
