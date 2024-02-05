@@ -116,18 +116,27 @@ class AppliedPromotionSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppliedPromotion
         fields = "__all__"
+        read_only_fields = ['sale_record']
 
+class RedeemedLoyaltyPointsSerializer(serializers.ModelSerializer):
+    model = RedeemedLoyaltyPoints
+    fields = "__all__"
+
+    read_only_fields = ['sale_record']
+    
 
 class SaleInvoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = SaleInvoice
         fields = "__all__"
+        # read_only_fields = ['sale_record']
         
 class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
         fields = ['id','full_name']
-
+        
+        
 class SaleRecordSerializer(serializers.ModelSerializer):
     
     appointment_services = SaleRecordsAppointmentServicesSerializer(many= True)
@@ -146,6 +155,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     applied_vouchers_records = AppliedVouchersSerializer(many = True)
     applied_gift_cards_records = AppliedGiftCardsSerializer(many = True)
     applied_promotions_records = AppliedPromotionSerializer(many = True)
+    applied_loyalty_points_records = RedeemedLoyaltyPointsSerializer(many = True)
     
     invoice = serializers.SerializerMethodField(read_only = True)
     
@@ -201,6 +211,8 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         applied_memberships_records = validated_data.pop('applied_memberships_records', [])
         applied_gift_cards_records = validated_data.pop('applied_gift_cards_records', [])
         applied_promotions_records = validated_data.pop('applied_promotions_records',[])
+        applied_loyalty_points_records = validated_data.pop('applied_loyalty_points_records,'[])
+        
         
         # =================================================== Checkout Records ========================================================
         '''
@@ -308,6 +320,9 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                 AppliedPromotion(sale_record= sale_record, **data) for data in applied_promotions_records
             ])
             
+            RedeemedLoyaltyPoints.objects.bulk_create([
+                RedeemedLoyaltyPoints(sale_record = sale_record, **data) for data in applied_loyalty_points_records
+            ])
             
 
         return sale_record
