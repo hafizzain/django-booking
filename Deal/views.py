@@ -165,14 +165,14 @@ def update_deal(request, deal_id):
             'error_message' : str(err)
         }, status.HTTP_404_NOT_FOUND)
 
-    try:
-        Deal.objects.get(code =request.data.get('code'))
-    except:
-        pass
-    else:
-        return Response({
-            'message' : 'Deal already exist with this code',
-        }, status.HTTP_400_BAD_REQUEST)
+    # try:
+    #     Deal.objects.get(code =request.data.get('code'))
+    # except:
+    #     pass
+    # else:
+    #     return Response({
+    #         'message' : 'Deal already exist with this code',
+    #     }, status.HTTP_400_BAD_REQUEST)
 
     serialized = DealSerializer(deal, data=request.data, partial=True)
     if serialized.is_valid():
