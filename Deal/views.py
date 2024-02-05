@@ -222,7 +222,6 @@ def get_products(request):
     result_page = paginator.paginate_queryset(products, request)
 
     return Response({
-        "data" : dict(paginator.get_paginated_response(result_page)),
         "response" : {
             "status": "result-found",
             "statusCode": 200,
