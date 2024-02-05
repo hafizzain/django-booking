@@ -17,6 +17,7 @@ urlpatterns = [
 
 
     path('products/', views.get_products),
+    path('services/', views.get_products),
 
     
 ]

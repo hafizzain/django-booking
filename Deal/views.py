@@ -13,6 +13,7 @@ from Deal.models import Deal, DealCategory, RedeemableChannel
 from Deal.serializers import DealSerializer
 
 from Product.models import Product
+from Service.models import Service
 
 @api_view(['GET'])
 def get_deal_audience_choices(request):
@@ -213,8 +214,9 @@ def get_single_deal(request, deal_id):
 
 @api_view(['GET'])
 def get_products(request):
+    search_text = request.GET.get('search_text', '')
 
-    products = Product.objects.filter(is_active=True, is_deleted=False, is_blocked=False).values('id', 'name')
+    products = Product.objects.filter(is_active=True, is_deleted=False, is_blocked=False, name__icontains=search_text).values('id', 'name')
     
 
     paginator = PageNumberPagination()
@@ -230,6 +232,31 @@ def get_products(request):
                 "page": request.GET.get('page', 1) or 1,
                 "totalRecords": products.count(),
                 "totalPageCount": products.count() / 10,
+                "recordsPerPage": 10,
+                "list": result_page
+            }
+        }
+    })
+
+@api_view(['GET'])
+def get_services(request):
+    search_text = request.GET.get('search_text', '')
+    services = Service.objects.filter(is_active=True, is_deleted=False, is_blocked=False, name__icontains=search_text).values('id', 'name')
+    
+
+    paginator = PageNumberPagination()
+    paginator.page_size = 10
+    result_page = paginator.paginate_queryset(services, request)
+
+    return Response({
+        "response" : {
+            "status": "result-found",
+            "statusCode": 200,
+            "message": "10 records found",
+            "data": {
+                "page": request.GET.get('page', 1) or 1,
+                "totalRecords": services.count(),
+                "totalPageCount": services.count() / 10,
                 "recordsPerPage": 10,
                 "list": result_page
             }
