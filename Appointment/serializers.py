@@ -394,6 +394,7 @@ class CalanderserializerResponse(serializers.ModelSerializer):
 class EmployeeAppointmentSerializer(serializers.ModelSerializer):
     employee = serializers.SerializerMethodField()
     appointments = serializers.SerializerMethodField()
+    appointments_service = serializers.SerializerMethodField()
 
     # unavailable_time = serializers.SerializerMethodField()
 
@@ -638,6 +639,75 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 loop_return = []
                 for id in data['ids']:
                     app_service = AppointmentService.objects.get(id=id)
+                    serialized_service = CalanderserializerResponse(app_service,many=False)
+                    # serialized_service = AppointmentServiceSerializer(app_service , many=False)
+                    loop_return.append(serialized_service.data)
+                returned_list.append(loop_return)
+
+            returned_list.extend(self.retreive_unavailable_time(obj))
+            return returned_list
+
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text=f'errors happen on appointment {str(err)}'
+            )
+            return str(err)
+    
+    def get_appointments_service(self, obj):
+        selected_date = self.context.get('selected_date', None)
+        if not selected_date:
+            return []
+        appoint_services = AppointmentService.objects.filter(
+            member=obj,
+            # is_active=True,
+            is_deleted=False,
+            # is_blocked = False
+            appointment_date=selected_date
+        ).exclude(appointment__status=choices.AppointmentStatus.CANCELLED).distinct()
+        # return str(appoint_services)
+        try:
+            # sort the appointments by start time
+            sorted_appointments = sorted(appoint_services, key=lambda a: a.appointment_time)
+
+            selected_data = []
+            for appointment in sorted_appointments:
+                app_id = appointment.id
+                appointment_time = appointment.appointment_time
+                app_duration = appointment.duration
+                app_date = appointment.appointment_date
+                app_date_time = datetime.combine(app_date, appointment_time)
+
+                # calculate the end time
+                duration = DURATION_CHOICES[app_duration.lower()]
+                end_time = (app_date_time + timedelta(minutes=duration)).time()
+
+                # check for overlaps
+                overlap = False
+                for data in selected_data:
+                    if data['date'] == app_date:
+                        if appointment_time < data['range_end'] and end_time > data['range_start']:
+                            overlap = True
+                            data['ids'].append(app_id)
+                            data['range_start'] = min(data['range_start'], appointment_time)
+                            data['range_end'] = max(data['range_end'], end_time)
+                            break
+
+                # add a new entry if there is no overlap
+                if not overlap:
+                    selected_data.append({
+                        'date': app_date,
+                        'range_start': appointment_time,
+                        'range_end': end_time,
+                        'ids': [app_id],
+                        'is_favourite': appointment.is_favourite,
+                    })
+
+            # serialize the data
+            returned_list = []
+            for data in selected_data:
+                loop_return = []
+                for id in data['ids']:
+                    app_service = AppointmentService.objects.get(id=id)
                     # serialized_service = CalanderserializerResponse(app_service,many=False)
                     serialized_service = AppointmentServiceSerializer(app_service , many=False)
                     loop_return.append(serialized_service.data)
@@ -664,6 +734,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             'employee',
             # 'unavailable_time',
             'appointments',
+            'appointments_service',
         ]
 
 
