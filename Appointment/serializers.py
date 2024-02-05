@@ -1171,7 +1171,7 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
         return {}
     def get_appointment(self, obj):
         appointment = Appointment.objects.get(id=obj.appointment.id)
-        return appointment
+        return AppointmentSerializer(appointment).data
     
     def get_designation(self, obj):
         try:
