@@ -210,8 +210,8 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         applied_vouchers_records = validated_data.pop('applied_vouchers_records', [])
         applied_memberships_records = validated_data.pop('applied_memberships_records', [])
         applied_gift_cards_records = validated_data.pop('applied_gift_cards_records', [])
-        applied_promotions_records = validated_data.pop('applied_promotions_records',[]),
-        applied_loyalty_points_records = validated_data.pop('applied_loyalty_points_records,'[])
+        applied_promotions_records = validated_data.pop('applied_promotions_records',[])
+        applied_loyalty_points_records = validated_data.pop('applied_loyalty_points_records',[])
         
         
         # =================================================== Checkout Records ========================================================
