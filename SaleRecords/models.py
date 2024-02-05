@@ -72,14 +72,14 @@ class SaleRecordsAppointmentServices(CommonField):
     appointment = models.ForeignKey(Appointment, on_delete = models.SET_NULL, null = True, related_name = 'sale_appointments_records')
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_appointment_services_employee')
     service = models.ForeignKey(Service, on_delete = models.SET_NULL, null = True)
-    appointment_status = models.CharField(choices = AppointmentStatus.choices,max_length = 50, default = AppointmentStatus.BOOKED, blank=False, null=False)
-    reason = models.CharField(max_length = 255, blank=True, null=True)
-    quantity = models.PositiveIntegerField(blank=True, null=True)
-    start_time = models.DateTimeField(blank=True, null=True)
-    end_time = models.DateTimeField(blank=True, null=True)
-    duration = models.PositiveIntegerField(blank=True, null=True)
-    discounted_price = models.FloatField(default = 0, blank=True, null=True)
+    service_status = models.CharField(choices = AppointmentStatus.choices,max_length = 50, default = AppointmentStatus.BOOKED, blank=False, null=False)
+    # quantity = models.PositiveIntegerField(blank=True, null=True)
+    service_start_time = models.DateTimeField(blank=True, null=True)
+    service_end_time = models.DateTimeField(blank=True, null=True)
+    duration = models.CharField(max_length= 50,blank=True, null=True)
+    price = models.FloatField(default = 0, blank=True, null=True)
     is_favourite = models.BooleanField(blank=True, null=True , default = False)
+    # reason = models.CharField(max_length = 255, blank=True, null=True)
     # appointment_notes = models.CharField(max_length = 255 , null = True , blank = True)
     
     
@@ -148,7 +148,7 @@ class SaleRecordAppliedCoupons(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_coupons_records')
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL,null = True)
     
-    coupon_type = models.CharField(choices = CouponType.choices,max_length = 50, default = '', blank=False, null=False)
+    coupon_type = models.CharField(max_length = 100, default = '', blank=False, null=False)
     coupon_discounted_price = models.FloatField(default =0, blank=False, null=False) 
     is_redeemed = models.BooleanField(default = False)
     

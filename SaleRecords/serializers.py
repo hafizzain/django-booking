@@ -193,8 +193,9 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         user = request.data.get('user')
         location_id = request.data.get('location')
         client = request.data.get('client')
+        sub_total = request.data.get('sub_total') # Without tax amount
         # raise ValidationError(f'client_id':str(client))
-        raise ValidationError(f"client = {client} location = {location_id} and user= {user}")
+        # raise ValidationError(f"client = {client} location = {location_id} and user= {user}")
         
         
         
@@ -316,7 +317,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             AppliedGiftCards.objects.bulk_create([
                 AppliedGiftCards(sale_record=sale_record, **data) for data in applied_gift_cards_records
             ])
-            self.update_gift_card_record(location_id, applied_gift_cards_records)
+            self.gift_card_record_update(location_id, applied_gift_cards_records)
             
             AppliedPromotion.objects.bulk_create([
                 AppliedPromotion(sale_record= sale_record, **data) for data in applied_promotions_records
@@ -325,7 +326,6 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             RedeemedLoyaltyPoints.objects.bulk_create([
                 RedeemedLoyaltyPoints(sale_record = sale_record, **data) for data in applied_loyalty_points_records
             ])
-            self.update_loyalty_points(location = location_id , )
             
 
         return sale_record
@@ -400,7 +400,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         # ], batch_size=len(updates))
         
         
-    def update_gift_card_record(self, location = None, gift_cards = None):
+    def gift_card_record_update(self, location = None, gift_cards = None):
         update_query = None
         if location and gift_cards:
             try:
@@ -428,7 +428,5 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         else:
             pass
             
+        
     
-    
-    def update_loyalty_points(self, location = None, client= None, loyalty_points = None):
-        pass
