@@ -227,7 +227,7 @@ def get_products(request):
             "statusCode": 200,
             "message": "10 records found",
             "data": {
-                "page": request.GET.get('page', 0) or 0,
+                "page": request.GET.get('page', 1) or 1,
                 "totalRecords": products.count(),
                 "totalPageCount": products.count() / 10,
                 "recordsPerPage": 10,
