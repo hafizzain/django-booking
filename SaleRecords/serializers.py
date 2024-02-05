@@ -122,7 +122,6 @@ class RedeemedLoyaltyPointsSerializer(serializers.ModelSerializer):
     class Meta:
         model = RedeemedLoyaltyPoints
         fields = "__all__"
-
         read_only_fields = ['sale_record']
     
 
@@ -193,7 +192,9 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         user = request.data.get('user')
         location_id = request.data.get('location')
-        # raise ValidationError(f"{location_id} and user:{user}")
+        client = request.data.get('client')
+        # raise ValidationError(f'client_id':str(client))
+        raise ValidationError(f"client = {client} location = {location_id} and user= {user}")
         
         
         
@@ -324,6 +325,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             RedeemedLoyaltyPoints.objects.bulk_create([
                 RedeemedLoyaltyPoints(sale_record = sale_record, **data) for data in applied_loyalty_points_records
             ])
+            self.update_loyalty_points(location = location_id , )
             
 
         return sale_record
@@ -427,3 +429,5 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             pass
             
     
+    
+    def update_loyalty_points(self, location = None, client= None, loyalty_points = None)
