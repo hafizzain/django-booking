@@ -2798,7 +2798,7 @@ def new_create_sale_order(request):
             client_points, created = ClientLoyaltyPoint.objects.get_or_create(
                 location=business_address,
                 client=checkout.client,
-                loyalty_points=point,
+                loyalty_points=point, # loyalty Foreignkey
             )
 
             loyalty_spend_amount = point.amount_spend
