@@ -62,3 +62,8 @@ class AppliedMembershipsAdmin(admin.ModelAdmin):
 @admin.register(AppliedPromotion)
 class AppliedPromotionAdmin(admin.ModelAdmin):
     list_display = ['id']
+
+
+@admin.register(RedeemedLoyaltyPoints)
+class RedeemedLoyaltyPointsAdmn(admin.ModelAdmin):
+    list_display = ['id', 'clinet_loyalty_point']
