@@ -116,18 +116,27 @@ class AppliedPromotionSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppliedPromotion
         fields = "__all__"
+        read_only_fields = ['sale_record']
 
+class RedeemedLoyaltyPointsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RedeemedLoyaltyPoints
+        fields = "__all__"
+        read_only_fields = ['sale_record']
+    
 
 class SaleInvoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = SaleInvoice
         fields = "__all__"
+        # read_only_fields = ['sale_record']
         
 class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
         fields = ['id','full_name']
-
+        
+        
 class SaleRecordSerializer(serializers.ModelSerializer):
     
     appointment_services = SaleRecordsAppointmentServicesSerializer(many= True)
@@ -146,6 +155,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     applied_vouchers_records = AppliedVouchersSerializer(many = True)
     applied_gift_cards_records = AppliedGiftCardsSerializer(many = True)
     applied_promotions_records = AppliedPromotionSerializer(many = True)
+    applied_loyalty_points_records = RedeemedLoyaltyPointsSerializer(many = True)
     
     invoice = serializers.SerializerMethodField(read_only = True)
     
@@ -182,7 +192,10 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         user = request.data.get('user')
         location_id = request.data.get('location')
-        # raise ValidationError(f"{location_id} and user:{user}")
+        client = request.data.get('client')
+        sub_total = request.data.get('sub_total') # Without tax amount
+        # raise ValidationError(f'client_id':str(client))
+        # raise ValidationError(f"client = {client} location = {location_id} and user= {user}")
         
         
         
@@ -201,6 +214,8 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         applied_memberships_records = validated_data.pop('applied_memberships_records', [])
         applied_gift_cards_records = validated_data.pop('applied_gift_cards_records', [])
         applied_promotions_records = validated_data.pop('applied_promotions_records',[])
+        applied_loyalty_points_records = validated_data.pop('applied_loyalty_points_records',[])
+        
         
         # =================================================== Checkout Records ========================================================
         '''
@@ -302,12 +317,16 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             AppliedGiftCards.objects.bulk_create([
                 AppliedGiftCards(sale_record=sale_record, **data) for data in applied_gift_cards_records
             ])
-            self.update_gift_card_record(location_id, applied_gift_cards_records)
+            self.gift_card_record_update(location_id, applied_gift_cards_records)
             
             AppliedPromotion.objects.bulk_create([
                 AppliedPromotion(sale_record= sale_record, **data) for data in applied_promotions_records
             ])
             
+            RedeemedLoyaltyPoints.objects.bulk_create([
+                RedeemedLoyaltyPoints(sale_record = sale_record, **data) for data in applied_loyalty_points_records
+            ])
+            self.loyalty_points_update(location = location_id , client = client , loyalty_points= applied_loyalty_points_records, sub_total=sub_total)
             
 
         return sale_record
@@ -382,7 +401,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         # ], batch_size=len(updates))
         
         
-    def update_gift_card_record(self, location = None, gift_cards = None):
+    def gift_card_record_update(self, location = None, gift_cards = None):
         update_query = None
         if location and gift_cards:
             try:
@@ -410,4 +429,15 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         else:
             pass
             
+    
+    def loyalty_points_update(self, location = None, client= None, loyalty_points = None , sub_total = None):
+        if location and client and loyalty_points and sub_total:
+            try:
+                amount_for_calcluating_point = (sub_total/amount_spent) * points_per_amount
+                eard_points = amount_for_calcluating_point*points_per_amount
+                wallet_reward_amount = reward_amount_per_point * (every_point * eard_points)
+                client_loyalty_obj, created = ClientLoyaltyPoint.objects.get_or_create()
+            except Exception as e:
+                raise ValidationError('Something went wrong')
+        
     

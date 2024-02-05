@@ -9,7 +9,7 @@ from Promotions.models import Coupon
 from Product.models import Product
 from Service.models import Service
 from Employee.models import Employee, GiftCards
-from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs
+from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs, LoyaltyPoints, ClientLoyaltyPoint
 from Finance.models import Refund
 from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip , Appointment
 # from Invoices.models import SaleInvoice
@@ -72,14 +72,14 @@ class SaleRecordsAppointmentServices(CommonField):
     appointment = models.ForeignKey(Appointment, on_delete = models.SET_NULL, null = True, related_name = 'sale_appointments_records')
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_appointment_services_employee')
     service = models.ForeignKey(Service, on_delete = models.SET_NULL, null = True)
-    appointment_status = models.CharField(choices = AppointmentStatus.choices,max_length = 50, default = AppointmentStatus.BOOKED, blank=False, null=False)
-    reason = models.CharField(max_length = 255, blank=True, null=True)
-    quantity = models.PositiveIntegerField(blank=True, null=True)
-    start_time = models.DateTimeField(blank=True, null=True)
-    end_time = models.DateTimeField(blank=True, null=True)
-    duration = models.PositiveIntegerField(blank=True, null=True)
-    discounted_price = models.FloatField(default = 0, blank=True, null=True)
+    service_status = models.CharField(choices = AppointmentStatus.choices,max_length = 50, default = AppointmentStatus.BOOKED, blank=False, null=False)
+    # quantity = models.PositiveIntegerField(blank=True, null=True)
+    service_start_time = models.DateTimeField(blank=True, null=True)
+    service_end_time = models.DateTimeField(blank=True, null=True)
+    duration = models.CharField(max_length= 50,blank=True, null=True)
+    price = models.FloatField(default = 0, blank=True, null=True)
     is_favourite = models.BooleanField(blank=True, null=True , default = False)
+    # reason = models.CharField(max_length = 255, blank=True, null=True)
     # appointment_notes = models.CharField(max_length = 255 , null = True , blank = True)
     
     
@@ -179,4 +179,10 @@ class AppliedPromotion(CommonField):
     # promotion = models.ForeignKey(Promotion, on_delete = models.SET_NULL,blank=True, null=True, related_name = "sale_record_promotions")
     promotion = models.CharField(max_length = 150 , blank=True, null=True)
     promotion_type = models.CharField(max_length = 255 , blank=True, null=True)
+    
+    
+class RedeemedLoyaltyPoints(CommonField):
+    sale_record = models.ForeignKey(SaleRecords,  on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_loyalty_points_records')
+    clinet_loyalty_point = models.ForeignKey(ClientLoyaltyPoint, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'loyalty_points_records')
+    redeemed_points = models.PositiveSmallIntegerField(default = 0 , blank=True, null=True)
     
