@@ -1055,7 +1055,7 @@ class ServiceReversal(serializers.ModelSerializer):
         model = Reversal
         fields= ['id','request_status']
 class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
-    appointment = serializers.CharField(source = 'AppointmentService.appointment.id')
+    appointment = serializers.CharField(source = 'appointment.id')
     client = serializers.SerializerMethodField(read_only=True)
     avaliable_service_group = serializers.SerializerMethodField(read_only=True)
     booked_by = serializers.SerializerMethodField(read_only=True)
