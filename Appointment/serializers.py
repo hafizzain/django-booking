@@ -1127,7 +1127,7 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
 
 class AppointmentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = AppointmentService
+        model = Appointment
         fields = '__all__'
 class ServiceReversal(serializers.ModelSerializer):
     class Meta:
@@ -1169,6 +1169,7 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
                 'level': f'{level}',
             }
         return {}
+    
     def get_appointment(self, obj):
         appointment = Appointment.objects.get(id=obj.appointment.id)
         return AppointmentSerializer(appointment).data
