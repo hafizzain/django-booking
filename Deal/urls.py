@@ -15,5 +15,8 @@ urlpatterns = [
     path('get_redeemable_channels/', views.get_redeemable_channels),
     path('get_deal_validity/', views.get_deal_validity),
 
+
+    path('products/', views.get_products),
+
     
 ]

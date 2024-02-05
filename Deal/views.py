@@ -10,6 +10,7 @@ from rest_framework import status
 from Deal.models import Deal, DealCategory, RedeemableChannel
 from Deal.serializers import DealSerializer
 
+from Product.models import Product
 
 @api_view(['GET'])
 def get_deal_audience_choices(request):
@@ -206,3 +207,25 @@ def get_single_deal(request, deal_id):
 
     data = DealSerializer(deal).data
     return Response({**data})
+
+
+@api_view(['GET'])
+def get_products(request, deal_id):
+
+    products = Product.objects.filter(is_active=True, is_deleted=False, is_blocked=False).values('id', 'name')
+
+    data = DealSerializer(deal).data
+    return Response({
+        "response" : {
+            "status": "result-found",
+            "statusCode": 200,
+            "message": "10 records found",
+            "data": {
+                "page": 0,
+                "totalRecords": products.count(),
+                "totalPageCount": products.count() / 10,
+                "recordsPerPage": 10,
+                "list": products
+            }
+        }
+    })
