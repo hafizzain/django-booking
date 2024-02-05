@@ -1,5 +1,5 @@
 from SaleRecords.models import SaleRecords
-from Invoices.models import SaleInvoice
+# from Invoices.models import SaleInvoice
 
 from rest_framework import status
 from rest_framework.response import Response

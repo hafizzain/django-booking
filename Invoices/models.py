@@ -18,7 +18,7 @@ from Appointment.models import Appointment, AppointmentCheckout, AppointmentServ
 from Utility.models import ExceptionRecord
 from MultiLanguage.models import InvoiceTranslation
 from MultiLanguage.serializers import InvoiceTransSerializer
-from SaleRecords.models import *
+# from SaleRecords.models import *
 
 
 class SaleInvoice(models.Model):
@@ -152,7 +152,7 @@ class SaleInvoice(models.Model):
         orders = []
         
         # ================================================ Old ===============================
-        # orders.extend(ProductOrder.objects.filter(checkout = checkout).annotate(name = F('product__name'), arabic_name=F('product__arabic_name')))
+        orders.extend(ProductOrder.objects.filter(checkout = checkout).annotate(name = F('product__name'), arabic_name=F('product__arabic_name')))
         # orders.extend(ServiceOrder.objects.filter(checkout = checkout).annotate(name = F('service__name'), arabic_name=F('service__arabic_name')))
         # orders.extend(VoucherOrder.objects.filter(checkout = checkout).annotate(name = F('voucher__name'), arabic_name=F('voucher__arabic_name')))
         # orders.extend(MemberShipOrder.objects.filter(checkout = checkout).annotate(name = F('membership__name'), arabic_name=F('membership__arabic_name')))
