@@ -2982,6 +2982,7 @@ def get_client_all_memberships(request):
     today_date = today_date.strftime('%Y-%m-%d')
     client_membership = SaleRecordMembership.objects.filter(
         sale_record__location__id=location_id,
+        expiry__gte=timezone.now(),
         # created_at__lt = F('end_date'),
         # end_date__gte = today_date,
         sale_record__client__id=client_id,
