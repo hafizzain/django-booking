@@ -45,12 +45,12 @@ class AppointmentStatus(models.TextChoices):
     
     
 class CouponType (models.TextChoices):
-    REFUND = 'refund','Refund Coupon'
-    SPEICFIC_PRODUCT_SERVICES = 'specific_product_services','Specific Service/Product Coupon'
-    BUY_ONE_GET_ONE = 'buy_one_get' ,'Buy one Get one Free'
-    SPEND_SOME_AMOUNT_= 'spend_some_amount' ,'Spend Some Amount'
-    PROMOTION = "is_promotion","Promotion"
-    VOUCHER = "voucher","Voucher"
-    MEMBERSHIP = "membership","Membership"
-    GIFT = "gift", "Gift"
+    REFUND = 'Refund Coupon','Refund Coupon'
+    SPEICFIC_PRODUCT_SERVICES = 'Specific Service/Product Coupon','Specific Service/Product Coupon'
+    BUY_ONE_GET_ONE = 'Buy one Get one Free' ,'Buy one Get one Free'
+    SPEND_SOME_AMOUNT_= 'Spend Some Amount' ,'Spend Some Amount'
+    PROMOTION = "Promotion","Promotion"
+    VOUCHER = "Voucher","Voucher"
+    MEMBERSHIP = "Membership","Membership"
+    GIFT = "Gift", "Gift"
     

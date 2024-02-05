@@ -157,14 +157,14 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     applied_promotions_records = AppliedPromotionSerializer(many = True)
     applied_loyalty_points_records = RedeemedLoyaltyPointsSerializer(many = True)
     
-    invoice = serializers.SerializerMethodField(read_only = True)
+    # invoice = serializers.SerializerMethodField(read_only = True)
     
     client_data = serializers.SerializerMethodField(read_only = True)
     
     
-    def get_invoice(self, obj):
-        invoice = SaleInvoice.objects.get(checkout = obj.id)
-        return SaleInvoiceSerializer(invoice).data
+    # def get_invoice(self, obj):
+    #     invoice = SaleInvoice.objects.get(checkout = obj.id)
+    #     return SaleInvoiceSerializer(invoice).data
     
     def get_client_data(self, obj):
         if obj.client:
@@ -326,7 +326,6 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             RedeemedLoyaltyPoints.objects.bulk_create([
                 RedeemedLoyaltyPoints(sale_record = sale_record, **data) for data in applied_loyalty_points_records
             ])
-            self.loyalty_points_update(location = location_id , client = client , loyalty_points= applied_loyalty_points_records, sub_total=sub_total)
             
 
         return sale_record
@@ -429,15 +428,3 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         else:
             pass
             
-    
-    def loyalty_points_update(self, location = None, client= None, loyalty_points = None , sub_total = None):
-        if location and client and loyalty_points and sub_total:
-            try:
-                amount_for_calcluating_point = (sub_total/amount_spent) * points_per_amount
-                eard_points = amount_for_calcluating_point*points_per_amount
-                wallet_reward_amount = reward_amount_per_point * (every_point * eard_points)
-                client_loyalty_obj, created = ClientLoyaltyPoint.objects.get_or_create()
-            except Exception as e:
-                raise ValidationError('Something went wrong')
-        
-    

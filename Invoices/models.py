@@ -18,7 +18,7 @@ from Appointment.models import Appointment, AppointmentCheckout, AppointmentServ
 from Utility.models import ExceptionRecord
 from MultiLanguage.models import InvoiceTranslation
 from MultiLanguage.serializers import InvoiceTransSerializer
-# from SaleRecords.models import PaymentMethods
+# from SaleRecords.models import *
 
 
 class SaleInvoice(models.Model):
@@ -112,11 +112,13 @@ class SaleInvoice(models.Model):
         '''
         getting the checkout instance of the checkout based on the checkout_type from the invoice model
         '''
-        if self.checkout_type == 'appointment':
-            checkout_instance = AppointmentCheckout.objects.get(id=self.checkout)
-        else:
-            checkout_instance = Checkout.objects.get(id=self.checkout)
+        # if self.checkout_type == 'appointment':
+        #     checkout_instance = AppointmentCheckout.objects.get(id=self.checkout)
+        # else:
+        #     checkout_instance = Checkout.objects.get(id=self.checkout)
         
+        # return checkout_instance
+        checkout_instance = SaleRecords.objects.get(id = self.checkout)
         return checkout_instance
     
     @property
@@ -126,17 +128,21 @@ class SaleInvoice(models.Model):
         return uuid
     
     def get_appointment_services(self, app_checkout):
-        services = AppointmentService.objects.filter(
-            appointment = app_checkout.appointment
-        )
+        # old
+        # services = AppointmentService.objects.filter(
+        #     appointment = app_checkout.appointment
+        # )
+        # New Query
+        appointment_services = SaleRecordsAppointmentServices.objects.filter(sale_record = app_checkout)
         ordersData = []
-        for order in services:
-            price = order.get_final_price()
+        for data in appointment_services:
+            # price = order.get_final_price() -> old
             data = {
-                'id': order.id,
-                'name' : f'{order.service.name}',
-                'arabic_name' : f'{order.service.arabic_name}',
-                'price' : round(price, 2),
+                'id': data.service.id,
+                'name' : f'{data.service.name}',
+                'arabic_name' : f'{data.service.arabic_name}',
+                # 'price' : round(price, 2), old
+                'price': data.price,
                 'quantity' : 1
             }
             ordersData.append(data)
@@ -144,11 +150,17 @@ class SaleInvoice(models.Model):
 
     def get_order_items(self, checkout):
         orders = []
-
+        
+        # ================================================ Old ===============================
         orders.extend(ProductOrder.objects.filter(checkout = checkout).annotate(name = F('product__name'), arabic_name=F('product__arabic_name')))
-        orders.extend(ServiceOrder.objects.filter(checkout = checkout).annotate(name = F('service__name'), arabic_name=F('service__arabic_name')))
-        orders.extend(VoucherOrder.objects.filter(checkout = checkout).annotate(name = F('voucher__name'), arabic_name=F('voucher__arabic_name')))
-        orders.extend(MemberShipOrder.objects.filter(checkout = checkout).annotate(name = F('membership__name'), arabic_name=F('membership__arabic_name')))
+        # orders.extend(ServiceOrder.objects.filter(checkout = checkout).annotate(name = F('service__name'), arabic_name=F('service__arabic_name')))
+        # orders.extend(VoucherOrder.objects.filter(checkout = checkout).annotate(name = F('voucher__name'), arabic_name=F('voucher__arabic_name')))
+        # orders.extend(MemberShipOrder.objects.filter(checkout = checkout).annotate(name = F('membership__name'), arabic_name=F('membership__arabic_name')))
+        
+        order.extend(SaleRecordsProducts.objects.filter(sale_record = checkout).annotate(name = F('product__name'), arabic_name=F('product__arabic_name')))
+        order.extend(SaleRecordServices.objects.filter(sale_record = checkout).annotate(name = F('service__name'), arabic_name=F('service__arabic_name')))
+        order.extend(SaleRecordMembership.objects.filter(sale_record = checkout).annotate(name = F('membership__name'), arabic_name=F('membership__arabic_name')))
+        order.extend(SaleRecordVouchers.objects.filter(sale_record = checkout).annotate(name = F('voucher__name'), arabic_name=F('voucher__arabic_name')))
 
         ordersData = []
         for order in orders:

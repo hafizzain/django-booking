@@ -37,27 +37,59 @@ def matching_records(is_quick_sale = None,location=None, range_start=None, range
 def calculate_voucher_commission(voucher = []):
     pass
 
-
-def calculate_loyalty_points(client_bill, amount_spent, points_per_amount, every_point, reward_amount_per_point):
-    """
-    Calculate loyalty points and the corresponding reward amount.
-
-    Parameters:
-    - amount_spent: The total amount spent by the client.
-    - points_per_amount: The number of loyalty points awarded per unit of currency spent.
-    - reward_amount_per_point: The reward amount for each loyalty point.
-
-    Returns:
-    A tuple containing the total loyalty points and the corresponding reward amount.
-    """
     
-    amount_for_calcluating_point = client_bill/amount_spent
-    eard_points = amount_for_calcluating_point*points_per_amount
-    wallet_reward_amount = reward_amount_per_point * every_point
-    
-    
-    
+def loyalty_points_update(location = None, client= None, loyalty_points = None , sub_total = None, sale_record = None, invoice = None ):
+        if location and loyalty_points and sub_total:
+            redeemed_loyalty = loyalty_points[0]
+            client_points = ClientLoyaltyPoint.objects.get(id=redeemed_loyalty['clinet_loyalty_point'])
+            
+            client_points.points_redeemed = float(client_points.points_redeemed) + float(redeemed_loyalty['redeemed_points'])
+            client_points.save()
 
-    return amount_for_calcluating_point, eard_points, wallet_reward_amount
+            single_point_value = client_points.customer_will_get_amount / client_points.for_every_points
+            total_redeemed_value = float(single_point_value) * float(redeemed_loyalty['redeemed_points'])
 
+            logs_points_redeemed = redeemed_loyalty['redeemed_points']
+            logs_total_redeened_value = total_redeemed_value
+            try:
+                location_loyalty = LoyaltyPoints.objects.get(
+                    Q(loyaltytype='Service') |
+                    Q(loyaltytype='Both'),
+                    location=location,
+                    # amount_spend = total_price,
+                    is_active=True,
+                    is_deleted=False
+                )
+                client_points, created = ClientLoyaltyPoint.objects.get_or_create(
+                location=location,
+                client=client,
+                loyalty_points=location_loyalty, # loyalty Foreignkey
+                )
+                amount_for_calcluating_point = (sub_total/location_loyalty.amount_spend) * location_loyalty.number_points
+                earned_points = amount_for_calcluating_point * location_loyalty.number_points
+                wallet_reward_amount = location_loyalty.total_earn_from_points * (location_loyalty.earn_points * earned_points)
+                if created:
+                    client_points.total_earn = earned_points
+                    client_points.total_amount = wallet_reward_amount
+                else:
+                    client_points.total_earn = float(client_points.total_earn) + float(earned_points)
+                    client_points.total_amount = client_points.total_amount + float(wallet_reward_amount)
+                client_points.for_every_points = location_loyalty.earn_points
+                client_points.customer_will_get_amount = location_loyalty.total_earn_from_points
 
+                client_points.save()
+
+                LoyaltyPointLogs.objects.create(
+                    location=location,
+                    client=client_points.client,
+                    client_points=client_points,
+                    loyalty=location_loyalty,
+                    points_earned=earned_points,
+                    points_redeemed=logs_points_redeemed,
+                    balance=client_points.total_available_points,
+                    actual_sale_value_redeemed=logs_total_redeened_value,
+                    invoice=invoice,
+                    checkout=sale_record,
+                )
+            except Exception as e:
+                return f"{str(e)}"
