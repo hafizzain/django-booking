@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
-from SaleRecords.helpers import matching_records
+from SaleRecords.helpers import matching_records, loyalty_points_update
 
 from SaleRecords.serializers import *
 
@@ -66,6 +66,9 @@ class SaleRecordViews(APIView):
             
             user = request.user
             request.data['user'] = user.id
+            location_id = request.data['location']
+            client = request.data['client']
+            sub_total = request.data['sub_total']
             # validity = request.data['gift_cards_records']
             # validity.get('valid_till'
             # return Response({'data': validity})
@@ -97,7 +100,8 @@ class SaleRecordViews(APIView):
                         service_commission_type=f'{request.data.get("service_commission_type")}' if request.data.get("service_commission_type") else '',
                         checkout=sale_record.id,
                     )
-                    invoice.save()
+                    invoice = invoice.save()
+                    loyalty_points_update(location = location_id , client = client , loyalty_points= sale_record.applied_loyalty_points_records, sub_total=sub_total, invoice = invoice)
                 except Exception as e:
                     return Response({'error':str(e), 'second': 'Second Try'})
                 
