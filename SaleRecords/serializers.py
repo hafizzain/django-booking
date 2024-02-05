@@ -430,4 +430,5 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             
     
     
-    def update_loyalty_points(self, location = None, client= None, loyalty_points = None)
+    def update_loyalty_points(self, location = None, client= None, loyalty_points = None):
+        pass
