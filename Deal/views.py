@@ -155,6 +155,35 @@ def create_deal(request):
         'error_messages' : serialized.errors
     }, status.HTTP_400_BAD_REQUEST)
 
+@api_view(['PUT'])
+def update_deal(request, deal_id):
+    try:
+        deal = Deal.objects.get(id = deal_id)
+    except Exception as err:
+        return Response({
+            'message' : 'Invalid Id',
+            'error_message' : str(err)
+        }, status.HTTP_404_NOT_FOUND)
+
+    try:
+        Deal.objects.get(code =request.data.get('code'))
+    except:
+        pass
+    else:
+        return Response({
+            'message' : 'Deal already exist with this code',
+        }, status.HTTP_400_BAD_REQUEST)
+
+    serialized = DealSerializer(deal, data=request.data, partial=True)
+    if serialized.is_valid():
+        serialized.save()
+        return Response({'message' : 'Deal updated sucessfully', 'deal' :  serialized.data})
+
+    return Response({
+        'message' : 'Invalid Data',
+        'error_messages' : serialized.errors
+    }, status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET'])
 def get_all_deals(request):
