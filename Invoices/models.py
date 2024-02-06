@@ -18,7 +18,6 @@ from Appointment.models import Appointment, AppointmentCheckout, AppointmentServ
 from Utility.models import ExceptionRecord
 from MultiLanguage.models import InvoiceTranslation
 from MultiLanguage.serializers import InvoiceTransSerializer
-from Employee.models import Employee
 # from Utility.get_models import get_sale_record_model
 # from SaleRecords.models import *
 
@@ -63,7 +62,6 @@ class SaleInvoice(models.Model):
     member = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
     client_type = models.CharField(choices = CLIENT_TYPE, max_length=50 , default = '', null=True, blank=True )
     payment_type = models.CharField(choices = PAYMENT_TYPE, max_length=50 , default = '', null=True, blank=True )
-    
     tip = models.FloatField(default = 0)
     total_service_price = models.FloatField(default = 0 , null=True, blank=True)
     total_product_price = models.FloatField(default = 0 , null=True, blank=True)
@@ -84,8 +82,8 @@ class SaleInvoice(models.Model):
     
     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True, blank=True) # will not use this 
     appointment_service = models.CharField(max_length=2000, default='', null=True, blank=True) # will not use this 
-    service = models.CharField(max_length=2000, default='', null=True, blank=True) # will not use this
-    member = models.CharField(max_length=2000, default='', null=True, blank=True) 
+    service = models.CharField(max_length=2000, default='', null=True, blank=True) # will not
+    member = models.CharField(max_length=2000, default='', null=True, blank=True)
     business_address = models.CharField(max_length=2000, default='', null=True, blank=True)
     
     # types of checkout and invoices
