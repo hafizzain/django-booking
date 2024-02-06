@@ -228,7 +228,7 @@
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
                     <div>
                       <p class="text-left">
-                        {% get_primary_translation item.id %}
+                        {% get_primary_translation|item.id %}
                         {% if item.discount_percentage %}
                         (Discount {{ item.discount_percentage}} %)
                         {% endif %}
