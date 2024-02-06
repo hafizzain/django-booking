@@ -67,7 +67,7 @@ class SaleRecordViews(APIView):
             user = request.user
             request.data['user'] = user.id
             location_id = request.data['location']
-            client = request.data['client']
+            client = request.data['client', None]
             sub_total = request.data['sub_total']
             # validity = request.data['gift_cards_records']
             # validity.get('valid_till'
