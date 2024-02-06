@@ -77,6 +77,7 @@ class SaleRecordViews(APIView):
             if serializer.is_valid():
                 sale_record = serializer.save()
                 try :
+                    loyalty_points = sale_record.applied_loyalty_points_records
                     invoice = SaleInvoice.objects.create(
                         user = user,
                         client = sale_record.client,
@@ -109,7 +110,7 @@ class SaleRecordViews(APIView):
                         checkout=sale_record.id,
                     )
                     invoice = invoice.save()
-                    loyalty_points_update(location = location_id , client = client , loyalty_points= sale_record.applied_loyalty_points_records, sub_total=sub_total, invoice = invoice)
+                    loyalty_points_update(location = location_id , client = client , loyalty_points= loyalty_points, sub_total=sub_total, invoice = invoice)
                 except Exception as e:
                     return Response({'error':str(e), 'second': 'Second Try'})
                 
