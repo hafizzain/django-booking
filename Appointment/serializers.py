@@ -392,7 +392,7 @@ class CalanderserializerResponse(serializers.ModelSerializer):
     class Meta:
         model = AppointmentService
         fields = '__all__'
-        exclude = ['client_type']
+        
 
     def get_service(self, obj):
         return ServiceAppointmentSerializer(obj.service).data
