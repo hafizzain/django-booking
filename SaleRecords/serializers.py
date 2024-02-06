@@ -157,14 +157,14 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     applied_promotions_records = AppliedPromotionSerializer(many = True)
     applied_loyalty_points_records = RedeemedLoyaltyPointsSerializer(many = True)
     
-    # invoice = serializers.SerializerMethodField(read_only = True)
+    invoice = serializers.SerializerMethodField(read_only = True)
     
     client_data = serializers.SerializerMethodField(read_only = True)
     
     
-    # def get_invoice(self, obj):
-    #     invoice = SaleInvoice.objects.get(checkout = obj.id)
-    #     return SaleInvoiceSerializer(invoice).data
+    def get_invoice(self, obj):
+        invoice = SaleInvoice.objects.get(checkout = obj.id)
+        return SaleInvoiceSerializer(invoice).data
     
     def get_client_data(self, obj):
         if obj.client:
