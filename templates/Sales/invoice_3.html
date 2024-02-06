@@ -421,7 +421,7 @@
                     <p>{{ coupon_data.coupon_discounted_price }} {{ currency_code }}</p>
                   </div>
               {% endif %}  {% endcomment %}
-
+              <hr>
               <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
                   <p>{{ business_address.primary_translation.subtotal}}</p>
@@ -487,15 +487,15 @@
                 <div>
 
                   <p>{{ business_address.primary_translation.payment_method}}</p>
-                  
+                  {% if business_address.secondary_translation.payment_method %}
+                        <p class="arabic">{{ business_address.secondary_translation.payment_method}}</p>
+                  {% endif %}
                   {% if checkout_data.payment_methods_records %}
                     
                     {% for payment in checkout_data.payment_methods_records.all %}
 
                     <p class="text-[#7B7B7B]">{{payment.payment_method}} on {{created_at}} </p>
-                    {% if business_address.secondary_translation.payment_method %}
-                        <p class="arabic">{{ business_address.secondary_translation.payment_method}}</p>
-                    {% endif %}
+                    
 
                     {% endfor %}
                       
