@@ -389,7 +389,7 @@ class BlockSerializer(serializers.ModelSerializer):
 class CalanderserializerResponse(serializers.ModelSerializer):
     service = serializers.SerializerMethodField(read_only=True)
     class Meta:
-        model = AppointmentService
+        model = Appointment
         fields = '__all__'
         
 
