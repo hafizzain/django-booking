@@ -246,7 +246,7 @@
 
                   {% comment %} ===============================if there is any service records in the checkout ========================{% endcomment %}
 
-                  {% comment %} {% if checkout_data.services_records %}
+                  {% if checkout_data.services_records %}
                   
                   {% for item in checkout_data.services_records %}
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
@@ -272,7 +272,7 @@
                   
                   {% comment %} ===============================if there is any appointment_services in the checkout_data ========================{% endcomment %}
                   
-                  {% comment %} {% if checkout_data.appointment_services %}
+                  {% if checkout_data.appointment_services %}
                   
                   {% for item in checkout_data.appointment_services %}
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
@@ -293,10 +293,10 @@
                   {% endfor %}
                     
                     
-                  {% endif %} {% endcomment %}
+                  {% endif %}
                   {% comment %} ===============================if there is any gift_cards_records in the checkout_data ========================{% endcomment %}
 
-                  {% comment %} {% if checkout_data.gift_cards_records %}
+                  {% if checkout_data.gift_cards_records %}
                   
                   {% for item in checkout_data.gift_cards_records %}
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
@@ -317,10 +317,10 @@
                   {% endfor %}
                     
                     
-                  {% endif %} {% endcomment %}
+                  {% endif %}
                   {% comment %} =============================== if there is any membership_records in the checkout data ========================{% endcomment %}
                   
-                  {% comment %} {% if checkout_data.membership_records %}
+                  {% if checkout_data.membership_records %}
                   
                   {% for item in checkout_data.membership_records %}
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
@@ -341,11 +341,11 @@
                   {% endfor %}
                     
                   
-                  {% endif %} {% endcomment %}
+                  {% endif %}
                   
                   {% comment %} =============================== if there is any vouchers_records in the checkout_data ========================{% endcomment %}
                   
-                  {% comment %} {% if checkout_data.vouchers_records %}
+                  {% if checkout_data.vouchers_records %}
                   
                   {% for item in checkout_data.vouchers_records %}
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
@@ -366,11 +366,11 @@
                   {% endfor %}
                     
                     
-                  {% endif %}  {% endcomment %}
+                  {% endif %}
 
                   {% comment %}======================================= old code ================================================================{% endcomment %}
 
-                  {% comment %} {% for order in checkout_data %}
+                  {% for order in checkout_data %}
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
                     <div>
                       <p class="text-left">
@@ -386,25 +386,25 @@
                       {{currency_code}}
                     </p>
                   </div>
-                  {% endfor %} {% endcomment %}
-
-                  {% comment %}====================================== old code ================================================================== {% endcomment %}
-
+                  {% endfor %}
                 </div>
               </div>
             </div>
+
+            {% comment %}====================================== old code ================================================================== {% endcomment %}
+          
             <div class="text-left flex flex-col gap-1">
 
-              {% comment %} {% if redeem_option %}
+              {% if redeem_option %}
               <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
                   <p>Paid from {{ redeem_option }} {% if voucher_redeem_percentage %}{{ voucher_redeem_percentage }} % {% endif %}</p>
                 </div>
                 <p>{{ total_discount }} {{ currency_code }}</p>
               </div>
-              {% endif %} {% endcomment %}
+              {% endif %}
 
-              {% comment %} {% if redeemed_points %}
+              {% if redeemed_points %}
                 <div class="flex items-center justify-between text-primary text-sm font-bold">
                   <div>
                     <p>Redeemed Points</p>
@@ -443,7 +443,7 @@
 
               {% comment %}============================================ tax details  ================================================================{% endcomment %}
 
-              {% comment %} {% if tax_applied or tax_applied1 %}
+              {% if tax_applied or tax_applied1 %}
                 <p>{{ business_address.primary_translation.taxes }}</p>
                 {% if business_address.secondary_translation.taxes %}<p class="arabic">{{ business_address.secondary_translation.taxes }} {% endif %}</p>
               {% endif %}
@@ -475,10 +475,10 @@
 
             <div class="text-left flex flex-col gap-1">
               <div
-                class="flex items-center justify-between text-primary text-sm font-bold"> {% endcomment %}
+                class="flex items-center justify-between text-primary text-sm font-bold"> 
               
               {% comment %}=============================================  Main div for payment methods show ===================================================={% endcomment %}
-              {% comment %} <div class="flex items-center justify-between text-primary text-sm w-full">
+              <div class="flex items-center justify-between text-primary text-sm w-full">
                 <div>
 
                   <p>{{ business_address.primary_translation.payment_method}}</p>
@@ -507,7 +507,7 @@
                     </p>
                  </div>
                 </div>
-              </div> {% endcomment %}
+              </div> 
 
               {% comment %}=========================================== payment methods ends here ==============================================================={% endcomment %}
               </div>
