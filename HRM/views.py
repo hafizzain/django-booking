@@ -199,7 +199,7 @@ class HolidayApiView(APIView):
         holiday_schedule = EmployeDailySchedule.objects.filter(
             is_holiday=True,
             from_date=holiday_data['start_date'],
-            to_date=holiday_data['end_date']
+            date=holiday_data['end_date']
         )
         holiday_schedule.delete()
         # holidays = Holiday.objects.all()
