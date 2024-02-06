@@ -66,6 +66,7 @@ class SaleRecordViews(APIView):
             
             user = request.user
             request.data['user'] = user.id
+            # return Response({'user': request.data})
             location_id = request.data['location']
             client = request.data.get('client', None)
             sub_total = request.data['sub_total']
