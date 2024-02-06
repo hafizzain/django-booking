@@ -77,7 +77,7 @@ class SaleRecordViews(APIView):
             if serializer.is_valid():
                 sale_record = serializer.save()
                 try :
-                    loyalty_points = sale_record.applied_loyalty_points_records
+                    loyalty_points = sale_record.applied_loyalty_points_records.all()
                     invoice = SaleInvoice.objects.create(
                         user = user,
                         client = sale_record.client,
