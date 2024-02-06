@@ -246,9 +246,9 @@
 
                   {% comment %} ===============================if there is any service records in the checkout ========================{% endcomment %}
 
-                  {% if checkout_data.services_records %}
+                  {% if checkout_data.services_records.all %}
                   
-                  {% for item in checkout_data.services_records %}
+                  {% for item in checkout_data.services_records.all %}
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
                     <div>
                       <p class="text-left">
@@ -272,9 +272,9 @@
                   
                   {% comment %} ===============================if there is any appointment_services in the checkout_data ========================{% endcomment %}
                   
-                  {% if checkout_data.appointment_services %}
+                  {% if checkout_data.appointment_services.all %}
                   
-                  {% for item in checkout_data.appointment_services %}
+                  {% for item in checkout_data.appointment_services.all %}
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
                     <div>
                       <p class="text-left">
@@ -296,9 +296,9 @@
                   {% endif %}
                   {% comment %} ===============================if there is any gift_cards_records in the checkout_data ========================{% endcomment %}
 
-                  {% if checkout_data.gift_cards_records %}
+                  {% if checkout_data.gift_cards_records.all %}
                   
-                  {% for item in checkout_data.gift_cards_records %}
+                  {% for item in checkout_data.gift_cards_records.all %}
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
                     <div>
                       <p class="text-left">
@@ -320,9 +320,9 @@
                   {% endif %}
                   {% comment %} =============================== if there is any membership_records in the checkout data ========================{% endcomment %}
                   
-                  {% if checkout_data.membership_records %}
+                  {% if checkout_data.membership_records.all %}
                   
-                  {% for item in checkout_data.membership_records %}
+                  {% for item in checkout_data.membership_records.all %}
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
                     <div>
                       <p class="text-left">
@@ -345,9 +345,9 @@
                   
                   {% comment %} =============================== if there is any vouchers_records in the checkout_data ========================{% endcomment %}
                   
-                  {% if checkout_data.vouchers_records %}
+                  {% if checkout_data.vouchers_records.all %}
                   
-                  {% for item in checkout_data.vouchers_records %}
+                  {% for item in checkout_data.vouchers_records.all %}
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
                     <div>
                       <p class="text-left">
@@ -370,23 +370,23 @@
 
                   {% comment %}======================================= old code ================================================================{% endcomment %}
 
-                  {% for order in checkout_data %}
-                  <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                    <div>
-                      <p class="text-left">
-                        {% get_primary_translation order.id %}
-                        {% if order.discount_percentage %}
-                        (Discount {{ order.discount_percentage}} %)
-                        {% endif %}
+                  {% comment %} {% for order in checkout_data %}
+                    <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                      <div>
+                        <p class="text-left">
+                          {% get_primary_translation order.id %}
+                          {% if order.discount_percentage %}
+                          (Discount {{ order.discount_percentage}} %)
+                          {% endif %}
+                        </p>
+                        <p class="arabic">{% get_secondary_translation order.id %}</p>
+                      </div>
+                      <p class="text-[#7B7B7B]">
+                        <span>{{order.quantity}} x </span>{{order.price}}
+                        {{currency_code}}
                       </p>
-                      <p class="arabic">{% get_secondary_translation order.id %}</p>
                     </div>
-                    <p class="text-[#7B7B7B]">
-                      <span>{{order.quantity}} x </span>{{order.price}}
-                      {{currency_code}}
-                    </p>
-                  </div>
-                  {% endfor %}
+                  {% endfor %} {% endcomment %}
                 </div>
               </div>
             </div>
@@ -395,32 +395,32 @@
           
             <div class="text-left flex flex-col gap-1">
 
-              {% if redeem_option %}
+              {% comment %} {% if redeem_option %}
               <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
                   <p>Paid from {{ redeem_option }} {% if voucher_redeem_percentage %}{{ voucher_redeem_percentage }} % {% endif %}</p>
                 </div>
                 <p>{{ total_discount }} {{ currency_code }}</p>
               </div>
-              {% endif %}
+              {% endif %} {% endcomment %}
 
-              {% if redeemed_points %}
+              {% comment %} {% if redeemed_points %}
                 <div class="flex items-center justify-between text-primary text-sm font-bold">
                   <div>
                     <p>Redeemed Points</p>
                   </div>
                   <p>{{redeemed_points}}</p>
                 </div>
-              {% endif %}
+              {% endif %} {% endcomment %}
 
-              {% if coupon_data.is_coupon_redeemed == 'true' %}
+              {% comment %} {% if coupon_data.is_coupon_redeemed == 'true' %}
                   <div class="flex items-center justify-between text-primary text-sm font-bold">
                     <div>
                         <p>Coupon redeemed</p>
                     </div>
                     <p>{{ coupon_data.coupon_discounted_price }} {{ currency_code }}</p>
                   </div>
-              {% endif %} 
+              {% endif %}  {% endcomment %}
 
               <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
@@ -448,9 +448,9 @@
                   {% if business_address.secondary_translation.taxes %}<p class="arabic">{{ business_address.secondary_translation.taxes }} {% endif %}</p>
                 {% endif %} {% endcomment %}
 
-              {% if checkout_data.tax_records %}
+              {% if checkout_data.tax_records.all %}
                 
-                {% for item in  checkout_data.tax_records %}
+                {% for item in  checkout_data.tax_records.all %}
                 
                   <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
                     <div class="font-semibold text-black">
@@ -486,7 +486,7 @@
                   
                   {% if checkout_data.payment_methods_records %}
                     
-                    {% for payment in checkout_data.payment_methods_records %}
+                    {% for payment in checkout_data.payment_methods_records.all %}
 
                     <p class="text-[#7B7B7B]">{{payment}} on {{created_at}} </p>
                     {% if business_address.secondary_translation.payment_method %}
