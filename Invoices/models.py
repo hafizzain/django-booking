@@ -59,7 +59,9 @@ class SaleInvoice(models.Model):
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True)
     location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, null=True, blank=True)
-    member = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, blank = True)
+    # member = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, related_name = 'member_records')
+    
+    # employee = models.ForeignKey(Employee, on_delete = models.CASCADE,blank=True, null=True, related_name = 'employee_records')
     
     client_type = models.CharField(choices = CLIENT_TYPE, max_length=50 , default = '', null=True, blank=True )
     payment_type = models.CharField(choices = PAYMENT_TYPE, max_length=50 , default = '', null=True, blank=True )
@@ -84,7 +86,7 @@ class SaleInvoice(models.Model):
     # appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True, blank=True) # will not use this 
     # appointment_service = models.CharField(max_length=2000, default='', null=True, blank=True) # will not use this 
     # service = models.CharField(max_length=2000, default='', null=True, blank=True) # will not
-    # member = models.CharField(max_length=2000, default='', null=True, blank=True)
+    member = models.CharField(blank=True, default='', max_length=2000, null=True)
     # business_address = models.CharField(max_length=2000, default='', null=True, blank=True)
     
     # types of checkout and invoices
@@ -98,6 +100,8 @@ class SaleInvoice(models.Model):
     total_tax = models.FloatField(default=0, null=True, blank=True)
     total_tip = models.FloatField(default=0, null=True, blank=True)
     
+    # gst = models.FloatField(default=0, null=True, blank=True)
+    # gst_price = models.FloatField(default=0, null=True, blank=True)
     
     # gst = models.FloatField(default=0, null=True, blank=True) # will not use
     # gst_price = models.FloatField(default=0, null=True, blank=True) # will not use
@@ -268,13 +272,13 @@ class SaleInvoice(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.file and self.checkout:
-            # order_items, order_tips, tax_details = self.get_invoice_order_items()
-            # if len(order_items) > 0:
-                # sub_total = sum([order['price'] for order in order_items])
-                # tips_total = sum([t['tip'] for t in order_tips])
+            order_items, order_tips, tax_details = self.get_invoice_order_items()
+            if len(order_items) > 0:
+                sub_total = sum([order['price'] for order in order_items])
+                tips_total = sum([t['tip'] for t in order_tips])
 
-                # checkout_redeem_data = self.get_checkout_redeemed_data()
-                # coupon_data = self.get_checkout_coupon_data()
+                checkout_redeem_data = self.get_checkout_redeemed_data()
+                coupon_data = self.get_checkout_coupon_data()
                 
                 checkout_data = self.get_all_order_items()
 
@@ -283,26 +287,21 @@ class SaleInvoice(models.Model):
                     'invoice_by' : self.user.user_full_name if self.user else '',
                     'invoice_by_arabic_name' : self.user.user_full_name if self.user else '',
                     'invoice_id' : self.short_id,
-                    # 'order_items' : order_items,
+                    'order_items' : order_items,
                     'currency_code' : self.location.currency.code,
-                    'sub_total' : self.sub_total,
-                    # 'tips' : order_tips,
-                    'total_tip':self.total_tip,
-                    # 'total' : round((float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0))), 2),
-                    'total': self.total_amount,
+                    'sub_total' : round(sub_total, 2),
+                    'tips' : order_tips,
+                    'total_tip':tips_total,
+                    'total' : round((float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0))), 2),
                     'created_at' : datetime.now().strftime('%Y-%m-%d'),
                     'BACKEND_HOST' : settings.BACKEND_HOST,
                     'payment_type': self.payment_type,
                     'location':self.location.address_name,
                     'business_address':self.location,
-                    'checkout_data': checkout_data,
-                    # 'products_records': checkout_data.products_records.all(),
-                    # 'products_records': checkout_data.products_records.all(),
-                    
-                    # 'redeemed_points':self.get_client_loyalty_points(),
-                    # 'coupon_data':coupon_data,
-                    # **tax_details,
-                    # **checkout_redeem_data,
+                    'redeemed_points':self.get_client_loyalty_points(),
+                    'coupon_data':coupon_data,
+                    **tax_details,
+                    **checkout_redeem_data,
                 }
                 schema_name = connection.schema_name
                 schema_dir = f'{settings.BASE_DIR}/media/{schema_name}'
