@@ -64,29 +64,29 @@ class SaleInvoice(models.Model):
     client_type = models.CharField(choices = CLIENT_TYPE, max_length=50 , default = '', null=True, blank=True )
     payment_type = models.CharField(choices = PAYMENT_TYPE, max_length=50 , default = '', null=True, blank=True )
     
-    # tip = models.FloatField(default = 0)
-    # total_service_price = models.FloatField(default = 0 , null=True, blank=True)
-    # total_product_price = models.FloatField(default = 0 , null=True, blank=True)
-    # total_voucher_price = models.FloatField(default = 0 , null=True, blank=True)
-    # total_membership_price = models.FloatField(default = 0 , null=True, blank=True)
+    tip = models.FloatField(default = 0)
+    total_service_price = models.FloatField(default = 0 , null=True, blank=True)
+    total_product_price = models.FloatField(default = 0 , null=True, blank=True)
+    total_voucher_price = models.FloatField(default = 0 , null=True, blank=True)
+    total_membership_price = models.FloatField(default = 0 , null=True, blank=True)
     
-    # service_commission = models.FloatField(default = 0 , null=True, blank=True)
-    # product_commission = models.FloatField(default = 0 , null=True, blank=True)
-    # voucher_commission = models.FloatField(default = 0 , null=True, blank=True)
+    service_commission = models.FloatField(default = 0 , null=True, blank=True)
+    product_commission = models.FloatField(default = 0 , null=True, blank=True)
+    voucher_commission = models.FloatField(default = 0 , null=True, blank=True)
     
-    # service_commission_type = models.CharField( max_length=50 , default = '', null=True, blank=True)
-    # product_commission_type = models.CharField( max_length=50 , default = '', null=True, blank=True)
-    # voucher_commission_type = models.CharField( max_length=50 , default = '', null=True, blank=True)
+    service_commission_type = models.CharField( max_length=50 , default = '', null=True, blank=True)
+    product_commission_type = models.CharField( max_length=50 , default = '', null=True, blank=True)
+    voucher_commission_type = models.CharField( max_length=50 , default = '', null=True, blank=True)
     
-    # is_promotion = models.BooleanField(default=False)
-    # selected_promotion_id = models.CharField(default='', max_length=800, null=True, blank=True)
-    # selected_promotion_type = models.CharField(default='', max_length=400, null=True, blank=True)
+    is_promotion = models.BooleanField(default=False)
+    selected_promotion_id = models.CharField(default='', max_length=800, null=True, blank=True)
+    selected_promotion_type = models.CharField(default='', max_length=400, null=True, blank=True)
     
     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True, blank=True) # will not use this 
     appointment_service = models.CharField(max_length=2000, default='', null=True, blank=True) # will not use this 
-    # service = models.CharField(max_length=2000, default='', null=True, blank=True) # will not use this
-    # member = models.ForeignKey(max_length=2000, default='', null=True, blank=True) 
-    # business_address = models.CharField(max_length=2000, default='', null=True, blank=True)
+    service = models.CharField(max_length=2000, default='', null=True, blank=True) # will not use this
+    member = models.CharField(max_length=2000, default='', null=True, blank=True) 
+    business_address = models.CharField(max_length=2000, default='', null=True, blank=True)
     
     # types of checkout and invoices
     
@@ -100,11 +100,11 @@ class SaleInvoice(models.Model):
     total_tip = models.FloatField(default=0, null=True, blank=True)
     
     
-    # gst = models.FloatField(default=0, null=True, blank=True) # will not use
-    # gst_price = models.FloatField(default=0, null=True, blank=True) # will not use
+    gst = models.FloatField(default=0, null=True, blank=True) # will not use
+    gst_price = models.FloatField(default=0, null=True, blank=True) # will not use
     
-    # service_price = models.FloatField(default=0, null=True, blank=True) # Will not use
-    # total_price = models.FloatField(default=0, null=True, blank=True) # will not use
+    service_price = models.FloatField(default=0, null=True, blank=True) # Will not use
+    total_price = models.FloatField(default=0, null=True, blank=True) # will not use
     checkout = models.CharField(max_length=128, null=True, blank=True)
 
     file = models.FileField(upload_to='invoicesFiles/', null=True, blank=True)
