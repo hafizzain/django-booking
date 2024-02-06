@@ -454,11 +454,11 @@
                   
                   <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
                     <div class="font-semibold text-black">
-                      <p>{{tax.name}} ({{tax_applied}}%)</p>
+                      <p>{{tax.name}} ({{tax.tax_percentage}}%)</p>
                       <p class="arabic"></p>
                     </div>
-                    {% if tax.value %}
-                    <p>{{ tax.value }} {{ currency_code }}</p>
+                    {% if tax.tax_value %}
+                    <p>{{ tax.tax_value }} {{ currency_code }}</p>
                       {% else %}
                     <p>No value available</p>
                   {% endif %}
