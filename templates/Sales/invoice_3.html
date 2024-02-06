@@ -228,7 +228,7 @@
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
                     <div>
                       <p class="text-left">
-                        {% get_primary_translation|item.id %}
+                        {% get_primary_translation item.id %}
                         {% if item.discount_percentage %}
                         (Discount {{ item.discount_percentage}} %)
                         {% endif %}
@@ -475,8 +475,8 @@
 
             <div class="text-left flex flex-col gap-1">
               <div
-                class="flex items-center justify-between text-primary text-sm font-bold" {% endcomment %}
-              >
+                class="flex items-center justify-between text-primary text-sm font-bold"> {% endcomment %}
+              
               {% comment %}=============================================  Main div for payment methods show ===================================================={% endcomment %}
               {% comment %} <div class="flex items-center justify-between text-primary text-sm w-full">
                 <div>
