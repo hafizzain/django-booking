@@ -191,7 +191,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get('request')
         user = request.data.get('user')
-        raise ValidationError(f'user: {user}')
+        # raise ValidationError(f'user: {user}')
         location_id = request.data.get('location')
         client = request.data.get('client', None)
         sub_total = request.data.get('sub_total') # Without tax amount
@@ -372,7 +372,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     # Bulk create ProductOrderStockReport instances
                     ProductOrderStockReport.objects.bulk_create(stock_reports)
                 except Exception as e:
-                    raise ValidationError(str(e))
+                    raise ValidationError(f"error in product stock': {str(e)}")
         else:
             pass
             
