@@ -7,6 +7,7 @@ class DealSerializer(serializers.ModelSerializer):
     class Meta:
         model = Deal
         fields = '__all__'
+        optional_fields = ['usagePerCustomer', 'validPeriod']
 
 
 class DealRestrictionSerializer(serializers.ModelSerializer):
@@ -16,6 +17,12 @@ class DealRestrictionSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'deal',
+            'excluded_products',
+            'excluded_services',
+            'block_dates',
+            'excluded_locations',
+        ]
+        optional_fields = [
             'excluded_products',
             'excluded_services',
             'block_dates',
