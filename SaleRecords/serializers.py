@@ -360,7 +360,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                         stock_reports.append(ProductOrderStockReport(
                             report_choice='Sold',
                             product=data['product'],
-                            user=user,
+                            user=user.id,
                             location=location_instance,
                             
                             before_quantity=product.available_quantity
