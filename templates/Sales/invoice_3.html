@@ -318,7 +318,7 @@
                     
                     
                   {% endif %}
-                  {% comment %} ===============================if there is any membership_records in the checkout data ========================{% endcomment %}
+                  {% comment %} =============================== if there is any membership_records in the checkout data ========================{% endcomment %}
                   
                   {% if checkout_data.membership_records %}
                   
@@ -343,7 +343,7 @@
                   
                   {% endif %}
                   
-                  {% comment %} ===============================if there is any vouchers_records in the checkout_data ========================{% endcomment %}
+                  {% comment %} =============================== if there is any vouchers_records in the checkout_data ========================{% endcomment %}
                   
                   {% if checkout_data.vouchers_records %}
                   
@@ -370,7 +370,7 @@
 
                   {% comment %}======================================= old code ================================================================{% endcomment %}
 
-                  {% for order in checkout_data %}
+                  {% comment %} {% for order in checkout_data %}
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
                     <div>
                       <p class="text-left">
@@ -386,12 +386,15 @@
                       {{currency_code}}
                     </p>
                   </div>
-                  {% endfor %}
+                  {% endfor %} {% endcomment %}
+
+                  {% comment %}====================================== old code ================================================================== {% endcomment %}
 
                 </div>
               </div>
             </div>
             <div class="text-left flex flex-col gap-1">
+
               {% if redeem_option %}
               <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
@@ -400,6 +403,7 @@
                 <p>{{ total_discount }} {{ currency_code }}</p>
               </div>
               {% endif %}
+
               {% if redeemed_points %}
                 <div class="flex items-center justify-between text-primary text-sm font-bold">
                   <div>
@@ -408,6 +412,7 @@
                   <p>{{redeemed_points}}</p>
                 </div>
               {% endif %}
+
               {% if coupon_data.is_coupon_redeemed == 'true' %}
                   <div class="flex items-center justify-between text-primary text-sm font-bold">
                     <div>
@@ -442,30 +447,24 @@
                 <p>{{ business_address.primary_translation.taxes }}</p>
                 {% if business_address.secondary_translation.taxes %}<p class="arabic">{{ business_address.secondary_translation.taxes }} {% endif %}</p>
               {% endif %}
-              {% if tax_applied %}
-                <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
-                  <div class="font-semibold text-black">
-                    <p>{{tax_name}} ({{tax_applied}}%)</p>
-                    <p class="arabic"></p>
+
+              {% if checkout_data.tax_records %}
+                
+                {% for item in  checkout_data.tax_records %}
+                  <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
+                    <div class="font-semibold text-black">
+                      <p>{{tax_name}} ({{tax_applied}}%)</p>
+                      <p class="arabic"></p>
+                    </div>
+                    <p>{{tax_amount}} {{currency_code}}</p>
                   </div>
-                  <p>{{tax_amount}} {{currency_code}}</p>
-                </div>
+                {% endfor %}
               {% endif %} 
-              
-              {% if tax_applied1 %}
-              <div
-                class="flex items-center justify-between text-[#7B7B7B] text-sm">
-                <div class="font-semibold text-black">
-                  <p>{{tax_name1}} ({{tax_applied1}}%)</p>
-                  <p class="arabic"></p>
-                </div>
-                <p>{{tax_amount1}} {{currency_code}}</p>
-              </div>
-              {% endif %}
+
+              <hr>
+
             </div>
-            <div
-              class="flex items-center justify-between text-primary text-sm font-bold"
-            >
+            <div class="flex items-center justify-between text-primary text-sm font-bold">
               <div>
                 <p class="text-left">{{ business_address.primary_translation.total}}</p>
                 {% if business_address.secondary_translation.total %}<p class="arabic">{{ business_address.secondary_translation.total }} {% endif %}</p>
@@ -473,16 +472,30 @@
               <p class="text-sm">{{total}} {{currency_code}}</p>
             </div>
             <hr />
+
             <div class="text-left flex flex-col gap-1">
               <div
                 class="flex items-center justify-between text-primary text-sm font-bold"
               >
-              {% comment %} Main div for payment methods show {% endcomment %}
+              {% comment %}=============================================  Main div for payment methods show ===================================================={% endcomment %}
               <div class="flex items-center justify-between text-primary text-sm w-full">
                 <div>
+
                   <p>{{ business_address.primary_translation.payment_method}}</p>
-                  <p class="text-[#7B7B7B]">{{payment_type}} on {{created_at}} </p>
-                  {% if business_address.secondary_translation.payment_method %}<p class="arabic">{{ business_address.secondary_translation.payment_method}}</p>{% endif %}
+                  
+                  {% if checkout_data.payment_methods_records %}
+                    
+                    {% for payment in checkout_data.payment_methods_records %}
+
+                    <p class="text-[#7B7B7B]">{{payment_type}} on {{created_at}} </p>
+                    {% if business_address.secondary_translation.payment_method %}
+                        <p class="arabic">{{ business_address.secondary_translation.payment_method}}</p>
+                    {% endif %}
+
+                    {% endfor %}
+                      
+                  {% endif %}
+
                 </div>
                 <div>
                   <div class="">
@@ -495,6 +508,8 @@
                  </div>
                 </div>
               </div>
+
+              {% comment %}=========================================== payment methods ends here ==============================================================={% endcomment %}
               </div>
             </div>
           </div>
