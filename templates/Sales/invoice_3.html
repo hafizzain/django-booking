@@ -457,7 +457,11 @@
                       <p>{{tax.name}} ({{tax_applied}}%)</p>
                       <p class="arabic"></p>
                     </div>
-                    <p>{{tax.value}} {{currency_code}}</p>
+                    {% if tax.value %}
+                    <p>{{ tax.value }} {{ currency_code }}</p>
+                      {% else %}
+                    <p>No value available</p>
+                  {% endif %}
                   </div>
                 {% endfor %}
               {% endif %} 
