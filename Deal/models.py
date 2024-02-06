@@ -105,11 +105,11 @@ class DealDate(models.Model):
 class DealRestriction(models.Model):
     deal = models.ForeignKey(Deal, on_delete=models.CASCADE, related_name='deal_restrictions')
 
-    excluded_products = models.ManyToManyField(Product)
-    excluded_services = models.ManyToManyField(Service)
+    excluded_products = models.ManyToManyField(Product, blank=True)
+    excluded_services = models.ManyToManyField(Service, blank=True)
 
-    block_dates = models.ManyToManyField(DealDate)
-    excluded_locations = models.ManyToManyField(BusinessAddress)
+    block_dates = models.ManyToManyField(DealDate, blank=True)
+    excluded_locations = models.ManyToManyField(BusinessAddress, blank=True)
 
 class DealMedia(models.Model):
     deal = models.ForeignKey(Deal, on_delete=models.CASCADE, related_name='deal_medias')
