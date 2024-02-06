@@ -272,7 +272,7 @@
                   
                   {% comment %} ===============================if there is any appointment_services in the checkout_data ========================{% endcomment %}
                   
-                  {% if checkout_data.appointment_services %}
+                  {% comment %} {% if checkout_data.appointment_services %}
                   
                   {% for item in checkout_data.appointment_services %}
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
@@ -293,10 +293,10 @@
                   {% endfor %}
                     
                     
-                  {% endif %}
+                  {% endif %} {% endcomment %}
                   {% comment %} ===============================if there is any gift_cards_records in the checkout_data ========================{% endcomment %}
 
-                  {% if checkout_data.gift_cards_records %}
+                  {% comment %} {% if checkout_data.gift_cards_records %}
                   
                   {% for item in checkout_data.gift_cards_records %}
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
@@ -317,10 +317,10 @@
                   {% endfor %}
                     
                     
-                  {% endif %}
+                  {% endif %} {% endcomment %}
                   {% comment %} =============================== if there is any membership_records in the checkout data ========================{% endcomment %}
                   
-                  {% if checkout_data.membership_records %}
+                  {% comment %} {% if checkout_data.membership_records %}
                   
                   {% for item in checkout_data.membership_records %}
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
@@ -341,11 +341,11 @@
                   {% endfor %}
                     
                   
-                  {% endif %}
+                  {% endif %} {% endcomment %}
                   
                   {% comment %} =============================== if there is any vouchers_records in the checkout_data ========================{% endcomment %}
                   
-                  {% if checkout_data.vouchers_records %}
+                  {% comment %} {% if checkout_data.vouchers_records %}
                   
                   {% for item in checkout_data.vouchers_records %}
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
@@ -366,7 +366,7 @@
                   {% endfor %}
                     
                     
-                  {% endif %} {% endcomment %}
+                  {% endif %}  {% endcomment %}
 
                   {% comment %}======================================= old code ================================================================{% endcomment %}
 
