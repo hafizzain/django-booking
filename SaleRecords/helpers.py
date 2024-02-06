@@ -40,7 +40,7 @@ def calculate_voucher_commission(voucher = []):
     
 def loyalty_points_update(location = None, client= None, loyalty_points = None , sub_total = None, sale_record = None, invoice = None ):
         try:
-            if location and loyalty_points and sub_total:
+            if location and loyalty_points and sub_total and client:
                 redeemed_loyalty = loyalty_points[0]
                 client_points = ClientLoyaltyPoint.objects.get(id=redeemed_loyalty['clinet_loyalty_point'])
                 
