@@ -491,7 +491,7 @@
                     
                     {% for payment in checkout_data.payment_methods_records.all %}
 
-                    <p class="text-[#7B7B7B]">{{payment}} on {{created_at}} </p>
+                    <p class="text-[#7B7B7B]">{{payment.payment_method}} on {{created_at}} </p>
                     {% if business_address.secondary_translation.payment_method %}
                         <p class="arabic">{{ business_address.secondary_translation.payment_method}}</p>
                     {% endif %}
