@@ -94,6 +94,14 @@ class Deal(models.Model):
 
 
 
+
+class DealDay(models.Model):
+    deal = models.ForeignKey(Deal, on_delete=models.CASCADE, related_name='deal_days')
+    day = models.CharField(default='', max_length=999)
+
+class DealDate(models.Model):
+    date = models.DateTimeField()
+
 class DealRestriction(models.Model):
     deal = models.ForeignKey(Deal, on_delete=models.CASCADE, related_name='deal_restrictions')
 
@@ -102,14 +110,6 @@ class DealRestriction(models.Model):
 
     block_dates = models.ManyToManyField(DealDate)
     excluded_locations = models.ManyToManyField(BusinessAddress)
-
-
-class DealDay(models.Model):
-    deal = models.ForeignKey(Deal, on_delete=models.CASCADE, related_name='deal_days')
-    day = models.CharField(default='', max_length=999)
-
-class DealDate(models.Model):
-    date = models.DateTimeField()
 
 class DealMedia(models.Model):
     deal = models.ForeignKey(Deal, on_delete=models.CASCADE, related_name='deal_medias')
