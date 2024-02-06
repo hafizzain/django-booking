@@ -226,7 +226,7 @@
                   
                   {% for item in checkout_data.products_records.all  %}
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                    {% comment %} <div>
+                    <div>
                       <p class="text-left">
                         {% get_primary_translation item.id %}
                         {% if item.discount_percentage %}
@@ -234,7 +234,7 @@
                         {% endif %}
                       </p>
                       <p class="arabic">{% get_secondary_translation item.id %}</p>
-                    </div> {% endcomment %}
+                    </div> 
                     <p class="text-[#7B7B7B]">
                       <span>{{item.quantity}} x </span>{{item.price}}
                       {{currency_code}}
