@@ -192,7 +192,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         user = request.data.get('user')
         location_id = request.data.get('location')
-        client = request.data.get('client')
+        client = request.data.get('client', None)
         sub_total = request.data.get('sub_total') # Without tax amount
         # raise ValidationError(f'client_id':str(client))
         # raise ValidationError(f"client = {client} location = {location_id} and user= {user}")
