@@ -326,9 +326,8 @@
               <div
                 class="flex items-center justify-between text-primary text-sm font-bold"
               >
-              <div
-                class="flex items-center justify-between text-primary text-sm w-full"
-              >
+              {% comment %} Main div for payment methods show {% endcomment %}
+              <div class="flex items-center justify-between text-primary text-sm w-full">
                 <div>
                   <p>{{ business_address.primary_translation.payment_method}}</p>
                   <p class="text-[#7B7B7B]">{{payment_type}} on {{created_at}} </p>
