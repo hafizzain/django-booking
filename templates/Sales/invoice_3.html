@@ -443,18 +443,15 @@
 
               {% comment %}============================================ tax details  ================================================================{% endcomment %}
 
-              {% comment %} {% if tax_applied or tax_applied1 %}
+              {% if tax_applied or tax_applied1 %}
                   <p>{{ business_address.primary_translation.taxes }}</p>
                   {% if business_address.secondary_translation.taxes %}<p class="arabic">{{ business_address.secondary_translation.taxes }} {% endif %}</p>
-                {% endif %} {% endcomment %}
+                {% endif %} 
 
               {% if checkout_data.tax_records.all %}
                 
                 {% for tax in  checkout_data.tax_records.all %}
-                  {% if checkout_data.tax_records.all%}
-                    <p>{{ business_address.primary_translation.taxes }}</p>
-                    {% if business_address.secondary_translation.taxes %}<p class="arabic">{{ business_address.secondary_translation.taxes }} {% endif %}</p>
-                  {% endif %}
+                  
                   <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
                     <div class="font-semibold text-black">
                       <p>{{tax.name}} ({{tax_applied}}%)</p>
