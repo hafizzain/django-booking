@@ -280,7 +280,7 @@ class SaleInvoice(models.Model):
                 # checkout_redeem_data = self.get_checkout_redeemed_data()
                 # coupon_data = self.get_checkout_coupon_data()
                 
-                checkout_data = self.get_all_order_items(self)
+                checkout_data = self.get_all_order_items()
 
                 context = {
                     'client': self.client,
