@@ -420,7 +420,7 @@
                     </div>
                     <p>{{ coupon_data.coupon_discounted_price }} {{ currency_code }}</p>
                   </div>
-              {% endif %} {% endcomment %}
+              {% endif %} 
 
               <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
@@ -443,20 +443,21 @@
 
               {% comment %}============================================ tax details  ================================================================{% endcomment %}
 
-              {% if tax_applied or tax_applied1 %}
-                <p>{{ business_address.primary_translation.taxes }}</p>
-                {% if business_address.secondary_translation.taxes %}<p class="arabic">{{ business_address.secondary_translation.taxes }} {% endif %}</p>
-              {% endif %}
+              {% comment %} {% if tax_applied or tax_applied1 %}
+                  <p>{{ business_address.primary_translation.taxes }}</p>
+                  {% if business_address.secondary_translation.taxes %}<p class="arabic">{{ business_address.secondary_translation.taxes }} {% endif %}</p>
+                {% endif %} {% endcomment %}
 
               {% if checkout_data.tax_records %}
                 
                 {% for item in  checkout_data.tax_records %}
+                
                   <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
                     <div class="font-semibold text-black">
-                      <p>{{item.}} ({{tax_applied}}%)</p>
+                      <p>{{item.name}} ({{tax_applied}}%)</p>
                       <p class="arabic"></p>
                     </div>
-                    <p>{{tax_amount}} {{currency_code}}</p>
+                    <p>{{item.value}} {{currency_code}}</p>
                   </div>
                 {% endfor %}
               {% endif %} 
