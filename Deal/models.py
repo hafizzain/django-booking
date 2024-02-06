@@ -1,7 +1,9 @@
 from django.db import models
 
 from uuid import uuid4
-from Product.models import Category, Brand
+from Product.models import Category, Brand, Product
+from Service.models import Service
+from Business.models import BusinessAddress
 # Create your models here.
 
 
@@ -85,5 +87,30 @@ class Deal(models.Model):
     startDate = models.DateTimeField()
     endDate = models.DateTimeField(null=True)
 
+    terms = models.TextField(default='')
+
 
     # "usagePerCustomer": null,
+
+
+
+class DealRestriction(models.Model):
+    deal = models.ForeignKey(Deal, on_delete=models.CASCADE, related_name='deal_restrictions')
+
+    excluded_products = models.ManyToManyField(Product)
+    excluded_services = models.ManyToManyField(Service)
+
+    block_dates = models.ManyToManyField(DealDate)
+    excluded_locations = models.ManyToManyField(BusinessAddress)
+
+
+class DealDay(models.Model):
+    deal = models.ForeignKey(Deal, on_delete=models.CASCADE, related_name='deal_days')
+    day = models.CharField(default='', max_length=999)
+
+class DealDate(models.Model):
+    date = models.DateTimeField()
+
+class DealMedia(models.Model):
+    deal = models.ForeignKey(Deal, on_delete=models.CASCADE, related_name='deal_medias')
+    file = models.FileField(upload_to='business/deals/images/')
