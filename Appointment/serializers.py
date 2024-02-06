@@ -388,9 +388,11 @@ class BlockSerializer(serializers.ModelSerializer):
 
 class CalanderserializerResponse(serializers.ModelSerializer):
     service = serializers.SerializerMethodField(read_only=True)
+    client_types = serializers.CharField(source='appointment.client.client_type', read_only=True)
     class Meta:
         model = AppointmentService
         fields = '__all__'
+        exclude = ['client_type']
 
     def get_service(self, obj):
         return ServiceAppointmentSerializer(obj.service).data
