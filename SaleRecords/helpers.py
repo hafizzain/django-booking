@@ -39,32 +39,33 @@ def calculate_voucher_commission(voucher = []):
 
     
 def loyalty_points_update(location = None, client= None, loyalty_points = None , sub_total = None, sale_record = None, invoice = None ):
-        if location and loyalty_points and sub_total:
-            redeemed_loyalty = loyalty_points[0]
-            client_points = ClientLoyaltyPoint.objects.get(id=redeemed_loyalty['clinet_loyalty_point'])
-            
-            client_points.points_redeemed = float(client_points.points_redeemed) + float(redeemed_loyalty['redeemed_points'])
-            client_points.save()
+        try:
+            if location and loyalty_points and sub_total:
+                redeemed_loyalty = loyalty_points[0]
+                client_points = ClientLoyaltyPoint.objects.get(id=redeemed_loyalty['clinet_loyalty_point'])
+                
+                client_points.points_redeemed = float(client_points.points_redeemed) + float(redeemed_loyalty['redeemed_points'])
+                client_points.save()
 
-            single_point_value = client_points.customer_will_get_amount / client_points.for_every_points
-            total_redeemed_value = float(single_point_value) * float(redeemed_loyalty['redeemed_points'])
+                single_point_value = client_points.customer_will_get_amount / client_points.for_every_points
+                total_redeemed_value = float(single_point_value) * float(redeemed_loyalty['redeemed_points'])
 
-            logs_points_redeemed = redeemed_loyalty['redeemed_points']
-            logs_total_redeened_value = total_redeemed_value
-            try:
+                logs_points_redeemed = redeemed_loyalty['redeemed_points']
+                logs_total_redeened_value = total_redeemed_value
+                
                 location_loyalty = LoyaltyPoints.objects.get(
-                    Q(loyaltytype='Service') |
-                    Q(loyaltytype='Both'),
-                    location=location,
-                    # amount_spend = total_price,
-                    is_active=True,
-                    is_deleted=False
-                )
+                        Q(loyaltytype='Service') |
+                        Q(loyaltytype='Both'),
+                        location=location,
+                        # amount_spend = total_price,
+                        is_active=True,
+                        is_deleted=False
+                    )
                 client_points, created = ClientLoyaltyPoint.objects.get_or_create(
-                location=location,
-                client=client,
-                loyalty_points=location_loyalty, # loyalty Foreignkey
-                )
+                    location=location,
+                    client=client,
+                    loyalty_points=location_loyalty, # loyalty Foreignkey
+                    )
                 amount_for_calcluating_point = (sub_total/location_loyalty.amount_spend) * location_loyalty.number_points
                 earned_points = amount_for_calcluating_point * location_loyalty.number_points
                 wallet_reward_amount = location_loyalty.total_earn_from_points * (location_loyalty.earn_points * earned_points)
@@ -91,7 +92,8 @@ def loyalty_points_update(location = None, client= None, loyalty_points = None ,
                     invoice=invoice,
                     checkout=sale_record,
                 )
-            except Exception as e:
+                
+            else:
+                pass
+        except Exception as e:
                 return f"error coming through loyalty_points {str(e)}"
-        else:
-            pass
