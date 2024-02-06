@@ -59,7 +59,8 @@ class SaleInvoice(models.Model):
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True)
     location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, null=True, blank=True)
-    member = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
+    member = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, blank = True)
+    
     client_type = models.CharField(choices = CLIENT_TYPE, max_length=50 , default = '', null=True, blank=True )
     payment_type = models.CharField(choices = PAYMENT_TYPE, max_length=50 , default = '', null=True, blank=True )
     tip = models.FloatField(default = 0)
