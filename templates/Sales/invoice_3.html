@@ -450,14 +450,17 @@
 
               {% if checkout_data.tax_records.all %}
                 
-                {% for item in  checkout_data.tax_records.all %}
-                
+                {% for tax in  checkout_data.tax_records.all %}
+                  {% if checkout_data.tax_records.all%}
+                    <p>{{ business_address.primary_translation.taxes }}</p>
+                    {% if business_address.secondary_translation.taxes %}<p class="arabic">{{ business_address.secondary_translation.taxes }} {% endif %}</p>
+                  {% endif %}
                   <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
                     <div class="font-semibold text-black">
-                      <p>{{item.name}} ({{tax_applied}}%)</p>
+                      <p>{{tax.name}} ({{tax_applied}}%)</p>
                       <p class="arabic"></p>
                     </div>
-                    <p>{{item.value}} {{currency_code}}</p>
+                    <p>{{tax.value}} {{currency_code}}</p>
                   </div>
                 {% endfor %}
               {% endif %} 
