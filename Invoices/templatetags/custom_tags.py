@@ -4,13 +4,14 @@ register = template.Library()
 from Order.models import ServiceOrder, ProductOrder
 from MultiLanguage.models import InvoiceTranslation
 from Appointment.models import AppointmentService
+from SaleRecords.models import *
 
 
 @register.simple_tag
 def get_secondary_translation(order_id):
-    service_order = ServiceOrder.objects.filter(id=order_id).first()
-    product_order = ProductOrder.objects.filter(id=order_id).first()
-    appointment_order = AppointmentService.objects.filter(id=order_id).first()
+    service_order = SaleRecordServices.objects.filter(id=order_id).first()
+    product_order = SaleRecordsProducts.objects.filter(id=order_id).first()
+    appointment_order = SaleRecordsAppointmentServices.objects.filter(id=order_id).first()
 
     if service_order and service_order.location.secondary_translation:
         secondary_invoice_traslation = InvoiceTranslation.objects.filter(id=service_order.location.secondary_translation.id).first()
@@ -26,9 +27,9 @@ def get_secondary_translation(order_id):
 
 @register.simple_tag
 def get_primary_translation(order_id):
-    service_order = ServiceOrder.objects.filter(id=order_id).first()
-    product_order = ProductOrder.objects.filter(id=order_id).first()
-    appointment_order = AppointmentService.objects.filter(id=order_id).first()
+    service_order = SaleRecordServices.objects.filter(id=order_id).first()
+    product_order = SaleRecordsProducts.objects.filter(id=order_id).first()
+    appointment_order = SaleRecordsAppointmentServices.objects.filter(id=order_id).first()
 
     if service_order and service_order.location.primary_translation:
         primary_invoice_traslation = InvoiceTranslation.objects.filter(id=service_order.location.primary_translation.id).first()
