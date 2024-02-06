@@ -9,8 +9,8 @@ from rest_framework.pagination import PageNumberPagination
 
 # Create your views here.
 
-from Deal.models import Deal, DealCategory, RedeemableChannel
-from Deal.serializers import DealSerializer
+from Deal.models import Deal, DealCategory, RedeemableChannel, DealDay
+from Deal.serializers import DealSerializer, DealRestrictionSerializer
 
 from Product.models import Product
 from Service.models import Service
@@ -197,16 +197,33 @@ def update_deal_restrictions(request, deal_id):
             'message' : 'Invalid Deal Id',
             'error_message' : str(err)
         }, status.HTTP_404_NOT_FOUND)
+    
+    try:
+        request.date._mutable = True
+    except:
+        pass
 
-    serialized = DealSerializer(deal, data=request.data, partial=True)
-    if serialized.is_valid():
-        serialized.save()
-        return Response({'message' : 'Deal updated sucessfully', 'deal' :  serialized.data})
+    request.data['deal'] = deal_id
+    restrictions_data = request.data.get('restrictions', {})
+    restrictions_data['block_dates'] = [{'date' : date} for date in restrictions_data.get('blockDates', [])]
 
-    return Response({
-        'message' : 'Invalid Data',
-        'error_messages' : serialized.errors
-    }, status.HTTP_400_BAD_REQUEST)
+    restrictions = DealRestrictionSerializer(restrictions_data)
+    if restrictions.is_valid():
+        restrictions.save()
+        excludedWeekDays = restrictions_data.get('excludedWeekDays', [])
+
+        for day in excludedWeekDays:
+            DealDay.objects.create(
+                deal = deal,
+                day = day,
+            )
+        return Response({'message' : 'Restrictions updated sucessfully', 'restrictions' :  restrictions.data})
+    else:
+        return Response({
+            'message' : 'Invalid Data',
+            'error_messages' : restrictions.errors
+        }, status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['GET'])
