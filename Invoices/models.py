@@ -63,7 +63,7 @@ class SaleInvoice(models.Model):
     
     client_type = models.CharField(choices = CLIENT_TYPE, max_length=50 , default = '', null=True, blank=True )
     payment_type = models.CharField(choices = PAYMENT_TYPE, max_length=50 , default = '', null=True, blank=True )
-    tip = models.FloatField(default = 0)
+    # tip = models.FloatField(default = 0)
     # total_service_price = models.FloatField(default = 0 , null=True, blank=True)
     # total_product_price = models.FloatField(default = 0 , null=True, blank=True)
     # total_voucher_price = models.FloatField(default = 0 , null=True, blank=True)
@@ -81,11 +81,11 @@ class SaleInvoice(models.Model):
     # selected_promotion_id = models.CharField(default='', max_length=800, null=True, blank=True)
     # selected_promotion_type = models.CharField(default='', max_length=400, null=True, blank=True)
     
-    appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True, blank=True) # will not use this 
-    appointment_service = models.CharField(max_length=2000, default='', null=True, blank=True) # will not use this 
-    service = models.CharField(max_length=2000, default='', null=True, blank=True) # will not
-    member = models.CharField(max_length=2000, default='', null=True, blank=True)
-    business_address = models.CharField(max_length=2000, default='', null=True, blank=True)
+    # appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True, blank=True) # will not use this 
+    # appointment_service = models.CharField(max_length=2000, default='', null=True, blank=True) # will not use this 
+    # service = models.CharField(max_length=2000, default='', null=True, blank=True) # will not
+    # member = models.CharField(max_length=2000, default='', null=True, blank=True)
+    # business_address = models.CharField(max_length=2000, default='', null=True, blank=True)
     
     # types of checkout and invoices
     
