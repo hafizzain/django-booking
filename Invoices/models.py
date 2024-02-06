@@ -296,6 +296,9 @@ class SaleInvoice(models.Model):
                     'location':self.location.address_name,
                     'business_address':self.location,
                     'checkout_data': checkout_data,
+                    # 'products_records': checkout_data.products_records.all(),
+                    # 'products_records': checkout_data.products_records.all(),
+                    
                     # 'redeemed_points':self.get_client_loyalty_points(),
                     # 'coupon_data':coupon_data,
                     # **tax_details,

@@ -222,15 +222,15 @@
                   {% comment %}========================================================  checkout_data =============================================={% endcomment %}
                   
                   {% comment %} ===============================if there is any product records in the checkout ========================{% endcomment %}
-                  {% if checkout_data.products_records %}
+                  {% if checkout_data.products_records.all %}
                   
-                  {% for item in checkout_data.products_records  %}
+                  {% for item in checkout_data.products_records.all  %}
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
                     <div>
                       <p class="text-left">
                         {% get_primary_translation item.id %}
-                        {% if order.discount_percentage %}
-                        (Discount {{ order.discount_percentage}} %)
+                        {% if item.discount_percentage %}
+                        (Discount {{ item.discount_percentage}} %)
                         {% endif %}
                       </p>
                       <p class="arabic">{% get_secondary_translation item.id %}</p>
@@ -246,7 +246,7 @@
 
                   {% comment %} ===============================if there is any service records in the checkout ========================{% endcomment %}
 
-                  {% if checkout_data.services_records %}
+                  {% comment %} {% if checkout_data.services_records %}
                   
                   {% for item in checkout_data.services_records %}
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
@@ -366,7 +366,7 @@
                   {% endfor %}
                     
                     
-                  {% endif %}
+                  {% endif %} {% endcomment %}
 
                   {% comment %}======================================= old code ================================================================{% endcomment %}
 
