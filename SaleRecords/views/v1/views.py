@@ -103,7 +103,7 @@ class SaleRecordViews(APIView):
                         # service_commission_type = f'{request.data.get("service_commission_type")}' if request.data.get("service_commission_type") else '',
                         
                         sub_total = sale_record.sub_total,
-                        total_amount = sale_record.total_amount,
+                        total_amount = sale_record.total_price,
                         total_tax = sale_record.total_tax,
                         total_tip = sale_record.total_tip, 
                         checkout=sale_record.id,
