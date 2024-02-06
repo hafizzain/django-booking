@@ -32,9 +32,4 @@ class Migration(migrations.Migration):
             model_name='saleinvoice',
             name='tip',
         ),
-        migrations.AlterField(
-            model_name='saleinvoice',
-            name='member',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='Employee.employee'),
-        ),
     ]
