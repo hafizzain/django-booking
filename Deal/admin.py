@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Deal, DealCategory, RedeemableChannel, DealRestriction
+from .models import Deal, DealCategory, RedeemableChannel, DealRestriction, DealDay
 # Register your models here.
 
 
@@ -29,4 +29,12 @@ class DealRestrictionAdmin(admin.ModelAdmin):
     list_display = [
         'id',
         'deal'
+    ]
+
+@admin.register(DealDay)
+class DealDayAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'deal',
+        'day',
     ]
