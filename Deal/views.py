@@ -238,12 +238,40 @@ def update_deal_restrictions(request, deal_id):
 
 
 @api_view(['GET'])
-def get_all_deals(request):
+def  get_all_deals(request):
+    page = request.GET.get('page', None)
+    search_text = request.GET.get('search_text', '')
+    status = request.GET.get('status', '')
 
-    deals = Deal.objects.all()
-    data = DealSerializer(deals, many=True).data
+    query = {}
+    if status:
+        query['status'] = status
+
+    deals = Deal.objects.filter(
+        title__icontains=search_text, 
+        **query
+    )
+
+    if page:
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+        data = DealSerializer(paginator.paginate_queryset(deals, request), many=True).data
+    else:
+        data = DealSerializer(deals, many=True).data
+
     return Response({
-        'data' : data,
+        "response" : {
+            "status": "result-found",
+            "statusCode": 200,
+            "message": "10 records found",
+            "data": {
+                "page": page or 1,
+                "totalRecords": deals.count(),
+                "totalPageCount": deals.count() / 10,
+                "recordsPerPage": len(data),
+                "list": data
+            }
+        }
     })
 
 @api_view(['GET'])
