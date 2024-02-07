@@ -4226,14 +4226,11 @@ def get_available_appointments(request):
         if search_text:
             search_text = search_text.replace('#', '')
             query &= Q(client__full_name__icontains=search_text) | \
-                    Q(member__full_name__icontains=search_text) | \
-                    Q(appointment_services__member__full_name__icontains=search_text) | \
-                    Q(appointment_services__service__name__icontains=search_text) | \
-                    Q(client_type__icontains=search_text)
+                    Q(client__id__icontains=search_text) | \
+                    Q(id__icontains=search_text)
                     
         if start_date and end_date:
             query &= Q(appointment_services__appointment_date__range=(start_date, end_date))
-            
         if location_id is not None:
             query &= Q(business_address__id=location_id)
         if appointment_id is not None:
