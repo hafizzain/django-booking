@@ -9,7 +9,7 @@ from rest_framework.pagination import PageNumberPagination
 
 # Create your views here.
 
-from Deal.models import Deal, DealCategory, RedeemableChannel, DealDay
+from Deal.models import Deal, DealCategory, RedeemableChannel, DealDay, DealRestriction
 from Deal.serializers import DealSerializer, DealRestrictionSerializer
 
 from Product.models import Product
@@ -188,8 +188,19 @@ def update_deal(request, deal_id):
         'error_messages' : serialized.errors
     }, status.HTTP_400_BAD_REQUEST)
 
-@api_view(['PUT'])
+@api_view(['PUT', 'GET'])
 def update_deal_restrictions(request, deal_id):
+    if request.method != 'GET':
+        try:
+            restriction = DealRestriction.objects.get(deal__id=deal_id)
+        except:
+            return Response({
+                'message' : 'Restriction not found',
+            }, status.HTTP_404_NOT_FOUND)
+
+        return Response(**DealRestrictionSerializer(restriction).data)
+    
+    # Else Put Method
     try:
         deal = Deal.objects.get(id = deal_id)
     except Exception as err:
