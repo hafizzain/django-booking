@@ -301,7 +301,7 @@ def delete_single_deal(request, deal_id):
             'message' : 'Deal not found',
         }, status.HTTP_404_NOT_FOUND)
 
-    data.delete()
+    deal.delete()
     return Response({'message' : 'Deleted successfully'})
 
 
