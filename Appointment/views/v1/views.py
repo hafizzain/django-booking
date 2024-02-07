@@ -225,6 +225,7 @@ def get_reversal(request):
             'start_date': start_date,
             'end_date': end_date,
             'check': check,
+            'search': search,
         }
     }
     return Response(data, status=status.HTTP_200_OK)
