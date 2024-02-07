@@ -183,27 +183,19 @@ def create_reversal(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_reversal(request):
-    no_pagination = request.GET.get('no_pagination', None)
     search = request.GET.get('search_text', None)
-    start_date = request.GET.get('start_date_filter', None)
-    end_date = request.GET.get('end_date_filter', None)
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
     
-    check = False
     #apply filter
     query = Q()  
     if start_date and end_date:
-        query &= Q(appointment_date__range=(start_date, end_date))
-            
-        check = True    
-            
+        query &= Q(appointment_date__range=(start_date, end_date))  
+    
     if search:
         query &= Q(generated_by__icontains=search) | Q(client_name__icontains=search) | Q(id__contains=search)
         
     all_reversal = Reversal.objects.filter(query).order_by('-created_at')
-    
-    # if start_date is not None and end_date is not None:
-    #     all_reversal = Reversal.objects.filter(start_date=start_date,
-    #                                            end_date=end_date)
     paginator = AppointmentsPagination()
     paginator.page_size = 10
     reversal_qs = paginator.paginate_queryset(all_reversal, request)
@@ -222,10 +214,6 @@ def get_reversal(request):
             'current_page': paginator.page.number,
             'per_page': paginator.page_size,
             'total_pages': paginator.page.paginator.num_pages,
-            'start_date': start_date,
-            'end_date': end_date,
-            'check': check,
-            'search': search,
         }
     }
     return Response(data, status=status.HTTP_200_OK)
