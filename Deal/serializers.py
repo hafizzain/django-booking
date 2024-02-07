@@ -25,6 +25,7 @@ class GetAllDealsSerializer(serializers.ModelSerializer):
 
 
 class DealRestrictionSerializer(serializers.ModelSerializer):
+    block_dates = serializers.CharField(source='block_dates.date', read_only=True, many=True)
 
     class Meta:
         model = DealRestriction
@@ -42,3 +43,17 @@ class DealRestrictionSerializer(serializers.ModelSerializer):
             'block_dates',
             'excluded_locations',
         ]
+    
+    # def to_representation(self, instace):
+    #     data = super(DealRestrictionSerializer, self).to_representation(instace)
+    #     data['block_dates'] = 
+    #     permissions = self.get_permissions(instace)
+    #     # return permissions.update({
+    #     #     'id': instace.id,
+    #     #     'name': instace.full_name,
+
+    #     # })
+    #     return {
+    #         "nme": instace.full_name,
+    #         permissions: permissions
+    #     }
