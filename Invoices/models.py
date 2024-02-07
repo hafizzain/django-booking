@@ -119,19 +119,20 @@ class SaleInvoice(models.Model):
     def __str__(self):
         return str(self.id)
     
-    # @property
-    # def checkout_instance(self,):
-    #     '''
-    #     getting the checkout instance of the checkout based on the checkout_type from the invoice model
-    #     '''
-    #     # if self.checkout_type == 'appointment':
-    #     #     checkout_instance = AppointmentCheckout.objects.get(id=self.checkout)
-    #     # else:
-    #     #     checkout_instance = Checkout.objects.get(id=self.checkout)
+    @property
+    def checkout_instance(self,):
+        from SaleRecords.models import SaleRecords
+        '''
+        getting the checkout instance of the checkout based on the checkout_type from the invoice model
+        '''
+        # if self.checkout_type == 'appointment':
+        #     checkout_instance = AppointmentCheckout.objects.get(id=self.checkout)
+        # else:
+        #     checkout_instance = Checkout.objects.get(id=self.checkout)
         
-    #     # return checkout_instance
-    #     checkout_instance = SaleRecords.objects.get(id = self.checkout)
-    #     return checkout_instance
+        # return checkout_instance
+        checkout_instance = SaleRecords.objects.get(id = self.checkout)
+        return checkout_instance
     
     @property
     def short_id(self):
