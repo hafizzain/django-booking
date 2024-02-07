@@ -428,4 +428,6 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                 raise ValidationError("Cannot update spend_amount to be less than partial_price.")
         else:
             pass
-            
+        
+    def employee_commission_calculation(self, products_list = None, vouchers = None, ):
+            pass

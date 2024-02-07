@@ -94,8 +94,6 @@ class SaleRecordViews(APIView):
                     )
                     invoice.save()
                     
-                    membership_order = serializer.membership_records
-                    raise Response({"memberships": membership_order})
                     # return Response({'membership records': membership_order})
                     # if client:
                     # # """
