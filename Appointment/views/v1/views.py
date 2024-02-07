@@ -186,11 +186,12 @@ def get_reversal(request):
     search = request.GET.get('search_text', None)
     start_date = request.GET.get('start_date', None)
     end_date = request.GET.get('end_date', None)
-    
+    date = False
     #apply filter
     query = Q()  
     if start_date and end_date:
-        query &= Q(appointment_date__range=(start_date, end_date))  
+        query &= Q(appointment_date__range=(start_date, end_date))
+        date = True
     
     if search:
         query &= Q(generated_by__icontains=search) | Q(client_name__icontains=search) | Q(id__contains=search)
@@ -214,6 +215,9 @@ def get_reversal(request):
             'current_page': paginator.page.number,
             'per_page': paginator.page_size,
             'total_pages': paginator.page.paginator.num_pages,
+            'date': date,
+            'start' : start_date,
+            'end' : end_date,
         }
     }
     return Response(data, status=status.HTTP_200_OK)
