@@ -190,18 +190,6 @@ def update_deal(request, deal_id):
 
 @api_view(['PUT', 'GET'])
 def update_deal_restrictions(request, deal_id):
-    if request.method == 'GET':
-        try:
-            restriction = DealRestriction.objects.get(deal__id=deal_id)
-        except Exception as err:
-            return Response({
-                'message' : 'Restriction not found',
-                'error_message' : str(err)
-            }, status.HTTP_404_NOT_FOUND)
-
-        return Response(**DealRestrictionSerializer(restriction).data)
-    
-    # Else Put Method
     try:
         deal = Deal.objects.get(id = deal_id)
     except Exception as err:
@@ -210,6 +198,13 @@ def update_deal_restrictions(request, deal_id):
             'error_message' : str(err)
         }, status.HTTP_404_NOT_FOUND)
     
+
+    restriction = DealRestriction.objects.get_or_create(deal = deal)
+
+    if request.method == 'GET':
+        return Response(**DealRestrictionSerializer(restriction).data)
+    
+    # Else Put Method
     try:
         request.date._mutable = True
     except:
@@ -219,7 +214,7 @@ def update_deal_restrictions(request, deal_id):
     restrictions_data['deal'] = deal_id
     restrictions_data['block_dates'] = [{'date' : date} for date in restrictions_data.get('blockDates', [])]
 
-    restrictions = DealRestrictionSerializer(data=restrictions_data)
+    restrictions = DealRestrictionSerializer(restriction, data=restrictions_data)
     if restrictions.is_valid():
         restrictions.save()
         excludedWeekDays = restrictions_data.get('excludedWeekDays', [])
