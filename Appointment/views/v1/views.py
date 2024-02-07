@@ -4219,6 +4219,7 @@ def get_available_appointments(request):
     no_pagination = request.GET.get('no_pagination', None)
     location_id = request.GET.get('location', None)
     search_text = request.GET.get('search_text', None)
+    
     try:
         query = Q(is_deleted=False)
         if appointment_status is not None:
