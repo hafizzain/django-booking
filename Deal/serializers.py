@@ -36,7 +36,7 @@ class BlockDateSerializer(serializers.ModelSerializer):
 
 
 class DealRestrictionSerializer(serializers.ModelSerializer):
-    block_dates = serializers.DateTimeField(read_only=True, source='block_dates.date', format="%Y-%m-%d")
+    block_dates = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = DealRestriction
@@ -55,16 +55,10 @@ class DealRestrictionSerializer(serializers.ModelSerializer):
             'excluded_locations',
         ]
     
-    # def to_representation(self, instace):
-    #     data = super(DealRestrictionSerializer, self).to_representation(instace)
-    #     data['block_dates'] = 
-    #     permissions = self.get_permissions(instace)
-    #     # return permissions.update({
-    #     #     'id': instace.id,
-    #     #     'name': instace.full_name,
-
-    #     # })
-    #     return {
-    #         "nme": instace.full_name,
-    #         permissions: permissions
-    #     }
+        # Assuming block_dates is a ManyToManyField related to a BlockDate model
+        
+    
+    def to_representation(self, instace):
+        data = super(DealRestrictionSerializer, self).to_representation(instace)
+        data['block_dates'] = [date.date.strftime("%Y-%m-%d") for date in obj.block_dates.all()]
+        return data
