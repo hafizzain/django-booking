@@ -8,6 +8,7 @@ from Utility.Campaign import send_refund_email
 from Finance.models import Refund, RefundCoupon, AllowRefunds,AllowRefundPermissionsEmployees, RefundProduct, RefundServices
 from Finance.serializers import RefundSerializer, CouponSerializer, AllowRefundsSerializer
 from Finance.helpers import short_uuid, check_permission, check_days
+from SaleRecords.models import SaleRecordsAppointmentServices, SaleRecordsProducts, SaleRecordServices
 from Invoices.models import SaleInvoice
 from Client.serializers import SaleInvoiceSerializer
 from Client.models import Client
@@ -158,17 +159,15 @@ class RefundAPIView(APIView):
                     newCheckoutInstance.pk = None 
                     # newCheckoutInstance.is_refund = True
                     newCheckoutInstance.save()
-                    newCheckoutInstance.previous_checkout = checkout_instance
-                    newCheckoutInstance.save()
-
-                    
+                    # newCheckoutInstance.previous_checkout = checkout_instance
+                    # newCheckoutInstance.save()
 
                     if checkout_type == 'appointment': 
-                        newAppointment = checkout_instance.appointment 
+                        newAppointment = checkout_instance.appointment_services.appointment
                         newAppointment.pk = None 
                         newAppointment.save() 
                         
-                        order_items = AppointmentService.objects.get_active_appointment_services(appointment = checkout_instance.appointment, service__id__in = refunded_services_ids) 
+                        order_items = SaleRecordsAppointmentServices.objects.get_active_appointment_services(appointment = checkout_instance.appointment_services.appointment, service__id__in = refunded_services_ids) 
 
                         for order in order_items:
                             order.pk = None
@@ -182,7 +181,7 @@ class RefundAPIView(APIView):
                             
                         # or you can do it in loop
                     else: 
-                        product_orders = ProductOrder.objects.filter(checkout=checkout_instance, product__id__in = refunded_products_ids) 
+                        product_orders = SaleRecordsProducts.objects.filter(sale_record=checkout_instance, product__id__in = refunded_products_ids) 
                         # product_orders.update(pk = None, checkout=newCheckoutInstance) 
                         
                         for order in product_orders:
@@ -196,7 +195,7 @@ class RefundAPIView(APIView):
                             order.price = RefundProduct.objects.get(product__id = order.id).refunded_amount 
                             order.save()
                             
-                        service_orders = ServiceOrder.objects.filter(checkout=checkout_instance, service__id__in = refunded_services_ids) 
+                        service_orders = SaleRecordServices.objects.filter(sale_record=checkout_instance, service__id__in = refunded_services_ids) 
                         # service_orders.update(pk = None, checkout=newCheckoutInstance) 
                         for order in service_orders:
                             order.pk = None
