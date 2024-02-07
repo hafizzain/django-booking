@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 
 from Invoices.models import SaleInvoice
 from Product.models import ProductStock, ProductOrderStockReport
+from Client.serializers import SaleInvoiceSerializer
 
 from SaleRecords.models import *
 from Invoices.models import SaleInvoice
@@ -30,7 +31,7 @@ class SaleRecordProductsSerializer(serializers.ModelSerializer):
     
     def get_product_names(self , obj):
         return {
-            'name':f"{obj.product.name}",
+            'name':f"{obj.prodct.name}",
             'arabic_name': f"{obj.product.arabic_name}"
             }
         
@@ -162,12 +163,6 @@ class RedeemedLoyaltyPointsSerializer(serializers.ModelSerializer):
         model = RedeemedLoyaltyPoints
         fields = "__all__"
         read_only_fields = ['sale_record']
-    
-
-class SaleInvoiceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SaleInvoice
-        fields = "__all__"
         # read_only_fields = ['sale_record']
         
 class ClientSerializer(serializers.ModelSerializer):
@@ -203,7 +198,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     
     def get_invoice(self, obj):
         invoice = SaleInvoice.objects.get(checkout = obj.id)
-        return SaleInvoiceSerializer(invoice).data
+        return SaleInvoiceSerializer(invoice, context = self.context).data
     
     def get_client_data(self, obj):
         if obj.client:
