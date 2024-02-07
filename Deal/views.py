@@ -192,7 +192,7 @@ def update_deal(request, deal_id):
 def update_deal_restrictions(request, deal_id):
     if request.method == 'GET':
         try:
-            restriction = DealRestriction.objects.get(deal__id=deal_id)
+            restriction = Deal.objects.get(deal__id=deal_id)
         except:
             return Response({
                 'message' : 'Restriction not found',
