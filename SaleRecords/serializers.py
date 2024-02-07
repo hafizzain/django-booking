@@ -196,9 +196,12 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     client_data = serializers.SerializerMethodField(read_only = True)
     
     
+    
     def get_invoice(self, obj):
         invoice = SaleInvoice.objects.get(checkout = obj.id)
         return SaleInvoiceSerializer(invoice, context = self.context).data
+    
+    
     
     def get_client_data(self, obj):
         if obj.client:
