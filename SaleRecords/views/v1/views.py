@@ -154,7 +154,7 @@ def single_sale_record(request):
                 'response': {
                             'message': 'Record fetched successfully!',
                             'error_message': None,
-                            'sales': serializer.data,
+                            'sales': serializer,
                             'invoice_translation': invoice_translations
                             # 'checkout': SaleRecordSerializer(sale_record, many = True).data,
                             # 'coupon': CouponSerializer(coupon_serializer.instance).data,
