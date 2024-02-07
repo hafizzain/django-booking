@@ -190,7 +190,7 @@ def update_deal(request, deal_id):
 
 @api_view(['PUT', 'GET'])
 def update_deal_restrictions(request, deal_id):
-    if request.method != 'GET':
+    if request.method == 'GET':
         try:
             restriction = DealRestriction.objects.get(deal__id=deal_id)
         except:
