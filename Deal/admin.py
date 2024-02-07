@@ -7,7 +7,8 @@ from .models import Deal, DealCategory, RedeemableChannel
 @admin.register(Deal)
 class DealAdmin(admin.ModelAdmin):
     list_display = [
-        'id'
+        'id',
+        'category',
     ]
 
 
