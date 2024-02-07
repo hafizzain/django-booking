@@ -145,8 +145,8 @@ def single_sale_record(request):
     business_address = BusinessAddress.objects.get(id=location)
     invoice_translations = BusinessAddressSerilaizer(business_address).data
     
-    sale_record = SaleRecords.objects.get(id = checkout_id , location= location)
-    serializer = SaleRecordSerializer(sale_record, many = True).data
+    sale_record = SaleRecords.objects.filter(id = checkout_id , location= location).first()
+    serializer = SaleRecordSerializer(sale_record).data
     
     response = {
                 'success': True,
