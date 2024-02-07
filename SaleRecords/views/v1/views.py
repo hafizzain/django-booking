@@ -94,14 +94,14 @@ class SaleRecordViews(APIView):
                     )
                     invoice.save()
                     
-                    # if client:
-                    # # """
-                    # # Sending order details to client through email
-                    # # """
-                    #     if sale_record.membership_records:
-                    #         send_membership_order_email(sale_record.membership_records, location_id, request)
-                    #     else:
-                    #         send_order_email(sale_record, request)
+                    if client:
+                    # """
+                    # Sending order details to client through email
+                    # """
+                        if sale_record.membership_records:
+                            send_membership_order_email(sale_record.membership_records, location_id, request)
+                        else:
+                            send_order_email(sale_record, request)
                         
                     loyalty_points_update(location=location_id, client=client, loyalty_points=loyalty_points, sub_total=sub_total, invoice=invoice)
                 except Exception as e:
