@@ -155,21 +155,21 @@ class HolidayApiView(APIView):
                                        partial=True)
         if serializer.is_valid():
             serializer.save()
-            # holiday = Holiday.objects.get(id=pk)
-            # holiday.start_date = start_date
-            # holiday.end_date = end_date
-            # holiday.name = name
-            # holiday.note = note
-            # holiday.save()
-            # holiday = str(holiday.id)
+            holiday = Holiday.objects.get(id=pk)
+            holiday.start_date = start_date
+            holiday.end_date = end_date
+            holiday.name = name
+            holiday.note = note
+            holiday.save()
+            holiday = str(holiday.id)
             data = {
-                # "holiday": holiday,
+                "holiday": holiday,
                 "success": True,
                 "status_code": 200,
                 "response": {
                     "message": "Holiday updated successfully",
                     "error_message": None,
-                    "data" : serializer.data
+                    # "data" : serializer.data
                 }
             }
             return Response(data, status=status.HTTP_200_OK)

@@ -195,18 +195,6 @@ class HolidaySerializer(serializers.ModelSerializer):
         return holiday
 
     def update(self, instance, validated_data):
-        
-        start_date = validated_data.get('start_date', instance.start_date)
-        end_date = validated_data.get('end_date', instance.end_date)
-        name = validated_data.get('name', instance.name)
-        note = validated_data.get('note', instance.note)
-        
-        # Update the instance fields
-        instance.start_date = start_date
-        instance.end_date = end_date
-        instance.name = name
-        instance.note = note
-        
         holiday_start_date = instance.start_date
         holiday_end_date = instance.end_date
         start_date = validated_data['start_date']
@@ -343,8 +331,7 @@ class HolidaySerializer(serializers.ModelSerializer):
                         #     is_working_schedule=False,
                         #     is_vacation=False
                         # )
-            instance.save()
-            return instance    
+
         except Exception as ex:
             ex = str(ex)
             raise serializers.ValidationError(ex)
