@@ -161,7 +161,7 @@
 
               <tr>
                 <td bgcolor="#ffffff" align="left" style="padding: 0px 30px 0px 30px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 25px;">
-                  <h2 style="font-size: 20px; font-weight: 400; margin: 0;">Hi {{ membership_order.client.full_name }},</h2>
+                  <h2 style="font-size: 20px; font-weight: 400; margin: 0;">Hi {{ sale_record.client.full_name }},</h2>
                 </td>
               </tr>
               <!-- COPY -->
@@ -194,7 +194,7 @@
                     </thead>
                     <tbody><tr>
                         <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ location.address_name }}</td>
-                        <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ membership_order.client.full_name }}</td>
+                        <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ membership_order.sale_record.client.full_name }}</td>
                         <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ membership_order.membership.name }}</td>
                         <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ membership_order.membership.discount }}</td>
                         <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ membership_currency.price }} {{membership_currency.currency.code}}</td>

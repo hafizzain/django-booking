@@ -95,7 +95,7 @@ def send_membership_order_email(membership_order, business_address, request):
                 'Membership Sale Alert',
                 text_content,
                 settings.EMAIL_HOST_USER,
-                to = [membership_order.client.email],
+                to = [membership_order.sale_record.client.email],
             )
         
         email.attach_alternative(html_file, "text/html")
