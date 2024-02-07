@@ -114,3 +114,6 @@ class DealRestriction(models.Model):
 class DealMedia(models.Model):
     deal = models.ForeignKey(Deal, on_delete=models.CASCADE, related_name='deal_medias')
     file = models.FileField(upload_to='business/deals/images/')
+
+    # deleted = models.BooleanField(default=False)
+    # exctension = models.CharField(default='', max_length=999)
