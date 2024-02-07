@@ -193,7 +193,7 @@ def get_reversal(request):
         query &= Q(appointment_date__range=(start_date, end_date))  
     
     if search:
-        query &= Q(generated_by__icontains=search) | Q(client_name__icontains=search) | Q(id__contains=search)
+        query &= Q(generated_by__icontains=search) | Q(client_name__icontains=search)
         
     all_reversal = Reversal.objects.filter(query).order_by('-created_at')
     paginator = AppointmentsPagination()
