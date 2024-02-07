@@ -202,7 +202,7 @@ def update_deal_restrictions(request, deal_id):
     restriction, created = DealRestriction.objects.get_or_create(deal = deal)
 
     if request.method == 'GET':
-        return Response(**DealRestrictionSerializer(restriction).data)
+        return Response({**DealRestrictionSerializer(restriction).data})
     
     # Else Put Method
     try:
