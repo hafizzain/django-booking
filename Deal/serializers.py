@@ -36,7 +36,7 @@ class BlockDateSerializer(serializers.ModelSerializer):
 
 
 class DealRestrictionSerializer(serializers.ModelSerializer):
-    block_dates = BlockDateSerializer(read_only=True)
+    block_dates = BlockDateSerializer(read_only=True, many=True)
 
     class Meta:
         model = DealRestriction
