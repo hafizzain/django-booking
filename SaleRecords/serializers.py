@@ -12,30 +12,62 @@ from Client.helpers import calculate_validity
 from Employee.models import *
 
 class SaleRecordsAppointmentServicesSerializer(serializers.ModelSerializer):
+    service_names = serializers.SerializerMethodField(read_only = True)
+    
+    
+    def get_service_names(self, obj):
+        return {
+            'name': f"{obj.service.name}",
+            'arabic_name': f"{obj.service.arabic_name}",
+        }
     class Meta:
         model = SaleRecordsAppointmentServices
         fields = "__all__"
-        read_only_fields = ['sale_record']
+        read_only_fields = ['sale_record','service_names']
     
 class SaleRecordProductsSerializer(serializers.ModelSerializer):
+    product_names = serializers.SerializerMethodField(read_only = True)
+    
+    def get_product_names(self , obj):
+        return {
+            'name':f"{obj.product.name}",
+            'arabic_name': f"{obj.product.arabic_name}"
+            }
+        
     class Meta: 
         model = SaleRecordsProducts
         fields = "__all__"
-        read_only_fields = ['sale_record']
+        read_only_fields = ['sale_record','product_names']
 
 
 class SaleRecordServicesSerializer(serializers.ModelSerializer):
+    service_names = serializers.SerializerMethodField(read_only = True)
+    
+    
+    def get_service_names(self, obj):
+        return {
+            'name': f"{obj.service.name}",
+            'arabic_name': f"{obj.service.arabic_name}",
+        }
     class Meta:
         model = SaleRecordServices
         fields = "__all__"
-        read_only_fields = ['sale_record']
+        read_only_fields = ['sale_record','service_names']
         
 class SaleRecordVouchersSerializer(serializers.ModelSerializer):
     valid_till = serializers.CharField(write_only=True, required=True)
+    voucher_names = serializers.SerializerMethodField(read_only = True)
+    
+    
+    def get_voucher_names(self, obj):
+        return {
+            'name': f"{obj.voucher.name}",
+            'arabic_name': f"{obj.voucher.arabic_name}",
+        }
     class Meta:
         model = SaleRecordVouchers
         fields = '__all__'
-        read_only_fields = ['sale_record']
+        read_only_fields = ['sale_record','voucher_names']
 
 
 class PurchasedGiftCardsSerializer(serializers.ModelSerializer):
@@ -62,10 +94,17 @@ class PurchasedGiftCardsSerializer(serializers.ModelSerializer):
         
 class SaleRecordMembershipSerializer(serializers.ModelSerializer):
     valid_till = serializers.CharField(write_only=True, required=True)
+    membership_names = serializers.SerializerMethodField(read_only = True)
+    
+    def get_membership_names(self, obj):
+        return {
+            'name': f"{obj.membership.name}",
+            'arabic_name': f"{obj.membership.arabic_name}",
+        }
     class Meta:
         model = SaleRecordMembership
         fields = "__all__"
-        read_only_fields = ['sale_record']
+        read_only_fields = ['sale_record','membership_names']
 
 
 class PaymentMethodsSerializer(serializers.ModelSerializer):
@@ -428,4 +467,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                 raise ValidationError("Cannot update spend_amount to be less than partial_price.")
         else:
             pass
+        
+    def employee_commission_calculation(self, products_list = None, vouchers = None, service_list = None):
+        pass
             
