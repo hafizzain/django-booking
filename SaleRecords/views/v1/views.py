@@ -44,7 +44,7 @@ class SaleRecordViews(APIView):
             #Apply Pagination
             paginator = self.pagination_class()
             result_page = paginator.paginate_queryset(sale_record, request)
-            serializer = SaleRecordSerializer(result_page, many=True)
+            serializer = SaleRecordSerializer(result_page, many=True, context = {'request': request})
             response = {
                 'count': paginator.page.paginator.count,
                 'next': paginator.get_next_link(),
@@ -122,7 +122,7 @@ class SaleRecordViews(APIView):
                             'message': 'Checkout created successfully!',
                             'error_message': None,
                             'data': {
-                                'checkout': SaleRecordSerializer(sale_record).data,
+                                'checkout': SaleRecordSerializer(sale_record, context = {'request': request}).data,
                                 # 'coupon': CouponSerializer(coupon_serializer.instance).data,
                                 # 'invoice': InvoiceSerializer(invoice).data
                             }
@@ -146,7 +146,7 @@ def single_sale_record(request):
     invoice_translations = BusinessAddressSerilaizer(business_address).data
     
     sale_record = SaleRecords.objects.get(id = checkout_id , location= location)
-    serializer = SaleRecordSerializer(sale_record).data
+    serializer = SaleRecordSerializer(sale_record, context = {'request': request}).data
     
     response = {
                 'success': True,
