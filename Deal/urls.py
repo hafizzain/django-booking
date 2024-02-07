@@ -7,6 +7,7 @@ urlpatterns = [
     path('create_deal/', views.create_deal),
     path('update_deal/<str:deal_id>/', views.update_deal),
     path('update_deal/<str:deal_id>/restrictions/', views.update_deal_restrictions),
+    path('get_deal_restrictions/<str:deal_id>/restrictions/', views.update_deal_restrictions),
     path('get_all_deals/', views.get_all_deals),
     path('get_single_deal/<str:deal_id>/', views.get_single_deal),
     path('delete_single_deal/<str:deal_id>/', views.delete_single_deal),
