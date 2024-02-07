@@ -185,8 +185,8 @@ def create_reversal(request):
 def get_reversal(request):
     no_pagination = request.GET.get('no_pagination', None)
     search = request.GET.get('search_text', None)
-    start_date = request.data.get('start_date_filter', None)
-    end_date = request.data.get('end_date_filter', None)
+    start_date = request.GET.get('start_date_filter', None)
+    end_date = request.GET.get('end_date_filter', None)
     
     check = False
     #apply filter
