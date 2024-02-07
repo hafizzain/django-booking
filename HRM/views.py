@@ -203,12 +203,10 @@ class HolidayApiView(APIView):
             )
 
         query = {}
-        if holiday.end_date:
-            query['to_date'] = holiday.end_date
+        query['date__date__range'] = (holiday.start_date, holiday.end_date if holiday.end_date else '3000-12-29')
 
         holiday_schedule = EmployeDailySchedule.objects.filter(
             is_holiday=True,
-            from_date = holiday.start_date,
             **query,
         )
         holiday_schedule.delete()
