@@ -82,7 +82,7 @@ class Deal(models.Model):
 
     description = models.TextField()
     code = models.CharField(default='', max_length=999)
-    status = models.CharField(default='', max_length=999)
+    status = models.CharField(default='Draft', max_length=999)
 
     startDate = models.DateTimeField()
     endDate = models.DateTimeField(null=True)
