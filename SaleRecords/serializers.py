@@ -31,7 +31,7 @@ class SaleRecordProductsSerializer(serializers.ModelSerializer):
     def get_product_names(self , obj):
         return {
             'name':f"{obj.product.name}",
-            'arabic_name': f"{obj.prodcut.arabic_name}"
+            'arabic_name': f"{obj.product.arabic_name}"
             }
         
     class Meta: 
