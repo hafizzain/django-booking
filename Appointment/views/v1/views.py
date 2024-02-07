@@ -198,17 +198,20 @@ def get_reversal(request):
     search = request.GET.get('search_text', None)
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
+    location = request.GET.get('location', None)
     
     #apply filter
-    query = Q()
-    if search:
-        query &= Q(generated_by__icontains=search) | Q(client_name__icontains=search)
+    query = Q()  
+    if start_date:
+        query &= Q(appointment_date__gte=start_date)
         
-    if start_date and end_date:
-        query &= Q(appointment_date__gte=start_date, appointment_date__lte=end_date)
-          
-    all_reversal = Reversal.objects.filter(query).order_by('-created_at')
-    
+    if end_date:
+        query &= Q( appointment_date__lte=end_date)
+            
+    if search:
+        query &= Q(generated_by__icontains=search) | Q(client_name__icontains=search) | Q(id__icontains=search)
+        
+    all_reversal = Reversal.objects.filter(query)
     
     # if start_date is not None and end_date is not None:
     #     all_reversal = Reversal.objects.filter(start_date=start_date,
