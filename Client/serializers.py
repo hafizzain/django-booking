@@ -806,7 +806,8 @@ class SaleInvoiceSerializer(serializers.ModelSerializer):
                 request = self.context["request"]
                 url = tenant_media_base_url(request, is_s3_url=False)
                 return f'{url}{obj.file}'
-            except:
+            except Exception as err:
+                return str(err)
                 return f'{obj.file}'
         return None
     class Meta:
