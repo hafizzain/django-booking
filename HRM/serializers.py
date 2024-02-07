@@ -56,6 +56,7 @@ class HolidaySerializer(serializers.ModelSerializer):
                     for emp in all_employees:
                         working_sch = EmployeDailySchedule.objects.filter(employee_id=emp.id, date=current_date).first()
                         if working_sch:
+                            employee_d_schedule = working_sch
                             working_sch.is_vacation = False
                             working_sch.is_weekend = False
                             working_sch.is_holiday = True
@@ -66,7 +67,7 @@ class HolidaySerializer(serializers.ModelSerializer):
                             working_sch.is_working_schedule = False
                             working_sch.save()
                         else:
-                            EmployeDailySchedule.objects.create(
+                            employee_d_schedule = EmployeDailySchedule.objects.create(
                                 employee_id=emp.id,
                                 date=current_date,
                                 from_date=current_date,
@@ -185,11 +186,12 @@ class HolidaySerializer(serializers.ModelSerializer):
         #                 is_weekend=False
         #             )
         try:
-            holiday = Holiday.objects.create(**validated_data, employee_schedule = employee_d_schedule)
+            validated_data['employee_schedule'] = employee_d_schedule
+            holiday = Holiday.objects.create(**validated_data)
         except Exception as e:
             e = str(e)
             raise serializers.ValidationError(e)
-            
+
         return holiday
 
     def update(self, instance, validated_data):
