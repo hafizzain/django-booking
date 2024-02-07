@@ -228,7 +228,7 @@
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
                     <div>
                       <p class="text-left">
-                        {% get_primary_translation item.id %}
+                        {{item.product.name}}/{% get_primary_translation item.id %}
                         {% if item.discount_percentage %}
                         (Discount {{ item.discount_percentage}} %)
                         {% endif %}
@@ -252,7 +252,7 @@
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
                     <div>
                       <p class="text-left">
-                        {% get_primary_translation item.id %}
+                        {{item.service.name}}/{% get_primary_translation item.id %}
                         {% if item.discount_percentage %}
                         (Discount {{ item.discount_percentage}} %)
                         {% endif %}
@@ -278,7 +278,7 @@
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
                     <div>
                       <p class="text-left">
-                        {% get_primary_translation item.id %}
+                        {{item.service.name}}/{% get_primary_translation item.id %}
                         {% if item.discount_percentage %}
                         (Discount {{ item.discount_percentage}} %)
                         {% endif %}
@@ -302,7 +302,7 @@
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
                     <div>
                       <p class="text-left">
-                        {% get_primary_translation item.id %}
+                        {{item.gift_card.title}}/{% get_primary_translation item.id %}
                         {% if item.discount_percentage %}
                         (Discount {{ item.discount_percentage}} %)
                         {% endif %}
@@ -326,7 +326,7 @@
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
                     <div>
                       <p class="text-left">
-                        {% get_primary_translation item.id %}
+                        {{item.membership.name}} / {% get_primary_translation item.id %}
                         {% if item.discount_percentage %}
                         (Discount {{ item.discount_percentage}} %)
                         {% endif %}
@@ -351,7 +351,7 @@
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
                     <div>
                       <p class="text-left">
-                        {% get_primary_translation item.id %}
+                        {{item.voucher.name}} / {% get_primary_translation item.id %}
                         {% if item.discount_percentage %}
                         (Discount {{ item.discount_percentage}} %)
                         {% endif %}
