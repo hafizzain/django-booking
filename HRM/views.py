@@ -155,7 +155,8 @@ class HolidayApiView(APIView):
                                        partial=True)
         if serializer.is_valid():
             serializer.save()
-            holiday = Holiday.objects.get(id=pk)
+            # holiday = Holiday.objects.get(id=pk)
+            holiday = instance
             holiday.start_date = start_date
             holiday.end_date = end_date
             holiday.name = name
