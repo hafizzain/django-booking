@@ -41,6 +41,7 @@ class SaleRecords(CommonField):
     total_tax = models.FloatField(blank=False, null=False)
     total_price = models.FloatField(blank=False, null=False) # with tax amount
     sub_total = models.FloatField(blank=False, null=False)  # without tax amount
+    change = models.models.FloatField(blank=True, null=True)
 
     class Meta:
         verbose_name_plural = 'Sale Records'
