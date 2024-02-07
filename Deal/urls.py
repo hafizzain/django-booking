@@ -9,6 +9,7 @@ urlpatterns = [
     path('update_deal/<str:deal_id>/restrictions/', views.update_deal_restrictions),
     path('get_all_deals/', views.get_all_deals),
     path('get_single_deal/<str:deal_id>/', views.get_single_deal),
+    path('delete_single_deal/<str:deal_id>/', views.delete_single_deal),
     path('get_deal_category/', views.get_deal_category),
 
     path('get_deal_audience_choices/', views.get_deal_audience_choices),
@@ -20,5 +21,4 @@ urlpatterns = [
     path('products/', views.get_products),
     path('services/', views.get_services),
 
-    
 ]

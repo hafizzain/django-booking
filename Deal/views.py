@@ -249,6 +249,20 @@ def get_single_deal(request, deal_id):
     return Response({**data})
 
 
+@api_view(['DELETE'])
+def delete_single_deal(request, deal_id):
+
+    try:
+        deal = Deal.objects.get(id = deal_id)
+    except:
+        return Response({
+            'message' : 'Deal not found',
+        }, status.HTTP_404_NOT_FOUND)
+
+    data.delete()
+    return Response({'message' : 'Deleted successfully'})
+
+
 @api_view(['GET'])
 def get_products(request):
     search_text = request.GET.get('search_text', '')
