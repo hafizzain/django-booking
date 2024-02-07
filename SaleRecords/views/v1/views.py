@@ -94,8 +94,8 @@ class SaleRecordViews(APIView):
                     )
                     invoice.save()
                     
-                    membership_order = sale_record.membership_records
-                    raise ValidationError(f"memberships: {str(membership_order)}")
+                    membership_order = serializer.membership_records
+                    raise Response({"memberships": membership_order})
                     # return Response({'membership records': membership_order})
                     # if client:
                     # # """
