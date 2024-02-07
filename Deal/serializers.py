@@ -59,5 +59,5 @@ class DealRestrictionSerializer(serializers.ModelSerializer):
     
     def to_representation(self, instace):
         data = super(DealRestrictionSerializer, self).to_representation(instace)
-        data['block_dates'] = [date.date.strftime("%Y-%m-%d") for date in obj.block_dates.all()]
+        data['block_dates'] = [date.date.strftime("%Y-%m-%d") for date in instace.block_dates.all()]
         return data
