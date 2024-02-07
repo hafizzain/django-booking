@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
 from SaleRecords.helpers import matching_records, loyalty_points_update
+from Client.Constants.client_order_email import send_order_email, send_membership_order_email
 
 from SaleRecords.serializers import *
 
@@ -92,6 +93,16 @@ class SaleRecordViews(APIView):
                         checkout=sale_record.id,
                     )
                     invoice.save()
+                    
+                    if client:
+                    # """
+                    # Sending order details to client through email
+                    # """
+                        if sale_record.membership_records:
+                            send_membership_order_email(sale_record.membership_records, location_id, request)
+                        else:
+                            send_order_email(sale_record, request)
+                        
                     loyalty_points_update(location=location_id, client=client, loyalty_points=loyalty_points, sub_total=sub_total, invoice=invoice)
                 except Exception as e:
                     return Response({'error':str(e), 'second': 'Second Try'})
