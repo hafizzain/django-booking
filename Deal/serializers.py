@@ -24,8 +24,19 @@ class GetAllDealsSerializer(serializers.ModelSerializer):
         ]
 
 
+class BlockDateSerializer(serializers.ModelSerializer):
+    date = serializers.SerializerMethodField()
+
+    def get_date(self, obj):
+        return obj.date.strftime("%Y-%m-%d")
+
+    class Meta:
+        model = DealDate
+        fields = ['date']
+
+
 class DealRestrictionSerializer(serializers.ModelSerializer):
-    block_dates = serializers.CharField(source='block_dates.date', read_only=True)
+    block_dates = BlockDateSerializer(read_only=True)
 
     class Meta:
         model = DealRestriction
