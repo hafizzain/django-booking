@@ -195,12 +195,24 @@ def get_reversal(request):
     # client_phone= request.data.get('client_phone',None)
     # url = request.data.get('url',None)
     no_pagination = request.GET.get('no_pagination', None)
-    all_reversal = Reversal.objects.all().order_by('-created_at')
+    search = request.GET.get('search_text', None)
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
-    if start_date is not None and end_date is not None:
-        all_reversal = Reversal.objects.filter(start_date=start_date,
-                                               end_date=end_date)
+    
+    #apply filter
+    query = Q()
+    if search:
+        query &= Q(generated_by__icontains=search) | Q(client_name__icontains=search)
+        
+    if start_date and end_date:
+        query &= Q(appointment_date__gte=start_date, appointment_date__lte=end_date)
+          
+    all_reversal = Reversal.objects.filter(query).order_by('-created_at')
+    
+    
+    # if start_date is not None and end_date is not None:
+    #     all_reversal = Reversal.objects.filter(start_date=start_date,
+    #                                            end_date=end_date)
     paginator = AppointmentsPagination()
     paginator.page_size = 10
     reversal_qs = paginator.paginate_queryset(all_reversal, request)
