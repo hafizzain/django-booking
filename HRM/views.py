@@ -189,13 +189,19 @@ class HolidayApiView(APIView):
     def delete(self, request, pk):
         holiday_data = {}
         holiday = Holiday.objects.filter(id=pk)
+        employee_schedule = None
         if holiday:
             holiday_first = Holiday.objects.filter(id=pk).first()
+            employee_schedule = holiday_first.employee_schedule
+
             holiday_data = {
                 'start_date': holiday_first.start_date,
                 'end_date': holiday_first.end_date if holiday_first.end_date else None,
             }
         holiday.delete()
+        if employee_schedule:
+            employee_schedule.delete()
+
         holiday_schedule = EmployeDailySchedule.objects.filter(
             is_holiday=True,
             from_date=holiday_data['start_date'],
