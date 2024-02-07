@@ -9,6 +9,7 @@ from SaleRecords.helpers import matching_records, loyalty_points_update
 from Client.Constants.client_order_email import send_order_email, send_membership_order_email
 
 from SaleRecords.serializers import *
+from Business.serializers.v1_serializers import BusinessAddressSerilaizer
 
 
 class SaleRecordViews(APIView):
@@ -26,6 +27,7 @@ class SaleRecordViews(APIView):
             service = request.GET.get('service', None)
             search_text = request.GET.get('search_text', None)
             is_quick_sale = request.GET.get('is_quick_sale', None)
+            checkout_id = request.GET.get('checkout_id', None)
             
             sale_record = matching_records(location= location,
                                             range_start = range_start,
@@ -35,10 +37,33 @@ class SaleRecordViews(APIView):
                                             search_text = search_text,
                                             is_quick_sale = is_quick_sale
                                         )
+            
+            business_address = BusinessAddress.objects.get(id=location)
+            invoice_translations = BusinessAddressSerilaizer(business_address).data
             #Apply Pagination
             paginator = self.pagination_class()
             result_page = paginator.paginate_queryset(sale_record, request)
             serializer = SaleRecordSerializer(result_page, many=True)
+            if checkout_id:
+                response = {
+                'count': paginator.page.paginator.count,
+                'next': paginator.get_next_link(),
+                'previous': paginator.get_previous_link(),
+                'current_page': paginator.page.number,
+                'per_page': self.page_size,
+                'total_pages': paginator.page.paginator.num_pages,
+                'success': True,
+                'status_code': 200,
+                'response': {
+                            'message': 'Record fetched successfully!',
+                            'error_message': None,
+                            'sales': serializer.data,
+                            'invoice_translations': invoice_translations
+                            # 'checkout': SaleRecordSerializer(sale_record, many = True).data,
+                            # 'coupon': CouponSerializer(coupon_serializer.instance).data,
+                            # 'invoice': InvoiceSerializer(invoice).data
+                        }
+                }
             response = {
                 'count': paginator.page.paginator.count,
                 'next': paginator.get_next_link(),
