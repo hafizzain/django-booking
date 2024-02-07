@@ -214,9 +214,9 @@ def update_deal_restrictions(request, deal_id):
     restrictions_data['deal'] = deal_id
     restrictions_data['block_dates'] = [DealDate.objects.create(date = date).id for date in restrictions_data.get('block_dates', [])]
 
-    restriction = DealRestrictionSerializer(restriction, data=restrictions_data)
-    if restriction.is_valid():
-        restriction.save()
+    restrictions = DealRestrictionSerializer(restriction, data=restrictions_data)
+    if restrictions.is_valid():
+        restrictions.save()
 
         excludedWeekDays = restrictions_data.get('excludedWeekDays', [])
         for day in excludedWeekDays:
