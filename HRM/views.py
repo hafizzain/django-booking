@@ -203,12 +203,12 @@ class HolidayApiView(APIView):
             )
 
         query = {}
-        if holiday_first.end_date:
-            query['to_date'] = holiday_first.end_date
+        if holiday.end_date:
+            query['to_date'] = holiday.end_date
 
         holiday_schedule = EmployeDailySchedule.objects.filter(
             is_holiday=True,
-            from_date = holiday_first.start_date,
+            from_date = holiday.start_date,
             **query,
         )
         holiday_schedule.delete()
@@ -221,8 +221,8 @@ class HolidayApiView(APIView):
                 "message": "Holiday deleted successfully",
                 "error_message": None,
                 "data": None,
-                'end_date' : str(holiday_first.end_date),
-                'start_date' : str(holiday_first.start_date)
+                'end_date' : str(holiday.end_date),
+                'start_date' : str(holiday.start_date)
             }
         }
         return Response(data, status=status.HTTP_200_OK)
