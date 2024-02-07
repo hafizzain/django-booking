@@ -9,7 +9,7 @@ from rest_framework.pagination import PageNumberPagination
 
 # Create your views here.
 
-from Deal.models import Deal, DealCategory, RedeemableChannel, DealDay, DealRestriction
+from Deal.models import Deal, DealCategory, RedeemableChannel, DealDay, DealRestriction, DealDate
 from Deal.serializers import DealSerializer, DealRestrictionSerializer, GetAllDealsSerializer
 
 from Product.models import Product
@@ -212,13 +212,16 @@ def update_deal_restrictions(request, deal_id):
 
     restrictions_data = request.data.get('restrictions', {})
     restrictions_data['deal'] = deal_id
-    restrictions_data['block_dates'] = [{'date' : date} for date in restrictions_data.get('block_dates', [])]
+    # restrictions_data['block_dates'] = [{'date' : date} for date in restrictions_data.get('block_dates', [])]
 
-    restrictions = DealRestrictionSerializer(restriction, data=restrictions_data)
-    if restrictions.is_valid():
-        restrictions.save()
+    restriction = DealRestrictionSerializer(restriction, data=restrictions_data)
+    if restriction.is_valid():
+        restriction_obj = restriction.save()
+        for date in restrictions_data.get('block_dates', []):
+            restriction_obj.block_dates.add(DealDate.objects.create(date = date))
+        restriction_obj.save()
+
         excludedWeekDays = restrictions_data.get('excludedWeekDays', [])
-
         for day in excludedWeekDays:
             DealDay.objects.create(
                 deal = deal,
