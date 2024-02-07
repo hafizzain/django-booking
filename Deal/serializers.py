@@ -36,7 +36,7 @@ class BlockDateSerializer(serializers.ModelSerializer):
 
 
 class DealRestrictionSerializer(serializers.ModelSerializer):
-    block_dates = BlockDateSerializer(read_only=True, many=True)
+    block_dates = serializers.DateTimeField(read_only=True, source='block_dates.date', format="%Y-%m-%d")
 
     class Meta:
         model = DealRestriction
