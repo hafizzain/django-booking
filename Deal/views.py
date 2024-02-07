@@ -193,9 +193,10 @@ def update_deal_restrictions(request, deal_id):
     if request.method == 'GET':
         try:
             restriction = Deal.objects.get(deal__id=deal_id)
-        except:
+        except Exception as err:
             return Response({
                 'message' : 'Restriction not found',
+                'error_message' : str(err)
             }, status.HTTP_404_NOT_FOUND)
 
         return Response(**DealRestrictionSerializer(restriction).data)
