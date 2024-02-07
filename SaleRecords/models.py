@@ -115,6 +115,7 @@ class PurchasedGiftCards(CommonField):
     spend_amount = models.FloatField(default = 0)
     quantity = models.SmallIntegerField(default = 0)
     expiry = models.DateTimeField(blank=True, null=True)
+    
 class PaymentMethods(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'payment_methods_records')
     
@@ -156,6 +157,7 @@ class AppliedMemberships(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_memberships_records')
     membership = models.ForeignKey(SaleRecordMembership, on_delete = models.SET_NULL, blank=True, null=True)
     is_redeemed = models.BooleanField(default = False)
+    price = models.FloatField(blank=True, null=True)
     
     
 class AppliedVouchers(CommonField):
@@ -163,6 +165,7 @@ class AppliedVouchers(CommonField):
     # voucher = models.ForeignKey(Vouchers, on_delete = models.SET_NULL, blank=False, null=True)
     voucher = models.ForeignKey(SaleRecordVouchers, on_delete = models.SET_NULL , blank=False, null=True)
     is_redeemed = models.BooleanField(default = False)
+    price = models.FloatField(blank=True, null=True)
     
     
 class AppliedGiftCards(CommonField):
