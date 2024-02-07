@@ -15,6 +15,7 @@ class GetAllDealsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Deal
         fields = [
+            'id',
             'title',
             'deal_type',
             'category',
