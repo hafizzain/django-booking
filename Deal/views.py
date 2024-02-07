@@ -10,7 +10,7 @@ from rest_framework.pagination import PageNumberPagination
 # Create your views here.
 
 from Deal.models import Deal, DealCategory, RedeemableChannel, DealDay, DealRestriction
-from Deal.serializers import DealSerializer, DealRestrictionSerializer
+from Deal.serializers import DealSerializer, DealRestrictionSerializer, GetAllDealsSerializer
 
 from Product.models import Product
 from Service.models import Service
@@ -258,9 +258,9 @@ def  get_all_deals(request):
     if page:
         paginator = PageNumberPagination()
         paginator.page_size = 10
-        data = DealSerializer(paginator.paginate_queryset(deals, request), many=True).data
+        data = GetAllDealsSerializer(paginator.paginate_queryset(deals, request), many=True).data
     else:
-        data = DealSerializer(deals, many=True).data
+        data = GetAllDealsSerializer(deals, many=True).data
 
     return Response({
         "response" : {

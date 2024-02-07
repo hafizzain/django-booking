@@ -10,6 +10,19 @@ class DealSerializer(serializers.ModelSerializer):
         optional_fields = ['usagePerCustomer', 'validPeriod']
 
 
+class GetAllDealsSerializer(serializers.ModelSerializer):
+    category = serializers.CharField(source='category.name')
+    class Meta:
+        model = Deal
+        fields = [
+            'title',
+            'deal_type',
+            'category',
+            'customerType',
+            'status',
+        ]
+
+
 class DealRestrictionSerializer(serializers.ModelSerializer):
 
     class Meta:
