@@ -183,17 +183,6 @@ def create_reversal(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_reversal(request):
-    # description = request.data.get('description', None)
-    # business = request.data.get('business', None)
-    # service_id = request.data.get('appointment_service', None)
-    # appointment_id = request.data.get('appointment_id', None)
-    # appointment_date = request.data.get('appointment_date', None)
-    # service_name = request.data.get('service_name',None)
-    # client_name = request.data.get('client_name',None)
-    # email = request.data.get('email',None)
-    # client_type = request.data.get('client_type',None)
-    # client_phone= request.data.get('client_phone',None)
-    # url = request.data.get('url',None)
     no_pagination = request.GET.get('no_pagination', None)
     search = request.GET.get('search_text', None)
     start_date = request.data.get('start_date', None)
@@ -202,11 +191,8 @@ def get_reversal(request):
     
     #apply filter
     query = Q()  
-    if start_date:
-        query &= Q(appointment_date__gte=start_date)
-        
-    if end_date:
-        query &= Q( appointment_date__lte=end_date)
+    if start_date and end_date:
+        query &= Q(appointment_date__range=(start_date, end_date))        
             
     if search:
         query &= Q(generated_by__icontains=search) | Q(client_name__icontains=search) | Q(id__contains=search)
