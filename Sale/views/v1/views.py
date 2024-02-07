@@ -1339,7 +1339,7 @@ def get_all_sale_orders_pagination(request):
     # if recent_five_sales:
     #     sorted_data = sorted_data[:5]
     
-    sale_records = SaleRecords.objects.get(id = checkout_id).all()
+    sale_records = SaleRecords.objects.get(id = checkout_id)
     serializer = SaleRecordSerializer(sale_records).data
 
     # invoicce translation data
