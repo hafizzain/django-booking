@@ -199,7 +199,7 @@ def update_deal_restrictions(request, deal_id):
         }, status.HTTP_404_NOT_FOUND)
     
 
-    restriction = DealRestriction.objects.get_or_create(deal = deal)
+    restriction, created = DealRestriction.objects.get_or_create(deal = deal)
 
     if request.method == 'GET':
         return Response(**DealRestrictionSerializer(restriction).data)
