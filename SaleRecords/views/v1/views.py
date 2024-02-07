@@ -145,7 +145,7 @@ def single_sale_record(request):
     business_address = BusinessAddress.objects.get(id=location)
     invoice_translations = BusinessAddressSerilaizer(business_address).data
     
-    sale_record = SaleRecords.objects.filter(id = checkout_id , location= location).first()
+    sale_record = SaleRecords.objects.get(id = checkout_id , location= location)
     serializer = SaleRecordSerializer(sale_record).data
     
     response = {
@@ -154,7 +154,7 @@ def single_sale_record(request):
                 'response': {
                             'message': 'Record fetched successfully!',
                             'error_message': None,
-                            'sales': serializer.data,
+                            'sales': serializer,
                             'invoice_translation': invoice_translations
                             # 'checkout': SaleRecordSerializer(sale_record, many = True).data,
                             # 'coupon': CouponSerializer(coupon_serializer.instance).data,
