@@ -212,7 +212,7 @@ def update_deal_restrictions(request, deal_id):
 
     restrictions_data = request.data.get('restrictions', {})
     restrictions_data['deal'] = deal_id
-    # restrictions_data['block_dates'] = [{'date' : date} for date in restrictions_data.get('block_dates', [])]
+    restrictions_data['block_dates'] = [{'date' : date} for date in restrictions_data.get('block_dates', [])]
 
     restrictions = DealRestrictionSerializer(restriction, data=restrictions_data)
     if restrictions.is_valid():
