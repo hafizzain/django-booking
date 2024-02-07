@@ -209,9 +209,9 @@ def get_reversal(request):
         query &= Q( appointment_date__lte=end_date)
             
     if search:
-        query &= Q(generated_by__icontains=search) | Q(client_name__icontains=search) | Q(id__icontains=search)
+        query &= Q(generated_by__icontains=search) | Q(client_name__icontains=search) | Q(id__contains=search)
         
-    all_reversal = Reversal.objects.filter(query).oder_by('-created_at')
+    all_reversal = Reversal.objects.filter(query).order_by('-created_at')
     
     # if start_date is not None and end_date is not None:
     #     all_reversal = Reversal.objects.filter(start_date=start_date,
