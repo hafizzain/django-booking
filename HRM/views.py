@@ -187,36 +187,42 @@ class HolidayApiView(APIView):
 
     @transaction.atomic
     def delete(self, request, pk):
-        holiday_data = {}
-        holiday = Holiday.objects.filter(id=pk)
-        employee_schedule = None
-        if holiday:
-            holiday_first = Holiday.objects.filter(id=pk).first()
-            employee_schedule = holiday_first.employee_schedule
+        try:
+            holiday = Holiday.objects.get(id=pk)
+        except:
+            return Response(
+                {
+                    "success": False,
+                    "status_code": 404,
+                    "response": {
+                        "message": "Holiday not found",
+                        "error_message": None,
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
 
-            holiday_data = {
-                'start_date': holiday_first.start_date,
-                'end_date': holiday_first.end_date if holiday_first.end_date else None,
-            }
-        holiday.delete()
-        if employee_schedule:
-            employee_schedule.delete()
+        query = {}
+        if holiday_first.end_date:
+            query['to_date'] = holiday_first.end_date
 
         holiday_schedule = EmployeDailySchedule.objects.filter(
             is_holiday=True,
-            from_date=holiday_data['start_date'],
-            to_date=holiday_data['end_date']
+            from_date = holiday_first.start_date,
+            **query,
         )
         holiday_schedule.delete()
-        # holidays = Holiday.objects.all()
-        # holidays.delete()
+        holiday.delete()
+
         data = {
             "success": True,
             "status_code": 200,
             "response": {
                 "message": "Holiday deleted successfully",
                 "error_message": None,
-                "data": None
+                "data": None,
+                'end_date' : str(holiday_first.end_date),
+                'start_date' : str(holiday_first.start_date)
             }
         }
         return Response(data, status=status.HTTP_200_OK)
