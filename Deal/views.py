@@ -220,7 +220,7 @@ def update_deal_restrictions(request, deal_id):
 
         excludedWeekDays = restrictions_data.get('excludedWeekDays', [])
         for day in excludedWeekDays:
-            DealDay.objects.create(
+            DealDay.objects.get_or_create(
                 deal = deal,
                 day = day,
             )
