@@ -242,10 +242,13 @@ def  get_all_deals(request):
     page = request.GET.get('page', None)
     search_text = request.GET.get('search_text', '')
     status = request.GET.get('status', '')
+    category = request.GET.get('category', '')
 
     query = {}
     if status:
         query['status'] = status
+    if category:
+        query['category__id'] = category
 
     deals = Deal.objects.filter(
         title__icontains=search_text, 
