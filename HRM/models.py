@@ -10,7 +10,7 @@ class Holiday(CommonField):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     business = models.ForeignKey(Business, on_delete=models.CASCADE)
     location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE)
-    employee_schedule = models.ForeignKey(EmployeDailySchedule, on_delete=models.SET_NULL, null= True, blank=True)
+    employee_schedule = models.ForeignKey(EmployeDailySchedule, on_delete=models.CASCADE, null= True, blank=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=200)
