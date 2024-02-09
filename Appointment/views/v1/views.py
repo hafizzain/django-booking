@@ -354,6 +354,124 @@ def get_appointments_service(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
+def get_appointments_group_services(request):
+    appointment_id = request.GET.get('appointment_group_id', None)
+    
+    total_sale = 0
+    voucher_total_price = 0
+    voucher_membership = []
+    
+    if not all([appointment_id]):
+        return Response(
+            {
+                'status': False,
+                'status_code': StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text': 'MISSING_FIELDS_4001',
+                'response': {
+                    'message': 'Invalid Data!',
+                    'error_message': 'Appointment id is required',
+                    'fields': [
+                        'appointment_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        appointment_group = AppointmentGroup.objects.get(appointment__id = appointment_id, appointment__is_deleted=False)
+    except Exception as err:
+        return Response(
+            {
+                'status': False,
+                'status_code': StatusCodes.INVALID_APPOINMENT_ID_4038,
+                'status_code_text': 'INVALID_APPOINMENT_ID_4038',
+                'response': {
+                    'message': 'Appointment Not Found',
+                    'error_message': str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+
+    serialized = SingleNoteSerializer(appointment_group.appointment.all(), many=True)
+    
+    # Calculate Total Sale of Client---------------------
+    clients = list(appointment_group.appointment.all().values_list('client', flat=True))
+    
+    # Client All Product Order---------------------
+    product_order = ProductOrder.objects \
+        .filter(checkout__client__id__in=clients) \
+        .select_related('product', 'member') \
+        .order_by('-created_at')
+    product_total = product_order.aggregate(total_sale=Sum('price'))['total_sale']
+    total_sale += product_total if product_total else 0
+    
+    # Client All Service Orders----------------------
+    service_orders = ServiceOrder.objects \
+        .filter(checkout__client__id__in=clients) \
+        .select_related('service', 'user', 'member') \
+        .order_by('-created_at')
+    service_total = service_orders.aggregate(total_sale=Sum('price'))['total_sale']
+    total_sale += service_total if service_total else 0
+    
+    # Client All Voucher & Membership Orders -----------------------
+    voucher_order = VoucherOrder.objects \
+                        .filter(checkout__client__id__in=clients) \
+                        .select_related('voucher', 'member', 'user') \
+                        .order_by('-created_at')[:5]
+    
+    # Client All Membership Orders -----------------------                    
+    membership_order = MemberShipOrder.objects \
+                            .filter(checkout__client__id__in=clients) \
+                            .select_related('membership', 'user', 'member') \
+                            .order_by('-created_at')[:5]
+                            
+    voucher_total = voucher_order.aggregate(total_sale=Sum('price'))['total_sale']
+    total_sale += voucher_total if voucher_total else 0
+    
+    voucher = VOSerializerForClientSale(voucher_order, many=True, context={'request': request, })
+    membership = MOrderSerializerForSale(membership_order[:5], many=True, context={'request': request, })
+
+    voucher_membership.extend(voucher.data)
+    voucher_membership.extend(membership.data)
+    
+    # Client All Appointment Orders ------------------------------
+    appointment_checkout_all = AppointmentService.objects \
+        .filter(
+        appointment__client__id__in=clients,
+        appointment_status__in=['Done', 'Paid']
+        ) \
+        .select_related('member', 'user', 'service') \
+        .order_by('-created_at')
+    
+    #Now Calculate Total Sale    
+    appointment_total = appointment_checkout_all.aggregate(total_sale=Sum('price'))['total_sale']
+    total_sale += appointment_total if appointment_total else 0
+    product = POSerializerForClientSale(product_order, many=True, context={'request': request, })
+    
+    price_values = sum(item.get('price', 0) for item in product.data)
+    voucher_total_price = sum(item.get('price', 0) for item in voucher.data)
+    total_sale = total_sale + price_values + voucher_total_price
+    
+    return Response(
+        {
+            'status': True,
+            'status_code': 200,
+            'status_code_text': '200',
+            'response': {
+                'message': 'All Appointments',
+                'error_message': None,
+                'appointment': serialized.data,
+                'total_sales': total_sale,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def get_appointments_device(request):
     employee_id = request.GET.get('employee_id', None)
     appointment_status = request.GET.get('status', None)
@@ -1575,6 +1693,8 @@ def create_group_appointment(request):
                     }
                 }
             )
+    else:
+        business_address = None
 
     group_instance = AppointmentGroup.objects.create(group_name='appointment_group')
 
