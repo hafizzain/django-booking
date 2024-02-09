@@ -206,6 +206,11 @@ class Appointment(models.Model):
         return str(self.id)
 
 
+class Comments(CommonField):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_comments',null=True, blank=True)
+    comment = models.TextField(null=True, blank=True)
+    appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True, blank=True, related_name='appointment_comment')
+    
 class AppointmentGroup(models.Model):
     group_name = models.TextField(null=True ,blank=True)
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
