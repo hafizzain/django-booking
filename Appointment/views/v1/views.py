@@ -3924,26 +3924,26 @@ def appointment_service_status_update(request):
     appointment_id = request.data.get('appointment_id', None)
     appointment_service_id = request.data.get('appointment_service_id', None)
     appointment_service_status = request.data.get('status', None)
+    service_void_reason = request.data.get('cancel_reason', None)
     gst_price = None
     gst_price1 = None
 
     seperate_or_combined = None
     group_or_individual = None
-    reason = request.data.get('reason', None)
 
     status_list = [choices.AppointmentServiceStatus.STARTED, choices.AppointmentServiceStatus.FINISHED]
 
     # changing the status
     appointment = Appointment.objects.get(id=appointment_id)
     appointment_service = AppointmentService.objects.get(id=appointment_service_id)
-
+        
     appointment_service.status = appointment_service_status
     if appointment_service_status == choices.AppointmentServiceStatus.STARTED:
         appointment_service.service_start_time = datetime.now()
     elif appointment_service_status == choices.AppointmentServiceStatus.FINISHED:
         appointment_service.service_end_time = datetime.now()
     elif appointment_service_status == choices.AppointmentServiceStatus.VOID:
-        appointment_service.reason = reason
+        appointment_service.service_void_reason=service_void_reason
     appointment_service.save()
 
     appoint_service_statuses = list(

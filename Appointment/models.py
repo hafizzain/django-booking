@@ -329,8 +329,7 @@ class AppointmentService(models.Model):
 
     client_tag = models.CharField(max_length=50, default='')
     client_type = models.CharField(max_length=50, default='')
-
-    reason = models.CharField(max_length=100, null=True, blank=True)
+    service_void_reason = models.TextField(null=True, blank=True)
 
     objects = AppointmentServiceCustomManager.as_manager()
 
@@ -416,7 +415,7 @@ class AppointmentService(models.Model):
     def __str__(self):
         return str(self.id)
 
-
+    
 class AppointmentCheckout(models.Model):
     PAYMENT_CHOICES = [
         ('Cash', 'Cash'),
