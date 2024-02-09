@@ -1481,8 +1481,6 @@ def create_appointment(request):
     appointment.service_commission = int(service_commission)
     appointment.service_commission_type = service_commission_type
     appointment.save()
-    ag = AppointmentGroup.objects.create(group_name='appointment_group')
-    ag.appointment.set(all_appointments)
     # serialized = AppoinmentSerializer(appointment)
     try:
         thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment': appointment, 'tenant': request.tenant,
@@ -1578,6 +1576,8 @@ def create_group_appointment(request):
                 }
             )
 
+    group_instance = AppointmentGroup.objects.create(group_name='appointment_group')
+
     for g_app in group_appointments:
         appointments = g_app.get('appointments', None)
         appointment_date = g_app.get('appointment_date', None)
@@ -1613,6 +1613,10 @@ def create_group_appointment(request):
             discount_type=discount_type,
             status=choices.AppointmentStatus.BOOKED
         )
+        group_instance.appointment.add(appointment)
+        group_instance.save()
+
+
         all_appointments.append(appointment)
 
         if is_promotion_availed:
@@ -1892,8 +1896,6 @@ def create_group_appointment(request):
         appointment.service_commission = int(service_commission)
         appointment.service_commission_type = service_commission_type
         appointment.save()
-        ag = AppointmentGroup.objects.create(group_name='appointment_group')
-        ag.appointment.set(all_appointments)
         # serialized = AppoinmentSerializer(appointment)
         try:
             thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment': appointment, 'tenant': request.tenant,
