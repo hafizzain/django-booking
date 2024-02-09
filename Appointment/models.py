@@ -18,6 +18,7 @@ from Order.models import Checkout
 from . import choices
 from Utility.models import CommonField
 from .choices import AppointmentServiceStatus
+from Client.models import Comments
 
 
 class AppointmentCheckoutManager(models.QuerySet):
@@ -183,6 +184,7 @@ class Appointment(models.Model):
     selected_promotion_id = models.CharField(default='', max_length=800)
     selected_promotion_type = models.CharField(default='', max_length=400)
 
+    comments = models.ForeignKey(Comments, on_delete=models.CASCADE, blank=True, null=True, related_name='comments')
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     is_checkout = models.BooleanField(default=False)
