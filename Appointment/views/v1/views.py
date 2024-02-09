@@ -3762,6 +3762,7 @@ def create_appointment_client(request):
     payment_method = request.data.get('payment_method', None)
     discount_type = request.data.get('discount_type', None)
     comments = request.data.get('comments', None)
+    
 
     errors = []
 
@@ -3966,7 +3967,7 @@ def create_appointment_client(request):
                 comment = Comments.objects.create(
                     user=request.user,
                     comment=comments,
-                    employee=member,   
+                    appointment=appointment.id,  
                 )
                 comment.save()
             

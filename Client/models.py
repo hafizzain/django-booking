@@ -23,6 +23,7 @@ from googletrans import Translator
 from dateutil.relativedelta import relativedelta
 from django.db.models import Count, Q
 from django.db.models.functions import Coalesce
+from Appointment.models import Appointment
 
 
 # from Appointment.models import AppointmentService
@@ -207,6 +208,7 @@ class ClientImages(models.Model):
 
 
 class Comments(CommonField):
+    appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, related_name='appointment_comment', null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_comment',null=True)
     comment = models.TextField(null=True)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
