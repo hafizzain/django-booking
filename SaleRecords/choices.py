@@ -17,8 +17,8 @@ class PaymentMethodsChoices(models.TextChoices):
     # GIFT = 'Gift','Gift Payment'
     
 class CheckoutType(models.TextChoices):
-    APPOINTMENT_CHECKOUT = 'Appointment', 'Appointment Checkout'
-    SALE_CHECKOUT = 'Sale','Sale Checkout'
+    APPOINTMENT_CHECKOUT = 'appointment_checkout', 'Appointment Checkout'
+    SALE_CHECKOUT = 'sale_checkout','Sale Checkout'
     
     
 class ItemType(models.TextChoices):
@@ -28,7 +28,7 @@ class ItemType(models.TextChoices):
     APPOINTMENT = 'appointment','Appointment'
     
 class Status (models.TextChoices):
-    IS_REFUND = 'is_refund','Is Refund'
+    IS_REFUND = 'Refund','Is Refund'
     CANCELLED = 'cancelled','Cancelled'
     PAID = 'paid' , 'Paid'
     UN_PAID = 'un_paid' , 'Un Paid'
