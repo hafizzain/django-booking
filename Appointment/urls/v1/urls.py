@@ -4,6 +4,7 @@ from Appointment.views.v1 import views
 urlpatterns = [
     # Appointment
     path('create_appointment/', views.create_appointment),
+    path('create_group_appointment/', views.create_group_appointment),
     path('get_calendar_appointment/', views.get_calendar_appointment),
     path('create_reversal/', views.create_reversal),
     # path('get_all_appointments/',views.get_all_appointments),
