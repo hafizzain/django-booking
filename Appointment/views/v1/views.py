@@ -4227,7 +4227,6 @@ def get_available_appointments(request):
         if search_text:
             search_text = search_text.replace('#', '')
             query &= Q(client__full_name__icontains=search_text) | \
-                    Q(client__id__icontains=search_text) | \
                     Q(id__icontains=search_text)
                     
         if start_date and end_date:
