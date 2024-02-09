@@ -28,7 +28,7 @@ class ItemType(models.TextChoices):
     APPOINTMENT = 'appointment','Appointment'
     
 class Status (models.TextChoices):
-    IS_REFUND = 'is_refund','Is Refund'
+    IS_REFUND = 'refund','Is Refund'
     CANCELLED = 'cancelled','Cancelled'
     PAID = 'paid' , 'Paid'
     UN_PAID = 'un_paid' , 'Un Paid'
