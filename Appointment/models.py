@@ -128,14 +128,6 @@ class LogDetails(models.Model):
         return str(self.id)
 
 
-class AppointmentGroup(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
-    client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True,)
-
-    def __str__(self):
-        return str(self.id)
-
-
 class Appointment(models.Model):
     DISCOUNT_CHOICES = [
         ('Promotions', 'Promotions'),
@@ -164,8 +156,6 @@ class Appointment(models.Model):
                              verbose_name='Creator ( User )')
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True,
                                  related_name='business_appointments')
-
-    appointment_group = models.ForeignKey(AppointmentGroup, on_delete=models.SET_NULL, null=True, blank=True, related_name='appointment_group_appointments')
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_appointments', null=True,
                                blank=True)
