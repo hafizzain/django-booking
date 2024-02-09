@@ -80,6 +80,7 @@ from ... import choices
 from Service.serializers import BasicServiceSerializer
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
+from Client.models import Comments
 
 
 @api_view(['GET'])
@@ -3760,6 +3761,7 @@ def create_appointment_client(request):
 
     payment_method = request.data.get('payment_method', None)
     discount_type = request.data.get('discount_type', None)
+    comments = request.data.get('comments', None)
 
     errors = []
 
@@ -3869,7 +3871,7 @@ def create_appointment_client(request):
         client_id = f'{client.id}'
         tenant_client.client_id = client_id
         tenant_client.save()
-
+        
         appointment = Appointment.objects.create(
             user=business.user,
             business=business,
@@ -3959,6 +3961,15 @@ def create_appointment_client(request):
                 total_price=price,
                 status=choices.AppointmentServiceStatus.BOOKED
             )
+            
+            if comments:
+                comment = Comments.objects.create(
+                    user=request.user,
+                    comment=comments,
+                    employee=member,   
+                )
+                comment.save()
+            
             if fav is not None:
                 appointment_service.is_favourite = True
                 appointment_service.save()
@@ -3990,7 +4001,8 @@ def create_appointment_client(request):
                     'error_message': None,
                     'appointments': serialized.data,
                     'client_id': client_id,
-                    'errors': errors
+                    'errors': errors,
+                    'comments': comments,
                 }
             },
             status=status.HTTP_201_CREATED
