@@ -21,7 +21,7 @@ from Product.models import Product
 from Utility.models import Country, Currency, ExceptionRecord, Language, State, City
 from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, \
     DiscountMembership, LoyaltyPoints, Subscription, Rewards, Promotion, Membership, Vouchers, ClientLoyaltyPoint, \
-    LoyaltyPointLogs, VoucherCurrencyPrice, ClientImages, Comments
+    LoyaltyPointLogs, VoucherCurrencyPrice, ClientImages
     
 from SaleRecords.models import PurchasedGiftCards
 from SaleRecords.serializers import PurchasedGiftCardsSerializer
@@ -33,7 +33,7 @@ from Client.serializers import (SingleClientSerializer, ClientSerializer, Client
                                 ClientMembershipsSerializer,
                                 ClientDropdownSerializer, CustomerDetailedLoyaltyPointsLogsSerializerOP,
                                 ClientImagesSerializerResponses,
-                                ClientImageSerializer, ClientResponse,
+                                ClientImageSerializer,
                                 )
 from Business.serializers.v1_serializers import BusinessAddressSerilaizer
 from Utility.models import NstyleFile
@@ -50,8 +50,8 @@ from Order.models import Checkout
 from Appointment import choices
 from Appointment.models import Appointment
 from Appointment.serializers import PaidUnpaidAppointmentSerializer, ClientImagesSerializerResponse
-from Appointment.models import AppointmentComment
-from Appointment.serializers import AppointmentCommentSerializer
+from Appointment.models import Comment
+from Appointment.serializers import CommentSerializer
 from Authentication.models import User
 
 
@@ -3596,20 +3596,8 @@ def create_comment(request):
     user_id = request.data.get('user_id', None)
     appointment = request.data.get('appointment_id', None)
     
-    
-    if appointment is not None:
-        user = User.objects.get(id=user_id)
-        appointment = AppointmentComment.objects.create(
-                user = user,
-                comment = comment,
-                appointment = appointment
-        )
-        client_data = AppointmentCommentSerializer(appointment, many=False).data
-        
-    else:
-        comment = Comments.objects.create(employee_id=employee_id, comment=comment,user_id=user_id)
-        client_data = ClientResponse(comment, many=False).data
-        
+    comment = Comment.objects.create(employee_id=employee_id, comment=comment,user_id=user_id, appointment=appointment)
+    client_data = CommentSerializer(comment, many=False).data  
     return Response(
         {
             'status': True,
@@ -3627,19 +3615,26 @@ def create_comment(request):
 @permission_classes([AllowAny])
 def get_comment(request):
     user_id = request.query_params.get('user_id', None)
-    appointment_id = request.query_params.get('appointment_id', None)
+    appointment = request.query_params.get('appointment_id', None)
     paginator = AppointmentsPagination()
     paginator.page_size = 10
     
-    def generate_response(comment_data, paginator):
-        return {
+    query = Q()
+    if appointment:
+        query &= Q(appointment=appointment)
+        
+    if user_id:
+        comment = Comment.objects.filter(user_id=user_id)
+        comment = paginator.paginate_queryset(comment, request)
+        client_data = CommentSerializer(comment, many=True).data
+        data = {
             'status': True,
             'status_code': 200,
             'status_code_text': '200',
             "response": {
                 "message": "Comment get Successfully",
                 "error_message": None,
-                "data": comment_data,
+                "data": client_data,
                 'count': paginator.page.paginator.count,
                 'next': paginator.get_next_link(),
                 'previous': paginator.get_previous_link(),
@@ -3648,105 +3643,26 @@ def get_comment(request):
                 'total_pages': paginator.page.paginator.num_pages,
             }
         }
-
-    if user_id:
-        comment = Comments.objects.filter(user_id=user_id)
-        comment = paginator.paginate_queryset(comment, request)
-        client_data = ClientResponse(comment, many=True).data
-        data = generate_response(client_data, paginator)
         return Response(data, status=201)
     
-    if appointment_id and user_id:
-        comment = AppointmentComment.objects.filter(appointment=appointment_id, user=user_id)
+    else:
+        comment = Comment.objects.all()
         comment = paginator.paginate_queryset(comment, request)
-        client_data = AppointmentCommentSerializer(comment, many=True).data
-        data = generate_response(client_data, paginator)
+        client_data = CommentSerializer(comment, many=True).data
+        data = {
+            'status': True,
+            'status_code': 200,
+            'status_code_text': '200',
+            "response": {
+                "message": "Comment get Successfully",
+                "error_message": None,
+                "data": client_data,
+                'count': paginator.page.paginator.count,
+                'next': paginator.get_next_link(),
+                'previous': paginator.get_previous_link(),
+                'current_page': paginator.page.number,
+                'per_page': paginator.page_size,
+                'total_pages': paginator.page.paginator.num_pages,
+            }
+        }
         return Response(data, status=201)
-
-    comment = Comments.objects.all()
-    comment = paginator.paginate_queryset(comment, request)
-    client_data = ClientResponse(comment, many=True).data
-
-    appointment = AppointmentComment.objects.all()
-    appointment_comments = AppointmentCommentSerializer(appointment, many=True).data
-    data = generate_response(client_data, paginator)
-    data['response']['appointment_comments'] = appointment_comments
-    return Response(data, status=201)
-
-# @api_view(['GET'])
-# @permission_classes([AllowAny])
-# def get_comment(request):
-#     user_id = request.query_params.get('user_id', None)
-#     appointment = request.query_params.get('appointment_id', None)
-#     paginator = AppointmentsPagination()
-#     paginator.page_size = 10
-    
-#     if user_id:
-#         comment = Comments.objects.filter(user_id=user_id)
-#         comment = paginator.paginate_queryset(comment, request)
-#         client_data = ClientResponse(comment, many=True).data
-#         data = {
-#             'status': True,
-#             'status_code': 200,
-#             'status_code_text': '200',
-#             "response": {
-#                 "message": "Comment get Successfully",
-#                 "error_message": None,
-#                 "data": client_data,
-#                 'count': paginator.page.paginator.count,
-#                 'next': paginator.get_next_link(),
-#                 'previous': paginator.get_previous_link(),
-#                 'current_page': paginator.page.number,
-#                 'per_page': paginator.page_size,
-#                 'total_pages': paginator.page.paginator.num_pages,
-#             }
-#         }
-#         return Response(data, status=201)
-    
-#     if appointment and user_id:
-#         comment = AppointmentComment.objects.filter(appointment=appointment, user=user_id)
-#         comment = paginator.paginate_queryset(comment, request)
-#         client_data = AppointmentCommentSerializer(comment, many=True).data
-#         data = {
-#             'status': True,
-#             'status_code': 200,
-#             'status_code_text': '200',
-#             "response": {
-#                 "message": "Comment get Successfully",
-#                 "error_message": None,
-#                 "data": client_data,
-#                 'count': paginator.page.paginator.count,
-#                 'next': paginator.get_next_link(),
-#                 'previous': paginator.get_previous_link(),
-#                 'current_page': paginator.page.number,
-#                 'per_page': paginator.page_size,
-#                 'total_pages': paginator.page.paginator.num_pages,
-#             }
-#         }
-#         return Response(data, status=201)
-    
-
-#     else:
-#         comment = Comments.objects.all()
-#         comment = paginator.paginate_queryset(comment, request)
-#         client_data = ClientResponse(comment, many=True).data
-#         appointment = AppointmentComment.objects.all()
-#         appointment_comments = AppointmentCommentSerializer(appointment, many=True).data
-#         data = {
-#             'status': True,
-#             'status_code': 200,
-#             'status_code_text': '200',
-#             "response": {
-#                 "message": "Comment get Successfully",
-#                 "error_message": None,
-#                 "data": client_data,
-#                 "appointment_comments": appointment_comments,
-#                 'count': paginator.page.paginator.count,
-#                 'next': paginator.get_next_link(),
-#                 'previous': paginator.get_previous_link(),
-#                 'current_page': paginator.page.number,
-#                 'per_page': paginator.page_size,
-#                 'total_pages': paginator.page.paginator.num_pages,
-#             }
-#         }
-#         return Response(data, status=201)
