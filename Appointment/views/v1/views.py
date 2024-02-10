@@ -80,7 +80,7 @@ from ... import choices
 from Service.serializers import BasicServiceSerializer
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
-from Appointment.models import Comments
+from Appointment.models import AppointmentComments
 
 
 @api_view(['GET'])
@@ -3430,7 +3430,7 @@ def create_appointment_client(request):
             )
             
             if comments:
-                comment = Comments.objects.create(
+                comment = AppointmentComments.objects.create(
                     user=request.user,
                     comment=comments,
                     appointment=appointment.id,   
