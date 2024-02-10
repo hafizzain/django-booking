@@ -52,6 +52,7 @@ from Appointment.models import Appointment
 from Appointment.serializers import PaidUnpaidAppointmentSerializer, ClientImagesSerializerResponse
 from Appointment.models import AppointmentComment
 from Appointment.serializers import AppointmentCommentSerializer
+from Authentication.models import User
 
 
 @transaction.atomic
@@ -3597,8 +3598,9 @@ def create_comment(request):
     
     
     if appointment is not None:
+        user = User.objects.get(id=user_id)
         appointment = AppointmentComment.objects.create(
-                user = user_id,
+                user = user,
                 comment = comment,
                 appointment = appointment
         )
