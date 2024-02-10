@@ -18,7 +18,7 @@ from Order.models import Checkout
 from . import choices
 from Utility.models import CommonField
 from .choices import AppointmentServiceStatus
-from Client.models import Comments
+
 
 
 class AppointmentCheckoutManager(models.QuerySet):
@@ -184,11 +184,11 @@ class Appointment(models.Model):
     selected_promotion_id = models.CharField(default='', max_length=800)
     selected_promotion_type = models.CharField(default='', max_length=400)
 
-    comments = models.ForeignKey(Comments, on_delete=models.CASCADE, blank=True, null=True, related_name='comments')
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     is_checkout = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
+    hello=models.CharField(max_length=100, default='', null=True, blank=True)
 
     def business_name(self):
         try:
@@ -329,7 +329,7 @@ class AppointmentService(models.Model):
 
     client_tag = models.CharField(max_length=50, default='')
     client_type = models.CharField(max_length=50, default='')
-    service_void_reason = models.TextField(null=True, blank=True)
+    reason = models.CharField(max_length=100, null=True, blank=True)
 
     objects = AppointmentServiceCustomManager.as_manager()
 
