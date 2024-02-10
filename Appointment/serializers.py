@@ -1671,7 +1671,7 @@ class AppointmentServiceResponseSeriailzer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentService
         fields = ['id', 'service', 'status', 'duration', 'price', 'service_start_time', 'service_end_time', 'user',
-                  'service_end_time', 'member', 'appointment_date', 'appointment_time']
+                  'service_end_time', 'member', 'appointment_date', 'appointment_time', 'reason']
 
 
 class SingleNoteResponseSerializer(serializers.ModelSerializer):
