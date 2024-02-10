@@ -188,7 +188,6 @@ class Appointment(models.Model):
     is_deleted = models.BooleanField(default=False)
     is_checkout = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
-    hello=models.CharField(max_length=100, default='', null=True, blank=True)
 
     def business_name(self):
         try:

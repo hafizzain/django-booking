@@ -3429,13 +3429,13 @@ def create_appointment_client(request):
                 status=choices.AppointmentServiceStatus.BOOKED
             )
             
-            # if comments:
-            #     comment = AppointmentComments.objects.create(
-            #         user=request.user,
-            #         comment=comments,
-            #         appointment=appointment.id,   
-            #     )
-            #     comment.save()
+            if comments:
+                comment = AppointmentComments.objects.create(
+                    user=request.user,
+                    comment=comments,
+                    appointment=appointment.id,   
+                )
+                comment.save()
             
             if fav is not None:
                 appointment_service.is_favourite = True
@@ -3924,7 +3924,7 @@ def appointment_service_status_update(request):
     appointment_id = request.data.get('appointment_id', None)
     appointment_service_id = request.data.get('appointment_service_id', None)
     appointment_service_status = request.data.get('status', None)
-    # service_void_reason = request.data.get('cancel_reason', None)
+    service_void_reason = request.data.get('cancel_reason', None)
     gst_price = None
     gst_price1 = None
 
@@ -3942,8 +3942,8 @@ def appointment_service_status_update(request):
         appointment_service.service_start_time = datetime.now()
     elif appointment_service_status == choices.AppointmentServiceStatus.FINISHED:
         appointment_service.service_end_time = datetime.now()
-    # elif appointment_service_status == choices.AppointmentServiceStatus.VOID:
-    #     appointment_service.service_void_reason=service_void_reason
+    elif appointment_service_status == choices.AppointmentServiceStatus.VOID:
+        appointment_service.reason=service_void_reason
     appointment_service.save()
 
     appoint_service_statuses = list(
