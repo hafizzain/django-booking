@@ -188,7 +188,6 @@ class Appointment(models.Model):
     is_deleted = models.BooleanField(default=False)
     is_checkout = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
-    hello=models.CharField(max_length=100, default='', null=True, blank=True)
 
     def business_name(self):
         try:
@@ -206,10 +205,10 @@ class Appointment(models.Model):
         return str(self.id)
 
 
-# class AppointmentComments(CommonField):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_comments',null=True, blank=True)
-#     comment = models.TextField(null=True, blank=True)
-#     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True, blank=True, related_name='appointment_comment')
+class AppointmentComment(CommonField):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_comments',null=True, blank=True)
+    comment = models.TextField(null=True, blank=True)
+    appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True, blank=True, related_name='appointment_comment')
     
 class AppointmentGroup(models.Model):
     group_name = models.TextField(null=True ,blank=True)
