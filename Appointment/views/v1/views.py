@@ -80,7 +80,7 @@ from ... import choices
 from Service.serializers import BasicServiceSerializer
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
-from Appointment.models import AppointmentComments
+# from Appointment.models import AppointmentComments
 
 
 @api_view(['GET'])
@@ -3429,13 +3429,13 @@ def create_appointment_client(request):
                 status=choices.AppointmentServiceStatus.BOOKED
             )
             
-            if comments:
-                comment = AppointmentComments.objects.create(
-                    user=request.user,
-                    comment=comments,
-                    appointment=appointment.id,   
-                )
-                comment.save()
+            # if comments:
+            #     comment = AppointmentComments.objects.create(
+            #         user=request.user,
+            #         comment=comments,
+            #         appointment=appointment.id,   
+            #     )
+            #     comment.save()
             
             if fav is not None:
                 appointment_service.is_favourite = True
