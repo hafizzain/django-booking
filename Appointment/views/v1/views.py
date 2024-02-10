@@ -81,7 +81,8 @@ from Service.serializers import BasicServiceSerializer
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from Appointment.models import AppointmentComment
-
+from Appointment.serializers import AppointmentCommentSerializer
+from rest_framework.views import APIView
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
