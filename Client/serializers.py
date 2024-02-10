@@ -11,8 +11,8 @@ from Service.models import Service
 from Utility.models import Country, State, City
 
 from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, \
-    Promotion, Rewards, Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs, VoucherCurrencyPrice, ClientImages, \
-    Comments
+    Promotion, Rewards, Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs, VoucherCurrencyPrice, ClientImages
+    
 from Invoices.models import SaleInvoice
 from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip, AppointmentService, Appointment
 from Order.models import Checkout, Order
@@ -851,8 +851,8 @@ class UserSerializerResponse(serializers.ModelSerializer):
         model = User
         fields = ['id','full_name','email']
 
-class ClientResponse(serializers.ModelSerializer):
-    user = UserSerializerResponse()
-    class Meta:
-        model = Comments
-        fields = ["id","user","comment",'employee']
+# class ClientResponse(serializers.ModelSerializer):
+#     user = UserSerializerResponse()
+#     class Meta:
+#         model = Comments
+#         fields = ["id","user","comment",'employee']

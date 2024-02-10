@@ -79,8 +79,8 @@ urlpatterns = [
 
    path('check_client_existance/', views.check_client_existance),
    path('create_client_image/', views.create_client_image),
-   path('create_comment/', views.create_comment),
-   path('get_comment/', views.get_comment),
+#    path('create_comment/', views.create_comment),
+#    path('get_comment/', views.get_comment),
 
 
 ]

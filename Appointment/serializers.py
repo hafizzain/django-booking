@@ -30,7 +30,7 @@ from . import choices
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Utility.models import ExceptionRecord
 from Service.models import Service
-from Appointment.models import AppointmentComment
+from Appointment.models import Comment
 
 
 class SerializerResponse(serializers.ModelSerializer):
@@ -1856,7 +1856,7 @@ class ClientImagesSerializerResponse(serializers.ModelSerializer):
         model = ClientImages
         fields = "__all__"
         
-class AppointmentCommentSerializer(serializers.ModelSerializer):
+class CommentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = AppointmentComment
+        model = Comment
         fields = "__all__"
