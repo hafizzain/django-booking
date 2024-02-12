@@ -77,4 +77,5 @@ urlpatterns = [
 
     path('update_reversal/', views.update_reversals),
     path('appointment_check_in/', views.update_appointment_check_in),
+    path('appointment_time_report/', views.appointment_time_report),
 ]
