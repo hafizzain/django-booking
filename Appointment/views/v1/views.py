@@ -4462,6 +4462,7 @@ def appointment_service_status_update(request):
     appointment_service_id = request.data.get('appointment_service_id', None)
     appointment_service_status = request.data.get('status', None)
     service_void_reason = request.data.get('cancel_reason', None)
+    appointment_checkin_time = request.data.get('checkin_time', None)
     gst_price = None
     gst_price1 = None
 
@@ -4476,6 +4477,9 @@ def appointment_service_status_update(request):
         
     appointment_service.status = appointment_service_status
     if appointment_service_status == choices.AppointmentServiceStatus.STARTED:
+        # Appointment Checkin time when service started
+        appointment.check_in_time = datetime.now()
+        appointment.save()
         appointment_service.service_start_time = datetime.now()
     elif appointment_service_status == choices.AppointmentServiceStatus.FINISHED:
         appointment_service.service_end_time = datetime.now()
@@ -4483,6 +4487,11 @@ def appointment_service_status_update(request):
         appointment_service.reason=service_void_reason
     appointment_service.save()
 
+    # Appointment Checkin time sperate
+    if appointment_checkin_time:
+        appointment.check_in_time = datetime.now()
+        appointment.save()
+            
     appoint_service_statuses = list(
         AppointmentService.objects.filter(appointment=appointment).values_list('status', flat=True))
 
