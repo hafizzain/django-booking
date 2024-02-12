@@ -3767,6 +3767,7 @@ def create_appointment_client(request):
     payment_method = request.data.get('payment_method', None)
     discount_type = request.data.get('discount_type', None)
     comments = request.data.get('comments', None)
+    group_appointment = request.data.get('group_appointment', None)
 
     errors = []
 
@@ -3966,12 +3967,13 @@ def create_appointment_client(request):
                 total_price=price,
                 status=choices.AppointmentServiceStatus.BOOKED
             )
-            
+                
             if comments:
                 comment = Comment.objects.create(
                     user=request.user,
                     comment=comments,
-                    appointment=appointment.id,   
+                    appointment=appointment.id,
+                    group_appointment_id=group_appointment.id,   
                 )
                 comment.save()
             
@@ -4967,8 +4969,8 @@ def update_appointment_check_in(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def appointment_time_report(request):
-    appointment_id = request.GET.get('appointment_id', None)
-    appointment_service = request.GET.get('appointment_service', None)
+    appointment_id = request.query_params.get('appointment_id', None)
+    appointment_service = request.query_params.get('appointment_service', None)
     
     if appointment_id and appointment_service:
         appointment = get_object_or_404(Appointment, id=appointment_id)

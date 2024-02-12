@@ -3621,7 +3621,7 @@ def create_comment(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_comment(request):
-    user_id = request.query_params.get('user_id', None)
+    group_appointment = request.query_params.get('group_appointment', None)
     appointment = request.query_params.get('appointment_id', None)
     paginator = AppointmentsPagination()
     paginator.page_size = 10
@@ -3629,7 +3629,9 @@ def get_comment(request):
     query = Q()
     if appointment:
         query &= Q(appointment=appointment)
-
+    if group_appointment:
+        query &= Q(group_appointment=group_appointment)
+        
         comment = Comment.objects.filter(query)
         comment = paginator.paginate_queryset(comment, request)
         client_data = CommentSerializer(comment, many=True).data
