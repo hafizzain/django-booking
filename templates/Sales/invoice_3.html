@@ -428,9 +428,11 @@
                   {% if business_address.secondary_translation.subtotal %}<p class="arabic">{{ business_address.secondary_translation.subtotal }} {% endif %}</p>
                 </div>
                 <p>{{sub_total}} {{currency_code}}</p>
+                
               </div>
               <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
+                  <strong><p>change</p></strong>
                   <p>{{ business_address.primary_translation.change}}</p>
                   {% if business_address.secondary_translation.change %}<p class="arabic">{{ business_address.secondary_translation.change }} {% endif %}</p>
                 </div>
