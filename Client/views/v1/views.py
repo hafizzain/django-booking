@@ -3626,7 +3626,7 @@ def get_comment(request):
     paginator = AppointmentsPagination()
     paginator.page_size = 10
     
-    query = Q(user_id=user_id)
+    query = Q()
     if appointment:
         query &= Q(appointment=appointment)
         
