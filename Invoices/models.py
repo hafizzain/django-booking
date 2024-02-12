@@ -96,6 +96,7 @@ class SaleInvoice(models.Model):
     
     # ================================== New Fields =========================
     sub_total = models.FloatField(default=0, null=True, blank=True)
+    change = models.FloatField(default = 0 , blank=True, null=True)
     total_amount = models.FloatField(default=0, null=True, blank=True)
     total_tax = models.FloatField(default=0, null=True, blank=True)
     total_tip = models.FloatField(default=0, null=True, blank=True)
@@ -295,6 +296,7 @@ class SaleInvoice(models.Model):
                     # 'tips' : order_tips,
                     # 'tips':
                     'total_tip':self.total_tip,
+                    'change': self.change,
                     # 'total' : round((float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0))), 2),
                     'total': self.total_amount,
                     'created_at' : datetime.now().strftime('%Y-%m-%d'),
