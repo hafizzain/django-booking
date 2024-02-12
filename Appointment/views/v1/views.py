@@ -4463,7 +4463,7 @@ def appointment_service_status_update(request):
     appointment_service_id = request.data.get('appointment_service_id', None)
     appointment_service_status = request.data.get('status', None)
     service_void_reason = request.data.get('cancel_reason', None)
-    appointment_checkin_time = request.data.get('checkin_time', None)
+    # appointment_checkin_time = request.data.get('checkin_time', None)
     gst_price = None
     gst_price1 = None
 
@@ -4478,12 +4478,13 @@ def appointment_service_status_update(request):
         
     appointment_service.status = appointment_service_status
     if appointment_service_status == choices.AppointmentServiceStatus.STARTED:
+        appointment.status = 'Started'
+        appointment.save()
         # Appointment Checkin time not exist 
         if appointment.check_in_time is None:
             # Appointment Checkin time when service started
             appointment.check_in_time = datetime.now()
-            appointment.save()
-            
+            appointment.save()    
         appointment_service.service_start_time = datetime.now()
     elif appointment_service_status == choices.AppointmentServiceStatus.FINISHED:
         appointment_service.service_end_time = datetime.now()
@@ -4491,10 +4492,10 @@ def appointment_service_status_update(request):
         appointment_service.reason=service_void_reason
     appointment_service.save()
 
-    # Appointment sperate Checkin time 
-    if appointment_checkin_time:
-        appointment.check_in_time = datetime.now()
-        appointment.save()
+    # # Appointment sperate Checkin time 
+    # if appointment_checkin_time:
+    #     appointment.check_in_time = datetime.now()
+    #     appointment.save()
             
     appoint_service_statuses = list(
         AppointmentService.objects.filter(appointment=appointment).values_list('status', flat=True))
@@ -4921,3 +4922,35 @@ def update_reversals(request):
             }
         }
         return Response(data, status=status.HTTP_200_OK)
+
+# Add Appointment check-in time  
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_appointment_check_in(request):
+    appointment_id = request.data.get('appointment_id', None)
+    
+    if appointment_id:
+        appointment = get_object_or_404(Appointment, id=appointment_id)
+        appointment.check_in_time = datetime.now()
+        appointment.save()
+        appointment_data = CommentSerializer(appointment).data
+        data = {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Appointment Checked In Successfuly',
+                    'error_message': None,
+                    'Appointment' : appointment_data
+                }
+            }
+        return Response(data, status=status.HTTP_200_OK)
+    else :
+        data = {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Appointment Checked In Failed',
+                    'error_message': None,
+                }
+            }
+        return Response(data, status=status.HTTP_400_BAD_REQUEST)
