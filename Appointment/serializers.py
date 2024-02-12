@@ -12,7 +12,7 @@ from django.db.models import Sum, Case, When, FloatField, Subquery, OuterRef
 
 from rest_framework import serializers
 from Appointment.Constants.durationchoice import DURATION_CHOICES
-from Appointment.models import (Appointment, AppointmentCheckout, AppointmentNotes, AppointmentService,
+from Appointment.models import (Appointment, AppointmentGroup, AppointmentCheckout, AppointmentNotes, AppointmentService,
                                 AppointmentLogs, LogDetails, AppointmentEmployeeTip, ClientMissedOpportunity,
                                 OpportunityEmployeeService, Reversal)
 from Business.models import BusinessAddress
@@ -177,6 +177,14 @@ class TodayAppoinmentSerializer(serializers.ModelSerializer):
     service = serializers.SerializerMethodField(read_only=True)
     service_image = serializers.SerializerMethodField(read_only=True)
 
+    appointment_group_id = serializers.SerializerMethodField(read_only=True)
+
+    def get_appointment_group_id(self, app_service_instance):
+        try:
+            return str(AppointmentGroup.objects.get(appointment = app_service_instance.appointment).id)
+        except Exception as err:
+            return None
+
     def get_member(self, obj):
         try:
             return obj.member.full_name
@@ -198,7 +206,7 @@ class TodayAppoinmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentService
         fields = ('id', 'duration', 'appointment_time', 'appointment_date',
-                  'member', 'service', 'appointment', 'service_image')
+                  'member', 'service', 'appointment', 'service_image', 'appointment_group_id')
 
 
 class AppointmentServiceSerializer(serializers.ModelSerializer):
@@ -393,6 +401,15 @@ class CalanderserializerResponse(serializers.ModelSerializer):
     client_name = serializers.CharField(source='appointment.client.full_name', read_only=True)
     client_types = serializers.CharField(source='appointment.client_type', read_only=True)
     appointment_id = serializers.CharField(source='appointment.id', read_only=True)
+
+    appointment_group_id = serializers.SerializerMethodField(read_only=True)
+
+    def get_appointment_group_id(self, app_service_instance):
+        try:
+            return str(AppointmentGroup.objects.get(appointment = app_service_instance.appointment).id)
+        except Exception as err:
+            return None
+
     class Meta:
         model = AppointmentService
         fields = '__all__'
