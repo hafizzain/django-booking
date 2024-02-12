@@ -81,7 +81,7 @@ from Service.serializers import BasicServiceSerializer
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from Appointment.models import Comment
-from Appointment.serializers import CommentSerializer
+from Appointment.serializers import *
 from rest_framework.views import APIView
 
 @api_view(['GET'])
@@ -4501,7 +4501,8 @@ def appointment_service_status_update(request):
         AppointmentService.objects.filter(appointment=appointment).values_list('status', flat=True))
 
     is_all_finished = all(
-        [True if status == choices.AppointmentServiceStatus.FINISHED else False for status in appoint_service_statuses])
+        [True if status == choices.AppointmentServiceStatus.FINISHED else False for status in appoint_service_statuses]
+        )
     is_all_void = all(
         [True if status == choices.AppointmentServiceStatus.VOID else False for status in appoint_service_statuses])
     is_all_started = all(
@@ -4933,7 +4934,7 @@ def update_appointment_check_in(request):
         appointment = get_object_or_404(Appointment, id=appointment_id)
         appointment.check_in_time = datetime.now()
         appointment.save()
-        appointment_data = CommentSerializer(appointment).data
+        appointment_data = CheckInSerializer(appointment).data
         data = {
                 'status': True,
                 'status_code': 200,

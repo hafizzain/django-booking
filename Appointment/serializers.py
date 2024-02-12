@@ -1861,7 +1861,7 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = "__all__"
         
-class CommentSerializer(serializers.ModelSerializer):
+class CheckInSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
         fields = "__all__"
