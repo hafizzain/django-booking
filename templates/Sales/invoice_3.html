@@ -430,14 +430,14 @@
                 <p>{{sub_total}} {{currency_code}}</p>
                 
               </div>
-              <div class="flex items-center justify-between text-primary text-sm font-bold">
+              <!-- <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
                   <strong><p>change</p></strong>
                   {% comment %} <p>{{ business_address.primary_translation.change}}</p> {% endcomment %}
                   {% if business_address.secondary_translation.change %}<p class="arabic">{{ business_address.secondary_translation.change }} {% endif %}</p>
                 </div>
                 <p>{{change}} {{currency_code}}</p>
-              </div>
+              </div>  -->
               {% comment %}=========================================== total_tip ================================================================={% endcomment %}
 
               {% if total_tip %}
@@ -508,6 +508,13 @@
                 {% if business_address.secondary_translation.total %}<p class="arabic">{{ business_address.secondary_translation.total }} {% endif %}</p>
               </div>
               <p class="text-sm">{{total}} {{currency_code}}</p>
+            </div>
+            <div class="flex items-center justify-between text-primary text-sm font-bold">
+              <div>
+                <p class="text-left">{{ business_address.primary_translation.change}}</p>
+                {% if business_address.secondary_translation.change %}<p class="arabic">{{ business_address.secondary_translation.change }} {% endif %}</p>
+              </div>
+              <p class="text-sm">{{change}} {{currency_code}}</p>
             </div>
             <hr />
 
