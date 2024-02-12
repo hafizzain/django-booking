@@ -5,23 +5,23 @@ from SaleRecords.models import *
 
 @admin.register (SaleRecords)
 class SaleRecords(admin.ModelAdmin):
-    list_display = ['id']
+    list_display = ['id','status','checkout_type','sub_total','total_price','created_at']
     ordering = ['-created_at']
     
 @admin.register(SaleRecordsAppointmentServices)
 class SaleRecordsAppointmentServicesAdmin(admin.ModelAdmin):
-    list_display = ['id']
+    list_display = ['id','sale_record','price','created_at']
     ordering = ['-created_at']
 
     
 @admin.register(SaleRecordServices)
 class SaleRecordServicesAdmin(admin.ModelAdmin):
-    list_display =['id']
+    list_display =['id','sale_record','price','created_at']
     ordering = ['-created_at']
     
 @admin.register(SaleRecordsProducts)
 class SaleRecordsProductsAdmin(admin.ModelAdmin):
-    list_display = ['id']
+    list_display = ['id','sale_record','price','created_at']
     ordering = ['-created_at']
 
 @admin.register(SaleRecordMembership)

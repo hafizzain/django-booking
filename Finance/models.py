@@ -40,6 +40,7 @@ class RefundServices(CommonField):
     refund = models.ForeignKey(Refund, on_delete=models.CASCADE, related_name='refunded_services')
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     
+    quantity = models.PositiveBigIntegerField(default = 0)
     refunded_amount = models.DecimalField(max_digits=10, decimal_places=2)
 
 class RefundCoupon(CommonField):
