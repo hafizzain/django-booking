@@ -91,6 +91,7 @@ class SaleRecordViews(APIView):
                         location=sale_record.location,
                         payment_type=request.data.get('payment_type', None),
                         invoice_type='order',
+                        change = request.data.get('change', 0),
                         checkout_type=f'{request.data.get("checkout_type")}' if request.data.get("checkout_type") else 'sale',
                         sub_total=sale_record.sub_total,
                         total_amount=sale_record.total_price,
