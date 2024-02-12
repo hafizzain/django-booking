@@ -1699,6 +1699,7 @@ def create_group_appointment(request):
         business_address = None
 
     group_instance = AppointmentGroup.objects.create(group_name='appointment_group')
+    all_appointments = []
 
     for g_app in group_appointments:
         appointments = g_app.get('appointments', None)
@@ -1715,7 +1716,6 @@ def create_group_appointment(request):
         selected_promotion_id = g_app.get('selected_promotion_id', None)
         is_promotion_availed = g_app.get('is_promotion_availed', False)
         all_data = g_app.get('all_data', [])
-        all_appointments = []
 
         Errors = []
         total_price_app = 0
@@ -1727,7 +1727,7 @@ def create_group_appointment(request):
             client = None
 
         appointment = Appointment.objects.create(
-            user=user,
+            user=request.user,
             business=business,
             client=client,
             client_type=client_type,
@@ -1851,7 +1851,7 @@ def create_group_appointment(request):
                 try:
                     complimentary = ComplimentaryDiscount.objects.get(id=selected_promotion_id)
                     ClientPromotions.objects.create(
-                        user=user,
+                        user=request.user,
                         business=business,
                         client=client,
                         complimentary=complimentary,
@@ -1888,7 +1888,7 @@ def create_group_appointment(request):
 
                 if testduration == False:
                     packages = ClientPackageValidation.objects.create(
-                        user=user,
+                        user=request.user,
                         business=business,
                         client=client,
                         serviceduration=service_duration,
@@ -1909,7 +1909,7 @@ def create_group_appointment(request):
             toValue = 0
 
             appointment_service = AppointmentService.objects.create(
-                user=user,
+                user=request.user,
                 business=business,
                 business_address=business_address,
                 appointment=appointment,
@@ -1978,7 +1978,7 @@ def create_group_appointment(request):
 
             # Creating Employee Anatylics Here
             employee_insight_obj = EmployeeBookingDailyInsights.objects.create(
-                user=user,
+                user=request.user,
                 employee=member,
                 business=business,
                 service=service,
@@ -2039,25 +2039,26 @@ def create_group_appointment(request):
 
         NotificationProcessor.send_notifications_to_users(user, title, body, request_user=request.user)
 
-        serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request': request})
-        return Response(
-            {
-                'status': True,
-                'status_code': 201,
-                'response': {
-                    'message': 'Appointment Create!',
-                    'error_message': None,
-                    'error': Errors,
-                    'appointment_group' : {
-                        'id' : str(group_instance.id),
-                    },
-                    'appointment_id': appointment.id,
-                    'appointment_service_id': service_appointments[0],
-                    'appointments': serialized.data,
-                }
-            },
-            status=status.HTTP_201_CREATED
-        )
+        # serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request': request})
+
+    return Response(
+        {
+            'status': True,
+            'status_code': 201,
+            'response': {
+                'message': 'Appointment Create!',
+                'error_message': None,
+                'error': Errors,
+                'appointment_group' : {
+                    'id' : str(group_instance.id),
+                },
+                'appointment_id': group_instance.appointment.all()[0].id,
+                # 'appointment_service_id': service_appointments[0],
+                # 'appointments': serialized.data,
+            }
+        },
+        status=status.HTTP_201_CREATED
+    )
 
 
 @transaction.atomic
