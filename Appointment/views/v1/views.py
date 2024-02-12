@@ -4951,7 +4951,7 @@ def update_appointment_check_in(request):
                 'status_code': 200,
                 'response': {
                     'message': 'Appointment Checked In Failed',
-                    'error_message': None,
+                    'error_message': 'Missing Appointment ID',
                 }
             }
         return Response(data, status=status.HTTP_400_BAD_REQUEST)
