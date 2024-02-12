@@ -527,10 +527,10 @@
               <div class="flex items-center justify-between text-primary text-sm w-full">
                 <div>
 
-                  <p>{{ business_address.primary_translation.payment_method}}</p>
+                  {% comment %} <p>{{ business_address.primary_translation.payment_method}}</p>
                   {% if business_address.secondary_translation.payment_method %}
                   <p class="arabic">{{ business_address.secondary_translation.payment_method}}</p>
-                  {% endif %}
+                  {% endif %} {% endcomment %}
                     <p class="text-[#7B7B7B]">Payment on {{created_at}} </p>
                   
 
