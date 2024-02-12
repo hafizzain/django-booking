@@ -3629,7 +3629,7 @@ def get_comment(request):
     query = Q()
     if appointment:
         query &= Q(appointment=appointment)
-           
+
         comment = Comment.objects.filter(query)
         comment = paginator.paginate_queryset(comment, request)
         client_data = CommentSerializer(comment, many=True).data
