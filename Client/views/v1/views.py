@@ -3600,7 +3600,10 @@ def create_comment(request):
     if appointment:
         appointment = Appointment.objects.get(id=appointment)
         
-    comment = Comment.objects.create(employee_id=employee_id, comment=comment,user_id=user_id, appointment=appointment)
+    comment = Comment.objects.create(employee_id=employee_id,
+                                    comment=comment,
+                                    user_id=user_id,
+                                    appointment=appointment)
     client_data = CommentSerializer(comment, many=False).data  
     return Response(
         {
