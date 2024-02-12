@@ -4531,6 +4531,11 @@ def appointment_service_status_update(request):
                 'appointment_service': serialized.data,
                 'seperate_or_combined': seperate_or_combined,
                 'group_or_individual': group_or_individual,
+                'appoint_service_statuses' : appoint_service_statuses,
+                'is_all_finished' : [True if status == choices.AppointmentServiceStatus.FINISHED else False for status in appoint_service_statuses],
+                'is_all_void' : [True if status == choices.AppointmentServiceStatus.VOID else False for status in appoint_service_statuses],
+                'is_all_started' : [True if status == choices.AppointmentServiceStatus.STARTED else False for status in appoint_service_statuses]
+
             }
         },
         status=status.HTTP_200_OK
