@@ -393,12 +393,14 @@ class CalanderserializerResponse(serializers.ModelSerializer):
     client_types = serializers.CharField(source='appointment.client_type', read_only=True)
     appointment_id = serializers.CharField(source='appointment.id', read_only=True)
 
+    appointment_group_id = serializers.SerializerMethodField(read_only=True)
+
     def get_appointment_group_id(self, app_service_instance):
         try:
             return str(AppointmentGroup.objects.get(appointment = app_service_instance.appointment).id)
         except:
             return None
-            
+
     class Meta:
         model = AppointmentService
         fields = '__all__'
