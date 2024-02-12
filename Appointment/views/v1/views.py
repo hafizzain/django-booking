@@ -4963,3 +4963,39 @@ def update_appointment_check_in(request):
                 }
             }
         return Response(data, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def appointment_time_report(request):
+    appointment_id = request.GET.get('appointment_id', None)
+    appointment_service = request.GET.get('appointment_service', None)
+    
+    if appointment_id and appointment_service:
+        appointment = get_object_or_404(Appointment, id=appointment_id)
+        appointment_service  = get_object_or_404(AppointmentService, id=appointment_service)
+        serializers = AppointmentTimeReportSerializer(appointment)
+        appointment_service_serializer =AppointmentServiceTimeSerializer(appointment_service)
+        
+        data = {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Appointment Time Report Successfuly',
+                    'error_message': None,
+                    'data': {
+                        'appointment' : serializers.data,
+                        'appointment_service' : appointment_service_serializer.data
+                    }
+                }
+            }
+        return Response(data, status=status.HTTP_200_OK)
+    else:
+        data = {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Appointment Time Report Failed',
+                    'error_message': 'Missing Appointment ID or Appointment Service ID',
+                }
+            }
+        return Response(data, status=status.HTTP_400_BAD_REQUEST)
