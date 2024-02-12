@@ -12,7 +12,7 @@ from django.db.models import Sum, Case, When, FloatField, Subquery, OuterRef
 
 from rest_framework import serializers
 from Appointment.Constants.durationchoice import DURATION_CHOICES
-from Appointment.models import (Appointment, AppointmentCheckout, AppointmentNotes, AppointmentService,
+from Appointment.models import (Appointment, AppointmentGroup, AppointmentCheckout, AppointmentNotes, AppointmentService,
                                 AppointmentLogs, LogDetails, AppointmentEmployeeTip, ClientMissedOpportunity,
                                 OpportunityEmployeeService, Reversal)
 from Business.models import BusinessAddress
