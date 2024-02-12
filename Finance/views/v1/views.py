@@ -169,7 +169,7 @@ class RefundAPIView(APIView):
                         newAppointment.pk = None 
                         newAppointment.save() 
                         
-                        order_items = SaleRecordsAppointmentServices.objects.get_active_appointment_services(appointment = checkout_instance.appointment_services.appointment, service__id__in = refunded_services_ids) 
+                        order_items = SaleRecordsAppointmentServices.objects.filter(appointment = checkout_instance.appointment_services.appointment, service__id__in = refunded_services_ids) 
 
                         for order in order_items:
                             order.pk = None
