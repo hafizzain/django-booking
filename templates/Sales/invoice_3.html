@@ -433,7 +433,7 @@
               <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
                   <strong><p>change</p></strong>
-                  <p>{{ business_address.primary_translation.change}}</p>
+                  {% comment %} <p>{{ business_address.primary_translation.change}}</p> {% endcomment %}
                   {% if business_address.secondary_translation.change %}<p class="arabic">{{ business_address.secondary_translation.change }} {% endif %}</p>
                 </div>
                 <p>{{change}} {{currency_code}}</p>
