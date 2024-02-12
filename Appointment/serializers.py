@@ -176,6 +176,14 @@ class TodayAppoinmentSerializer(serializers.ModelSerializer):
     service = serializers.SerializerMethodField(read_only=True)
     service_image = serializers.SerializerMethodField(read_only=True)
 
+    appointment_group_id = serializers.SerializerMethodField(read_only=True)
+
+    def get_appointment_group_id(self, app_service_instance):
+        try:
+            return str(AppointmentGroup.objects.get(appointment = app_service_instance.appointment).id)
+        except Exception as err:
+            return None
+
     def get_member(self, obj):
         try:
             return obj.member.full_name
@@ -197,7 +205,7 @@ class TodayAppoinmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentService
         fields = ('id', 'duration', 'appointment_time', 'appointment_date',
-                  'member', 'service', 'appointment', 'service_image')
+                  'member', 'service', 'appointment', 'service_image', 'appointment_group_id')
 
 
 class AppointmentServiceSerializer(serializers.ModelSerializer):
