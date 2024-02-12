@@ -4507,7 +4507,10 @@ def appointment_service_status_update(request):
     is_all_started = all(
         [True if status == choices.AppointmentServiceStatus.STARTED else False for status in appoint_service_statuses])
 
-    if (is_all_finished or is_all_void) or (not is_all_started):
+    if "Started" in appoint_service_statuses:
+        appointment.status = choices.AppointmentStatus.STARTED
+        appointment.save()
+    elif (is_all_finished or is_all_void) or (not is_all_started):
         appointment.status = choices.AppointmentStatus.FINISHED
         appointment.save()
     else:
