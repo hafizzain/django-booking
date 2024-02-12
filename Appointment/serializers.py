@@ -399,7 +399,6 @@ class CalanderserializerResponse(serializers.ModelSerializer):
         try:
             return str(AppointmentGroup.objects.get(appointment = app_service_instance.appointment).id)
         except Exception as err:
-            return str(err)
             return None
 
     class Meta:
