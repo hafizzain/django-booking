@@ -188,8 +188,6 @@ class RefundAPIView(APIView):
                             order.pk = None
                             order.checkout = newCheckoutInstance
                             order.quantity = -RefundProduct.objects.get(product__id = order.id).refunded_quantity
-                            order.tip = 0
-                            order.gst = 0
                             # order.tax_amount = 0
                             order.is_refund = 'refund'
                             order.price = RefundProduct.objects.get(product__id = order.id).refunded_amount 
