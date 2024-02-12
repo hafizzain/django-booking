@@ -44,6 +44,7 @@ class InvoiceTranslation(models.Model):
     taxes = models.CharField(max_length=500, null=True, blank=True)
     total = models.CharField(max_length=500, null=True, blank=True)
     payment_method = models.CharField(max_length=500, null=True, blank=True)
+    change = models.CharField(max_length=500, null=True, blank=True)
     status = models.CharField(max_length=10, choices=status_type, default='active')
     
     def __str__(self):
