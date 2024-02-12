@@ -75,6 +75,9 @@ class AppointmentServiceAdmin(admin.ModelAdmin):
 @admin.register(AppointmentGroup)
 class AppointmentGroupAdmin(admin.ModelAdmin):
     list_display = [
-        'id'
-        
+        'id',
+        'total_appointments'
     ]
+
+    def total_appointments(self, obj):
+        return obj.appointment.all().count()
