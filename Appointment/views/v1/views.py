@@ -380,7 +380,7 @@ def get_appointments_group_services(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     try:
-        appointment_group = AppointmentGroup.objects.get(appointment__id = appointment_id, appointment__is_deleted=False)
+        appointment_group = AppointmentGroup.objects.get(id = appointment_id)
     except Exception as err:
         return Response(
             {
