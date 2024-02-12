@@ -2048,6 +2048,9 @@ def create_group_appointment(request):
                     'message': 'Appointment Create!',
                     'error_message': None,
                     'error': Errors,
+                    'appointment_group' : {
+                        'id' : str(group_instance.id),
+                    },
                     'appointment_id': appointment.id,
                     'appointment_service_id': service_appointments[0],
                     'appointments': serialized.data,
