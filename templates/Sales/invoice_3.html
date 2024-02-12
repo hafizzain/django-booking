@@ -477,29 +477,7 @@
 
               <hr>
               {% comment %}=================================================== Payment methods Details =========================={% endcomment %}
-              <p>{{ business_address.primary_translation.payment_method}}</p>
-              {% if business_address.secondary_translation.payment_method %}
-                <p class="arabic">{{ business_address.secondary_translation.payment_method}}</p>
-              {% endif %}
-
-              {% if checkout_data.payment_methods_records.all %}
-                
-                {% for method in  checkout_data.payment_methods_records.all %}
-                  
-                  <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
-                    <div class="font-semibold text-black">
-                      <p>{{method.payment_method}}</p>
-                      <p class="arabic"></p>
-                    </div>
-                    
-                    <p>{{ method.amount }} {{ currency_code }}</p>
-                      
-                  
-                  
-                  </div>
-                {% endfor %}
-              {% endif %} 
-              <hr>
+              
 
             </div>
             <div class="flex items-center justify-between text-primary text-sm font-bold">
@@ -518,6 +496,29 @@
             </div>
             <hr />
 
+            <p class="font-semibold text-black">{{ business_address.primary_translation.payment_method}}</p>
+              {% if business_address.secondary_translation.payment_method %}
+                <p class="arabic font-semibold text-black">{{ business_address.secondary_translation.payment_method}}</p>
+              {% endif %}
+
+              {% if checkout_data.payment_methods_records.all %}
+                
+                {% for method in  checkout_data.payment_methods_records.all %}
+                  
+                  <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
+                    <div class="font-semibold text-black">
+                      <p>{{method.payment_method}}</p>
+                      <p class="arabic"></p>
+                    </div>
+                    
+                    <p class="font-semibold text-black">{{ method.amount }} {{ currency_code }}</p>
+                      
+                  </div>
+                {% endfor %}
+              {% endif %} 
+
+              <hr>
+
             <div class="text-left flex flex-col gap-1">
               <div
                 class="flex items-center justify-between text-primary text-sm font-bold"> 
@@ -530,16 +531,8 @@
                   {% if business_address.secondary_translation.payment_method %}
                   <p class="arabic">{{ business_address.secondary_translation.payment_method}}</p>
                   {% endif %}
-                  {% if checkout_data.payment_methods_records %}
-                    
-                    {% for payment in checkout_data.payment_methods_records.all %}
-
-                    <p class="text-[#7B7B7B]">{{payment.payment_method}} on {{created_at}} </p>
-                    
-
-                    {% endfor %}
-                      
-                  {% endif %}
+                    <p class="text-[#7B7B7B]">Payment on {{created_at}} </p>
+                  
 
                 </div>
                 <div>
