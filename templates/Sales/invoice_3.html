@@ -479,6 +479,7 @@
               {% if business_address.secondary_translation.payment_method %}
                 <p class="arabic">{{ business_address.secondary_translation.payment_method}}</p>
               {% endif %}
+
               {% if checkout_data.payment_methods_records.all %}
                 
                 {% for method in  checkout_data.payment_methods_records.all %}
@@ -491,8 +492,8 @@
                     
                     <p>{{ method.amount }} {{ currency_code }}</p>
                       
-                    <p>No value available</p>
-                  {% endif %}
+                  
+                  
                   </div>
                 {% endfor %}
               {% endif %} 
