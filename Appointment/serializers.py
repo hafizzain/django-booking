@@ -363,7 +363,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
 class AppointmentSerializerForStatus(serializers.ModelSerializer):
     class Meta:
         model = Appointment
-        fields = ['id', 'status', 'cancel_note', 'cancel_reason']
+        fields = ['id', 'status', 'cancel_note', 'cancel_reason', 'check_in_time']
 
 
 class AppointmentServiceSerializerBasic(serializers.ModelSerializer):
@@ -1380,7 +1380,7 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
         fields = ('id', 'location', 'client', 'client_id', 'service',
                   'appointment_time', 'end_time', 'member', 'price',
                   'appointment_status', 'currency', 'booked_by', 'booking_id', 'appointment_date', 'client_type',
-                  'duration', 'notes', 'is_favourite'
+                  'duration', 'notes', 'is_favourite', 'check_in_time'
                   )
 
 
