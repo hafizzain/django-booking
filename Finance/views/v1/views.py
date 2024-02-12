@@ -159,15 +159,17 @@ class RefundAPIView(APIView):
                     newCheckoutInstance.pk = None 
                     # newCheckoutInstance.is_refund = True
                     newCheckoutInstance.save()
-                    # newCheckoutInstance.previous_checkout = checkout_instance
-                    # newCheckoutInstance.save()
+                    newCheckoutInstance.checkout_type = 'Refund'
+                    newCheckoutInstance.sub_total = float(-refund_price)
+                    newCheckoutInstance.total_price = float(-refund_price)
+                    newCheckoutInstance.save()
 
                     if checkout_type == 'Appointment': 
                         newAppointment = checkout_instance.appointment_services.appointment
                         newAppointment.pk = None 
                         newAppointment.save() 
                         
-                        order_items = SaleRecordsAppointmentServices.objects.get_active_appointment_services(appointment = checkout_instance.appointment_services.appointment, service__id__in = refunded_services_ids) 
+                        order_items = SaleRecordsAppointmentServices.objects.filter(appointment = checkout_instance.appointment_services.appointment, service__id__in = refunded_services_ids) 
 
                         for order in order_items:
                             order.pk = None

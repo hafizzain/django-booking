@@ -428,9 +428,11 @@
                   {% if business_address.secondary_translation.subtotal %}<p class="arabic">{{ business_address.secondary_translation.subtotal }} {% endif %}</p>
                 </div>
                 <p>{{sub_total}} {{currency_code}}</p>
+                
               </div>
               <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
+                  <strong><p>change</p></strong>
                   <p>{{ business_address.primary_translation.change}}</p>
                   {% if business_address.secondary_translation.change %}<p class="arabic">{{ business_address.secondary_translation.change }} {% endif %}</p>
                 </div>
@@ -479,20 +481,21 @@
               {% if business_address.secondary_translation.payment_method %}
                 <p class="arabic">{{ business_address.secondary_translation.payment_method}}</p>
               {% endif %}
-              {% if checkout_data.payment_method.all %}
+
+              {% if checkout_data.payment_methods_records.all %}
                 
-                {% for method in  checkout_data.payment_method.all %}
+                {% for method in  checkout_data.payment_methods_records.all %}
                   
                   <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
                     <div class="font-semibold text-black">
                       <p>{{method.payment_method}}</p>
                       <p class="arabic"></p>
                     </div>
-                    {% if method.amount %}
+                    
                     <p>{{ method.amount }} {{ currency_code }}</p>
-                      {% else %}
-                    <p>No value available</p>
-                  {% endif %}
+                      
+                  
+                  
                   </div>
                 {% endfor %}
               {% endif %} 

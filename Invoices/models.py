@@ -266,10 +266,13 @@ class SaleInvoice(models.Model):
     #     return tips
     def get_all_order_items (self):
         from SaleRecords.models import SaleRecords
+        try:
+            sale_records = SaleRecords.objects.get(id = self.checkout)
         
-        sale_records = SaleRecords.objects.get(id = self.checkout)
-        
-        return sale_records
+            
+            return sale_records
+        except Exception as e:
+            return False
     
     
     def save(self, *args, **kwargs):
