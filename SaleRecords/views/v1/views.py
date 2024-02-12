@@ -107,7 +107,8 @@ class SaleRecordViews(APIView):
                     # Sending order details to client through email
                     # """
                         if sale_record.membership_records:
-                            send_membership_order_email(sale_record.membership_records, location_id, request)
+                            # send_membership_order_email(sale_record.membership_records, location_id, request)
+                            pass
                         else:
                             send_order_email(sale_record, request)
                         
