@@ -4478,9 +4478,11 @@ def appointment_service_status_update(request):
         
     appointment_service.status = appointment_service_status
     if appointment_service_status == choices.AppointmentServiceStatus.STARTED:
-        # Appointment Checkin time when service started
-        appointment.check_in_time = datetime.now()
-        appointment.save()
+        # Appointment Checkin time not exist 
+        if appointment.check_in_time:
+            # Appointment Checkin time when service started
+            appointment.check_in_time = datetime.now()
+            appointment.save()
         appointment_service.service_start_time = datetime.now()
     elif appointment_service_status == choices.AppointmentServiceStatus.FINISHED:
         appointment_service.service_end_time = datetime.now()
