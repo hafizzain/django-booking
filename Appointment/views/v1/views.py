@@ -1727,7 +1727,7 @@ def create_group_appointment(request):
             client = None
 
         appointment = Appointment.objects.create(
-            user=user,
+            user=request.user,
             business=business,
             client=client,
             client_type=client_type,
@@ -1851,7 +1851,7 @@ def create_group_appointment(request):
                 try:
                     complimentary = ComplimentaryDiscount.objects.get(id=selected_promotion_id)
                     ClientPromotions.objects.create(
-                        user=user,
+                        user=request.user,
                         business=business,
                         client=client,
                         complimentary=complimentary,
@@ -1888,7 +1888,7 @@ def create_group_appointment(request):
 
                 if testduration == False:
                     packages = ClientPackageValidation.objects.create(
-                        user=user,
+                        user=request.user,
                         business=business,
                         client=client,
                         serviceduration=service_duration,
@@ -1909,7 +1909,7 @@ def create_group_appointment(request):
             toValue = 0
 
             appointment_service = AppointmentService.objects.create(
-                user=user,
+                user=request.user,
                 business=business,
                 business_address=business_address,
                 appointment=appointment,
@@ -1978,7 +1978,7 @@ def create_group_appointment(request):
 
             # Creating Employee Anatylics Here
             employee_insight_obj = EmployeeBookingDailyInsights.objects.create(
-                user=user,
+                user=request.user,
                 employee=member,
                 business=business,
                 service=service,
