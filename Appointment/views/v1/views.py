@@ -4488,7 +4488,7 @@ def appointment_service_status_update(request):
         appointment_service.reason=service_void_reason
     appointment_service.save()
 
-    # Appointment Checkin time sperate
+    # Appointment sperate Checkin time 
     if appointment_checkin_time:
         appointment.check_in_time = datetime.now()
         appointment.save()
