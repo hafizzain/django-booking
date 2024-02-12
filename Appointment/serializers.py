@@ -398,7 +398,8 @@ class CalanderserializerResponse(serializers.ModelSerializer):
     def get_appointment_group_id(self, app_service_instance):
         try:
             return str(AppointmentGroup.objects.get(appointment = app_service_instance.appointment).id)
-        except:
+        except Exception as err:
+            return str(err)
             return None
 
     class Meta:
