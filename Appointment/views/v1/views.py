@@ -4479,7 +4479,7 @@ def appointment_service_status_update(request):
     appointment_service.status = appointment_service_status
     if appointment_service_status == choices.AppointmentServiceStatus.STARTED:
         # Appointment Checkin time not exist 
-        if appointment.check_in_time is not None:
+        if appointment.check_in_time is None:
             # Appointment Checkin time when service started
             appointment.check_in_time = datetime.now()
             appointment.save()
