@@ -272,7 +272,7 @@ class SaleInvoice(models.Model):
             
             return sale_records
         except Exception as e:
-            return f"{"error": str(e)}"
+            return False
     
     
     def save(self, *args, **kwargs):
