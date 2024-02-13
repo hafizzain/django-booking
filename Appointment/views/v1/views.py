@@ -4981,12 +4981,12 @@ def update_group_appointment_check_in(request):
             appointment.check_in_time = timezone.now()
             appointment.save()
         
-        group_appointment_data = GroupAppointmentSerializer(group_appointment).data
+        group_appointment_data = GroupCheckInSerializer(group_appointment).data
         data = {
                 'status': True,
                 'status_code': 200,
                 'response': {
-                    'message': 'Appointment Checked In Successfuly',
+                    'message': 'Group Checked In Successfuly',
                     'error_message': None,
                     'Appointment' : group_appointment_data
                 }
@@ -4997,7 +4997,7 @@ def update_group_appointment_check_in(request):
                 'status': True,
                 'status_code': 200,
                 'response': {
-                    'message': 'Appointment Checked In Failed',
+                    'message': 'Group Checked In Failed',
                     'error_message': 'Missing Group Appointment ID',
                 }
             }
