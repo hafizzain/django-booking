@@ -197,12 +197,12 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     
     
     
-    def get_invoice(self, obj):
-        try:
-            invoice = SaleInvoice.objects.get(checkout = obj.id)
-            return SaleInvoiceSerializer(invoice, context = self.context).data
-        except Exception as e:
-            raise ValidationError(f'Error Occured while getting the invoice in the serializer')
+    # def get_invoice(self, obj):
+    #     try:
+    #         invoice = SaleInvoice.objects.get(checkout = obj.id)
+    #         return SaleInvoiceSerializer(invoice, context = self.context).data
+    #     except Exception as e:
+    #         raise ValidationError(f'Error Occured while getting the invoice in the serializer')
     
     
     
