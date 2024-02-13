@@ -17,6 +17,14 @@ from Client.models import Client
 from Appointment.models import AppointmentCheckout, AppointmentService
 from Order.models import Checkout, ProductOrder, ServiceOrder
 
+
+
+
+
+
+
+
+
 @api_view(['GET'])
 def check_permission_view(request):
     try:
@@ -185,8 +193,16 @@ class RefundAPIView(APIView):
                         # or you can do it in loop
                     else: 
                         product_orders = SaleRecordsProducts.objects.filter(sale_record=invoice.checkout_instance, product__id__in = refunded_products_ids) 
-                        from SaleRecords.serializers import SaleRecordProductsSerializer
-                        return Response({'Sale Order order count ': SaleRecordProductsSerializer(product_orders).data })
+                        
+                        
+                        # from SaleRecords.serializers import SaleRecordProductsSerializer
+                        from django.http import JsonResponse
+                        from django.core.serializers import serialize   
+                        
+                        serialized_data = serialize('json', product_orders)
+                        return JsonResponse(serialized_data, safe=False)
+                    
+                    
                         # product_orders.update(pk = None, checkout=newCheckoutInstance) 
                         
                         for order in product_orders:
