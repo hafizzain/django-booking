@@ -214,7 +214,7 @@ class RefundAPIView(APIView):
                                     employee=order.employee,  # assuming you want to keep the same employee
                                     product=order.product,
                                     quantity = refund_product.refunded_quantity,  # negative quantity for refund
-                                    price=refund_product.refunded_amount,
+                                    price = float(-refund_product.refunded_amount),
                                     # copy other fields as needed
                                 )
                             except ObjectDoesNotExist:
@@ -237,6 +237,8 @@ class RefundAPIView(APIView):
                     newInvoice.sub_total = float(-refund_price)
                     newInvoice.total_amount = float(-refund_price)
                     newInvoice.checkout = str(newCheckoutInstance.id) 
+                    newInvoice.total_tax = 0
+                    newInvoice.total_tip = 0
                     # newInvoice.checkout_type = 'refund'
                     newInvoice.payment_type = payment_type
                     newInvoice.save() 
