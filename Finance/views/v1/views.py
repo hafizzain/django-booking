@@ -170,7 +170,7 @@ class RefundAPIView(APIView):
                         newAppointment.pk = None 
                         newAppointment.save() 
                         
-                        order_items = SaleRecordsAppointmentServices.objects.filter(appointment = checkout_instance.appointment_services.appointment, service__id__in = refunded_services_ids) 
+                        order_items = SaleRecordsAppointmentServices.objects.filter(appointment = invoice.checkout_instance.appointment_services.appointment, service__id__in = refunded_services_ids) 
                         return Response({'Appointment order count ': order_items.count() })
                         for order in order_items:
                             order.pk = None
@@ -184,7 +184,7 @@ class RefundAPIView(APIView):
                             
                         # or you can do it in loop
                     else: 
-                        product_orders = SaleRecordsProducts.objects.filter(sale_record=checkout_instance, product__id__in = refunded_products_ids) 
+                        product_orders = SaleRecordsProducts.objects.filter(sale_record=invoice.checkout_instance, product__id__in = refunded_products_ids) 
                         return Response({'Sale Order order count ': product_orders.count() })
                         # product_orders.update(pk = None, checkout=newCheckoutInstance) 
                         
