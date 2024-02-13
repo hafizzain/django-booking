@@ -200,7 +200,7 @@ class RefundAPIView(APIView):
                         
                         for order in product_orders:
                             try:
-                                refund_product = RefundProduct.objects.get(checkout = invoice.checkout_instance,product__id=order.product.id)
+                                refund_product = RefundProduct.objects.get(checkouts = invoice.checkout_instance,product__id=order.product.id)
                                 # Create a new SaleRecordsProducts instance for the refund
                                 SaleRecordsProducts.objects.create(
                                     sale_record=newCheckoutInstance,
@@ -218,7 +218,7 @@ class RefundAPIView(APIView):
                         # service_orders.update(pk = None, checkout=newCheckoutInstance) 
                         for order in service_orders:
                             try :
-                                refunded_services = SaleRecordServices.objects.get(checkout = invoice.checkout_instance,service__id = order.service.id)
+                                refunded_services = SaleRecordServices.objects.get(checkouts = invoice.checkout_instance,service__id = order.service.id)
                                 SaleRecordServices.objects.create(
                                     sale_record = newCheckoutInstance,
                                     employee = order.employee,
