@@ -35,6 +35,7 @@ class RefundProduct(CommonField):
     refunded_quantity = models.PositiveIntegerField()
     refunded_amount = models.DecimalField(max_digits=10, decimal_places=2)
     in_stock = models.BooleanField(default = False)
+    checkouts = models.CharField(null=True, blank=True, max_length=150)
     
 class RefundServices(CommonField):
     refund = models.ForeignKey(Refund, on_delete=models.CASCADE, related_name='refunded_services')
@@ -42,6 +43,7 @@ class RefundServices(CommonField):
     
     quantity = models.PositiveBigIntegerField(default = 0)
     refunded_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    checkouts = models.CharField(null=True, blank=True, max_length=150)
 
 class RefundCoupon(CommonField):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
