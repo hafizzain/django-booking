@@ -5009,14 +5009,13 @@ def update_group_appointment_check_in(request):
 @permission_classes([IsAuthenticated])
 def appointment_time_report(request):
     appointment_id = request.query_params.get('appointment_id', None)
-    # appointment_service = request.query_params.get('appointment_service', None)
+    appointment_service = request.query_params.get('appointment_service', None)
     
     if appointment_id and appointment_service:
-        # appointment = get_object_or_404(Appointment, id=appointment_id)
+        appointment = get_object_or_404(Appointment, id=appointment_id)
         appointment_service  = get_object_or_404(AppointmentService, id=appointment_service)
-        # serializers = AppointmentTimeReportSerializer(appointment)
-        appointment_service_serializer =AppointmentServiceTimeSerializer(appointment_service,
-                                                                        context={'appointment_id': appointment_id})
+        serializers = AppointmentTimeReportSerializer(appointment)
+        appointment_service_serializer =AppointmentServiceTimeSerializer(appointment_service)
         
         data = {
                 'status': True,
@@ -5024,15 +5023,17 @@ def appointment_time_report(request):
                 'response': {
                     'message': 'Appointment Time Report Successfuly',
                     'error_message': None,
-                        # 'appointment' : serializers.data,
+                    'data' : {
+                        'appointment' : serializers.data,
                         'appointment_service' : appointment_service_serializer.data
+                    }
                 }
             }
         return Response(data, status=status.HTTP_200_OK)
     else:
-        # appointment = Appointment.objects.all()
+        appointment = Appointment.objects.all()
         appointment_service = AppointmentService.objects.all()
-        # serializers = AppointmentTimeReportSerializer(appointment, many=True)
+        serializers = AppointmentTimeReportSerializer(appointment, many=True)
         appointment_service_serializer =AppointmentServiceTimeSerializer(appointment_service, many=True)
         data = {
                 'status': True,
@@ -5040,10 +5041,10 @@ def appointment_time_report(request):
                 'response': {
                     'message': 'All Appointment Time Report Failed',
                     'error_message': None,
-                    
-                        # 'appointment' : serializers.data,
-                    'appointment_service' : appointment_service_serializer.data
-                    
+                    'data': {
+                        'appointment' : serializers.data,
+                        'appointment_service' : appointment_service_serializer.data
+                    }
                 }
             }
         return Response(data, status=status.HTTP_200_OK)
