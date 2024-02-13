@@ -3631,10 +3631,11 @@ def get_comment(request):
     paginator.page_size = 10
     
     query = Q()
+    if group_appointment:
+            query &= Q(group_appointment=group_appointment)
+            
     if appointment:
         query &= Q(appointment=appointment)
-    if group_appointment:
-        query &= Q(group_appointment=group_appointment)
         
         comment = Comment.objects.filter(query)
         comment = paginator.paginate_queryset(comment, request)
