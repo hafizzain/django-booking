@@ -165,12 +165,13 @@ class RefundAPIView(APIView):
                     newCheckoutInstance.save()
 
                     if checkout_type == 'Appointment': 
+                        print('coming here')
                         newAppointment = checkout_instance.appointment_services.appointment
                         newAppointment.pk = None 
                         newAppointment.save() 
                         
                         order_items = SaleRecordsAppointmentServices.objects.filter(appointment = checkout_instance.appointment_services.appointment, service__id__in = refunded_services_ids) 
-
+                        return Response({'order count ': order_items.count() })
                         for order in order_items:
                             order.pk = None
                             order.is_refund = 'refund'
@@ -184,6 +185,7 @@ class RefundAPIView(APIView):
                         # or you can do it in loop
                     else: 
                         product_orders = SaleRecordsProducts.objects.filter(sale_record=checkout_instance, product__id__in = refunded_products_ids) 
+                        return Response({'order count ': product_orders.count() })
                         # product_orders.update(pk = None, checkout=newCheckoutInstance) 
                         
                         for order in product_orders:
