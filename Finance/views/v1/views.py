@@ -196,11 +196,11 @@ class RefundAPIView(APIView):
                         
                         
                         # from SaleRecords.serializers import SaleRecordProductsSerializer
-                        from django.http import JsonResponse
-                        from django.core.serializers import serialize   
+                        # from django.http import JsonResponse
+                        # from django.core.serializers import serialize   
                         
-                        serialized_data = serialize('json', product_orders)
-                        return JsonResponse(serialized_data, safe=False)
+                        # serialized_data = serialize('json', product_orders)
+                        # return JsonResponse(serialized_data, safe=False)
                     
                     
                         # product_orders.update(pk = None, checkout=newCheckoutInstance) 
