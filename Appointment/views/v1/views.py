@@ -4965,7 +4965,45 @@ def update_appointment_check_in(request):
                 }
             }
         return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+# Group Appointment Check-in ------------------------------------------     
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_group_appointment_check_in(request):
+    group_appointment_id = request.data.get('group_appointment_id', None)
     
+    if group_appointment_id:
+        group_appointment = get_object_or_404(AppointmentGroup, id=group_appointment_id)
+        # group_appointment.appointment.update(check_in_time=timezone.now())
+        
+        # Update each appointment individually
+        for appointment in group_appointment.appointment.all():
+            appointment.check_in_time = timezone.now()
+            appointment.save()
+        
+        group_appointment_data = GroupAppointmentSerializer(group_appointment).data
+        data = {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Appointment Checked In Successfuly',
+                    'error_message': None,
+                    'Appointment' : group_appointment_data
+                }
+            }
+        return Response(data, status=status.HTTP_200_OK)
+    else :
+        data = {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Appointment Checked In Failed',
+                    'error_message': 'Missing Group Appointment ID',
+                }
+            }
+        return Response(data, status=status.HTTP_400_BAD_REQUEST)
+    
+# Appointment Time Report ----------------------------------------------------------
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def appointment_time_report(request):
