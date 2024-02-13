@@ -213,7 +213,7 @@ class RefundAPIView(APIView):
                                     sale_record=newCheckoutInstance,
                                     employee=order.employee,  # assuming you want to keep the same employee
                                     product=order.product,
-                                    quantity=-refund_product.refunded_quantity,  # negative quantity for refund
+                                    quantity = refund_product.refunded_quantity,  # negative quantity for refund
                                     price=refund_product.refunded_amount,
                                     # copy other fields as needed
                                 )
