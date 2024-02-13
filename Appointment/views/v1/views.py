@@ -4981,7 +4981,7 @@ def update_group_appointment_check_in(request):
             appointment.check_in_time = timezone.now()
             appointment.save()
         
-        group_appointment_data = GroupAppointmentSerializer(group_appointment).data
+        group_appointment_data = GroupCheckInSerializer(group_appointment).data
         data = {
                 'status': True,
                 'status_code': 200,

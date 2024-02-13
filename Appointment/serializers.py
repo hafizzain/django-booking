@@ -1895,7 +1895,7 @@ class AppointmentTimeReportSerializer(serializers.ModelSerializer):
         fields = ['id','check_in_time','created_at']
         
 
-class GroupAppointmentSerializer(serializers.ModelSerializer):
+class GroupCheckInSerializer(serializers.ModelSerializer):
     appointment = AppointmentTimeReportSerializer(many=True, read_only=True)
     class Meta:
         model = AppointmentGroup
