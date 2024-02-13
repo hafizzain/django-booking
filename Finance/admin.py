@@ -8,12 +8,12 @@ class RefundCouponAdmin(admin.ModelAdmin):
 
 @admin.register(RefundProduct)
 class RefundProductsAdmin(admin.ModelAdmin):
-    list_display = ['id','refunded_quantity','refunded_amount','in_stock']
+    list_display = ['id','product','refunded_quantity','refunded_amount','in_stock']
     ordering = ['-created_at']
 
 @admin.register(RefundServices)
 class RefundServiceAdmin(admin.ModelAdmin):
-    list_display = ['id','service','refunded_amount']
+    list_display = ['id','service','refunded_quantity','refunded_amount']
     ordering = ['-created_at']
     
 @admin.register(Refund)
