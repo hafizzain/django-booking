@@ -13,7 +13,7 @@ class RefundProductsAdmin(admin.ModelAdmin):
 
 @admin.register(RefundServices)
 class RefundServiceAdmin(admin.ModelAdmin):
-    list_display = ['id','service','refunded_quantity','refunded_amount']
+    list_display = ['id','service','refunded_amount']
     ordering = ['-created_at']
     
 @admin.register(Refund)

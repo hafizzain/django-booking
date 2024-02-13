@@ -34,7 +34,7 @@ class SaleRecords(CommonField):
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, null = True, blank=True, related_name='sale_records_client')
     client_type = models.CharField(choices=ClientTypeChoices.choices, max_length=50, blank=False, null=False) 
     
-    status = models.CharField(choices = Status.choices, max_length=50 , default = Status.UN_PAID) 
+    status = models.CharField(choices = Status.choices, max_length=50 , default = Status.PAID) 
     
     
     total_tip = models.FloatField(blank=False, null=False)
