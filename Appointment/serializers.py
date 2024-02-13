@@ -1885,22 +1885,19 @@ class CheckInSerializer(serializers.ModelSerializer):
         model = Appointment
         fields = "__all__"
 
+class AppointmentTimeReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = ['id','check_in_time','created_at']
+        
 class AppointmentServiceTimeSerializer(serializers.ModelSerializer):
+    appointment = AppointmentTimeReportSerializer(read_only=True)
     class Meta:
         model = AppointmentService
-        fields = ['service_start_time',]
-class AppointmentTimeReportSerializer(serializers.ModelSerializer):
-    service = AppointmentServiceTimeSerializer(many=True, read_only=True)
-    class Meta:
-        model = Appointment
-        fields = ['id', 'check_in_time', 'created_at', 'service']
-    
-class AppointmentCheckInSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Appointment
-        fields = ['id', 'check_in_time', 'created_at']
+        fields = ['service_start_time', 'appointment']       
+
 class GroupCheckInSerializer(serializers.ModelSerializer):
-    appointment = AppointmentCheckInSerializer(many=True, read_only=True)
+    appointment = AppointmentTimeReportSerializer(many=True, read_only=True)
     class Meta:
         model = AppointmentGroup
         fields = "__all__"
