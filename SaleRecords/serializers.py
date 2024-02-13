@@ -204,7 +204,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                 return SaleInvoiceSerializer(invoice, context = self.context).data
             return None
         except Exception as e:
-            raise ValidationError(f'Error Occured while getting the invoice in the serializer')
+            raise ValidationError(f'Error Occured while getting the invoice in the serializer {str(e)}')
     
     
     
