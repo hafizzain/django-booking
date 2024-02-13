@@ -121,7 +121,7 @@ class SaleInvoice(models.Model):
         return str(self.id)
     
     @property
-    def checkout_instance(self,):
+    def checkout_instance(self):
         from SaleRecords.models import SaleRecords
         '''
         getting the checkout instance of the checkout based on the checkout_type from the invoice model
