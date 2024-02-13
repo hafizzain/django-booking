@@ -1886,21 +1886,11 @@ class CheckInSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class AppointmentTimeReportSerializer(serializers.ModelSerializer):
-    service = serializers.SerializerMethodField(read_only=True)
     
-        
-    def get_service(self, obj):
-        appointment_id = self.context.get('appointment_id')
-        try:
-            service = AppointmentService.objects.filter(appointment=appointment_id)
-            return AppointmentServiceTimeSerializer(service, many=True).data
-        except Exception as err:
-            return None
     class Meta:
         model = Appointment
         fields = ['id','check_in_time','created_at', 'service']    
 class AppointmentServiceTimeSerializer(serializers.ModelSerializer):
-    # appointment = AppointmentTimeReportSerializer(read_only=True)
     class Meta:
         model = AppointmentService
         fields = ['service_start_time', 'appointment']       
