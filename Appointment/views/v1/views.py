@@ -4992,12 +4992,21 @@ def appointment_time_report(request):
             }
         return Response(data, status=status.HTTP_200_OK)
     else:
+        appointment = Appointment.objects.select_related('user', 'business', 'client', 'business_address', 'member')
+        appointment_service = AppointmentService.objects.select_related('user', 'business', 'appointment',
+                                                                    'service' , 'member', 'business_address')
+        serializers = AppointmentTimeReportSerializer(appointment)
+        appointment_service_serializer =AppointmentServiceTimeSerializer(appointment_service)
         data = {
                 'status': True,
                 'status_code': 200,
                 'response': {
-                    'message': 'Appointment Time Report Failed',
-                    'error_message': 'Missing Appointment ID or Appointment Service ID',
+                    'message': 'All Appointment Time Report Failed',
+                    'error_message': None,
+                    'data': {
+                        'appointment' : serializers.data,
+                        'appointment_service' : appointment_service_serializer.data
+                    }
                 }
             }
-        return Response(data, status=status.HTTP_400_BAD_REQUEST)
+        return Response(data, status=status.HTTP_200_OK)
