@@ -4974,12 +4974,12 @@ def update_group_appointment_check_in(request):
     
     if group_appointment_id:
         group_appointment = get_object_or_404(AppointmentGroup, id=group_appointment_id)
-        # group_appointment.appointment.update(check_in_time=timezone.now())
+        group_appointment.appointment.update(check_in_time=timezone.now())
         
-        # Update each appointment individually
-        for appointment in group_appointment.appointment.all():
-            appointment.check_in_time = timezone.now()
-            appointment.save()
+        # # Update each appointment individually
+        # for appointment in group_appointment.appointment.all():
+        #     appointment.check_in_time = timezone.now()
+        #     appointment.save()
         
         group_appointment_data = GroupCheckInSerializer(group_appointment).data
         data = {
@@ -4988,7 +4988,7 @@ def update_group_appointment_check_in(request):
                 'response': {
                     'message': 'Group Checked In Successfuly',
                     'error_message': None,
-                    'Appointment' : group_appointment_data
+                    'Group Appointment' : group_appointment_data
                 }
             }
         return Response(data, status=status.HTTP_200_OK)
