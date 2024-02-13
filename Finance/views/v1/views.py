@@ -185,7 +185,8 @@ class RefundAPIView(APIView):
                         # or you can do it in loop
                     else: 
                         product_orders = SaleRecordsProducts.objects.filter(sale_record=invoice.checkout_instance, product__id__in = refunded_products_ids) 
-                        return Response({'Sale Order order count ': product_orders.all })
+                        from SaleRecords.serializers import SaleRecordProductsSerializer
+                        return Response({'Sale Order order count ': SaleRecordProductsSerializer(product_orders).data })
                         # product_orders.update(pk = None, checkout=newCheckoutInstance) 
                         
                         for order in product_orders:
