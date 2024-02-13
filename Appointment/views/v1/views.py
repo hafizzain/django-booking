@@ -4934,7 +4934,7 @@ def update_reversals(request):
         }
         return Response(data, status=status.HTTP_200_OK)
 
-# Add Appointment check-in time  
+# Update Appointment check-in time ---------------------------------------------------
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_appointment_check_in(request):
@@ -4974,13 +4974,9 @@ def update_group_appointment_check_in(request):
     
     if group_appointment_id:
         group_appointment = get_object_or_404(AppointmentGroup, id=group_appointment_id)
+        
+        # Bulk Update appointment check-in time
         group_appointment.appointment.update(check_in_time=timezone.now())
-        
-        # # Update each appointment individually
-        # for appointment in group_appointment.appointment.all():
-        #     appointment.check_in_time = timezone.now()
-        #     appointment.save()
-        
         group_appointment_data = GroupCheckInSerializer(group_appointment).data
         data = {
                 'status': True,
@@ -5011,9 +5007,9 @@ def appointment_time_report(request):
     appointment_service = request.query_params.get('appointment_service', None)
     
     if appointment_id and appointment_service:
-        appointment = get_object_or_404(Appointment, id=appointment_id)
+        # appointment = get_object_or_404(Appointment, id=appointment_id)
         appointment_service  = get_object_or_404(AppointmentService, id=appointment_service)
-        serializers = AppointmentTimeReportSerializer(appointment)
+        # serializers = AppointmentTimeReportSerializer(appointment)
         appointment_service_serializer =AppointmentServiceTimeSerializer(appointment_service)
         
         data = {
@@ -5023,7 +5019,7 @@ def appointment_time_report(request):
                     'message': 'Appointment Time Report Successfuly',
                     'error_message': None,
                     'data': {
-                        'appointment' : serializers.data,
+                        # 'appointment' : serializers.data,
                         'appointment_service' : appointment_service_serializer.data
                     }
                 }
