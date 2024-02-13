@@ -4977,7 +4977,7 @@ def update_group_appointment_check_in(request):
         # group_appointment.appointments.update(check_in_time=timezone.now())
         
         # Update each appointment individually
-        for appointment in group_appointment.appointments.all():
+        for appointment in group_appointment.appointment.all():
             if appointment.check_in_time is None:
                 appointment.check_in_time = timezone.now()
                 appointment.save()
