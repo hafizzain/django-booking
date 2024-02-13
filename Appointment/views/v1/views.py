@@ -4992,11 +4992,10 @@ def appointment_time_report(request):
             }
         return Response(data, status=status.HTTP_200_OK)
     else:
-        appointment = Appointment.objects.select_related('user', 'business', 'client', 'business_address', 'member')
-        appointment_service = AppointmentService.objects.select_related('user', 'business', 'appointment',
-                                                                    'service' , 'member', 'business_address')
-        serializers = AppointmentTimeReportSerializer(appointment)
-        appointment_service_serializer =AppointmentServiceTimeSerializer(appointment_service)
+        appointment = Appointment.objects.all()
+        appointment_service = AppointmentService.objects.all()
+        serializers = AppointmentTimeReportSerializer(appointment, many=True)
+        appointment_service_serializer =AppointmentServiceTimeSerializer(appointment_service, many=True)
         data = {
                 'status': True,
                 'status_code': 200,
