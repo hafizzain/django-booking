@@ -204,15 +204,19 @@ class RefundAPIView(APIView):
                     
                     
                         # product_orders.update(pk = None, checkout=newCheckoutInstance) 
-                        
+                        from django.core.exceptions import ObjectDoesNotExist
                         for order in product_orders:
-                            order.pk = None
-                            order.sale_record = newCheckoutInstance
-                            order.quantity = RefundProduct.objects.get(product__id = order.id).refunded_quantity
-                            # order.tax_amount = 0
-                            # order.is_refund = 'refund'
-                            order.price = RefundProduct.objects.get(product__id = order.id).refunded_amount 
-                            order.save()
+                            try:
+                                refund_product = RefundProduct.objects.get(product__id=order.product.id)
+                                order.pk = None
+                                order.sale_record = newCheckoutInstance
+                                order.quantity = float(-refund_product.refunded_quantity)
+                                order.price = refund_product.refunded_amount
+                                order.save()
+                            except ObjectDoesNotExist:
+                                # Handle the case where RefundProduct does not exist for the current order's product ID
+                                # For example, you can log the error or handle it in any appropriate way
+                                print(f"No RefundProduct found for product ID {order.product.id}")
                             
                         service_orders = SaleRecordServices.objects.filter(sale_record=invoice.checkout_instance, service__id__in = refunded_services_ids) 
                         # service_orders.update(pk = None, checkout=newCheckoutInstance) 
