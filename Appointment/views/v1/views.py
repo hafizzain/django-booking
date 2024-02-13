@@ -5037,7 +5037,7 @@ def appointment_time_report(request):
                     'message': 'All Appointment Time Report Failed',
                     'error_message': None,
                     'data': {
-                        'appointment' : serializers.data,
+                        # 'appointment' : serializers.data,
                         'appointment_service' : appointment_service_serializer.data
                     }
                 }
