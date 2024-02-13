@@ -1889,7 +1889,7 @@ class AppointmentTimeReportSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Appointment
-        fields = ['id','check_in_time','created_at', 'service']    
+        fields = ['id','check_in_time','created_at']    
 class AppointmentServiceTimeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentService
