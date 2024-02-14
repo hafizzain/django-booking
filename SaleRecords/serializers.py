@@ -532,9 +532,35 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                                 tip = 0
                             )
                         ])
+                        
+            if service_list:
+                for item in service_list:
+                    sale_commission =  CategoryCommission.objects.filter(
+                        commission__employee = item.get('employee'),
+                        from_value__lte = float(item.get("price")),
+                        category_comission__iexact = 'Service'
+                    ).order_by('-from_value').first()
+                    
+                    if sale_commission:
+                        calculated_commission  = sale_commission.calculated_commission(item.get('price'))
+                        EmployeeCommission.objects.bulk_create([
+                            EmployeeCommission(
+                                user_id = user,
+                                business=checkout_id.location.business,
+                                location_id = location,
+                                employee = item.get('employee'),
+                                commission = sale_commission.commission,
+                                category_commission = sale_commission,
+                                commission_category = sale_commission.category_comission,
+                                commission_type = sale_commission.comission_choice,
+                                sale_value = float(item.get('price')),
+                                commission_rate = float(sale_commission.commission_percentage),
+                                commission_amount = float(calculated_commission),
+                                symbol = sale_commission.symbol,
+                                sale_id = checkout_id.id,
+                                tip = 0
+                            )
+                        ])    
                 
-                
-                
-            
         except Exception as e:
             raise ValidationError(f'Error occured in Employee Commission Calculations {str(e)}')
