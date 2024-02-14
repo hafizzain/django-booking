@@ -152,7 +152,10 @@ def create_reversal(request):
     client_phone = request.data.get('client_phone', None)
     url = request.data.get('url', None)
     generated_by = request.data.get('generated_by', None)
+    location = request.data.get('location_id', None)
+    
     Reversal.objects.create(
+        location_id=location,
         url=url,
         description=description, appointment_date=appointment_date,
         business_id=business, request_status='pending',
@@ -188,9 +191,10 @@ def get_reversal(request):
     search = request.GET.get('search_text', None)
     start_date = request.GET.get('start_date', None)
     end_date = request.GET.get('end_date', None)
+    location = request.GET.get('location_id', None)
     
     #apply filter
-    query = Q()  
+    query = Q(location=location)  
     if start_date and end_date:
         query &= Q(appointment_date__range=(start_date, end_date))  
     

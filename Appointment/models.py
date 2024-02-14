@@ -677,6 +677,7 @@ class OpportunityEmployeeService(CommonField):
 
 
 class Reversal(CommonField):
+    location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='location_reversal')
     url = models.TextField(null=True, blank=True)
     email = models.TextField(null=True)
     appointment_date = models.DateField(null=True, blank=True)

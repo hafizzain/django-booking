@@ -125,6 +125,14 @@ class SaleRecordViews(APIView):
                     loyalty_points_update(location=location_id, client=client, loyalty_points=loyalty_points, sub_total=sub_total, invoice=invoice)
                     
                     # Calculating commission for the employee ----------------------------------------------------------------------
+                    # sale_price = 0
+                    # if order_discount_price:
+                    #     sale_price = float(order_discount_price)
+                    # else:
+                    #     sale_price = float(price)
+
+                    # total_from_value = float(sale_price) * float(quantity)
+                    
                     # sale_commissions = CategoryCommission.objects.filter(
                     #     commission__employee=employee_id,
                     #     from_value__lte=float(total_from_value),
