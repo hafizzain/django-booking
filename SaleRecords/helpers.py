@@ -37,7 +37,8 @@ def matching_records(is_quick_sale = None,location=None, range_start=None, range
     
 
     
-def loyalty_points_update(location = None, client= None, loyalty_points = None , sub_total = None, sale_record = None, invoice = None ):
+def loyalty_points_calculations(location = None, client= None, loyalty_points = None , sub_total = None, sale_record = None, invoice = None ):
+        
         try:
             raise ValidationError('Coming in the function')
             # =========================================== If loyalty points redeemed ===============================
