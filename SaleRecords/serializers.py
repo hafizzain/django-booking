@@ -370,42 +370,42 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                 RedeemedLoyaltyPoints(sale_record = sale_record, **data) for data in applied_loyalty_points_records
             ])
             
-        # # Calculate commission for employees ------------------------------------------------------
+        # Calculate commission for employees ------------------------------------------------------
         
-        # if SaleRecordsProducts:
-        #     employee_id = SaleRecordsProducts.employee.id
-        #     sale_type  = 'Retail'
-        # if SaleRecordsAppointmentServices:
-        #     employee_id = SaleRecordsAppointmentServices.employee.id
-        #     sale_type = 'Service'
-        # if SaleRecordVouchers:
-        #     employee_id = SaleRecordVouchers.employee.id
-        #     sale_type = 'Voucher'
+        if SaleRecordsProducts:
+            employee_id = SaleRecordsProducts.employee.id
+            sale_type  = 'Retail'
+        if SaleRecordsAppointmentServices:
+            employee_id = SaleRecordsAppointmentServices.employee.id
+            sale_type = 'Service'
+        if SaleRecordVouchers:
+            employee_id = SaleRecordVouchers.employee.id
+            sale_type = 'Voucher'
         
-        # sale_commissions = CategoryCommission.objects.filter(
-        #         commission__employee=employee_id,
-        #         category_comission__iexact=sale_type
-        #     ).order_by('-from_value')
+        sale_commissions = CategoryCommission.objects.filter(
+                commission__employee=employee_id,
+                category_comission__iexact=sale_type
+            ).order_by('-from_value')
         
-        # if sale_commissions:
-        #     commission = sale_commissions.first()
-        #     calculated_commission = commission.calculated_commission(sub_total)
-        #     employee_commission = EmployeeCommission.objects.create(
-        #         user=request.user,
-        #         location=location_id,
-        #         employee=employee_id,
-        #         commission=commission.commission,
-        #         category_commission=commission,
-        #         commission_category=commission.category_comission,
-        #         commission_type=commission.comission_choice,
-        #         sale_value=float(sub_total),
-        #         commission_rate=float(commission.commission_percentage),
-        #         commission_amount=float(calculated_commission),
-        #         symbol=commission.symbol,
-        #         tip=0
-        #     )
-        #     employee_commission.sale_id = sale_record.id
-        #     employee_commission.save()
+        if sale_commissions:
+            commission = sale_commissions.first()
+            calculated_commission = commission.calculated_commission(sub_total)
+            employee_commission = EmployeeCommission.objects.create(
+                user=request.user,
+                location=location_id,
+                employee=employee_id,
+                commission=commission.commission,
+                category_commission=commission,
+                commission_category=commission.category_comission,
+                commission_type=commission.comission_choice,
+                sale_value=float(sub_total),
+                commission_rate=float(commission.commission_percentage),
+                commission_amount=float(calculated_commission),
+                symbol=commission.symbol,
+                tip=0
+            )
+            # employee_commission.sale_id = sale_record.id
+            employee_commission.save()
         
         return sale_record
     
