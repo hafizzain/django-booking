@@ -2769,6 +2769,8 @@ def new_create_sale_order(request):
         logs_points_redeemed = 0
         logs_total_redeened_value = 0
         
+        # ========================================= Updating the loyalty point ===================================
+        
         if all([is_loyalty_points_redeemed, loyalty_points_redeemed_id, loyalty_points_redeemed]):
             try:
                 client_points = ClientLoyaltyPoint.objects.get(id=loyalty_points_redeemed_id)
