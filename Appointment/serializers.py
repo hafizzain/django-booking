@@ -1154,7 +1154,6 @@ class ServiceReversal(serializers.ModelSerializer):
         fields= ['id','request_status']
 class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
     appointment = serializers.CharField(source = 'appointment.id')
-    appointment_check_in = serializers.CharField(source = 'appointment.check_in_time')
     client = serializers.SerializerMethodField(read_only=True)
     client_id = serializers.SerializerMethodField(read_only=True)
     avaliable_service_group = serializers.SerializerMethodField(read_only=True)
@@ -1659,7 +1658,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Appointment
-        fields = ['id', 'client','user_id','client_name', 'client_email', 'client_phone', 'client_all_appointment',
+        fields = ['id','check_in_time', 'client','user_id','client_name', 'client_email', 'client_phone', 'client_all_appointment',
                   'client_all_sales', 'appointment_tips', 'notes', 'business_address',
                   'client_type', 'appointmnet_service', 'customer_note', 'status']
 
