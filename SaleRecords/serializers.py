@@ -237,7 +237,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get('request')
         user = request.data.get('user')
-        tenant = request.Tenant
+        tenant = request.tenant
         # raise ValidationError(f'user: {user}')
         location_id = request.data.get('location')
         client = request.data.get('client', None)
