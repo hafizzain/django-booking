@@ -2748,7 +2748,7 @@ def new_create_sale_order(request):
                     tip=float(checkout_tip),
                     business_address=business_address,
                 )
-
+# ======================================================= Loyalty point calculations ===========================
     if checkout.client:
         these_orders = Order.objects.filter(
             checkout=checkout
@@ -2764,10 +2764,11 @@ def new_create_sale_order(request):
             else:
                 sale_order_price = sale_order.total_price
 
-            total_price += float(sale_order_price * sale_order.quantity)
+            total_price += float(sale_order_price * sale_order.quantity) # total Price  of the orders 
 
         logs_points_redeemed = 0
         logs_total_redeened_value = 0
+        
         if all([is_loyalty_points_redeemed, loyalty_points_redeemed_id, loyalty_points_redeemed]):
             try:
                 client_points = ClientLoyaltyPoint.objects.get(id=loyalty_points_redeemed_id)
