@@ -363,6 +363,7 @@ def get_appointments_service(request):
 def get_appointments_group_services(request):
     appointment_id = request.GET.get('appointment_group_id', None)
     
+    
     total_sale = 0
     voucher_total_price = 0
     voucher_membership = []
@@ -470,6 +471,7 @@ def get_appointments_group_services(request):
                 'error_message': None,
                 'appointment': serialized.data,
                 'total_sales': total_sale,
+                'Group Check-in': appointment_group.group_check_in_time,
             }
         },
         status=status.HTTP_200_OK
