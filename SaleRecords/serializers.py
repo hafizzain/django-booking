@@ -388,15 +388,14 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             with transaction.atomic():
                 try:
                     for data in products:
-                        ProductStock.objects.bulk_update([
-                            ProductStock(
+                        ProductStock.objects.update(
+                            
                             location_id=location,
                             product=data.get('product'),
                             sold_quantity=ExpressionWrapper(F('sold_quantity') + data.get('quantity'), output_field=IntegerField()),
                             available_quantity=ExpressionWrapper(F('available_quantity') - data.get('quantity'), output_field=IntegerField()),
                             consumed_quantity=ExpressionWrapper(F('consumed_quantity') + data.get('quantity'), output_field=IntegerField())
                         )
-                        ])
                         # update_instance = ProductStock(
                         #     location_id=location,
                         #     product=data.get('product'),
