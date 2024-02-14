@@ -478,7 +478,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             if products_list:
                 for item in products_list:
                     sale_commission =  CategoryCommission.objects.filter(
-                        commission_employee = item.get('employee'),
+                        commission__employee = item.get('employee'),
                         from_value__lte = float(item.get('price')),
                         category_comission__iexact = 'Retail'
                     ).order_by('-from_value').first()
@@ -506,7 +506,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             if vouchers_list:
                 for item in vouchers_list:
                     sale_commission =  CategoryCommission.objects.filter(
-                        commission_employee = item.get('employee'),
+                        commission__employee = item.get('employee'),
                         from_value__lte = float(item.get("price")),
                         category_comission__iexact = 'Voucher'
                     ).order_by('-from_value').first()
