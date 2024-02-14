@@ -370,7 +370,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                 RedeemedLoyaltyPoints(sale_record = sale_record, **data) for data in applied_loyalty_points_records
             ])
             
-            self.employee_commission_calculation(location_id, user, sub_total, sale_record.id, products_records , vouchers_records , services_records)
+            self.employee_commission_calculation(location_id, user, sub_total, sale_record, products_records , vouchers_records , services_records)
             
         
         return sale_record
@@ -499,7 +499,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                                 commission_rate = float(sale_commission.commission_percentage),
                                 commission_amount = float(calculated_commission),
                                 symbol = sale_commission.symbol,
-                                sale_id = checkout_id,
+                                sale_id = checkout_id.id,
                                 tip = 0
                             )
                         ])
@@ -528,7 +528,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                                 commission_rate = float(sale_commission.commission_percentage),
                                 commission_amount = float(calculated_commission),
                                 symbol = sale_commission.symbol,
-                                sale_id = checkout_id,
+                                sale_id = checkout_id.id,
                                 tip = 0
                             )
                         ])
