@@ -149,7 +149,7 @@ class SaleRecordViews(APIView):
                         commission = sale_commissions[0]
                         commission_category = commission.category_comission
                         
-                        calculated_commission = sale_commissions.calculated_commission(sale_record.total_price)
+                        calculated_commission = sale_commissions.calculated_commission(sale_price)
                         employee_commission = EmployeeCommission.objects.create(
                             user=request.user,
                             location=sale_record.location,
