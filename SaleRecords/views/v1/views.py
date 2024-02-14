@@ -122,10 +122,10 @@ class SaleRecordViews(APIView):
                         else:
                             send_order_email(sale_record, request)
                     try:
-                        return Response({
-                            'client' : client,
-                            'loyalty Points': loyalty_points
-                        })
+                        # return Response({
+                        #     'client' : client,
+                        #     'loyalty Points': loyalty_points
+                        # })
                         # raise ValidationError('Comming here')
                         loyalty = loyalty_points_update(location=location_id, client=client, loyalty_points=loyalty_points, sub_total=sub_total, invoice=invoice)
                     except Exception as e: 
