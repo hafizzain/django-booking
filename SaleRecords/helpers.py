@@ -34,8 +34,6 @@ def matching_records(is_quick_sale = None,location=None, range_start=None, range
         raise ValueError(f"Error processing matching_records: {str(e)}")
     
     
-def calculate_voucher_commission(voucher = []):
-    pass
 
     
 def loyalty_points_update(location = None, client= None, loyalty_points = None , sub_total = None, sale_record = None, invoice = None ):
@@ -56,58 +54,58 @@ def loyalty_points_update(location = None, client= None, loyalty_points = None ,
                 logs_points_redeemed = loyalty_points['redeemed_points']
                 logs_total_redeened_value = total_redeened_value
                 
-            
+            else:
+                raise ValueError('Coming in the else part')
+                allowed_points = LoyaltyPoints.objects.filter(
+                                            Q(loyaltytype='Service') |
+                                            Q(loyaltytype='Both'),
+                                            location=location,
+                                            # amount_spend = total_price,
+                                            is_active=True,
+                                            is_deleted=False
+                                        )
                 
-            allowed_points = LoyaltyPoints.objects.filter(
-                                        Q(loyaltytype='Service') |
-                                        Q(loyaltytype='Both'),
-                                        location=location,
-                                        # amount_spend = total_price,
-                                        is_active=True,
-                                        is_deleted=False
-                                    )
-            
-            if len(allowed_points) > 0:
-                point = allowed_points[0]
-                client_points, created = ClientLoyaltyPoint.objects.get_or_create(
-                    location=location,
-                    client=sale_record.client,
-                    loyalty_points=point, # loyalty Foreignkey
-                )
+                if len(allowed_points) > 0:
+                    point = allowed_points[0]
+                    client_points, created = ClientLoyaltyPoint.objects.get_or_create(
+                        location=location,
+                        client=sale_record.client,
+                        loyalty_points=point, # loyalty Foreignkey
+                    )
 
-                loyalty_spend_amount = point.amount_spend
-                loyalty_earned_points = point.number_points  # total earned points if user spend amount point.amount_spend
+                    loyalty_spend_amount = point.amount_spend
+                    loyalty_earned_points = point.number_points  # total earned points if user spend amount point.amount_spend
 
-                # gained points based on customer's total Checkout Bill
+                    # gained points based on customer's total Checkout Bill
 
-                earned_points = (float(sub_total) / float(loyalty_spend_amount)) * float(loyalty_earned_points)
-                earned_amount = (earned_points / point.earn_points) * float(point.total_earn_from_points)
+                    earned_points = (float(sub_total) / float(loyalty_spend_amount)) * float(loyalty_earned_points)
+                    earned_amount = (earned_points / point.earn_points) * float(point.total_earn_from_points)
 
-                if created:
-                    client_points.total_earn = earned_points
-                    client_points.total_amount = earned_amount
+                    if created:
+                        client_points.total_earn = earned_points
+                        client_points.total_amount = earned_amount
 
-                else:
-                    client_points.total_earn = float(client_points.total_earn) + float(earned_points)
-                    client_points.total_amount = client_points.total_amount + float(earned_amount)
+                    else:
+                        client_points.total_earn = float(client_points.total_earn) + float(earned_points)
+                        client_points.total_amount = client_points.total_amount + float(earned_amount)
 
-                client_points.for_every_points = point.earn_points
-                client_points.customer_will_get_amount = point.total_earn_from_points
+                    client_points.for_every_points = point.earn_points
+                    client_points.customer_will_get_amount = point.total_earn_from_points
 
-                client_points.save()
+                    client_points.save()
 
-                LoyaltyPointLogs.objects.create(
-                    location=location,
-                    client=client_points.client,
-                    client_points=client_points,
-                    loyalty=point,
-                    points_earned=earned_points,
-                    points_redeemed=logs_points_redeemed,
-                    balance=client_points.total_available_points,
-                    actual_sale_value_redeemed=logs_total_redeened_value,
-                    invoice=invoice.id,
-                    checkout=sale_record.id
-                )
+                    LoyaltyPointLogs.objects.create(
+                        location=location,
+                        client=client_points.client,
+                        client_points=client_points,
+                        loyalty=point,
+                        points_earned=earned_points,
+                        points_redeemed=logs_points_redeemed,
+                        balance=client_points.total_available_points,
+                        actual_sale_value_redeemed=logs_total_redeened_value,
+                        invoice=invoice.id,
+                        checkout=sale_record.id
+                    )
                 
                 
                 
