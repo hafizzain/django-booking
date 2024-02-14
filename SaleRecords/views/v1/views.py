@@ -87,11 +87,11 @@ class SaleRecordViews(APIView):
                     from django.http import JsonResponse
                     from django.core.serializers import serialize
                     
-                    loyalty_points = sale_record.applied_loyalty_points_records.all()
-                    serialized_data = serialize('json', loyalty_points)
+                    loyalty_points = sale_record.applied_loyalty_points_records
+                    # serialized_data = serialize('json', loyalty_points)
 
                     # Return the serialized data as JSON response
-                    return JsonResponse(serialized_data, safe=False)
+                    # return JsonResponse(serialized_data, safe=False)
                 
                 
                 
