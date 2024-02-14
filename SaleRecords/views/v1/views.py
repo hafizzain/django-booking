@@ -128,16 +128,15 @@ class SaleRecordViews(APIView):
                     
                     employee_id = None
                     if sale_record.products_records:
-                        employee_id = sale_record.products_records.employee
+                        mployee_id = sale_record.products_records.get().employee
                         sale_type = 'PRODUCT'
-                        quantity = sale_record.products_records.quantity
                         
                     elif sale_record.services_records:
-                        employee_id = sale_record.services_records.employee
+                        employee_id = sale_record.services_records.get().employee
                         sale_type = 'SERVICE'
                         
                     elif sale_record.vouchers_records:
-                        employee_id = sale_record.vouchers_records.employee
+                        employee_id = sale_record.vouchers_records.get().employee
                         sale_type = 'VOUCHER'
                         
                     if sale_type in ['PRODUCT', 'SERVICE', 'VOUCHER']:
