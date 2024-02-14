@@ -478,23 +478,23 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             if products_list:
                 for item in products_list:
                     sale_commission =  CategoryCommission.objects.filter(
-                        commission_employee = item.employee.id,
-                        from_value__lte = float(item.price),
+                        commission_employee = item.get('employee'),
+                        from_value__lte = float(item.get('price')),
                         category_comission__iexact = 'Retail'
                     ).order_by('-from_value').first()
                     
                     if sale_commission:
-                        calculated_commission  = sale_commission.calculated_commission(item.price)
+                        calculated_commission  = sale_commission.calculated_commission(item.get('price'))
                         employee_commission = EmployeeCommission.objects.bulk_create([
                             EmployeeCommission(
-                                user = self.user,
+                                user = user,
                                 location = location,
-                                employee = item.employee,
+                                employee = item.get('employee'),
                                 commission = sale_commission.commission,
                                 category_commission = sale_commission,
                                 commission_category = sale_commission.category_comission,
                                 commission_type = sale_commission.comission_choice,
-                                sale_value = float(sub_total),
+                                sale_value = float(item.get('price')),
                                 commission_rate = float(sale_commission.commission_percentage),
                                 commission_amount = float(calculated_commission),
                                 symbol = sale_commission.symbol,
@@ -506,23 +506,23 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             if vouchers_list:
                 for item in vouchers_list:
                     sale_commission =  CategoryCommission.objects.filter(
-                        commission_employee = item.employee.id,
-                        from_value__lte = float(item.price),
+                        commission_employee = item.get('employee'),
+                        from_value__lte = float(item.get("price")),
                         category_comission__iexact = 'Voucher'
                     ).order_by('-from_value').first()
                     
                     if sale_commission:
-                        calculated_commission  = sale_commission.calculated_commission(item.price)
+                        calculated_commission  = sale_commission.calculated_commission(item.get('price'))
                         EmployeeCommission.objects.bulk_create([
                             EmployeeCommission(
-                                user = self.user,
+                                user = user,
                                 location = location,
-                                employee = item.employee,
+                                employee = item.get('employee'),
                                 commission = sale_commission.commission,
                                 category_commission = sale_commission,
                                 commission_category = sale_commission.category_comission,
                                 commission_type = sale_commission.comission_choice,
-                                sale_value = float(sub_total),
+                                sale_value = float(item.get('price')),
                                 commission_rate = float(sale_commission.commission_percentage),
                                 commission_amount = float(calculated_commission),
                                 symbol = sale_commission.symbol,
