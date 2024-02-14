@@ -388,7 +388,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             with transaction.atomic():
                 try:
                     for data in products:
-                        ProductStock.objects.get(location = location , product_id = data.get('product')).update(
+                        ProductStock.objects.filter(location = location , product_id = data.get('product')).update(
                             
                             location_id=location,
                             product=data.get('product'),
