@@ -381,40 +381,59 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         
         if location and products and user:
             
-            updates = []
+            # updates = []
             stock_reports = []
             # location_instance = BusinessAddress.objects.get(id = location)
             
             with transaction.atomic():
                 try:
                     for data in products:
-                        
-                        update_instance = ProductStock(
+                        ProductStock.objects.bulk_update([
+                            ProductStock(
                             location_id=location,
                             product=data.get('product'),
                             sold_quantity=ExpressionWrapper(F('sold_quantity') + data.get('quantity'), output_field=IntegerField()),
                             available_quantity=ExpressionWrapper(F('available_quantity') - data.get('quantity'), output_field=IntegerField()),
                             consumed_quantity=ExpressionWrapper(F('consumed_quantity') + data.get('quantity'), output_field=IntegerField())
                         )
-                        updates.append(update_instance)
+                        ])
+                        # update_instance = ProductStock(
+                        #     location_id=location,
+                        #     product=data.get('product'),
+                        #     sold_quantity=ExpressionWrapper(F('sold_quantity') + data.get('quantity'), output_field=IntegerField()),
+                        #     available_quantity=ExpressionWrapper(F('available_quantity') - data.get('quantity'), output_field=IntegerField()),
+                        #     consumed_quantity=ExpressionWrapper(F('consumed_quantity') + data.get('quantity'), output_field=IntegerField())
+                        # )
+                        # updates.append(update_instance)
                         
                         # Collect data for ProductOrderStockReport
                         # users_instance = User.objects.get(id = user)
                         product = ProductStock.objects.get(location_id=location, product=data.get('product'))
-                        stock_reports.append(ProductOrderStockReport(
+                        # stock_reports.append(
+                        #     ProductOrderStockReport(
+                        #     report_choice='Sold',
+                        #     product=data.get('product'),
+                        #     user_id=user,
+                        #     location_id=location,
+                            
+                        #     before_quantity=product.available_quantity,
+                        #     after_quantity =  product.available_quantity - data.get('quantity')
+                            
+                        # ))
+                        ProductOrderStockReport.objects.create(
                             report_choice='Sold',
                             product=data.get('product'),
                             user_id=user,
                             location_id=location,
                             
-                            before_quantity=product.available_quantity
-                        ))
+                            before_quantity=product.available_quantity,
+                            after_quantity =  product.available_quantity - data.get('quantity')
+                        )
 
-                    # Bulk update ProductStock instances
-                    ProductStock.objects.bulk_update(updates, fields=['sold_quantity', 'available_quantity', 'consumed_quantity'])
-
-                    # Bulk create ProductOrderStockReport instances
-                    ProductOrderStockReport.objects.bulk_create(stock_reports)
+                    
+                    
+                    
+                    
                 except Exception as e:
                     raise ValidationError(f"error in product stock': {str(e)}")
         else:
@@ -455,8 +474,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                         sale_record__location=location,
                         id=data['purchased_gift_card_id'].id,
                         spend_amount__gte=data['partial_price']  # Ensure spend_amount is greater than or equal to partial_price
-                    ).update(
-                        spend_amount=Case(
+                    ).update(spend_amount=Case(
                             When(
                                 spend_amount__gte=data['partial_price'],
                                 then=ExpressionWrapper(F('spend_amount') - data['partial_price'], output_field=FloatField())
