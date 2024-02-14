@@ -84,7 +84,17 @@ class SaleRecordViews(APIView):
             if serializer.is_valid():
                 sale_record = serializer.save()
                 try :
+                    from django.http import JsonResponse
+                    from django.core.serializers import serialize
+                    
                     loyalty_points = sale_record.applied_loyalty_points_records.all()
+                    serialized_data = serialize('json', loyalty_points)
+
+                    # Return the serialized data as JSON response
+                    return JsonResponse(serialized_data, safe=False)
+                
+                
+                
                     invoice = SaleInvoice.objects.create(
                         user=user,
                         client=sale_record.client,
