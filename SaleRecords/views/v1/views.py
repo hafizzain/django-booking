@@ -113,6 +113,29 @@ class SaleRecordViews(APIView):
                             send_order_email(sale_record, request)
                         
                     loyalty_points_update(location=location_id, client=client, loyalty_points=loyalty_points, sub_total=sub_total, invoice=invoice)
+                    
+                    # Calculating commission for the employee ----------------------------------------------------------------------
+                    calculated_commission = commission.calculated_commission(total_from_value)
+                    employee_commission = EmployeeCommission.objects.create(
+                        user=request.user,
+                        business=business_address.business,
+                        location=sale_record.location,
+                        employee=employee_id,
+                        commission=commission.commission,
+                        category_commission=commission,
+                        commission_category=commission_category,
+                        commission_type=commission.comission_choice,
+                        sale_value=float(order_discount_price) if order_discount_price else float(price),
+                        commission_rate=float(commission.commission_percentage),
+                        commission_amount=float(calculated_commission),
+                        symbol=commission.symbol,
+                        item_name=item_name,
+                        item_id=item_id,
+                        quantity=quantity,
+                        tip=0
+                    )
+                    employee_commission.sale_id = sale_record.id
+                    employee_commission.save()
                 except Exception as e:
                     return Response({'error':str(e), 'second': 'Second Try'})
                 
