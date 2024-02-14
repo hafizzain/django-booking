@@ -710,7 +710,7 @@ class GiftCards(models.Model):
     # name = models.TextField(null=True, blank=True)
     title = models.TextField(null=True, blank=True)
     gift_card_value = models.FloatField(default=0, null=True)
-
+    retail_price = models.FloatField(default=0, null=True, blank = True)
     expire_date = models.DateField(auto_now_add=now, null=True)
     start_date = models.DateField(null=True)
     end_date = models.DateField(null=True)
@@ -726,7 +726,6 @@ class GiftCards(models.Model):
     updated_at = models.DateTimeField(null=True, blank=True)
     custom_card = models.TextField(null=True)
     is_custom_card = models.BooleanField(default=False)
-    # retail_price = models.FloatField(default=0, null=True)
 
 
 class GiftDetail(models.Model):

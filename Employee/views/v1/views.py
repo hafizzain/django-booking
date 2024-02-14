@@ -7196,7 +7196,11 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         price = request.data.get('price', None)
         retail_price = request.data.get('retail_price', None)
         term_condition = request.data.get('term_condition', None)
+        location = request.data.get('location_id', None)
+        
         code_check = GiftCards.objects.filter(code__contains=code)
+        
+        
         if code_check:
             data = {
                 "success": True,
@@ -7210,7 +7214,8 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         if custom_card is None:
             card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,
                                             discount_to_show=discount_to_show,
-                                            custom_card=None, term_condition=term_condition)
+                                            custom_card=None, term_condition=term_condition,
+                                            location_id = location)
             # currency_gift_card_price = json.loads(currency_gift_card_price)
             if len(currency_gift_card_price) > 0:
                 for data in currency_gift_card_price:
@@ -7229,7 +7234,9 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         else:
             card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,
                                             custom_card='avaliable',
-                                            price=price, retail_price=retail_price)
+                                            price=price,
+                                            retail_price=retail_price,
+                                            location_is=location)
 
             data = {
                 "success": True,
@@ -7339,6 +7346,8 @@ def update_gift_card(request):
 @permission_classes([AllowAny])
 def get_gift_card(request):
     selected_location = request.query_params.get('selected_location')
+    
+    
     query_set = GiftCards.objects.all()
     search_text = request.query_params.get('search_text', None)
     if search_text:
