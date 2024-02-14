@@ -4985,7 +4985,8 @@ def update_group_appointment_check_in(request):
             if appointment.check_in_time is None:
                 appointment.check_in_time = timezone.now()
                 appointment.save()
-            
+        
+        group_appointment.group_check_in_time = timezone.now()   
         group_appointment_data = GroupCheckInSerializer(group_appointment).data
         data = {
                 'status': True,
