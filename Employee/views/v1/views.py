@@ -7338,17 +7338,18 @@ def update_gift_card(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_gift_card(request):
-    selected_location = request.query_params.get('selected_location')
+    selected_location = request.query_params.get('selected_location', None)
     search_text = request.query_params.get('search_text', None)
-    quick_sales = request.query_params.get('quick_sales')
+    quick_sales = request.query_params.get('quick_sales', None)
     
     query = Q()
     if selected_location:
-        query &= Q(location=selected_location)
+        query &= Q(location_currency=selected_location)
     if search_text:
         query &= Q(title_i__contains=search_text)
         
-    query_set = GiftCards.objects.filter(query)
+    query_set = GiftCards.objects.all()
+    # deatils = GiftDetail.objects.filter(gift_card__in=query_set)
     serializer_context = {'selected_location': selected_location}
     serializer = GiftCardSerializerResponse(query_set, many=True, context=serializer_context).data
     data = {
