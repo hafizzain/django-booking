@@ -122,7 +122,7 @@ class SaleRecordViews(APIView):
                         else:
                             send_order_email(sale_record, request)
                     try:
-                            
+                        raise ValidationError('Comming here')
                         loyalty = loyalty_points_update(location=location_id, client=client, loyalty_points=loyalty_points, sub_total=sub_total, invoice=invoice)
                     except Exception:
                         return Response({'error': str(e)})
