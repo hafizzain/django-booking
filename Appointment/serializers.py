@@ -1320,7 +1320,7 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
                   'booked_by', 'booking_id', 'appointment_type', 'client_can_book', 'slot_availible_for_online',
                   'appointment_status', 'location', 'employee_list', 'created_at', 'is_deleted',
                   'appointment_service_member',
-                  'service_start_time', 'service_end_time', 'is_favourite', 'appointment_check_in',)
+                  'service_start_time', 'service_end_time', 'is_favourite',)
 
 
 class SingleAppointmentSerializer(serializers.ModelSerializer):
