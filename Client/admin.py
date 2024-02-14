@@ -35,6 +35,7 @@ class LoyaltyPointLogsAdmin(admin.ModelAdmin):
         'points_redeemed',
         'balance',
         'actual_sale_value_redeemed',
+        'created_at'
     ]
     ordering = ['-created_at']
     
