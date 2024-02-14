@@ -228,7 +228,7 @@
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
                     <div>
                       <p class="text-left">
-                        {{item.product.name}}/{% get_primary_translation item.id %}
+                        {{item.product.name}}
                         {% if item.discount_percentage %}
                         (Discount {{ item.discount_percentage}} %)
                         {% endif %}
@@ -252,7 +252,7 @@
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
                     <div>
                       <p class="text-left">
-                        {{item.service.name}}/{% get_primary_translation item.id %}
+                        {{item.service.name}}
                         {% if item.discount_percentage %}
                         (Discount {{ item.discount_percentage}} %)
                         {% endif %}
@@ -278,7 +278,7 @@
                   <div class="flex items-center justify-between text-primary text-sm font-semibold">
                     <div>
                       <p class="text-left">
-                        {{item.service.name}}/{% get_primary_translation item.id %}
+                        {{item.service.name}}
                         {% if item.discount_percentage %}
                         (Discount {{ item.discount_percentage}} %)
                         {% endif %}
@@ -495,11 +495,19 @@
               <p class="text-sm">{{change}} {{currency_code}}</p>
             </div>
             <hr />
+        {% comment %} ======================================================== pyament methods ======================================= {% endcomment %}
 
-            <p class="font-semibold text-black">{{ business_address.primary_translation.payment_method}}</p>
+              {% comment %} <p class="font-semibold text-black text-left">{{ business_address.primary_translation.payment_method}}</p>
               {% if business_address.secondary_translation.payment_method %}
-                <p class="arabic font-semibold text-black">{{ business_address.secondary_translation.payment_method}}</p>
-              {% endif %}
+                <p class="arabic font-semibold text-black text-left">{{ business_address.secondary_translation.payment_method}}</p>
+              {% endif %} {% endcomment %}
+
+              <div class="flex items-center justify-between text-primary text-sm font-bold">
+                <div>
+                  <p class="text-left">{{ business_address.primary_translation.payment_method}}</p>
+                  {% if business_address.secondary_translation.payment_method %}<p class="arabic">{{ business_address.secondary_translation.payment_method }} {% endif %}</p>
+                </div>
+              </div>
 
               {% if checkout_data.payment_methods_records.all %}
                 
