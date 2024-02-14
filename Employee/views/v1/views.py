@@ -7339,11 +7339,16 @@ def update_gift_card(request):
 @permission_classes([AllowAny])
 def get_gift_card(request):
     selected_location = request.query_params.get('selected_location')
-    query_set = GiftCards.objects.all()
     search_text = request.query_params.get('search_text', None)
+    quick_sales = request.query_params.get('quick_sales')
+    
+    query = Q()
+    if selected_location:
+        query &= Q(location=selected_location)
     if search_text:
-        query_set = GiftCards.objects.filter(title_i__contains=search_text)
+        query &= Q(title_i__contains=search_text)
         
+    query_set = GiftCards.objects.filter(query)
     serializer_context = {'selected_location': selected_location}
     serializer = GiftCardSerializerResponse(query_set, many=True, context=serializer_context).data
     data = {
