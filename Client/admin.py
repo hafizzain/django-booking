@@ -30,6 +30,7 @@ class VoucherCurrencyPriceAdmin(admin.ModelAdmin):
 class LoyaltyPointLogsAdmin(admin.ModelAdmin):
     list_display= [
         'id',
+        'checkout',
         'points_earned',
         'points_redeemed',
         'balance',
