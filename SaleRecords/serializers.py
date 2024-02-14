@@ -1,8 +1,12 @@
 from rest_framework import serializers
+from threading import Thread
 from django.db import transaction
 from django.db.models import F ,Q, Case, When, Value, FloatField,IntegerField, ExpressionWrapper
 from django.core.exceptions import ValidationError
 
+from Business.models import StockNotificationSetting
+from Sale.Constants.stock_lowest import stock_lowest
+from Sale.Constants.tunrover import ProductTurnover
 from Invoices.models import SaleInvoice
 from Product.models import ProductStock, ProductOrderStockReport
 from Client.serializers import SaleInvoiceSerializer
@@ -233,6 +237,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get('request')
         user = request.data.get('user')
+        tenant = request.Tenant
         # raise ValidationError(f'user: {user}')
         location_id = request.data.get('location')
         client = request.data.get('client', None)
@@ -283,7 +288,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             SaleRecordsProducts.objects.bulk_create([
                 SaleRecordsProducts(sale_record=sale_record, **data) for data in products_records
             ])
-            self.product_stock_update(location_id, products_records, user)
+            self.product_stock_update(location_id, products_records, user, tenant)
 
             # Create records for PaymentMethods
             PaymentMethods.objects.bulk_create([
@@ -377,7 +382,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     
     # Class Methods 
     
-    def product_stock_update(self, location = None, products= None, user = None):
+    def product_stock_update(self, location = None, products= None, user = None, tenant = None):
         
         if location and products and user:
             
@@ -392,7 +397,8 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                             available_quantity=ExpressionWrapper(F('available_quantity') - data.get('quantity'), output_field=IntegerField()),
                             consumed_quantity=ExpressionWrapper(F('consumed_quantity') + data.get('quantity'), output_field=IntegerField())
                         )
-                        product = ProductStock.objects.get(location_id=location, product=data.get('product'))                   
+                        product = ProductStock.objects.get(location_id=location, product=data.get('product'))    
+
                         ProductOrderStockReport.objects.create(
                             report_choice='Sold',
                             product=data.get('product'),
@@ -402,6 +408,35 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                             before_quantity=product.available_quantity,
                             after_quantity =  product.available_quantity - data.get('quantity')
                         )
+                        location  = BusinessAddress.objects.get(id =  location)
+                        try:
+                            
+                            admin_email = StockNotificationSetting.objects.get(business=str(location.business))
+                            if admin_email.notify_stock_turnover == True and product.available_quantity <= 5:
+                                try:
+                                    thrd = Thread(target=ProductTurnover, args=[],
+                                                kwargs={'product': product, 'product_stock': product,
+                                                        'business_address': location.id, 'tenant': tenant})
+                                    thrd.start()
+                                except Exception as e:
+                                    raise ValidationError(f'{str(e)}')
+                        except:
+                            pass
+                        
+                        try:
+                            admin_email = StockNotificationSetting.objects.get(business=str(location.business))
+                            if admin_email.notify_for_lowest_stock == True and product.available_quantity <= 5:
+                                try:
+                                    thrd = Thread(target=stock_lowest, args=[],
+                                                kwargs={'product': product, 'product_stock': product,
+                                                        'business_address': location.id, 'tenant': tenant,
+                                                        'quantity': product.available_quantity})
+                                    thrd.start()
+                                except Exception as err:
+                                    raise ValidationError(f'{str(e)}')
+                        except:
+                            pass
+                        
 
                 except Exception as e:
                     raise ValidationError(f"error in product stock': {str(e)}")
