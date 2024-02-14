@@ -84,8 +84,8 @@ class SaleRecordViews(APIView):
             if serializer.is_valid():
                 sale_record = serializer.save()
                 try :
-                    from django.http import JsonResponse
-                    from django.core.serializers import serialize
+                    # from django.http import JsonResponse
+                    # from django.core.serializers import serialize
                     
                     loyalty_points = sale_record.applied_loyalty_points_records
                     # serialized_data = serialize('json', loyalty_points)
