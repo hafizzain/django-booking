@@ -373,13 +373,13 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         # Calculate commission for employees ------------------------------------------------------
         
         if SaleRecordsProducts:
-            employee_id = SaleRecordsProducts.employee
+            employee_id = SaleRecordsProducts.employee.id
             sale_type  = 'Retail'
         if SaleRecordsAppointmentServices:
-            employee_id = SaleRecordsAppointmentServices.employee
+            employee_id = SaleRecordsAppointmentServices.employee.id
             sale_type = 'Service'
         if SaleRecordVouchers:
-            employee_id = SaleRecordVouchers.employee
+            employee_id = SaleRecordVouchers.employee.id
             sale_type = 'Voucher'
         
         sale_commissions = CategoryCommission.objects.filter(
