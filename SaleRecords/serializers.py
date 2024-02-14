@@ -488,6 +488,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                         employee_commission = EmployeeCommission.objects.bulk_create([
                             EmployeeCommission(
                                 user_id = user,
+                                business=checkout_id.location.business,
                                 location_id = location,
                                 employee = item.get('employee'),
                                 commission = sale_commission.commission,
@@ -516,6 +517,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                         EmployeeCommission.objects.bulk_create([
                             EmployeeCommission(
                                 user_id = user,
+                                business=checkout_id.location.business,
                                 location_id = location,
                                 employee = item.get('employee'),
                                 commission = sale_commission.commission,
