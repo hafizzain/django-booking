@@ -1,6 +1,7 @@
 from .models import SaleRecords
 from django.db.models import Q
 from Client.models import LoyaltyPoints, LoyaltyPointLogs, ClientLoyaltyPoint
+from django.core.exceptions import ValidationError
 
 def matching_records(is_quick_sale = None,location=None, range_start=None, range_end=None, services=None, client=None , search_text = None):
     try:
@@ -38,12 +39,13 @@ def matching_records(is_quick_sale = None,location=None, range_start=None, range
     
 def loyalty_points_update(location = None, client= None, loyalty_points = None , sub_total = None, sale_record = None, invoice = None ):
         try:
+            
             # =========================================== If loyalty points redeemed ===============================
             logs_points_redeemed = 0
             logs_total_redeened_value = 0
             
             if loyalty_points or client:
-                raise ValueError('If part')
+                raise ValidationError('If part')
                 client_points = ClientLoyaltyPoint.objects.get(id= loyalty_points.clinet_loyalty_point)
                 
                 client_points.points_redeemed = float(client_points.points_redeemed) + float(loyalty_points['redeemed_points'])
@@ -56,7 +58,7 @@ def loyalty_points_update(location = None, client= None, loyalty_points = None ,
                 logs_total_redeened_value = total_redeened_value
                 
             else:
-                raise ValueError('Coming in the else part')
+                raise ValidationError('Coming in the else part')
                 allowed_points = LoyaltyPoints.objects.filter(
                                             Q(loyaltytype='Service') |
                                             Q(loyaltytype='Both'),
