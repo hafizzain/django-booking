@@ -383,29 +383,29 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             
             updates = []
             stock_reports = []
-            location_instance = BusinessAddress.objects.get(id = location)
+            # location_instance = BusinessAddress.objects.get(id = location)
             
             with transaction.atomic():
                 try:
                     for data in products:
                         
                         update_instance = ProductStock(
-                            location=location_instance,
-                            product=data['product'],
-                            sold_quantity=ExpressionWrapper(F('sold_quantity') + data['quantity'], output_field=IntegerField()),
-                            available_quantity=ExpressionWrapper(F('available_quantity') - data['quantity'], output_field=IntegerField()),
-                            consumed_quantity=ExpressionWrapper(F('consumed_quantity') + data['quantity'], output_field=IntegerField())
+                            location_id=location,
+                            product=data.get('product'),
+                            sold_quantity=ExpressionWrapper(F('sold_quantity') + data.get('quantity'), output_field=IntegerField()),
+                            available_quantity=ExpressionWrapper(F('available_quantity') - data.get('quantity'), output_field=IntegerField()),
+                            consumed_quantity=ExpressionWrapper(F('consumed_quantity') + data.get('quantity'), output_field=IntegerField())
                         )
                         updates.append(update_instance)
                         
                         # Collect data for ProductOrderStockReport
                         # users_instance = User.objects.get(id = user)
-                        product = ProductStock.objects.get(location=location_instance, product=data['product'])
+                        product = ProductStock.objects.get(location_id=location, product=data.get('quantity'))
                         stock_reports.append(ProductOrderStockReport(
                             report_choice='Sold',
-                            product=data['product'],
+                            product=data.get('product'),
                             user_id=user,
-                            location=location_instance,
+                            location_id=location,
                             
                             before_quantity=product.available_quantity
                         ))
