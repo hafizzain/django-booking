@@ -7346,10 +7346,15 @@ def update_gift_card(request):
 @permission_classes([AllowAny])
 def get_gift_card(request):
     selected_location = request.query_params.get('selected_location')
-    
-    
-    query_set = GiftCards.objects.all()
     search_text = request.query_params.get('search_text', None)
+    
+    
+    ceruncy = BusinessAddress.objects.filter(id=selected_location).values_list('currency', flat=True)
+    gift_detils = list(GiftDetail.objects.filter(currencies__in=ceruncy).values_list('gift_card', flat=True))
+    
+    query_set = GiftCards.objects.filter(id__in=gift_detils)
+    
+    
     if search_text:
         query_set = GiftCards.objects.filter(title_i__contains=search_text)
         

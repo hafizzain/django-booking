@@ -4996,7 +4996,7 @@ def update_group_appointment_check_in(request):
                 'response': {
                     'message': 'Group Checked In Successfuly',
                     'error_message': None,
-                    'Group Appointment' : group_appointment_data
+                    'group_appointment' : group_appointment_data
                 }
             }
         return Response(data, status=status.HTTP_200_OK)
