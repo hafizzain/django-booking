@@ -392,7 +392,6 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                             available_quantity=ExpressionWrapper(F('available_quantity') - data.get('quantity'), output_field=IntegerField()),
                             consumed_quantity=ExpressionWrapper(F('consumed_quantity') + data.get('quantity'), output_field=IntegerField())
                         )
-
                         product = ProductStock.objects.get(location_id=location, product=data.get('product'))                   
                         ProductOrderStockReport.objects.create(
                             report_choice='Sold',
