@@ -166,8 +166,5 @@ def loyalty_points_update(location = None, client= None, loyalty_points = None ,
             #         invoice=invoice,
             #         checkout=sale_record,
             #     )
-                
-            else:
-                pass
         except Exception as e:
                 return f"error coming through loyalty_points {str(e)}"

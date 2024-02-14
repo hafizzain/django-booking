@@ -485,7 +485,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     
                     if sale_commission:
                         calculated_commission  = sale_commission.calculated_commission(item.get('price'))
-                        employee_commission = EmployeeCommission.objects.bulk_create([
+                        EmployeeCommission.objects.bulk_create([
                             EmployeeCommission(
                                 user_id = user,
                                 business=checkout_id.location.business,
