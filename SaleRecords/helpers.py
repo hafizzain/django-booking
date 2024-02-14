@@ -42,7 +42,7 @@ def loyalty_points_update(location = None, client= None, loyalty_points = None ,
             logs_points_redeemed = 0
             logs_total_redeened_value = 0
             
-            if loyalty_points and client:
+            if loyalty_points or client:
                 raise ValueError('If part')
                 client_points = ClientLoyaltyPoint.objects.get(id= loyalty_points.clinet_loyalty_point)
                 
