@@ -115,41 +115,59 @@ class SaleRecordViews(APIView):
                     loyalty_points_update(location=location_id, client=client, loyalty_points=loyalty_points, sub_total=sub_total, invoice=invoice)
                     
                     # Calculating commission for the employee ----------------------------------------------------------------------
-                    # sale_price = 0
-                    # if order_discount_price:
-                    #     sale_price = float(order_discount_price)
-                    # else:
-                    #     sale_price = float(price)
+                    
+                    employee_id = None
+                    if sale_record.products_records:
+                        employee_id = sale_record.products_records.employee
+                        sale_type = 'PRODUCT'
+                        quantity = sale_record.products_records.quantity
+                        
+                    elif sale_record.services_records:
+                        employee_id = sale_record.services_records.employee
+                        sale_type = 'SERVICE'
+                        
+                    elif sale_record.vouchers_records:
+                        employee_id = sale_record.vouchers_records.employee
+                        sale_type = 'VOUCHER'
+                        
+                    if sale_type in ['PRODUCT', 'SERVICE', 'VOUCHER']:
 
-                    # total_from_value = float(sale_price) * float(quantity)
+                        CommissionType = {
+                            'PRODUCT': 'Retail',
+                            'SERVICE': 'Service',
+                            'VOUCHER': 'Voucher',
+                        }
+                        commission_category = CommissionType[sale_type]
+                        
+                    sale_price = float(sale_record.sub_total)
                     
-                    # sale_commissions = CategoryCommission.objects.filter(
-                    #     commission__employee=employee_id,
-                    #     from_value__lte=float(total_from_value),
-                    #     category_comission__iexact=commission_category
-                    #     ).order_by('-from_value')
+                    sale_commissions = CategoryCommission.objects.filter(
+                        commission__employee=employee_id,
+                        category_comission__iexact=commission_category
+                    ).order_by('-from_value')
                     
-                    # calculated_commission = commission.calculated_commission(total_from_value)
-                    # employee_commission = EmployeeCommission.objects.create(
-                    #     user=request.user,
-                    #     business=business_address.business,
-                    #     location=sale_record.location,
-                    #     employee=employee_id,
-                    #     commission=commission.commission,
-                    #     category_commission=commission,
-                    #     commission_category=commission_category,
-                    #     commission_type=commission.comission_choice,
-                    #     sale_value=float(order_discount_price) if order_discount_price else float(price),
-                    #     commission_rate=float(commission.commission_percentage),
-                    #     commission_amount=float(calculated_commission),
-                    #     symbol=commission.symbol,
-                    #     item_name=item_name,
-                    #     item_id=item_id,
-                    #     quantity=quantity,
-                    #     tip=0
-                    # )
-                    # employee_commission.sale_id = sale_record.id
-                    # employee_commission.save()
+                    if sale_commissions > 0:
+                        commission = sale_commissions[0]
+                        commission_category = commission.category_comission
+                        
+                        calculated_commission = sale_commissions.calculated_commission(sale_record.total_price)
+                        employee_commission = EmployeeCommission.objects.create(
+                            user=request.user,
+                            location=sale_record.location,
+                            employee=employee_id,
+                            commission=commission.commission,
+                            category_commission=commission,
+                            commission_category=commission_category,
+                            commission_type=commission.comission_choice,
+                            sale_value=float(sale_price),
+                            commission_rate=float(commission.commission_percentage),
+                            commission_amount=float(calculated_commission),
+                            symbol=commission.symbol,
+                            quantity=quantity,
+                            tip=0
+                        )
+                        employee_commission.sale_id = sale_record.id
+                        employee_commission.save()
                 except Exception as e:
                     return Response({'error':str(e), 'second': 'Second Try'})
                 
