@@ -8,7 +8,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import api_view
 
 
-from SaleRecords.helpers import matching_records, loyalty_points_update
+from SaleRecords.helpers import matching_records, loyalty_points_calculations
 from Client.Constants.client_order_email import send_order_email, send_membership_order_email
 
 from SaleRecords.serializers import *
@@ -121,7 +121,7 @@ class SaleRecordViews(APIView):
                             pass
                         else:
                             send_order_email(sale_record, request)
-                    loyalty_points_update(location=location_id, client=client, loyalty_points=loyalty_points, sub_total=sub_total, invoice=invoice)
+                    loyalty_points_calculations(location=location_id, client=client, loyalty_points=loyalty_points, sub_total=sub_total, invoice=invoice)
                 except Exception as e:
                     return Response({'error':str(e), 'second': 'Second Try'})
                 
