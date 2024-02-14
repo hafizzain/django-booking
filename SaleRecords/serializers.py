@@ -370,42 +370,8 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                 RedeemedLoyaltyPoints(sale_record = sale_record, **data) for data in applied_loyalty_points_records
             ])
             
-        # Calculate commission for employees ------------------------------------------------------
-        
-        if SaleRecordsProducts:
-            employee_id = SaleRecordsProducts.employee.id
-            sale_type  = 'Retail'
-        if SaleRecordsAppointmentServices:
-            employee_id = SaleRecordsAppointmentServices.employee.id
-            sale_type = 'Service'
-        if SaleRecordVouchers:
-            employee_id = SaleRecordVouchers.employee.id
-            sale_type = 'Voucher'
-        
-        sale_commissions = CategoryCommission.objects.filter(
-                commission__employee=employee_id,
-                category_comission__iexact=sale_type
-            ).order_by('-from_value')
-        
-        if sale_commissions:
-            commission = sale_commissions.first()
-            calculated_commission = commission.calculated_commission(sub_total)
-            employee_commission = EmployeeCommission.objects.create(
-                user=request.user,
-                location=location_id,
-                employee=employee_id,
-                commission=commission.commission,
-                category_commission=commission,
-                commission_category=commission.category_comission,
-                commission_type=commission.comission_choice,
-                sale_value=float(sub_total),
-                commission_rate=float(commission.commission_percentage),
-                commission_amount=float(calculated_commission),
-                symbol=commission.symbol,
-                tip=0
-            )
-            # employee_commission.sale_id = sale_record.id
-            employee_commission.save()
+            self.employee_commission_calculation(location_id, user, sub_total, sale_record.id, products_records , vouchers_records , services_records)
+            
         
         return sale_record
     
@@ -507,6 +473,66 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         else:
             pass
         
-    def employee_commission_calculation(self, products_list = None, vouchers = None, service_list = None):
-        pass
+    def employee_commission_calculation(self,location = None, user = None,  sub_total = None, checkout_id = None, products_list = None, vouchers_list = None, service_list = None):
+        try:
+            if products_list:
+                for item in products_list:
+                    sale_commission =  CategoryCommission.objects.filter(
+                        commission_employee = item.employee.id,
+                        from_value__lte = float(item.price),
+                        category_comission__iexact = 'Retail'
+                    ).order_by('-from_value').first()
+                    
+                    if sale_commission:
+                        calculated_commission  = sale_commission.calculated_commission(item.price)
+                        employee_commission = EmployeeCommission.objects.bulk_create([
+                            EmployeeCommission(
+                                user = self.user,
+                                location = location,
+                                employee = item.employee,
+                                commission = sale_commission.commission,
+                                category_commission = sale_commission,
+                                commission_category = sale_commission.category_comission,
+                                commission_type = sale_commission.comission_choice,
+                                sale_value = float(sub_total),
+                                commission_rate = float(sale_commission.commission_percentage),
+                                commission_amount = float(calculated_commission),
+                                symbol = sale_commission.symbol,
+                                sale_id = checkout_id,
+                                tip = 0
+                            )
+                        ])
+                        
+            if vouchers_list:
+                for item in vouchers_list:
+                    sale_commission =  CategoryCommission.objects.filter(
+                        commission_employee = item.employee.id,
+                        from_value__lte = float(item.price),
+                        category_comission__iexact = 'Voucher'
+                    ).order_by('-from_value').first()
+                    
+                    if sale_commission:
+                        calculated_commission  = sale_commission.calculated_commission(item.price)
+                        EmployeeCommission.objects.bulk_create([
+                            EmployeeCommission(
+                                user = self.user,
+                                location = location,
+                                employee = item.employee,
+                                commission = sale_commission.commission,
+                                category_commission = sale_commission,
+                                commission_category = sale_commission.category_comission,
+                                commission_type = sale_commission.comission_choice,
+                                sale_value = float(sub_total),
+                                commission_rate = float(sale_commission.commission_percentage),
+                                commission_amount = float(calculated_commission),
+                                symbol = sale_commission.symbol,
+                                sale_id = checkout_id,
+                                tip = 0
+                            )
+                        ])
+                
+                
+                
             
+        except Exception as e:
+            raise ValidationError(f'Error occured in Employee Commission Calculations {str(e)}')
