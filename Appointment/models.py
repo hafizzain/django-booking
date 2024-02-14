@@ -216,7 +216,7 @@ class AppointmentGroup(models.Model):
     group_name = models.TextField(null=True ,blank=True)
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     appointment = models.ManyToManyField(Appointment, null=True, blank=True, related_name='appointment_group')
-    
+    group_check_in_time = models.DateTimeField(null=True, blank=True)
 class Comment(CommonField):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_comment',null=True)
     comment = models.TextField(null=True)
