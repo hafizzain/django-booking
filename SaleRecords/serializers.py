@@ -381,10 +381,6 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         
         if location and products and user:
             
-            # updates = []
-            stock_reports = []
-            # location_instance = BusinessAddress.objects.get(id = location)
-            
             with transaction.atomic():
                 try:
                     for data in products:
@@ -396,29 +392,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                             available_quantity=ExpressionWrapper(F('available_quantity') - data.get('quantity'), output_field=IntegerField()),
                             consumed_quantity=ExpressionWrapper(F('consumed_quantity') + data.get('quantity'), output_field=IntegerField())
                         )
-                        # update_instance = ProductStock(
-                        #     location_id=location,
-                        #     product=data.get('product'),
-                        #     sold_quantity=ExpressionWrapper(F('sold_quantity') + data.get('quantity'), output_field=IntegerField()),
-                        #     available_quantity=ExpressionWrapper(F('available_quantity') - data.get('quantity'), output_field=IntegerField()),
-                        #     consumed_quantity=ExpressionWrapper(F('consumed_quantity') + data.get('quantity'), output_field=IntegerField())
-                        # )
-                        # updates.append(update_instance)
-                        
-                        # Collect data for ProductOrderStockReport
-                        # users_instance = User.objects.get(id = user)
-                        product = ProductStock.objects.get(location_id=location, product=data.get('product'))
-                        # stock_reports.append(
-                        #     ProductOrderStockReport(
-                        #     report_choice='Sold',
-                        #     product=data.get('product'),
-                        #     user_id=user,
-                        #     location_id=location,
-                            
-                        #     before_quantity=product.available_quantity,
-                        #     after_quantity =  product.available_quantity - data.get('quantity')
-                            
-                        # ))
+                        product = ProductStock.objects.get(location_id=location, product=data.get('product'))                   
                         ProductOrderStockReport.objects.create(
                             report_choice='Sold',
                             product=data.get('product'),
@@ -429,38 +403,10 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                             after_quantity =  product.available_quantity - data.get('quantity')
                         )
 
-                    
-                    
-                    
-                    
                 except Exception as e:
                     raise ValidationError(f"error in product stock': {str(e)}")
         else:
             pass
-            
-        # =============================== Optimized Code with less hits to the database ========================
-        # updates = []
-        # location_instance = BusinessAddress.objects.get(id = location)
-        # for data in products:
-        #     update_instance = ProductStock(
-        #         location=location_instance,
-        #         product=data['product'],
-        #         sold_quantity=ExpressionWrapper(F('sold_quantity') + data['quantity'],  output_field=IntegerField()),
-        #         available_quantity=ExpressionWrapper(F('available_quantity') - data['quantity'],  output_field=IntegerField()),
-        #         consumed_quantity=ExpressionWrapper(F('consumed_quantity') + data['quantity'],  output_field=IntegerField())
-        #     )
-        #     ProductOrderStockReport.objects.create(
-        #                 report_choice='Sold',
-        #                 product=data['product'],
-        #                 user=request.user,
-        #                 location=business_address,
-        #                 before_quantity=product_stock.available_quantity
-        #             )
-        #     updates.append(update_instance)
-
-        # ProductStock.objects.bulk_update(updates, fields=[
-        #     'sold_quantity', 'available_quantity', 'consumed_quantity'
-        # ], batch_size=len(updates))
         
         
     def gift_card_record_update(self, location = None, gift_cards = None):
