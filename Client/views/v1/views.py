@@ -2266,6 +2266,7 @@ def update_memberships(request):
         membership.save()
 
     errors.append(services)
+    
     for serv in services:
         service_id = serv['service']
         percentage = serv['percentage']
@@ -2282,8 +2283,10 @@ def update_memberships(request):
                 membership_service, created = DiscountMembership.objects.get_or_create(
                     service=service_instance,
                     membership=membership,
-                    percentage = percentage
+                    # percentage = percentage
                 )
+                if membership_service:
+                    membership_service.percentage = percentage
             except Exception as err:
                 errors.append(str(err))
             else:
