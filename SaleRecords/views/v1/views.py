@@ -88,6 +88,7 @@ class SaleRecordViews(APIView):
                     # from django.core.serializers import serialize
                     
                     loyalty_points = sale_record.applied_loyalty_points_records
+                    
                     # serialized_data = serialize('json', loyalty_points)
 
                     # Return the serialized data as JSON response
@@ -121,7 +122,7 @@ class SaleRecordViews(APIView):
                             pass
                         else:
                             send_order_email(sale_record, request)
-                    # loyalty_points_calculations(location=location_id, client=client, loyalty_points=loyalty_points, sub_total=sub_total, invoice=invoice)
+                    loyalty_points_calculations(location=location_id, client=client, loyalty_points=loyalty_points, sale_record=sale_record, sub_total=sub_total, invoice=invoice)
                 except Exception as e:
                     return Response({'error':str(e), 'second': 'Second Try'})
                 
