@@ -110,7 +110,7 @@ class SaleRecordViews(APIView):
                         checkout=sale_record.id,
                     )
                     invoice.save()
-                    loyalty_points = RedeemedLoyaltyPoints.objects.get(sale_record_id = sale_record.id)
+                    loyalty_points = RedeemedLoyaltyPoints.objects.get(sale_record = sale_record)
                     
                     # return Response({'membership records': membership_order})
                     if client:
