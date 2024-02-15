@@ -78,7 +78,7 @@ class SaleRecordViews(APIView):
             client = request.data.get('client', None)
             sub_total = request.data['sub_total']
             loyalty_points_data = request.data.get('applied_loyalty_points_records', None)
-            return Response({'data':loyalty_points_data})
+            # return Response({'data':loyalty_points_data})
             # validity = request.data['gift_cards_records']
             # validity.get('valid_till'
             # return Response({'data': validity})
