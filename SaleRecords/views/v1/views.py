@@ -184,7 +184,7 @@ class SaleRecordViews(APIView):
                             client_points.save()
 
                             LoyaltyPointLogs.objects.create(
-                                location=request.data.get('location'),
+                                location_id=request.data.get('location'),
                                 client=client_points.client,
                                 client_points=client_points,
                                 loyalty=point,
