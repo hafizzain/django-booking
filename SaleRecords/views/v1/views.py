@@ -10,6 +10,7 @@ from rest_framework.decorators import api_view
 
 from SaleRecords.helpers import matching_records, loyalty_points_calculations
 from Client.Constants.client_order_email import send_order_email, send_membership_order_email
+from Reports.models import DiscountPromotionSalesReport
 
 from SaleRecords.serializers import *
 from Business.serializers.v1_serializers import BusinessAddressSerilaizer
@@ -78,6 +79,7 @@ class SaleRecordViews(APIView):
             client = request.data.get('client', None)
             sub_total = request.data['sub_total']
             loyalty_points_data = request.data.get('applied_loyalty_points_records', [])
+            applied_promotions = request.data.get('applied_promotions_records',[])
             # return Response({'data':loyalty_points_data[0]})
             # validity = request.data['gift_cards_records']
             # validity.get('valid_till'
@@ -199,6 +201,19 @@ class SaleRecordViews(APIView):
                                 actual_sale_value_redeemed=logs_total_redeened_value,
                                 invoice=invoice.id,
                                 checkout=sale_record.id
+                            )
+                            
+                    if len(applied_promotions) is not 0:
+                        promotion_data = applied_promotions[0]
+                        DiscountPromotionSalesReport.objects.create(
+                                checkout_id=sale_record.id,
+                                checkout_type='Sale',
+                                invoice=invoice,
+                                promotion_id=promotion_data.get('promotion'),
+                                promotion_type= promotion_data.get('promotion_type'),
+                                user=user,
+                                client=client,
+                                location=location_id,
                             )
                 except Exception as e:
                     return Response({'error':str(e), 'second': 'Second Try'})
