@@ -129,7 +129,7 @@ class SaleRecordViews(APIView):
                     logs_total_redeened_value = 0
                     
                     if loyalty_points_data:
-                        loyalty_points = RedeemedLoyaltyPoints.objects.get(sale_record = sale_record)
+                        loyalty_points = RedeemedLoyaltyPoints.objects.filter(sale_record = sale_record).first()
                         # raise ValidationError('If part')
                         if loyalty_points:
                             client_points = ClientLoyaltyPoint.objects.get(id = loyalty_points.client_loyalty_point.id)
