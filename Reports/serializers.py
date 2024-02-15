@@ -940,8 +940,13 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
             return None
 
     def get_checkout(self, obj):
-        checkout = Checkout.objects.filter(id=obj.checkout_id).first()
-        return CheckoutSerializer(checkout).data
+        from SaleRecords.models import SaleRecords
+        from SaleRecords.serializers import SaleRecordSerializer
+        
+        # checkout = Checkout.objects.filter(id=obj.checkout_id).first()
+        # return Sale(checkout).data
+        checkout  = SaleRecords.objects.get(id = obj.checkout_id)
+        return SaleRecordSerializer(checkout).data
     
         
     def get_membership(self, obj):
