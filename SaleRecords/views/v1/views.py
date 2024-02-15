@@ -78,7 +78,7 @@ class SaleRecordViews(APIView):
             client = request.data.get('client', None)
             sub_total = request.data['sub_total']
             loyalty_points_data = request.data.get('applied_loyalty_points_records', None)
-            return Response({'data':loyalty_points_data[0]})
+            # return Response({'data':loyalty_points_data[0]})
             # validity = request.data['gift_cards_records']
             # validity.get('valid_till'
             # return Response({'data': validity})
@@ -131,18 +131,18 @@ class SaleRecordViews(APIView):
                     # raise ValidationError(f'{sale_record.applied_loyalty_points_records}')
                     
                     if loyalty_points_data is not None:
-                        loyalty_points = ClientLoyaltyPoint.objects.get(id = loyalty_points_data.data.get('redeemed_id'))
+                        loyalty_points = ClientLoyaltyPoint.objects.get(id = loyalty_points_data[0].get('redeemed_id'))
                         # raise ValidationError('If part')
                         if loyalty_points:
                             client_points = ClientLoyaltyPoint.objects.get(id = loyalty_points.client_loyalty_point.id)
                             
-                            client_points.points_redeemed = float(client_points.points_redeemed) + float(loyalty_points_data.data.get('redeemed_points'))
+                            client_points.points_redeemed = float(client_points.points_redeemed) + float(loyalty_points_data[0].get('redeemed_points'))
                             client_points.save()
 
                             single_point_value = client_points.customer_will_get_amount / client_points.for_every_points
-                            total_redeened_value = float(single_point_value) * float(loyalty_points_data.data.get('redeemed_points'))
+                            total_redeened_value = float(single_point_value) * float(loyalty_points_data[0].get('redeemed_points'))
 
-                            logs_points_redeemed = loyalty_points_data.data.get('redeemed_points')
+                            logs_points_redeemed = loyalty_points_data[0].get('redeemed_points')
                             logs_total_redeened_value = total_redeened_value
                         
                     else:
