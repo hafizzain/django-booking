@@ -913,25 +913,25 @@ class DiscountPromotion_SaleInvoiceSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
-    promotion = serializers.SerializerMethodField(read_only=True)
-    invoice = serializers.SerializerMethodField(read_only=True)
-    discounted_price = serializers.SerializerMethodField(read_only=True)
-    location = LocationSerializer(read_only=True)
+    # promotion = serializers.SerializerMethodField(read_only=True)
+    # invoice = serializers.SerializerMethodField(read_only=True)
+    # discounted_price = serializers.SerializerMethodField(read_only=True)
+    # location = LocationSerializer(read_only=True)
 
-    product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
-    service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
-    membership  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
-    voucher  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
+    # product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
+    # service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
+    # membership  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
+    # voucher  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
     
-    client = ClientSerializer()
+    # client = ClientSerializer()
 
-    ids = serializers.SerializerMethodField(read_only=True)
-    membership_product = serializers.SerializerMethodField(read_only=True)
-    membership_service = serializers.SerializerMethodField(read_only=True)
+    # ids = serializers.SerializerMethodField(read_only=True)
+    # membership_product = serializers.SerializerMethodField(read_only=True)
+    # membership_service = serializers.SerializerMethodField(read_only=True)
     
-    tip = serializers.SerializerMethodField(read_only=True)
+    # tip = serializers.SerializerMethodField(read_only=True)
     checkout = serializers.SerializerMethodField(read_only=True)
-    payment_type = serializers.SerializerMethodField(read_only=True)
+    # payment_type = serializers.SerializerMethodField(read_only=True)
 
     def get_payment_type(self, obj):
         try:
