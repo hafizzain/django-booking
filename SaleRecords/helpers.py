@@ -40,13 +40,13 @@ def matching_records(is_quick_sale = None,location=None, range_start=None, range
 def loyalty_points_calculations(location = None, client= None, loyalty_points = None , sale_record = None, sub_total = None, invoice = None ):
         
         try:
-            raise ValidationError('Coming in the function')
+            # raise ValidationError('Coming in the function')
             # =========================================== If loyalty points redeemed ===============================
             logs_points_redeemed = 0
             logs_total_redeened_value = 0
             
             if loyalty_points or client:
-                raise ValidationError('If part')
+                # raise ValidationError('If part')
                 client_points = ClientLoyaltyPoint.objects.get(id= loyalty_points.clinet_loyalty_point)
                 
                 client_points.points_redeemed = float(client_points.points_redeemed) + float(loyalty_points['redeemed_points'])
@@ -59,7 +59,7 @@ def loyalty_points_calculations(location = None, client= None, loyalty_points = 
                 logs_total_redeened_value = total_redeened_value
                 
             else:
-                raise ValidationError('Coming in the else part')
+                # raise ValidationError('Coming in the else part')
                 allowed_points = LoyaltyPoints.objects.filter(
                                             Q(loyaltytype='Service') |
                                             Q(loyaltytype='Both'),
