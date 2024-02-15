@@ -933,11 +933,11 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
     checkout = serializers.SerializerMethodField(read_only=True)
     # payment_type = serializers.SerializerMethodField(read_only=True)
 
-    def get_payment_type(self, obj):
-        try:
-            return obj.invoice.payment_type
-        except:
-            return None
+    # def get_payment_type(self, obj):
+    #     try:
+    #         return obj.invoice.payment_type
+    #     except:
+    #         return None
 
     def get_checkout(self, obj):
         from SaleRecords.models import SaleRecords

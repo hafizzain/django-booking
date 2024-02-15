@@ -202,7 +202,7 @@ class SaleRecordViews(APIView):
                                 promotion_id=promotion_data.get('promotion'),
                                 promotion_type= promotion_data.get('promotion_type'),
                                 user=user,
-                                client=client,
+                                client_id=client,
                                 location=location_id,
                             )
                 except Exception as e:
