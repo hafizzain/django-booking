@@ -945,7 +945,7 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
         
         # checkout = Checkout.objects.filter(id=obj.checkout_id).first()
         # return Sale(checkout).data
-        checkout  = SaleRecords.objects.get(id = obj.checkout_id)
+        checkout  = SaleRecords.objects.filter(id = obj.checkout_id).first()
         return SaleRecordSerializer(checkout).data
     
         
