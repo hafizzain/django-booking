@@ -123,7 +123,7 @@ class SaleRecordViews(APIView):
                     logs_total_redeened_value = 0
                     # raise ValidationError(f'{sale_record.applied_loyalty_points_records}')
                     
-                    if len(loyalty_points_data) is not 0:
+                    if len(loyalty_points_data) > 0:
                         # loyalty_points_record = loyalty_points_data[0]
                         loyalty_points_record = loyalty_points_data[0]
                         loyalty_points = ClientLoyaltyPoint.objects.get(id = loyalty_points_record.get('client_loyalty_point'))
@@ -193,7 +193,7 @@ class SaleRecordViews(APIView):
                                 checkout=sale_record.id
                             )
                             
-                    if len(applied_promotions) is not 0:
+                    if len(applied_promotions) > 0:
                         promotion_data = applied_promotions[0]
                         DiscountPromotionSalesReport.objects.create(
                                 checkout_id=sale_record.id,
