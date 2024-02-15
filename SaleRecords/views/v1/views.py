@@ -122,7 +122,8 @@ class SaleRecordViews(APIView):
                             pass
                         else:
                             send_order_email(sale_record, request)
-                    loyalty_points_calculations(location=location_id, client=client, loyalty_points=loyalty_points, sale_record=sale_record, sub_total=sub_total, invoice=invoice)
+                    raise ValidationError('Coming here')
+                    # loyalty_points_calculations(location=location_id, client=client, loyalty_points=loyalty_points, sale_record=sale_record, sub_total=sub_total, invoice=invoice)
                 except Exception as e:
                     return Response({'error':str(e), 'second': 'Second Try'})
                 
