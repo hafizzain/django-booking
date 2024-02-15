@@ -131,10 +131,10 @@ class SaleRecordViews(APIView):
                     # raise ValidationError(f'{sale_record.applied_loyalty_points_records}')
                     
                     if loyalty_points_data is not None:
-                        loyalty_points = ClientLoyaltyPoint.objects.get(id = loyalty_points_data[0].get('redeemed_id'))
+                        loyalty_points = ClientLoyaltyPoint.objects.get(id = loyalty_points_data[0].get('client_loyalty_point'))
                         # raise ValidationError('If part')
                         if loyalty_points:
-                            client_points = ClientLoyaltyPoint.objects.get(id = loyalty_points_data[0].get('redeemed_id'))
+                            client_points = ClientLoyaltyPoint.objects.get(id = loyalty_points_data[0].get('client_loyalty_point'))
                             
                             client_points.points_redeemed = float(client_points.points_redeemed) + float(loyalty_points_data[0].get('redeemed_points'))
                             client_points.save()
