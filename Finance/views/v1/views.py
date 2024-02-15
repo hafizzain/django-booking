@@ -149,6 +149,10 @@ class RefundAPIView(APIView):
             user = request.user
             request.data['user'] = user.id
             expiry_date = request.data.get('expiry_date')
+            appointment_services= request.data.get('appointment_services')
+            appointment_services_ids =list(AppointmentService.objects \
+                                        .filter(id__in=appointment_services) \
+                                        .values_list('service__id', flat=True))
             serializer = RefundSerializer(data=request.data, context={'request': request})
             # return Response({'data': serializer.validated_data}, status=status.HTTP_200_OK)
             if serializer.is_valid():
@@ -217,6 +221,20 @@ class RefundAPIView(APIView):
                         service_orders = SaleRecordServices.objects.filter(sale_record=invoice.checkout_instance, service__id__in = refunded_services_ids) 
                         # service_orders.update(pk = None, checkout=newCheckoutInstance) 
                         for order in service_orders:
+                            try :
+                                refunded_services = SaleRecordServices.objects.get(checkouts = invoice.checkout_instance,service__id = order.service.id)
+                                SaleRecordServices.objects.create(
+                                    sale_record = newCheckoutInstance,
+                                    employee = order.employee,
+                                    service = order.service,
+                                    quantity = 1,
+                                    price = float(-refunded_services.price)
+                                )
+                            except ObjectDoesNotExist:
+                                print(f"No RefundProduct found for product ID {order.product.id}")
+                        
+                        appointment_service_orders = SaleRecordServices.objects.filter(sale_record=invoice.checkout_instance, service__id__in = appointment_services_ids) 
+                        for order in appointment_service_orders:
                             try :
                                 refunded_services = SaleRecordServices.objects.get(checkouts = invoice.checkout_instance,service__id = order.service.id)
                                 SaleRecordServices.objects.create(
