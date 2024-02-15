@@ -90,7 +90,7 @@ class SaleRecordViews(APIView):
                     loyalty_points = sale_record.applied_loyalty_points_records.all()
                     # return Response({'loyalty points data': loyalty_points})
                     
-                    serialized_data = serialize('json', loyalty_points['fields']['client_loyalty_point'])
+                    serialized_data = serialize('json', loyalty_points['0']['fields']['client_loyalty_point'])
 
                     # Return the serialized data as JSON response
                     return JsonResponse(serialized_data, safe=False)
