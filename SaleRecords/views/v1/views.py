@@ -77,7 +77,7 @@ class SaleRecordViews(APIView):
             location_id = request.data['location']
             client = request.data.get('client', None)
             sub_total = request.data['sub_total']
-            loyalty_points_data = request.data.get('applied_loyalty_points_records', None)
+            loyalty_points_data = request.data.get('applied_loyalty_points_records', [])
             # return Response({'data':loyalty_points_data[0]})
             # validity = request.data['gift_cards_records']
             # validity.get('valid_till'
@@ -130,7 +130,7 @@ class SaleRecordViews(APIView):
                     logs_total_redeened_value = 0
                     # raise ValidationError(f'{sale_record.applied_loyalty_points_records}')
                     
-                    if loyalty_points_data is not None:
+                    if loyalty_points_data is not []:
                         loyalty_points = ClientLoyaltyPoint.objects.get(id = loyalty_points_data[0].get('client_loyalty_point'))
                         # raise ValidationError('If part')
                         if loyalty_points:
