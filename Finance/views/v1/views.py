@@ -183,7 +183,7 @@ class RefundAPIView(APIView):
                         newAppointment.save() 
                         
                         order_items = SaleRecordsAppointmentServices.objects.filter(appointment = invoice.checkout_instance.appointment_services.appointment, service__id__in = refunded_services_ids) 
-                        # return Response({'Appointment order count ': order_items.count() })
+                        return Response({'Appointment order count ': order_items.count() })
                         for order in order_items:
                             order.pk = None
                             order.is_refund = 'refund'
