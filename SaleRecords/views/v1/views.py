@@ -128,7 +128,7 @@ class SaleRecordViews(APIView):
                     
                     if loyalty_points or client:
                         # raise ValidationError('If part')
-                        client_points = ClientLoyaltyPoint.objects.get(id= loyalty_points.clinet_loyalty_point)
+                        client_points = ClientLoyaltyPoint.objects.get(id= loyalty_points.client_loyalty_point)
                         
                         client_points.points_redeemed = float(client_points.points_redeemed) + float(loyalty_points['redeemed_points'])
                         client_points.save()
