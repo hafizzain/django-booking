@@ -131,7 +131,8 @@ class SaleRecordViews(APIView):
                     logs_total_redeened_value = 0
                     # raise ValidationError(f'{sale_record.applied_loyalty_points_records}')
                     
-                    if loyalty_points_data:
+                    if len(loyalty_points_data) is not 0:
+                        # loyalty_points_record = loyalty_points_data[0]
                         loyalty_points_record = loyalty_points_data[0]
                         loyalty_points = ClientLoyaltyPoint.objects.get(id = loyalty_points_record.get('client_loyalty_point'))
                         # raise ValidationError('If part')
