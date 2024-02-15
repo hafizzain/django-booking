@@ -162,7 +162,7 @@ class SaleRecordViews(APIView):
                         if len(allowed_points) > 0:
                             point = allowed_points[0]
                             client_points, created = ClientLoyaltyPoint.objects.get_or_create(
-                                location=location_id,
+                                location_id=location_id,
                                 client=sale_record.client,
                                 loyalty_points=point, # loyalty Foreignkey
                             )
