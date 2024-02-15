@@ -183,17 +183,32 @@ class RefundAPIView(APIView):
                         newAppointment.save() 
                         
                         order_items = SaleRecordsAppointmentServices.objects.filter(appointment = invoice.checkout_instance.appointment_services.appointment, service__id__in = refunded_services_ids) 
-                        return Response({'Appointment order count ': order_items.count() })
+                        # return Response({'Appointment order count ': order_items.count() })
+                        # for order in order_items:
+                        #     order.pk = None
+                        #     order.is_refund = 'refund'
+                        #     order.price = float(-RefundServices.objects.get(service__id = order.id).refunded_amount)
+                        #     # order.tip = 0
+                        #     # order.gst = 0
+                        #     # order.tax_amount = 0
+                        #     order.appointment = newAppointment
+                        #     order.save()
+                        
+                        
                         for order in order_items:
-                            order.pk = None
-                            order.is_refund = 'refund'
-                            order.price = float(-RefundServices.objects.get(service__id = order.id).refunded_amount)
-                            # order.tip = 0
-                            # order.gst = 0
-                            # order.tax_amount = 0
-                            order.appointment = newAppointment
-                            order.save()
-                            
+                            refunded_services = RefundServices.objects.get(checkouts = invoice.checkout_instance,service__id = order.service.id)
+                            SaleRecordsAppointmentServices.objects.create(
+                                sale_record=newCheckoutInstance,
+                                appointment = newAppointment,
+                                employee = order.employee, 
+                                service = order.service,
+                                service_start_time = order.service_start_time,
+                                service_end_time = order.service_end_time,
+                                quantity = 1,
+                                price = float(-refunded_services.price)
+
+                            )
+                    
                         # or you can do it in loop
                     else: 
                         product_orders = SaleRecordsProducts.objects.filter(sale_record=invoice.checkout_instance, product__id__in = refunded_products_ids) 
@@ -219,7 +234,7 @@ class RefundAPIView(APIView):
                         # service_orders.update(pk = None, checkout=newCheckoutInstance) 
                         for order in service_orders:
                             try :
-                                refunded_services = SaleRecordServices.objects.get(checkouts = invoice.checkout_instance,service__id = order.service.id)
+                                refunded_services = RefundServices.objects.get(checkouts = invoice.checkout_instance,service__id = order.service.id)
                                 SaleRecordServices.objects.create(
                                     sale_record = newCheckoutInstance,
                                     employee = order.employee,
