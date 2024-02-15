@@ -131,13 +131,13 @@ class SaleRecordViews(APIView):
                         # raise ValidationError('If part')
                         client_points = ClientLoyaltyPoint.objects.get(id = loyalty_points.client_loyalty_point.id)
                         
-                        client_points.points_redeemed = float(client_points.points_redeemed) + float(loyalty_points['redeemed_points'])
+                        client_points.points_redeemed = float(client_points.points_redeemed) + float(loyalty_points.redeemed_points)
                         client_points.save()
 
                         single_point_value = client_points.customer_will_get_amount / client_points.for_every_points
-                        total_redeened_value = float(single_point_value) * float(loyalty_points['redeemed_points'])
+                        total_redeened_value = float(single_point_value) * float(loyalty_points.redeemed_points)
 
-                        logs_points_redeemed = loyalty_points['redeemed_points']
+                        logs_points_redeemed = loyalty_points.redeemed_points
                         logs_total_redeened_value = total_redeened_value
                         
                     else:
