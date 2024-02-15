@@ -461,6 +461,8 @@ def get_appointments_group_services(request):
     voucher_total_price = sum(item.get('price', 0) for item in voucher.data)
     total_sale = total_sale + price_values + voucher_total_price
     
+    appointment_group = AppointmentGroup.objects.get(id = appointment_id)
+    group_check_in_time = appointment_group.group_check_in_time
     return Response(
         {
             'status': True,
@@ -471,7 +473,7 @@ def get_appointments_group_services(request):
                 'error_message': None,
                 'appointment': serialized.data,
                 'total_sales': total_sale,
-                'group_check_in': appointment_group.group_check_in_time,
+                'group_check_in_time': group_check_in_time,
             }
         },
         status=status.HTTP_200_OK
@@ -4991,6 +4993,7 @@ def update_group_appointment_check_in(request):
         
         group_appointment.group_check_in_time = timezone.now()
         group_appointment.save()
+        
         group_appointment_data = GroupCheckInSerializer(group_appointment).data
         data = {
                 'status': True,
