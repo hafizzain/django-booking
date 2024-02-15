@@ -705,50 +705,50 @@ class CustomerLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 
 class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 
-    date = serializers.SerializerMethodField()
-    actual_sale_value_redeemed = serializers.SerializerMethodField()
-    invoice_data = serializers.SerializerMethodField()
-    customer = serializers.SerializerMethodField()
-    loyalty = serializers.SerializerMethodField()
-    points_earned = serializers.SerializerMethodField()
-    points_redeemed = serializers.SerializerMethodField()
-    balance = serializers.SerializerMethodField()
+    # date = serializers.SerializerMethodField()
+    # actual_sale_value_redeemed = serializers.SerializerMethodField()
+    # invoice_data = serializers.SerializerMethodField()
+    # customer = serializers.SerializerMethodField()
+    # loyalty = serializers.SerializerMethodField()
+    # points_earned = serializers.SerializerMethodField()
+    # points_redeemed = serializers.SerializerMethodField()
+    # balance = serializers.SerializerMethodField()
     checkout_data = serializers.SerializerMethodField()
 
-    def get_date(self, c_points):
-        return c_points.created_at.strftime('%Y-%m-%d')
+    # def get_date(self, c_points):
+    #     return c_points.created_at.strftime('%Y-%m-%d')
 
-    def get_actual_sale_value_redeemed(self, c_points):
-        return c_points.actual_sale_value_redeemed
+    # def get_actual_sale_value_redeemed(self, c_points):
+    #     return c_points.actual_sale_value_redeemed
 
-    def get_invoice_data(self, c_points):
-        try:
-            invoice = SaleInvoice.objects.get(id__icontains = c_points.invoice)
-            serializer = SaleInvoiceSerializer(invoice, context=self.context)
-            return serializer.data
-        except Exception as e:
-            return str(e)
+    # def get_invoice_data(self, c_points):
+    #     try:
+    #         invoice = SaleInvoice.objects.get(id__icontains = c_points.invoice)
+    #         serializer = SaleInvoiceSerializer(invoice, context=self.context)
+    #         return serializer.data
+    #     except Exception as e:
+    #         return str(e)
 
-    def get_customer(self, c_points):
-        return {
-            'customer_id' : f'{c_points.client.client_id}',
-            'customer_name' : f'{c_points.client.full_name}',
-        }
+    # def get_customer(self, c_points):
+    #     return {
+    #         'customer_id' : f'{c_points.client.client_id}',
+    #         'customer_name' : f'{c_points.client.full_name}',
+    #     }
 
-    def get_loyalty(self, c_points):
-        return {
-            'loyalty_name' : f'{c_points.loyalty.name}',
-            'id' : f'{c_points.loyalty.id}',
-        }
+    # def get_loyalty(self, c_points):
+    #     return {
+    #         'loyalty_name' : f'{c_points.loyalty.name}',
+    #         'id' : f'{c_points.loyalty.id}',
+    #     }
 
-    def get_points_earned(self, c_points):
-        return c_points.points_earned
+    # def get_points_earned(self, c_points):
+    #     return c_points.points_earned
 
-    def get_points_redeemed(self, c_points):
-        return c_points.points_redeemed
+    # def get_points_redeemed(self, c_points):
+    #     return c_points.points_redeemed
 
-    def get_balance(self, c_points):
-        return c_points.balance
+    # def get_balance(self, c_points):
+    #     return c_points.balance
 
     def get_checkout_data(self, c_points):
         # from Sale.serializers import SaleOrders_CheckoutSerializer, SaleOrders_AppointmentCheckoutSerializer
@@ -777,7 +777,7 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LoyaltyPointLogs
-        fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed','balance', 'checkout', 'checkout_data', 'invoice', 'invoice_data', 'actual_sale_value_redeemed', 'date']
+        fields = ['checkout_data']
 
 
 class CustomerDetailedLoyaltyPointsLogsSerializerOP(serializers.ModelSerializer):

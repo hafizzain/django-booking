@@ -949,147 +949,130 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
         return SaleRecordSerializer(checkout).data
     
         
-    def get_membership(self, obj):
+    # def get_membership(self, obj):
         
-        check = MemberShipOrder.objects.only(
-            'id',
-            'membership',
-            'current_price',
-            'quantity',
-        ).select_related(
-            'membership',
-        ).filter(
-            checkout__id = obj.checkout_id
-        )
-        return SaleOrder_MemberShipSerializer(check, many = True ).data
+    #     check = MemberShipOrder.objects.only(
+    #         'id',
+    #         'membership',
+    #         'current_price',
+    #         'quantity',
+    #     ).select_related(
+    #         'membership',
+    #     ).filter(
+    #         checkout__id = obj.checkout_id
+    #     )
+    #     return SaleOrder_MemberShipSerializer(check, many = True ).data
 
 
-    def get_voucher(self, obj):
+    # def get_voucher(self, obj):
         
-        check = VoucherOrder.objects.only(
-            'id',
-            'voucher',
-            'current_price',
-            'quantity',
-        ).select_related(
-            'voucher',
-        ).filter(
-            checkout__id = obj.checkout_id
-        )
-        # return VoucherOrderSerializer(check, many = True , context=self.context ).data
-        return SaleOrder_VoucherSerializer(check, many = True ).data
+    #     check = VoucherOrder.objects.only(
+    #         'id',
+    #         'voucher',
+    #         'current_price',
+    #         'quantity',
+    #     ).select_related(
+    #         'voucher',
+    #     ).filter(
+    #         checkout__id = obj.checkout_id
+    #     )
+    #     # return VoucherOrderSerializer(check, many = True , context=self.context ).data
+    #     return SaleOrder_VoucherSerializer(check, many = True ).data
 
 
-    def get_product(self, obj):
-        check = ProductOrder.objects.only(
-                'current_price', 
-                'id',
-                'quantity',
-                'product',
-            ).select_related(
-                'product',
-            ).filter(
-            checkout__id = obj.checkout_id
-        )
-        # data =  ProductOrderSerializer(check, many = True , context=self.context ).data
-        data =  SaleOrder_ProductSerializer(check, many = True ).data
-        self.product = data
-        return self.product
+    # def get_product(self, obj):
+    #     check = ProductOrder.objects.only(
+    #             'current_price', 
+    #             'id',
+    #             'quantity',
+    #             'product',
+    #         ).select_related(
+    #             'product',
+    #         ).filter(
+    #         checkout__id = obj.checkout_id
+    #     )
+    #     # data =  ProductOrderSerializer(check, many = True , context=self.context ).data
+    #     data =  SaleOrder_ProductSerializer(check, many = True ).data
+    #     self.product = data
+    #     return self.product
             
-    def get_membership_product(self, obj):
-        return self.product
+    # def get_membership_product(self, obj):
+    #     return self.product
 
-    def get_service(self, obj):
-        if obj.checkout_type == 'Sale':
-            service = ServiceOrder.objects.only(
-                'id',
-                'quantity',
-                'current_price',
-                'service',
-            ).select_related(
-                'service',
-            ).filter(
-                checkout__id = obj.checkout_id
-            )
-            # data = ServiceOrderSerializer(service, many = True , context=self.context ).data
-            data = SaleOrder_ServiceSerializer(service, many = True ).data
-            self.service = data
-        elif obj.checkout_type == 'Appointment':
-            try:
-                app_checkout = AppointmentCheckout.objects.get(
-                    id = obj.checkout_id
-                )
-            except:
-                self.service = []
-            else:
-                app_services = AppointmentService.objects.filter(
-                    appointment = app_checkout.appointment
-                )
-                data = AppointmentService_DiscountReportSerializer(app_services, many=True).data
-                self.service = data
-        else:
-            self.service = []
+    # def get_service(self, obj):
+    #     if obj.checkout_type == 'Sale':
+    #         service = ServiceOrder.objects.only(
+    #             'id',
+    #             'quantity',
+    #             'current_price',
+    #             'service',
+    #         ).select_related(
+    #             'service',
+    #         ).filter(
+    #             checkout__id = obj.checkout_id
+    #         )
+    #         # data = ServiceOrderSerializer(service, many = True , context=self.context ).data
+    #         data = SaleOrder_ServiceSerializer(service, many = True ).data
+    #         self.service = data
+    #     elif obj.checkout_type == 'Appointment':
+    #         try:
+    #             app_checkout = AppointmentCheckout.objects.get(
+    #                 id = obj.checkout_id
+    #             )
+    #         except:
+    #             self.service = []
+    #         else:
+    #             app_services = AppointmentService.objects.filter(
+    #                 appointment = app_checkout.appointment
+    #             )
+    #             data = AppointmentService_DiscountReportSerializer(app_services, many=True).data
+    #             self.service = data
+    #     else:
+    #         self.service = []
 
-        return self.service
+    #     return self.service
     
-    def get_membership_service(self, obj):
-        return self.service
+    # def get_membership_service(self, obj):
+    #     return self.service
     
-    def get_ids(self, obj):
+    # def get_ids(self, obj):
         
-        ids_data = []
-        ids_data.extend(self.product)
-        ids_data.extend(self.service)
+    #     ids_data = []
+    #     ids_data.extend(self.product)
+    #     ids_data.extend(self.service)
 
-        return ids_data
+    #     return ids_data
     
-    def get_tip(self, obj):
-        tips = AppointmentEmployeeTip.objects.filter(checkout__id=obj.checkout_id)
-        serialized_tips = CheckoutTipsSerializer(tips, many=True).data
-        return serialized_tips
+    # def get_tip(self, obj):
+    #     tips = AppointmentEmployeeTip.objects.filter(checkout__id=obj.checkout_id)
+    #     serialized_tips = CheckoutTipsSerializer(tips, many=True).data
+    #     return serialized_tips
         
     
-    def get_invoice(self, obj):
-        try:
-            invoice = SaleInvoice.objects.get(checkout__icontains = obj.checkout_id)
-            serializer = DiscountPromotion_SaleInvoiceSerializer(invoice, context=self.context)
-            return serializer.data
-        except Exception as e:
-            return str(e)
+    # def get_invoice(self, obj):
+    #     try:
+    #         invoice = SaleInvoice.objects.get(checkout__icontains = obj.checkout_id)
+    #         serializer = DiscountPromotion_SaleInvoiceSerializer(invoice, context=self.context)
+    #         return serializer.data
+    #     except Exception as e:
+    #         return str(e)
 
-    def get_promotion(self, obj):
-        return {
-            'promotion_name' : obj.promotion_name,
-        }
+    # def get_promotion(self, obj):
+    #     return {
+    #         'promotion_name' : obj.promotion_name,
+    #     }
         
 
-    def get_discounted_price(self, obj):
+    # def get_discounted_price(self, obj):
         
-        return obj.discount_price
+    #     return obj.discount_price
         
     class Meta:
         model = DiscountPromotionSalesReport
         fields = [
-            'id',
-            'checkout_id',
-            'checkout_type', 
-            'promotion', 
-            'invoice', 
-            'created_at', 
-            'original_price', 
-            'discounted_price', 
-            'location', 
-            'product', 
-            'service', 
-            'membership', 
-            'voucher', 
-            'client', 
-            'ids', 
-            'membership_product', 
-            'membership_service', 
-            'tip',
+            
             'checkout',
-            'payment_type'
+            
         ]
 
 
