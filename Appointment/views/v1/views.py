@@ -472,6 +472,7 @@ def get_appointments_group_services(request):
                 'appointment': serialized.data,
                 'total_sales': total_sale,
                 'group_check_in': appointment_group.group_check_in_time,
+                'group_name': appointment_group.group_name,
             }
         },
         status=status.HTTP_200_OK
