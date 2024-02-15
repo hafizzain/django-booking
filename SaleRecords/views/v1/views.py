@@ -193,18 +193,18 @@ class SaleRecordViews(APIView):
                                 checkout=sale_record.id
                             )
                             
-                    if len(applied_promotions) > 0:
-                        promotion_data = applied_promotions[0]
-                        DiscountPromotionSalesReport.objects.create(
-                                checkout_id=sale_record.id,
-                                checkout_type='Sale',
-                                invoice=invoice,
-                                promotion_id=promotion_data.get('promotion'),
-                                promotion_type= promotion_data.get('promotion_type'),
-                                user=user,
-                                client_id=client,
-                                location_id=location_id,
-                            )
+                    # if len(applied_promotions) > 0:
+                    #     promotion_data = applied_promotions[0]
+                    #     DiscountPromotionSalesReport.objects.create(
+                    #             checkout_id=sale_record.id,
+                    #             checkout_type='Sale',
+                    #             invoice=invoice,
+                    #             promotion_id=promotion_data.get('promotion'),
+                    #             promotion_type= promotion_data.get('promotion_type'),
+                    #             user=user,
+                    #             client_id=client,
+                    #             location_id=location_id,
+                    #         )
                 except Exception as e:
                     return Response({'error':str(e), 'second': 'Second Try'})
                 
