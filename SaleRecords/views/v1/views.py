@@ -77,6 +77,7 @@ class SaleRecordViews(APIView):
             location_id = request.data['location']
             client = request.data.get('client', None)
             sub_total = request.data['sub_total']
+            loyalty_points = request.data.get('applied_loyalty_points_records', None)
             # validity = request.data['gift_cards_records']
             # validity.get('valid_till'
             # return Response({'data': validity})
@@ -110,8 +111,9 @@ class SaleRecordViews(APIView):
                         checkout=sale_record.id,
                     )
                     invoice.save()
+                    if loyalty_points:
+                        loyalty_points = RedeemedLoyaltyPoints.objects.get(sale_record = sale_record)
                     
-                    loyalty_points = RedeemedLoyaltyPoints.objects.get(sale_record = sale_record)
                     
                     # return Response({'membership records': membership_order})
                     if client:
