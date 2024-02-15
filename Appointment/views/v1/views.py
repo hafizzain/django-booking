@@ -472,7 +472,6 @@ def get_appointments_group_services(request):
                 'appointment': serialized.data,
                 'total_sales': total_sale,
                 'group_check_in': appointment_group.group_check_in_time,
-                'group_name': appointment_group.group_name,
             }
         },
         status=status.HTTP_200_OK
@@ -4973,6 +4972,7 @@ def update_appointment_check_in(request):
             }
         return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
+
 # Group Appointment Check-in ------------------------------------------     
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -4989,7 +4989,8 @@ def update_group_appointment_check_in(request):
                 appointment.check_in_time = timezone.now()
                 appointment.save()
         
-        group_appointment.group_check_in_time = timezone.now()   
+        group_appointment.group_check_in_time = timezone.now()
+        group_appointment.save()
         group_appointment_data = GroupCheckInSerializer(group_appointment).data
         data = {
                 'status': True,
