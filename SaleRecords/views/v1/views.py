@@ -131,16 +131,17 @@ class SaleRecordViews(APIView):
                     if loyalty_points_data:
                         loyalty_points = RedeemedLoyaltyPoints.objects.get(sale_record = sale_record)
                         # raise ValidationError('If part')
-                        client_points = ClientLoyaltyPoint.objects.get(id = loyalty_points.client_loyalty_point.id)
-                        
-                        client_points.points_redeemed = float(client_points.points_redeemed) + float(loyalty_points.redeemed_points)
-                        client_points.save()
+                        if loyalty_points:
+                            client_points = ClientLoyaltyPoint.objects.get(id = loyalty_points.client_loyalty_point.id)
+                            
+                            client_points.points_redeemed = float(client_points.points_redeemed) + float(loyalty_points.redeemed_points)
+                            client_points.save()
 
-                        single_point_value = client_points.customer_will_get_amount / client_points.for_every_points
-                        total_redeened_value = float(single_point_value) * float(loyalty_points.redeemed_points)
+                            single_point_value = client_points.customer_will_get_amount / client_points.for_every_points
+                            total_redeened_value = float(single_point_value) * float(loyalty_points.redeemed_points)
 
-                        logs_points_redeemed = loyalty_points.redeemed_points
-                        logs_total_redeened_value = total_redeened_value
+                            logs_points_redeemed = loyalty_points.redeemed_points
+                            logs_total_redeened_value = total_redeened_value
                         
                     else:
                         # raise ValidationError('Coming in the else part')
@@ -156,7 +157,7 @@ class SaleRecordViews(APIView):
                         if len(allowed_points) > 0:
                             point = allowed_points[0]
                             client_points, created = ClientLoyaltyPoint.objects.get_or_create(
-                                location=request.data.get('location'),
+                                location=location_id,
                                 client=sale_record.client,
                                 loyalty_points=point, # loyalty Foreignkey
                             )
@@ -183,7 +184,7 @@ class SaleRecordViews(APIView):
                             client_points.save()
 
                             LoyaltyPointLogs.objects.create(
-                                location_id=request.data.get('location'),
+                                location_id=location_id,
                                 client=client_points.client,
                                 client_points=client_points,
                                 loyalty=point,
