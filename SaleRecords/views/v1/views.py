@@ -306,7 +306,8 @@ def get_sales_analytics(request):
             membership['total_membership_sale'] +
             gift_card['total_gift_card_sale']
         )
-
+        avg_sale = total_sale / 5 # average of 5 sales records
+        
         data = {
             'success': True,
             'status_code': status.HTTP_200_OK,
@@ -325,6 +326,7 @@ def get_sales_analytics(request):
                 'membership_total_sale': membership['total_membership_sale'],
                 'gift_card_total_sale': gift_card['total_gift_card_sale'],
                 'appointment_average': appointment_average['avg_appointment'],
+                'avg_sale': avg_sale,
                 'total_sale': total_sale,
             }
         }
