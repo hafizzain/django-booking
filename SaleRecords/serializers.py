@@ -569,16 +569,10 @@ class SaleRecordSerializer(serializers.ModelSerializer):
 class ServiceTargetSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceTarget
-        fields = "__all__"
+        fields = ['service_target',]
 
 class RetailTargetSerializer(serializers.ModelSerializer):
     class Meta:
         model = RetailTarget
-        fields = "__all__"
+        fields = ['brand_target',]
                 
-class ServiceRecordSerializer(serializers.ModelSerializer):
-    # get_total_service_sale = serializers.SerializerMethodField()
-
-    class Meta:
-        model = SaleRecordServices
-        fields = "__all__"
