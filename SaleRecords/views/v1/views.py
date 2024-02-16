@@ -291,7 +291,7 @@ def get_sales_analytics(request):
         gift_card = PurchasedGiftCards.objects.filter(query).aggregate(total_gift_card_sale=Sum('price'))
         
         appointment_average = SaleRecordsAppointmentServices.objects.filter(query) \
-                                .aggregate(avg_appointment_sale=Avg('price'))
+                                .aggregate(avg_appointment=Avg('price'))
         
         # Calculate the total sum
         total_sum = (
@@ -308,14 +308,18 @@ def get_sales_analytics(request):
             'message': 'Data fetched successfully',
             'error_message': None,
             'data': {
-                'service_target': service_target.get('total_service_target', 0),
-                'retail_target': retail_target.get('total_retail_target', 0),
-                'service_total_sale': service.get('total_service_sale', 0),
-                'product_total_sale': product.get('total_product_sale', 0),
+                'service' : {
+                    'total_service_target': service_target.get('total_service_target', 0),
+                    'service_total_sale': service.get('total_service_sale', 0),
+                },
+                'product' : {
+                    'total_retail_target': retail_target.get('total_retail_target', 0),
+                    'product_total_sale': product.get('total_product_sale', 0),
+                },
                 'vouchers_total_sale': vouchers.get('total_vouchers_sale', 0),
                 'membership_total_sale': membership.get('total_membership_sale', 0),
                 'gift_card_total_sale': gift_card.get('total_gift_card_sale', 0),
-                'appointment_average': appointment_average.get('avg_appointment_sale', 0),
+                'appointment_average': appointment_average.get('avg_appointment', 0),
                 'total_sum': total_sum,
             }
         }
