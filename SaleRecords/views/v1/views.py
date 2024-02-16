@@ -299,6 +299,13 @@ def get_sales_analytics(request):
         appointment_average = SaleRecordsAppointmentServices.objects.filter(query) \
                                 .aggregate(avg_appointment=Coalesce(Avg('price', output_field=FloatField()), Value(0, output_field=FloatField())))
         
+        # Appointment Count
+        cancel_appointment = Appointment.objects.filter(location, query, status='Cancelled').count()
+        finished_appointment = Appointment.objects.filter(location, query, status='Finished').count()
+        
+        # Total Appointment count
+        total_appointment = cancel_appointment + finished_appointment
+        
         # Calculate the total sum
         total_sale = (
             service['total_service_sale'] +
@@ -332,6 +339,11 @@ def get_sales_analytics(request):
                     'membership_total_sale': membership['total_membership_sale'],
                     'gift_card_total_sale': gift_card['total_gift_card_sale'],
                     'total_sale': total_sale,
+                },
+                'appointment_progress': {
+                    'cancel_appointment': cancel_appointment,
+                    'finished_appointment': finished_appointment,
+                    'total_appointment': total_appointment,
                 }
             }   
         }
