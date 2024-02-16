@@ -266,8 +266,9 @@ def get_sales_analytics(request):
         today = request.GET.get('today')
         
         query = Q()
+        location = Q()
         if location_id:
-            query &= Q(location=location_id)
+            location &= Q(location=location_id)
             
         if year:
             query &= Q(created_at__year=year)
@@ -279,8 +280,8 @@ def get_sales_analytics(request):
             query &= Q(created_at__date=today)
             
         # Get Target Data    
-        service_target = ServiceTarget.objects.filter(query)
-        retail_target = RetailTarget.objects.filter(query).annotate(total_retail_target=Sum('brand_target'))
+        service_target = ServiceTarget.objects.filter(query).filter(location)
+        retail_target = RetailTarget.objects.filter(query).annotate(total_retail_target=Sum('brand_target')).filter(location)
         
         # Get Sale Records
         service = SaleRecordServices.objects.filter(query).annotate(total_service_sale=Sum('price'))
