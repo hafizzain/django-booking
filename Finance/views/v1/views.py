@@ -198,7 +198,7 @@ class RefundAPIView(APIView):
                         for order in order_items:
                             refunded_services = RefundServices.objects.get(checkouts = invoice.checkout_instance,service__id = order.service.id)
                             SaleRecordsAppointmentServices.objects.create(
-                                sale_record=newCheckoutInstance,
+                                sale_record = newCheckoutInstance,
                                 appointment = newAppointment,
                                 employee = order.employee, 
                                 service = order.service,
@@ -206,14 +206,12 @@ class RefundAPIView(APIView):
                                 service_end_time = order.service_end_time,
                                 quantity = 1,
                                 price = float(-refunded_services.price)
-
                             )
                     
                         # or you can do it in loop
                     else: 
                         product_orders = SaleRecordsProducts.objects.filter(sale_record=invoice.checkout_instance, product__id__in = refunded_products_ids) 
 
-                        
                         for order in product_orders:
                             try:
                                 refund_product = RefundProduct.objects.get(checkouts = invoice.checkout_instance,product__id=order.product.id)
@@ -224,7 +222,6 @@ class RefundAPIView(APIView):
                                     product=order.product,
                                     quantity = refund_product.refunded_quantity,
                                     price = float(-refund_product.refunded_amount),
-                                
                                 )
                             except ObjectDoesNotExist:
                                 # Handle the case where RefundProduct does not exist for the current order's product ID
