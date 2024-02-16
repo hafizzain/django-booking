@@ -5,7 +5,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from django.db.models import Sum, Avg
 from django.db.models import Q
 from django.db.models import Value
@@ -259,6 +260,7 @@ def single_sale_record(request):
 
 # Get Sales Analytics Pos Analytics ------------------------------------------------------------------------------------------
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_sales_analytics(request):
     try:
         location_id = request.GET.get('location_id')
