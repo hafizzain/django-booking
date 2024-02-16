@@ -6,13 +6,15 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import api_view
-
+from django.db.models import Sum, Avg
+from django.db.models import Q
 
 from SaleRecords.helpers import matching_records, loyalty_points_calculations
 from Client.Constants.client_order_email import send_order_email, send_membership_order_email
 
 from SaleRecords.serializers import *
 from Business.serializers.v1_serializers import BusinessAddressSerilaizer
+from TragetControl.models import *
 
 
 class SaleRecordViews(APIView):
@@ -172,3 +174,76 @@ def single_sale_record(request):
                         }
             }
     return Response(response)
+
+# Get Sales Analytics Pos Analytics ------------------------------------------------------------------------------------------
+@api_view(['GET'])
+def get_sales_analytics(request):
+    try:
+        location_id = request.GET.get('location_id')
+        year = request.GET.get('year')
+        month = request.GET.get('month')
+        today = request.GET.get('today')
+        
+        query = Q()
+        if location_id:
+            query &= Q(location=location_id)
+            
+        if year:
+            query &= Q(created_at__year=year)
+        
+        if month:
+            query &= Q(created_at__month=month)
+        
+        if today:
+            query &= Q(created_at__date=today)
+            
+        # Get Target Data    
+        service_target = ServiceTarget.objects.filter(query)
+        retail_target = RetailTarget.objects.filter(query).annotate(total_retail_target=Sum('brand_target'))
+        
+        # Get Sale Records
+        service = SaleRecordServices.objects.filter(query).annotate(total_service_sale=Sum('price'))
+        product = SaleRecordsProducts.objects.filter(query).annotate(total_product_sale=Sum('price'))
+        vouchers = SaleRecordVouchers.objects.filter(query).annotate(total_vouchers_sale=Sum('price'))
+        membership = SaleRecordMembership.objects.filter(query).annotate(total_membership_sale=Sum('price'))
+        gift_card = PurchasedGiftCards.objects.filter(query).annotate(total_gift_card_sale=Sum('price'))
+        
+        appointment_average = SaleRecordsAppointmentServices.objects.filter(query).annotate(avg_appointment_sale=Avg('price'))
+        
+        # Get Total Sales
+        total_sum = (
+            service.aggregate(total=Sum('total_service_sale'))['total'] or 0 +
+            product.aggregate(total=Sum('total_product_sale'))['total'] or 0 +
+            vouchers.aggregate(total=Sum('total_vouchers_sale'))['total'] or 0 +
+            membership.aggregate(total=Sum('total_membership_sale'))['total'] or 0 +
+            gift_card.aggregate(total=Sum('total_gift_card_sale'))['total'] or 0
+        )
+        
+        data = {
+            'success': True,
+            'status_code': status.HTTP_200_OK,
+            'message': 'Data fetched successfully',
+            'error_message': None,
+            'data': {
+                'service_target': ServiceTargetSerializer(service_target, many=True).data,
+                'retail_target': RetailTargetSerializer(retail_target, many=True).data,
+                'service': ServiceRecordSerializer(service, many=True).data,
+                'product': product,
+                # 'vouchers': VoucherRecordSerializer(vouchers, many=True).data,
+                # 'membership': MembershipRecordSerializer(membership, many=True).data,
+                # 'gift_card': GiftCardRecordSerializer(gift_card, many=True).data,
+                # 'appointment_average': AppointmentServiceRecordSerializer(appointment_average, many=True).data,
+                'total_sum': total_sum
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)
+    except Exception as e:
+        # Handle exceptions and return an appropriate error response
+        error_data = {
+            'success': False,
+            'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
+            'message': 'Internal Server Error',
+            'error_message': str(e),
+            'data': None
+        }
+        return Response(error_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
