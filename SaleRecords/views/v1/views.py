@@ -278,8 +278,10 @@ def get_sales_analytics(request):
             query &= Q(created_at__date=today)
             
         # Get Target Data    
-        service_target = ServiceTarget.objects.filter(query).filter(location)
-        retail_target = RetailTarget.objects.filter(query, location).aggregate(total_retail_target=Sum('brand_target'))
+        service_target = ServiceTarget.objects.filter(query, location) \
+                            .aaggregate(total_service_target=Sum('service_target'))
+        retail_target = RetailTarget.objects.filter(query, location) \
+                            .aggregate(total_retail_target=Sum('brand_target'))
         
         # Get Sale Records
         service = SaleRecordServices.objects.filter(query).aggregate(total_service_sale=Sum('price'))
@@ -288,30 +290,31 @@ def get_sales_analytics(request):
         membership = SaleRecordMembership.objects.filter(query).aggregate(total_membership_sale=Sum('price'))
         gift_card = PurchasedGiftCards.objects.filter(query).aggregate(total_gift_card_sale=Sum('price'))
         
-        appointment_average = SaleRecordsAppointmentServices.objects.filter(query).aggregate(avg_appointment_sale=Avg('price'))
+        appointment_average = SaleRecordsAppointmentServices.objects.filter(query) \
+                                .aggregate(avg_appointment_sale=Avg('price'))
         
         # Calculate the total sum
         total_sum = (
-            service['total_service_sale'] or 0 +
-            product['total_product_sale'] or 0 +
-            vouchers['total_vouchers_sale'] or 0 +
-            membership['total_membership_sale'] or 0 +
-            gift_card['total_gift_card_sale'] or 0
+            service.get('total_service_sale', 0) +
+            product.get('total_product_sale', 0) +
+            vouchers.get('total_vouchers_sale', 0) +
+            membership.get('total_membership_sale', 0) +
+            gift_card.get('total_gift_card_sale', 0)
         )
-        
+
         data = {
             'success': True,
             'status_code': status.HTTP_200_OK,
             'message': 'Data fetched successfully',
             'error_message': None,
             'data': {
-                'service_target': ServiceTargetSerializer(service_target, many=True).data,
+                'service_target': service_target.get('total_service_target', 0),
                 'retail_target': retail_target.get('total_retail_target', 0),
-                'service': service.get('total_service_sale', 0),
-                'product': product.get('total_product_sale', 0),
-                'vouchers': vouchers.get('total_vouchers_sale', 0),
-                'membership': membership.get('total_membership_sale', 0),
-                'gift_card': gift_card.get('total_gift_card_sale', 0),
+                'service_total_sale': service.get('total_service_sale', 0),
+                'product_total_sale': product.get('total_product_sale', 0),
+                'vouchers_total_sale': vouchers.get('total_vouchers_sale', 0),
+                'membership_total_sale': membership.get('total_membership_sale', 0),
+                'gift_card_total_sale': gift_card.get('total_gift_card_sale', 0),
                 'appointment_average': appointment_average.get('avg_appointment_sale', 0),
                 'total_sum': total_sum,
             }
