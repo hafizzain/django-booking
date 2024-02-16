@@ -272,7 +272,7 @@ def get_sales_analytics(request):
     try:    
         if location_id:
             location &= Q(location=location_id)
-            business &= Q(business=location_id)
+            business &= Q(business_address=location_id)
             
         if year:
             query &= Q(created_at__year=year)
