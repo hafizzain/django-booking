@@ -290,7 +290,7 @@ def get_sales_analytics(request):
         membership = SaleRecordMembership.objects.filter(query).annotate(total_membership_sale=Sum('price')).values('total_membership_sale')
         gift_card = PurchasedGiftCards.objects.filter(query).annotate(total_gift_card_sale=Sum('price')).values('total_gift_card_sale')
         
-        appointment_average = SaleRecordsAppointmentServices.objects.filter(query).annotate(avg_appointment_sale=Avg('price'))
+        appointment_average = SaleRecordsAppointmentServices.objects.filter(query).annotate(avg_appointment_sale=Avg('price')).values('avg_appointment_sale')
         
         # Get Total Sales
         total_sum = (
@@ -309,7 +309,7 @@ def get_sales_analytics(request):
             'data': {
                 'service_target': ServiceTargetSerializer(service_target, many=True).data,
                 'retail_target': RetailTargetSerializer(retail_target, many=True).data,
-                'service': service[0]['total_service_sale'],
+                'service': service.,
                 'product': product[0]['total_product_sale'],
                 'vouchers': vouchers[0]['total_vouchers_sale'],
                 'membership': membership[0]['total_membership_sale'],
