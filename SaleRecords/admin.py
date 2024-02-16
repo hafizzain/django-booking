@@ -77,5 +77,5 @@ class AppliedPromotionAdmin(admin.ModelAdmin):
 
 @admin.register(RedeemedLoyaltyPoints)
 class RedeemedLoyaltyPointsAdmn(admin.ModelAdmin):
-    list_display = ['id', 'clinet_loyalty_point']
+    list_display = ['id', 'client_loyalty_point']
     ordering = ['-created_at']
