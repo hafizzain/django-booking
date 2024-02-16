@@ -327,10 +327,12 @@ def get_sales_analytics(request):
                     'total_retail_target': retail_target['total_retail_target'],
                     'product_total_sale': product['total_product_sale'],
                 },
-                'vouchers_total_sale': vouchers['total_vouchers_sale'],
-                'membership_total_sale': membership['total_membership_sale'],
-                'gift_card_total_sale': gift_card['total_gift_card_sale'],
-                'total_sale': total_sale,
+                'sales_progress': {
+                    'vouchers_total_sale': vouchers['total_vouchers_sale'],
+                    'membership_total_sale': membership['total_membership_sale'],
+                    'gift_card_total_sale': gift_card['total_gift_card_sale'],
+                    'total_sale': total_sale,
+                }
             }
         }
         return Response(data, status=status.HTTP_200_OK)
