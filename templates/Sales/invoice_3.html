@@ -368,25 +368,6 @@
                     
                   {% endif %}
 
-                  {% comment %}======================================= old code ================================================================{% endcomment %}
-
-                  {% comment %} {% for order in checkout_data %}
-                    <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                      <div>
-                        <p class="text-left">
-                          {% get_primary_translation order.id %}
-                          {% if order.discount_percentage %}
-                          (Discount {{ order.discount_percentage}} %)
-                          {% endif %}
-                        </p>
-                        <p class="arabic">{% get_secondary_translation order.id %}</p>
-                      </div>
-                      <p class="text-[#7B7B7B]">
-                        <span>{{order.quantity}} x </span>{{order.price}}
-                        {{currency_code}}
-                      </p>
-                    </div>
-                  {% endfor %} {% endcomment %}
                 </div>
               </div>
             </div>
@@ -394,33 +375,6 @@
             {% comment %}====================================== old code ================================================================== {% endcomment %}
           
             <div class="text-left flex flex-col gap-1">
-
-              {% comment %} {% if redeem_option %}
-              <div class="flex items-center justify-between text-primary text-sm font-bold">
-                <div>
-                  <p>Paid from {{ redeem_option }} {% if voucher_redeem_percentage %}{{ voucher_redeem_percentage }} % {% endif %}</p>
-                </div>
-                <p>{{ total_discount }} {{ currency_code }}</p>
-              </div>
-              {% endif %} {% endcomment %}
-
-              {% comment %} {% if redeemed_points %}
-                <div class="flex items-center justify-between text-primary text-sm font-bold">
-                  <div>
-                    <p>Redeemed Points</p>
-                  </div>
-                  <p>{{redeemed_points}}</p>
-                </div>
-              {% endif %} {% endcomment %}
-
-              {% comment %} {% if coupon_data.is_coupon_redeemed == 'true' %}
-                  <div class="flex items-center justify-between text-primary text-sm font-bold">
-                    <div>
-                        <p>Coupon redeemed</p>
-                    </div>
-                    <p>{{ coupon_data.coupon_discounted_price }} {{ currency_code }}</p>
-                  </div>
-              {% endif %}  {% endcomment %}
               <hr>
               <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
@@ -430,14 +384,7 @@
                 <p>{{sub_total}} {{currency_code}}</p>
                 
               </div>
-              <!-- <div class="flex items-center justify-between text-primary text-sm font-bold">
-                <div>
-                  <strong><p>change</p></strong>
-                  {% comment %} <p>{{ business_address.primary_translation.change}}</p> {% endcomment %}
-                  {% if business_address.secondary_translation.change %}<p class="arabic">{{ business_address.secondary_translation.change }} {% endif %}</p>
-                </div>
-                <p>{{change}} {{currency_code}}</p>
-              </div>  -->
+            
               {% comment %}=========================================== total_tip ================================================================={% endcomment %}
 
               {% if total_tip %}
