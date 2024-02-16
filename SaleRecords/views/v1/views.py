@@ -319,21 +319,21 @@ def get_sales_analytics(request):
                     'avg_sale': avg_sale,
                     'appointment_average': appointment_average['avg_appointment'],
                 },
-                'service': {
-                    'total_service_target': service_target['total_service_target'],
-                    'service_total_sale': service['total_service_sale'],
-                },
-                'product': {
-                    'total_retail_target': retail_target['total_retail_target'],
-                    'product_total_sale': product['total_product_sale'],
-                },
                 'sales_progress': {
+                    'service': {
+                        'total_service_target': service_target['total_service_target'],
+                        'service_total_sale': service['total_service_sale'],
+                    },
+                    'product': {
+                        'total_retail_target': retail_target['total_retail_target'],
+                        'product_total_sale': product['total_product_sale'],
+                    },
                     'vouchers_total_sale': vouchers['total_vouchers_sale'],
                     'membership_total_sale': membership['total_membership_sale'],
                     'gift_card_total_sale': gift_card['total_gift_card_sale'],
                     'total_sale': total_sale,
                 }
-            }
+            }   
         }
         return Response(data, status=status.HTTP_200_OK)
     except Exception as e:
