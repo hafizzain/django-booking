@@ -308,7 +308,7 @@ def get_sales_analytics(request):
             'error_message': None,
             'data': {
                 'service_target': ServiceTargetSerializer(service_target, many=True).data,
-                'retail_target': RetailTargetSerializer(retail_target, many=True).data,
+                'retail_target': retail_target.get('total_retail_target', 0),
                 'service': service.get('total_service_sale', 0),
                 'product': product.get('total_product_sale', 0),
                 'vouchers': vouchers.get('total_vouchers_sale', 0),
