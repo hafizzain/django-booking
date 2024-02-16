@@ -284,11 +284,11 @@ def get_sales_analytics(request):
         retail_target = RetailTarget.objects.filter(query).annotate(total_retail_target=Sum('brand_target')).filter(location)
         
         # Get Sale Records
-        service = SaleRecordServices.objects.filter(query).annotate(total_service_sale=Sum('price'))
-        product = SaleRecordsProducts.objects.filter(query).annotate(total_product_sale=Sum('price'))
-        vouchers = SaleRecordVouchers.objects.filter(query).annotate(total_vouchers_sale=Sum('price'))
-        membership = SaleRecordMembership.objects.filter(query).annotate(total_membership_sale=Sum('price'))
-        gift_card = PurchasedGiftCards.objects.filter(query).annotate(total_gift_card_sale=Sum('price'))
+        service = SaleRecordServices.objects.filter(query).annotate(total_service_sale=Sum('price')).values('total_service_sale')
+        product = SaleRecordsProducts.objects.filter(query).annotate(total_product_sale=Sum('price')).values('total_product_sale')
+        vouchers = SaleRecordVouchers.objects.filter(query).annotate(total_vouchers_sale=Sum('price')).values('total_vouchers_sale')
+        membership = SaleRecordMembership.objects.filter(query).annotate(total_membership_sale=Sum('price')).values('total_membership_sale')
+        gift_card = PurchasedGiftCards.objects.filter(query).annotate(total_gift_card_sale=Sum('price')).values('total_gift_card_sale')
         
         appointment_average = SaleRecordsAppointmentServices.objects.filter(query).annotate(avg_appointment_sale=Avg('price'))
         
@@ -309,12 +309,12 @@ def get_sales_analytics(request):
             'data': {
                 'service_target': ServiceTargetSerializer(service_target, many=True).data,
                 'retail_target': RetailTargetSerializer(retail_target, many=True).data,
-                'service': ServiceRecordSerializer(service, many=True).data,
-                # 'product': product,
-                # 'vouchers': VoucherRecordSerializer(vouchers, many=True).data,
-                # 'membership': MembershipRecordSerializer(membership, many=True).data,
-                # 'gift_card': GiftCardRecordSerializer(gift_card, many=True).data,
-                # 'appointment_average': AppointmentServiceRecordSerializer(appointment_average, many=True).data,
+                'service': service[0]['total_service_sale'],
+                'product': product[0]['total_product_sale'],
+                'vouchers': vouchers[0]['total_vouchers_sale'],
+                'membership': membership[0]['total_membership_sale'],
+                'gift_card': gift_card[0]['total_gift_card_sale'],
+                'appointment_average': appointment_average[0]['avg_appointment_sale'],
                 'total_sum': total_sum
             }
         }
