@@ -269,10 +269,12 @@ def get_sales_analytics(request):
     
     query = Q()
     location = Q()
+    business= Q()
     
     try:    
         if location_id:
             location &= Q(location=location_id)
+            business &= Q(business=location_id)
             
         if year:
             query &= Q(created_at__year=year)
@@ -300,8 +302,8 @@ def get_sales_analytics(request):
                                 .aggregate(avg_appointment=Coalesce(Avg('price', output_field=FloatField()), Value(0, output_field=FloatField())))
         
         # Appointment Count
-        cancel_appointment = Appointment.objects.filter(location, query, status='Cancelled').count()
-        finished_appointment = Appointment.objects.filter(location, query, status='Finished').count()
+        cancel_appointment = Appointment.objects.filter(business, query, status='Cancelled').count()
+        finished_appointment = Appointment.objects.filter(business, query, status='Finished').count()
         
         # Total Appointment count
         total_appointment = cancel_appointment + finished_appointment
