@@ -296,11 +296,11 @@ def get_sales_analytics(request):
                                 .aggregate(avg_appointment=Avg('price'))
         
         # Calculate the total sum
-        total_sale = sum(
-            service.get('total_service_sale', 0),
-            product.get('total_product_sale', 0),
-            vouchers.get('total_vouchers_sale', 0),
-            membership.get('total_membership_sale', 0),
+        total_sale = (
+            service.get('total_service_sale', 0) +
+            product.get('total_product_sale', 0) +
+            vouchers.get('total_vouchers_sale', 0) +
+            membership.get('total_membership_sale', 0) +
             gift_card.get('total_gift_card_sale', 0)
         )
 
