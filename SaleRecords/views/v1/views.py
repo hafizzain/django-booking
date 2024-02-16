@@ -296,11 +296,11 @@ def get_sales_analytics(request):
                                 .aggregate(avg_appointment=Avg('price'))
         
         # Calculate the total sum
-        total_sum = (
-            service.get('total_service_sale', 0) +
-            product.get('total_product_sale', 0) +
-            vouchers.get('total_vouchers_sale', 0) +
-            membership.get('total_membership_sale', 0) +
+        total_sale = sum(
+            service.get('total_service_sale', 0),
+            product.get('total_product_sale', 0),
+            vouchers.get('total_vouchers_sale', 0),
+            membership.get('total_membership_sale', 0),
             gift_card.get('total_gift_card_sale', 0)
         )
 
@@ -322,7 +322,7 @@ def get_sales_analytics(request):
                 'membership_total_sale': membership.get('total_membership_sale', 0),
                 'gift_card_total_sale': gift_card.get('total_gift_card_sale', 0),
                 'appointment_average': appointment_average.get('avg_appointment', 0),
-                'total_sum': total_sum,
+                'total_sale': total_sale,
             }
         }
         return Response(data, status=status.HTTP_200_OK)
