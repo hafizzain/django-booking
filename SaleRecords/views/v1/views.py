@@ -8,6 +8,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import api_view
 from django.db.models import Sum, Avg
 from django.db.models import Q
+from django.db.models import Value
 
 from SaleRecords.helpers import matching_records, loyalty_points_calculations
 from Client.Constants.client_order_email import send_order_email, send_membership_order_email
@@ -279,19 +280,19 @@ def get_sales_analytics(request):
             
         # Get Target Data    
         service_target = ServiceTarget.objects.filter(query, location) \
-                            .aggregate(total_service_target=Coalesce(Sum('service_target', output_field=FloatField()), Value(0)))
+                            .aggregate(total_service_target=Coalesce(Sum('service_target', output_field=FloatField()), Value(0, output_field=FloatField())))
         retail_target = RetailTarget.objects.filter(query, location) \
-                            .aggregate(total_retail_target=Coalesce(Sum('brand_target', output_field=FloatField()), Value(0)))
+                            .aggregate(total_retail_target=Coalesce(Sum('brand_target', output_field=FloatField()), Value(0, output_field=FloatField())))
         
         # Get Sale Records
-        service = SaleRecordServices.objects.filter(query).aggregate(total_service_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0)))
-        product = SaleRecordsProducts.objects.filter(query).aggregate(total_product_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0)))
-        vouchers = SaleRecordVouchers.objects.filter(query).aggregate(total_vouchers_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0)))
-        membership = SaleRecordMembership.objects.filter(query).aggregate(total_membership_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0)))
-        gift_card = PurchasedGiftCards.objects.filter(query).aggregate(total_gift_card_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0)))
+        service = SaleRecordServices.objects.filter(query).aggregate(total_service_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        product = SaleRecordsProducts.objects.filter(query).aggregate(total_product_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        vouchers = SaleRecordVouchers.objects.filter(query).aggregate(total_vouchers_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        membership = SaleRecordMembership.objects.filter(query).aggregate(total_membership_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        gift_card = PurchasedGiftCards.objects.filter(query).aggregate(total_gift_card_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
         
         appointment_average = SaleRecordsAppointmentServices.objects.filter(query) \
-                                .aggregate(avg_appointment=Coalesce(Avg('price', output_field=FloatField()), Value(0)))
+                                .aggregate(avg_appointment=Coalesce(Avg('price', output_field=FloatField()), Value(0, output_field=FloatField())))
         
         # Calculate the total sum
         total_sale = (
@@ -308,11 +309,11 @@ def get_sales_analytics(request):
             'message': 'Data fetched successfully',
             'error_message': None,
             'data': {
-                'service' : {
+                'service': {
                     'total_service_target': service_target['total_service_target'],
                     'service_total_sale': service['total_service_sale'],
                 },
-                'product' : {
+                'product': {
                     'total_retail_target': retail_target['total_retail_target'],
                     'product_total_sale': product['total_product_sale'],
                 },
@@ -334,4 +335,3 @@ def get_sales_analytics(request):
             'data': None
         }
         return Response(error_data, status=status.HTTP_400_BAD_REQUEST)
-
