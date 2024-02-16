@@ -281,27 +281,27 @@ def get_sales_analytics(request):
             
         # Get Target Data    
         service_target = ServiceTarget.objects.filter(query, location) \
-                            .aggregate(total_service_target=Sum('service_target'))
+                            .aggregate(total_service_target=Coalesce(Sum('service_target'), Value(0)))
         retail_target = RetailTarget.objects.filter(query, location) \
-                            .aggregate(total_retail_target=Sum('brand_target'))
+                            .aggregate(total_retail_target=Coalesce(Sum('brand_target'), Value(0)))
         
         # Get Sale Records
-        service = SaleRecordServices.objects.filter(query).aggregate(total_service_sale=Sum('price'))
-        product = SaleRecordsProducts.objects.filter(query).aggregate(total_product_sale=Sum('price'))
-        vouchers = SaleRecordVouchers.objects.filter(query).aggregate(total_vouchers_sale=Sum('price'))
-        membership = SaleRecordMembership.objects.filter(query).aggregate(total_membership_sale=Sum('price'))
-        gift_card = PurchasedGiftCards.objects.filter(query).aggregate(total_gift_card_sale=Sum('price'))
+        service = SaleRecordServices.objects.filter(query).aggregate(total_service_sale=Coalesce(Sum('price'), Value(0)))
+        product = SaleRecordsProducts.objects.filter(query).aggregate(total_product_sale=Coalesce(Sum('price'), Value(0)))
+        vouchers = SaleRecordVouchers.objects.filter(query).aggregate(total_vouchers_sale=Coalesce(Sum('price'), Value(0)))
+        membership = SaleRecordMembership.objects.filter(query).aggregate(total_membership_sale=Coalesce(Sum('price'), Value(0)))
+        gift_card = PurchasedGiftCards.objects.filter(query).aggregate(total_gift_card_sale=Coalesce(Sum('price'), Value(0)))
         
         appointment_average = SaleRecordsAppointmentServices.objects.filter(query) \
-                                .aggregate(avg_appointment=Avg('price'))
+                                .aggregate(avg_appointment=Coalesce(Avg('price'), Value(0)))
         
         # Calculate the total sum
         total_sale = (
-            service.get('total_service_sale', 0) +
-            product.get('total_product_sale', 0) +
-            vouchers.get('total_vouchers_sale', 0) +
-            membership.get('total_membership_sale', 0) +
-            gift_card.get('total_gift_card_sale', 0)
+            service['total_service_sale'] +
+            product['total_product_sale'] +
+            vouchers['total_vouchers_sale'] +
+            membership['total_membership_sale'] +
+            gift_card['total_gift_card_sale']
         )
 
         data = {
@@ -311,17 +311,17 @@ def get_sales_analytics(request):
             'error_message': None,
             'data': {
                 'service' : {
-                    'total_service_target': service_target.get('total_service_target', 0),
-                    'service_total_sale': service.get('total_service_sale', 0),
+                    'total_service_target': service_target['total_service_target'],
+                    'service_total_sale': service['total_service_sale'],
                 },
                 'product' : {
-                    'total_retail_target': retail_target.get('total_retail_target', 0),
-                    'product_total_sale': product.get('total_product_sale', 0),
+                    'total_retail_target': retail_target['total_retail_target'],
+                    'product_total_sale': product['total_product_sale'],
                 },
-                'vouchers_total_sale': vouchers.get('total_vouchers_sale', 0),
-                'membership_total_sale': membership.get('total_membership_sale', 0),
-                'gift_card_total_sale': gift_card.get('total_gift_card_sale', 0),
-                'appointment_average': appointment_average.get('avg_appointment', 0),
+                'vouchers_total_sale': vouchers['total_vouchers_sale'],
+                'membership_total_sale': membership['total_membership_sale'],
+                'gift_card_total_sale': gift_card['total_gift_card_sale'],
+                'appointment_average': appointment_average['avg_appointment'],
                 'total_sale': total_sale,
             }
         }
@@ -336,3 +336,4 @@ def get_sales_analytics(request):
             'data': None
         }
         return Response(error_data, status=status.HTTP_400_BAD_REQUEST)
+
