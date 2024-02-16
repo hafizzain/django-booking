@@ -310,7 +310,7 @@ def get_sales_analytics(request):
                 'service_target': ServiceTargetSerializer(service_target, many=True).data,
                 'retail_target': RetailTargetSerializer(retail_target, many=True).data,
                 'service': ServiceRecordSerializer(service, many=True).data,
-                'product': product,
+                # 'product': product,
                 # 'vouchers': VoucherRecordSerializer(vouchers, many=True).data,
                 # 'membership': MembershipRecordSerializer(membership, many=True).data,
                 # 'gift_card': GiftCardRecordSerializer(gift_card, many=True).data,
