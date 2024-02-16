@@ -577,9 +577,7 @@ class RetailTargetSerializer(serializers.ModelSerializer):
         fields = "__all__"
                 
 class ServiceRecordSerializer(serializers.ModelSerializer):
-
     # get_total_service_sale = serializers.SerializerMethodField()
-
 
     class Meta:
         model = SaleRecordServices
