@@ -308,14 +308,14 @@ def get_sales_analytics(request):
             'error_message': None,
             'data': {
                 'service_target': ServiceTargetSerializer(service_target, many=True).data,
-                'retail_target': RetailTargetSerializer(retail_target, many=True).data,
+                'retail_target': retail_target.get('total_retail_target', 0),
                 'service': service.get('total_service_sale', 0),
-                # 'product': product,
-                # 'vouchers': vouchers,
-                # 'membership': membership,
-                # 'gift_card': gift_card,
-                # 'appointment_average': appointment_average,
-                'total_sum': total_sum
+                'product': product.get('total_product_sale', 0),
+                'vouchers': vouchers.get('total_vouchers_sale', 0),
+                'membership': membership.get('total_membership_sale', 0),
+                'gift_card': gift_card.get('total_gift_card_sale', 0),
+                'appointment_average': appointment_average.get('avg_appointment_sale', 0),
+                'total_sum': total_sum,
             }
         }
         return Response(data, status=status.HTTP_200_OK)
