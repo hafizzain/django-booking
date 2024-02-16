@@ -281,7 +281,7 @@ def get_sales_analytics(request):
             
         # Get Target Data    
         service_target = ServiceTarget.objects.filter(query).filter(location)
-        retail_target = RetailTarget.objects.filter(query).aggregate(total_retail_target=Sum('brand_target')).filter(location)
+        retail_target = RetailTarget.objects.filter(query, location).aggregate(total_retail_target=Sum('brand_target'))
         
         # Get Sale Records
         service = SaleRecordServices.objects.filter(query).aggregate(total_service_sale=Sum('price'))
