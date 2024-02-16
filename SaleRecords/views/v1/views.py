@@ -281,24 +281,24 @@ def get_sales_analytics(request):
             
         # Get Target Data    
         service_target = ServiceTarget.objects.filter(query).filter(location)
-        retail_target = RetailTarget.objects.filter(query).annotate(total_retail_target=Sum('brand_target')).filter(location)
+        retail_target = RetailTarget.objects.filter(query).aggregate(total_retail_target=Sum('brand_target')).filter(location)
         
         # Get Sale Records
-        service = SaleRecordServices.objects.filter(query).annotate(total_service_sale=Sum('price'))
-        product = SaleRecordsProducts.objects.filter(query).annotate(total_product_sale=Sum('price'))
-        vouchers = SaleRecordVouchers.objects.filter(query).annotate(total_vouchers_sale=Sum('price'))
-        membership = SaleRecordMembership.objects.filter(query).annotate(total_membership_sale=Sum('price'))
-        gift_card = PurchasedGiftCards.objects.filter(query).annotate(total_gift_card_sale=Sum('price'))
+        service = SaleRecordServices.objects.filter(query).aggregate(total_service_sale=Sum('price'))
+        product = SaleRecordsProducts.objects.filter(query).aggregate(total_product_sale=Sum('price'))
+        vouchers = SaleRecordVouchers.objects.filter(query).aggregate(total_vouchers_sale=Sum('price'))
+        membership = SaleRecordMembership.objects.filter(query).aggregate(total_membership_sale=Sum('price'))
+        gift_card = PurchasedGiftCards.objects.filter(query).aggregate(total_gift_card_sale=Sum('price'))
         
-        appointment_average = SaleRecordsAppointmentServices.objects.filter(query).annotate(avg_appointment_sale=Avg('price'))
+        appointment_average = SaleRecordsAppointmentServices.objects.filter(query).aggregate(avg_appointment_sale=Avg('price'))
         
-        # Get Total Sales
+        # Calculate the total sum
         total_sum = (
-            service.aggregate(total=Sum('total_service_sale'))['total'] or 0 +
-            product.aggregate(total=Sum('total_product_sale'))['total'] or 0 +
-            vouchers.aggregate(total=Sum('total_vouchers_sale'))['total'] or 0 +
-            membership.aggregate(total=Sum('total_membership_sale'))['total'] or 0 +
-            gift_card.aggregate(total=Sum('total_gift_card_sale'))['total'] or 0
+            service['total_service_sale'] or 0 +
+            product['total_product_sale'] or 0 +
+            vouchers['total_vouchers_sale'] or 0 +
+            membership['total_membership_sale'] or 0 +
+            gift_card['total_gift_card_sale'] or 0
         )
         
         data = {
@@ -309,7 +309,7 @@ def get_sales_analytics(request):
             'data': {
                 'service_target': ServiceTargetSerializer(service_target, many=True).data,
                 'retail_target': RetailTargetSerializer(retail_target, many=True).data,
-                'service': service.total_service_sale,
+                'service': service.get('total_service_sale', 0),
                 # 'product': product,
                 # 'vouchers': vouchers,
                 # 'membership': membership,
@@ -323,9 +323,9 @@ def get_sales_analytics(request):
         # Handle exceptions and return an appropriate error response
         error_data = {
             'success': False,
-            'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
+            'status_code': 400,
             'message': 'Internal Server Error',
             'error_message': str(e),
             'data': None
         }
-        return Response(error_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(error_data, status=status.HTTP_400_BAD_REQUEST)
