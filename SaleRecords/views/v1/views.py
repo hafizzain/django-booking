@@ -258,18 +258,19 @@ def single_sale_record(request):
             }
     return Response(response)
 
-# Get Sales Analytics Pos Analytics ------------------------------------------------------------------------------------------
+# Get Sales Analytics For POS Analytics ------------------------------------------------------------------------------------------
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_sales_analytics(request):
-    try:
-        location_id = request.GET.get('location_id')
-        year = request.GET.get('year')
-        month = request.GET.get('month')
-        today = request.GET.get('today')
-        
-        query = Q()
-        location = Q()
+    location_id = request.GET.get('location_id', None)
+    year = request.GET.get('year', None)
+    month = request.GET.get('month', None)
+    today = request.GET.get('today', None)
+    
+    query = Q()
+    location = Q()
+    
+    try:    
         if location_id:
             location &= Q(location=location_id)
             
@@ -314,6 +315,10 @@ def get_sales_analytics(request):
             'message': 'Data fetched successfully',
             'error_message': None,
             'data': {
+                'sales_cards':{
+                    'avg_sale': avg_sale,
+                    'appointment_average': appointment_average['avg_appointment'],
+                },
                 'service': {
                     'total_service_target': service_target['total_service_target'],
                     'service_total_sale': service['total_service_sale'],
@@ -325,8 +330,6 @@ def get_sales_analytics(request):
                 'vouchers_total_sale': vouchers['total_vouchers_sale'],
                 'membership_total_sale': membership['total_membership_sale'],
                 'gift_card_total_sale': gift_card['total_gift_card_sale'],
-                'appointment_average': appointment_average['avg_appointment'],
-                'avg_sale': avg_sale,
                 'total_sale': total_sale,
             }
         }
