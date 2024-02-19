@@ -566,13 +566,3 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         except Exception as e:
             raise ValidationError(f'Error occured in Employee Commission Calculations {str(e)}')
         
-class ServiceTargetSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ServiceTarget
-        fields = ['service_target',]
-
-class RetailTargetSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = RetailTarget
-        fields = ['brand_target',]
-                
