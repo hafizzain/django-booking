@@ -36,9 +36,22 @@ class SaleRecordProductsSerializer(serializers.ModelSerializer):
     product_names = serializers.SerializerMethodField(read_only = True)
     
     def get_product_names(self , obj):
-        return {
-            'name':f"{obj.product.name}",
-            'arabic_name': f"{obj.product.arabic_name}"
+        from Invoices.models import InvoiceTranslation
+        
+        secondary_invoice_traslation = InvoiceTranslation.objects.filter(id=obj.sale_record.location.secondary_translation.id).first()
+        translation = obj.product.producttranslations_set.filter(language__id=secondary_invoice_traslation.language.id).first()
+        
+        if translation:
+            return {
+                'name': f"{obj.service.name}",
+                'arabic_name': f"{obj.service.arabic_name}",
+                'secondary_name': f"{translation.service_name}"
+            }
+        else:
+            return {
+                'name': f"{obj.service.name}",
+                'arabic_name': f"{obj.service.arabic_name}",
+                'secondary_name': f""
             }
         
     class Meta: 
