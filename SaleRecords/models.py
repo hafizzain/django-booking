@@ -11,7 +11,7 @@ from Service.models import Service
 from Employee.models import Employee, GiftCards
 from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs, LoyaltyPoints, ClientLoyaltyPoint
 from Finance.models import Refund
-from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip , Appointment
+from Appointment.models import  Appointment, AppointmentGroup
 # from Invoices.models import SaleInvoice
 
 # from Business.models import
@@ -70,9 +70,15 @@ class SaleRecordsProducts(CommonField):
 class SaleRecordsAppointmentServices(CommonField):
     
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null =True , blank =True , related_name = 'appointment_services')
+    
+    # client = models.ForeignKey(Client, on_delete = models.SET_NULL, null=True, related_name = 'appointment_client')
     appointment = models.ForeignKey(Appointment, on_delete = models.SET_NULL, null = True, related_name = 'sale_appointments_records')
-    employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_appointment_services_employee')
+    # group = models.ForeignKey(AppointmentGroup, on_delete = models.SET_NULL, blank=True, null=True, realated_name = 'appointment_group')
+    
     service = models.ForeignKey(Service, on_delete = models.SET_NULL, null = True)
+    employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_appointment_services_employee')
+    
+    
     service_status = models.CharField(choices = AppointmentStatus.choices,max_length = 50, default = AppointmentStatus.BOOKED, blank=False, null=False)
     # quantity = models.PositiveIntegerField(blank=True, null=True)
     service_start_time = models.DateTimeField(blank=True, null=True)

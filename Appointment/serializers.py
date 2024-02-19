@@ -1658,7 +1658,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Appointment
-        fields = ['id','check_in_time', 'client','user_id','client_name', 'client_email', 'client_phone', 'client_all_appointment',
+        fields = ['id','selected_promotion_id','selected_promotion_type','discount_price','discount_percentage','check_in_time', 'client','user_id','client_name', 'client_email', 'client_phone', 'client_all_appointment',
                   'client_all_sales', 'appointment_tips', 'notes', 'business_address',
                   'client_type', 'appointmnet_service', 'customer_note', 'status']
 
