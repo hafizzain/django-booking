@@ -2116,15 +2116,16 @@ def get_memberships(request):
 
     serialized = MembershipSerializer(all_memberships, many=True,
                                     context={'request': request, 'location_id': location_id})
+    filtered_memberships = [membership for membership in serialized.data if membership["currency_membership"]]
     
-    data = json.loads(serialized)
-    data  = data['response'].get('membership')
-# print(data)
-    for i in data:
-        # print(i)
-        if len(i.get('currency_membership')) == 0:
-            data.pop(data.index(i))
-    serialized = json.dumps(data)
+#     data = json.loads(serialized)
+#     data  = data['response'].get('membership')
+# # print(data)
+#     for i in data:
+#         # print(i)
+#         if len(i.get('currency_membership')) == 0:
+#             data.pop(data.index(i))
+#     serialized = json.dumps(data)
     # filtered_memberships = [membership for membership in serialized["response"]["membership"] if membership["currency_membership"]]
 
     # # Update the response with the filtered memberships
@@ -2143,7 +2144,8 @@ def get_memberships(request):
                 'pages': page_count,
                 'per_page_result': per_pege_results,
                 'error_message': None,
-                'membership': serialized.data
+                # 'membership': serialized.data
+                'membership':filtered_memberships
             }
         },
         status=status.HTTP_200_OK
