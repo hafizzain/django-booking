@@ -413,7 +413,7 @@ class MembershipSerializer(serializers.ModelSerializer):
             pro = CurrencyPriceMembership.objects.filter(
                 membership = obj,
                 **query,
-            ).distinct()
+            )
             return CurrencyPriceMembershipSerializers(pro, many= True).data
         except Exception as err:
             print(err)
