@@ -698,8 +698,11 @@ def update_service(request):
 
     error = []
     if image is not None :
-        service_id.image = image
-        service_id.save()
+        try:
+            service_id.image = image
+            service_id.save()
+        except:
+            pass
         
     if location is not None:
         if type(location) == str:
@@ -858,7 +861,6 @@ def update_service(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-
 
 @transaction.atomic
 @api_view(['POST'])
