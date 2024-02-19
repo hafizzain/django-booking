@@ -712,7 +712,7 @@ def update_service(request):
                 loca = BusinessAddress.objects.get(id=loc)
                 service_id.location.add(loca)
             except Exception as err:
-                error.append(str(err))
+                error.append(f"error in locatoin update{str(err)}")
 
     if service is not None:
         if type(service) == str:
@@ -725,7 +725,7 @@ def update_service(request):
                 service = Service.objects.get(id=usr)
                 service_id.parrent_service.add(service)
             except Exception as err:
-                error.append(str(err))
+                error.append(f"error usr service {str(err)}")
 
     if employeeslist is not None:
         if type(employeeslist) == str:
@@ -747,7 +747,7 @@ def update_service(request):
 
                 # service_id.employee.add(employe)
             except Exception as err:
-                error.append(str(err))
+                error.append(f"error in employeelist loop {str(err)}")
     try:
         print(staffgroup_id)
         all_prev_ser_grops = ServiceGroup.objects.filter(services=service_id, is_deleted=False)
@@ -760,7 +760,7 @@ def update_service(request):
         service_group.save()
 
     except Exception as err:
-        error.append(str(err))
+        error.append(f"error in service group{str(err)}")
 
     if priceservice is not None:
         if check == True:
