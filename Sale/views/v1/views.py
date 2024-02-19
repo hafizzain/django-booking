@@ -651,9 +651,9 @@ def delete_service(request):
 
 
 @transaction.atomic
-@api_view(['PATCH'])
+@api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def update_service(request, partial=True):
+def update_service(request):
     id = request.data.get('id', None)
     priceservice = request.data.get('priceservice', None)
     staffgroup_id = request.data.get('staffgroup_id', None)
