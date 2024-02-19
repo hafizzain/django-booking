@@ -2115,6 +2115,9 @@ def get_memberships(request):
 
     serialized = MembershipSerializer(all_memberships, many=True,
                                       context={'request': request, 'location_id': location_id})
+    
+    
+    
     return Response(
         {
             'status': 200,
