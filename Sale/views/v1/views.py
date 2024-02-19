@@ -699,10 +699,10 @@ def update_service(request):
 
     error = []
     if image is not None :
-        def get_image(self, image):   # get client image url from AWS 
+        def get_image(request, image):   # get client image url from AWS 
             if image:
                 try:
-                    request = self.request
+                    # request = self.request
                     url = tenant_media_base_url(request, is_s3_url=service_id.is_image_uploaded_s3)
                     return f'{url}{service_id.image}'
                 except:
