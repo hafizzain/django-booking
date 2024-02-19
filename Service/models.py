@@ -167,7 +167,7 @@ class Service(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_services_or_packages')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_services_or_packages', null=True, blank=True)
 
-    name = models.CharField(max_length=100, default='')
+    name = models.CharField(max_length=255, default='')
     arabic_name = models.CharField(max_length=999, default='')
 
     #service_type = models.CharField(choices=TREATMENT_TYPES, max_length=50, null=True, blank=True)
