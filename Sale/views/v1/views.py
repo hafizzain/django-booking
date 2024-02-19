@@ -778,26 +778,27 @@ def update_service(request):
             priceservice = json.loads(priceservice)
         else:
             pass
+        
         sum = 0
-        # for ser in priceservice:
-        #     sum = sum + 1
-        #     s_service_id = ser.get('id', None)
-        #     duration = ser.get('duration', None)
-        #     price = ser.get('price', None)
-        #     currency = ser.get('currency', None)
-        #     is_deleted = ser.get('is_deleted', None)
-        #     try:
-        #         currency_id = Currency.objects.get(id=currency)
-        #     except Exception as err:
-        #         pass
+        for ser in priceservice:
+            sum = sum + 1
+            s_service_id = ser.get('id', None)
+            duration = ser.get('duration', None)
+            price = ser.get('price', None)
+            currency = ser.get('currency', None)
+            is_deleted = ser.get('is_deleted', None)
+            try:
+                currency_id = Currency.objects.get(id=currency)
+            except Exception as err:
+                pass
 
-        #     ser = Service.objects.get(id=id)
-        #     PriceService.objects.create(
-        #         service=ser,
-        #         duration=duration,
-        #         price=price,
-        #         currency=currency_id
-        #     )
+            ser = Service.objects.get(id=id)
+            PriceService.objects.create(
+                service=ser,
+                duration=duration,
+                price=price,
+                currency=currency_id
+            )
 
     if invoices is not None:
         if type(invoices) == str:

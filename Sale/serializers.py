@@ -535,8 +535,12 @@ class ServiceSerializerMainpage(serializers.ModelSerializer):
     price = serializers.SerializerMethodField(read_only=True)
 
     def get_price(self, obj):
+    
         ser = obj.service_priceservice.order_by('-created_at').first()
-        return ser.price
+        if ser:
+            return ser.price
+        else:
+            return None
 
     def get_service_group(self, obj):
         group = obj.servicegroup_services.filter(is_deleted=False)
