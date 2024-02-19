@@ -183,7 +183,7 @@ class Appointment(models.Model):
     is_promotion = models.BooleanField(default=False)
     selected_promotion_id = models.CharField(default='', max_length=800)
     selected_promotion_type = models.CharField(default='', max_length=400)
-    appointment_discount = models.FloatField()
+    appointment_discount = models.FloatField(default  = 0 , blank=True, null=True)
     check_in_time = models.DateTimeField(null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
