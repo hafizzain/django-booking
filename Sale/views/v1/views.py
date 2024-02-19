@@ -651,7 +651,7 @@ def delete_service(request):
 
 
 @transaction.atomic
-@api_view(['PUT'])
+@api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
 def update_service(request):
     id = request.data.get('id', None)
@@ -697,7 +697,7 @@ def update_service(request):
         )
 
     error = []
-    if image is not None:
+    if image is not None :
         service_id.image = image
         service_id.save()
         
