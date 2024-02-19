@@ -31,7 +31,7 @@ class SaleRecordViews(APIView):
             range_start = request.GET.get('range_start', None)
             range_end = request.GET.get('range_end', None)
             client = request.GET.get('client',None)
-            search_text = request.GET.get('search_text', None)
+            # search_text = request.GET.get('search_text', None)
             service = request.GET.get('service', None)
             search_text = request.GET.get('search_text', None)
             is_quick_sale = request.GET.get('is_quick_sale', None)
