@@ -24,6 +24,7 @@ def matching_records(is_quick_sale = None,location=None, range_start=None, range
         
         if search_text is not None:
             filters &= Q(client__full_name__icontains = search_text)
+            
         
         if is_quick_sale:
             matching_records = SaleRecords.objects.filter(filters).order_by('-created_at')[:5]
