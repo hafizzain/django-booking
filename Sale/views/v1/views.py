@@ -853,7 +853,7 @@ def update_service(request):
                     'error': error,
                     'service': serializer.data,
                     'sum': sum,
-                    'image_url': image_url
+                    'image_url': image_url,
                     'image': image
                 }
             },
