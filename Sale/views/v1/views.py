@@ -710,9 +710,9 @@ def update_service(request):
             return None
         
         image_url = get_image(request, image)
-        if image_url != request.data.get('image'):
-            service_id.image = image
-            service_id.save()
+        # if image_url != request.data.get('image'):
+            # service_id.image = image
+            # service_id.save()
         
     if location is not None:
         if type(location) == str:
@@ -853,7 +853,8 @@ def update_service(request):
                     'error': error,
                     'service': serializer.data,
                     'sum': sum,
-
+                    'image_url': image_url
+                    'image': image
                 }
             },
             status=status.HTTP_200_OK
@@ -872,219 +873,7 @@ def update_service(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
-# # Service Update Api ---------------------------------------------------------------------
-# @transaction.atomic
-# @api_view(['PATCH'])
-# @permission_classes([IsAuthenticated])
-# def update_service_patch(request):
-#     id = request.data.get('id', None)
-#     priceservice = request.data.get('priceservice', None)
-#     staffgroup_id = request.data.get('staffgroup_id', None)
 
-#     employeeslist = request.data.get('employee', None)
-#     service = request.data.get('service', None)
-#     location = request.data.get('location', None)
-#     check = True
-#     invoices = request.data.get('invoices', None)
-#     image = request.data.get('image', None)
-
-#     if id is None:
-#         return Response(
-#             {
-#                 'status': False,
-#                 'status_code': StatusCodes.MISSING_FIELDS_4001,
-#                 'status_code_text': 'MISSING_FIELDS_4001',
-#                 'response': {
-#                     'message': 'Invalid Data!',
-#                     'error_message': 'Service ID are required.',
-#                     'fields': [
-#                         'id'
-#                     ]
-#                 }
-#             },
-#             status=status.HTTP_400_BAD_REQUEST
-#         )
-#     try:
-#         service_id = Service.objects.get(id=id)
-#     except Exception as err:
-#         return Response(
-#             {
-#                 'status': False,
-#                 'status_code_text': 'INVALID_SERVICE_ID',
-#                 'response': {
-#                     'message': 'Service Not Found',
-#                     'error_message': str(err),
-#                 }
-#             },
-#             status=status.HTTP_404_NOT_FOUND
-#         )
-
-#     error = []
-#     if image is not None :
-#         try:
-#             service_id.image = image
-#             service_id.save()
-#         except:
-#             pass
-        
-#     if location is not None:
-#         if type(location) == str:
-#             location = json.loads(location)
-#         elif type(location) == list:
-#             pass
-#         service_id.location.clear()
-#         for loc in location:
-#             try:
-#                 loca = BusinessAddress.objects.get(id=loc)
-#                 service_id.location.add(loca)
-#             except Exception as err:
-#                 error.append(f"error in locatoin update{str(err)}")
-
-#     if service is not None:
-#         if type(service) == str:
-#             service = json.loads(service)
-#         elif type(service) == list:
-#             pass
-#         service_id.parrent_service.clear()
-#         for usr in service:
-#             try:
-#                 service = Service.objects.get(id=usr)
-#                 service_id.parrent_service.add(service)
-#             except Exception as err:
-#                 error.append(f"error usr service {str(err)}")
-
-#     if employeeslist is not None:
-#         if type(employeeslist) == str:
-#             employeeslist = json.loads(employeeslist)
-#         elif type(employeeslist) == list:
-#             pass
-#         all_pending_services = EmployeeSelectedService.objects.filter(service=service_id).exclude(
-#             employee__in=employeeslist)
-#         for empl_service in all_pending_services:
-#             empl_service.delete()
-
-#         for empl_id in employeeslist:
-#             try:
-#                 employe = Employee.objects.get(id=empl_id)
-#                 employe_service, created = EmployeeSelectedService.objects.get_or_create(
-#                     service=service_id,
-#                     employee=employe
-#                 )
-
-#                 # service_id.employee.add(employe)
-#             except Exception as err:
-#                 error.append(f"error in employeelist loop {str(err)}")
-#     try:
-#         print(staffgroup_id)
-#         all_prev_ser_grops = ServiceGroup.objects.filter(services=service_id, is_deleted=False)
-#         for i in all_prev_ser_grops:
-#             i.services.remove(service_id)
-#             i.save()
-
-#         service_group = ServiceGroup.objects.get(id=staffgroup_id)
-#         service_group.services.add(service_id)
-#         service_group.save()
-
-#     except Exception as err:
-#         error.append(f"error in service group{str(err)}")
-
-#     if priceservice is not None:
-#         if check == True:
-#             vch = PriceService.objects.filter(service=service_id).order_by('-created_at')
-#             check = False
-#             for i in vch:
-#                 try:
-#                     voucher = PriceService.objects.get(id=i.id)
-#                     voucher.delete()
-#                 except:
-#                     pass
-
-#         if type(priceservice) == str:
-#             priceservice = priceservice.replace("'", '"')
-#             priceservice = json.loads(priceservice)
-#         else:
-#             pass
-        
-#         sum = 0
-#         for ser in priceservice:
-#             sum = sum + 1
-#             s_service_id = ser.get('id', None)
-#             duration = ser.get('duration', None)
-#             price = ser.get('price', None)
-#             currency = ser.get('currency', None)
-#             is_deleted = ser.get('is_deleted', None)
-#             try:
-#                 currency_id = Currency.objects.get(id=currency)
-#             except Exception as err:
-#                 pass
-
-#             ser = Service.objects.get(id=id)
-#             PriceService.objects.create(
-#                 service=ser,
-#                 duration=duration,
-#                 price=price,
-#                 currency=currency_id
-#             )
-
-#     if invoices is not None:
-#         if type(invoices) == str:
-#             invoices = invoices.replace("'", '"')
-#             invoices = json.loads(invoices)
-#         else:
-#             pass
-
-#         old_data = ServiceTranlations.objects.filter(service=service_id)
-#         for old in old_data:
-#             old = ServiceTranlations.objects.get(id=old.id)
-#             old.delete()
-
-#         for invoice in invoices:
-#             try:
-#                 language = invoice['invoiceLanguage']
-#                 service_name = invoice['service_name']
-#             except:
-#                 pass
-#             else:
-#                 serviceTranslation = ServiceTranlations(
-#                     service=service_id,
-#                     service_name=service_name
-#                 )
-#                 language = Language.objects.get(id__icontains=str(language))
-#                 serviceTranslation.language = language
-#                 serviceTranslation.save()
-
-#     serializer = ServiceSerializer(service_id, context={'request': request}, data=request.data, partial=True)
-#     if serializer.is_valid():
-#         serializer.save()
-#         return Response(
-#             {
-#                 'status': True,
-#                 'status_code': 200,
-#                 'response': {
-#                     'message': ' Service updated successfully',
-#                     'error_message': None,
-#                     'error': error,
-#                     'service': serializer.data,
-#                     'sum': sum,
-
-#                 }
-#             },
-#             status=status.HTTP_200_OK
-#         )
-
-#     else:
-#         return Response(
-#             {
-#                 'status': False,
-#                 'status_code': StatusCodes.SERIALIZER_INVALID_4024,
-#                 'response': {
-#                     'message': 'Invialid Data',
-#                     'error_message': str(serializer.errors),
-#                 }
-#             },
-#             status=status.HTTP_404_NOT_FOUND
-#         )
-        
 @transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
