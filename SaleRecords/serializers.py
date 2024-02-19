@@ -45,7 +45,7 @@ class SaleRecordProductsSerializer(serializers.ModelSerializer):
             return {
                 'name': f"{obj.service.name}",
                 'arabic_name': f"{obj.service.arabic_name}",
-                'secondary_name': f"{translation.service_name}"
+                'secondary_name': f"{translation.product_name}"
             }
         else:
             return {
