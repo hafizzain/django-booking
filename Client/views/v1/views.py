@@ -2134,7 +2134,7 @@ def get_memberships(request):
                 'pages': page_count,
                 'per_page_result': per_pege_results,
                 'error_message': None,
-                'membership': updated_serialized_data
+                'membership': updated_serialized_data.data
             }
         },
         status=status.HTTP_200_OK
