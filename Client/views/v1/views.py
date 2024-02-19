@@ -557,7 +557,8 @@ def create_client(request):
         about_us=about_us,
     )
     if images is not None:
-        ids = json.loads(images)
+        # ids = json.loads(images)
+        ids = images
         for id in ids:
             ClientImages.objects.filter(id=id).update(client_id=client.id)
 
