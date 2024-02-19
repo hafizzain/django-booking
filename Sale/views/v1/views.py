@@ -811,20 +811,20 @@ def update_service(request):
             old = ServiceTranlations.objects.get(id=old.id)
             old.delete()
 
-        for invoice in invoices:
-            try:
-                language = invoice['invoiceLanguage']
-                service_name = invoice['service_name']
-            except:
-                pass
-            else:
-                serviceTranslation = ServiceTranlations(
-                    service=service_id,
-                    service_name=service_name
-                )
-                language = Language.objects.get(id__icontains=str(language))
-                serviceTranslation.language = language
-                serviceTranslation.save()
+        # for invoice in invoices:
+        #     try:
+        #         language = invoice['invoiceLanguage']
+        #         service_name = invoice['service_name']
+        #     except:
+        #         pass
+        #     else:
+        #         serviceTranslation = ServiceTranlations(
+        #             service=service_id,
+        #             service_name=service_name
+        #         )
+        #         language = Language.objects.get(id__icontains=str(language))
+        #         serviceTranslation.language = language
+        #         serviceTranslation.save()
 
     serializer = ServiceSerializer(service_id, context={'request': request}, data=request.data, partial=True)
     if serializer.is_valid():
