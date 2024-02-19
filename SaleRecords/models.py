@@ -71,9 +71,9 @@ class SaleRecordsAppointmentServices(CommonField):
     
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null =True , blank =True , related_name = 'appointment_services')
     
-    # client = models.ForeignKey(Client, on_delete = models.SET_NULL, null=True, related_name = 'appointment_client')
+    client = models.ForeignKey(Client, on_delete = models.SET_NULL, null=True, related_name = 'appointment_client')
     appointment = models.ForeignKey(Appointment, on_delete = models.SET_NULL, null = True, related_name = 'sale_appointments_records')
-    # group = models.ForeignKey(AppointmentGroup, on_delete = models.SET_NULL, blank=True, null=True, realated_name = 'appointment_group')
+    group = models.ForeignKey(AppointmentGroup, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'appointment_group')
     
     service = models.ForeignKey(Service, on_delete = models.SET_NULL, null = True)
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_appointment_services_employee')
