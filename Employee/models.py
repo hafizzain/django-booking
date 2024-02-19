@@ -187,7 +187,7 @@ class EmployeeSelectedService(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='employee_service')
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_selected_service')
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-    level = models.CharField(max_length=100, choices=LEVEL_CHOICE, default='Average',
+    level = models.CharField(max_length=255, choices=LEVEL_CHOICE, default='Average',
                              verbose_name='Employee Service Level')
 
     def __str__(self):

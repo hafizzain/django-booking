@@ -171,7 +171,7 @@ class Service(models.Model):
     arabic_name = models.CharField(max_length=999, default='')
 
     #service_type = models.CharField(choices=TREATMENT_TYPES, max_length=50, null=True, blank=True)
-    service_availible = models.CharField(choices=SERVICE_CHOICE, max_length=50, default ='Everyone'  ,null=True, blank=True)
+    service_availible = models.CharField(choices=SERVICE_CHOICE, max_length=255, default ='Everyone'  ,null=True, blank=True)
     
     #servicegroup = models.ForeignKey("ServiceGroup", on_delete=models.SET_NULL, related_name='service_servicegroup', null=True, blank=True)
     parrent_service = models.ManyToManyField('Service', null=True, blank=True, related_name='parent_package_services')
@@ -229,7 +229,7 @@ class ServiceGroup(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_servicesgroup')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_servicesgroup', null=True, blank=True)
     
-    name = models.CharField(max_length=100, default='')
+    name = models.CharField(max_length=255, default='')
     services = models.ManyToManyField(Service, null=True, blank=True, related_name='servicegroup_services')
     
     allow_client_to_select_team_member = models.BooleanField(default=False)

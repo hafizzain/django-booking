@@ -2095,6 +2095,7 @@ def create_memberships(request):
 def get_memberships(request):
     location_id = request.GET.get('location_id')
     search_text = request.GET.get('search_text')
+    
     all_memberships = Membership.objects \
         .with_total_orders() \
         .order_by('-total_orders')
