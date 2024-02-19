@@ -2117,6 +2117,14 @@ def get_memberships(request):
     serialized = MembershipSerializer(all_memberships, many=True,
                                     context={'request': request, 'location_id': location_id})
     
+    data = json.loads(serialized)
+    data  = data['response'].get('membership')
+# print(data)
+    for i in data:
+        # print(i)
+        if len(i.get('currency_membership')) == 0:
+            data.pop(data.index(i))
+    serialized = json.dumps(data)
     # filtered_memberships = [membership for membership in serialized["response"]["membership"] if membership["currency_membership"]]
 
     # # Update the response with the filtered memberships
