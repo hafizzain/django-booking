@@ -2096,11 +2096,9 @@ def get_memberships(request):
     location_id = request.GET.get('location_id')
     search_text = request.GET.get('search_text')
     
-    
-    currency_id =list(CurrencyPriceMembership.objects.filter(price__isnull=True).values_list('membership'))
     all_memberships = Membership.objects \
         .with_total_orders() \
-        .order_by('-total_orders').exclude(id__in=currency_id)
+        .order_by('-total_orders')
     all_memberships_count = all_memberships.count()
 
     if search_text:
