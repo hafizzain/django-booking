@@ -21,6 +21,7 @@ from Utility.models import Country, Currency, ExceptionRecord, State, City
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
+from Product.Constants.index import tenant_media_base_url
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -698,8 +699,20 @@ def update_service(request):
 
     error = []
     if image is not None :
-        service_id.image = image
-        service_id.save()
+        def get_image(self, image):   # get client image url from AWS 
+            if image:
+                try:
+                    request = self.request
+                    url = tenant_media_base_url(request, is_s3_url=service_id.is_image_uploaded_s3)
+                    return f'{url}{service_id.image}'
+                except:
+                    return f'{service_id.image}'
+            return None
+        
+        image_url = get_image(request, image)
+        if image_url != image:
+            service_id.image = image
+            service_id.save()
         
     if location is not None:
         if type(location) == str:
