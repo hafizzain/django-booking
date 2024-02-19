@@ -2096,8 +2096,12 @@ def get_memberships(request):
     location_id = request.GET.get('location_id')
     search_text = request.GET.get('search_text')
     
+    
+    member_ids=list(CurrencyPriceMembership.objects.all().values_list('membership', flat=True))
+    
     all_memberships = Membership.objects \
         .with_total_orders() \
+        .filter(id__in=member_ids) \
         .order_by('-total_orders')
     all_memberships_count = all_memberships.count()
 
