@@ -127,7 +127,7 @@ class PaymentMethods(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'payment_methods_records')
     
     
-    payment_method = models.CharField(choices = PaymentMethodsChoices.choices, max_length = 50 , null = True , blank = False)
+    payment_method = models.CharField(max_length = 100 , null = True , blank = False)
     amount = models.FloatField(default  = 0 , blank= False)
     
     
