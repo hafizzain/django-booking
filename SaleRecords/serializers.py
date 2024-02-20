@@ -565,7 +565,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                         from_value__lte = float(item.get("price")),
                         category_comission__iexact = 'Voucher'
                     ).order_by('-from_value').first()
-                    voucher = Vouchers.objects.get(id = f'{item.get('service')}')
+                    voucher = Vouchers.objects.get(id  = f'{item.get("voucher")}')
                     if sale_commission:
                         calculated_commission  = sale_commission.calculated_commission(item.get('price'))
                         EmployeeCommission.objects.create(
@@ -598,7 +598,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                         from_value__lte = float(item.get("price")),
                         category_comission__iexact = 'Service'
                     ).order_by('-from_value').first()
-                    service = Service.objects.get(id = f'{item.get('service')}')
+                    service = Service.objects.get(id = f'{item.get("service")}')
                     if sale_commission:
                         calculated_commission  = sale_commission.calculated_commission(item.get('price'))
                         EmployeeCommission.objects.create(
