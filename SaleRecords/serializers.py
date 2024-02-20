@@ -528,8 +528,9 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     ).order_by('-from_value').first()
                     if sale_commission:
                         raise ValidationError('Commission found')
+                    raise ValidationError('Not found')
                     
-                    product_id = item.get('product')
+                    product_id = item.get('product').strip('""')
                     product = Product.objects.filter(id  = product_id).first()
                     
                     if sale_commission:
