@@ -1629,10 +1629,10 @@ class SingleNoteSerializer(serializers.ModelSerializer):
         else:
             return obj.client.mobile_number if obj.client else None
         
-    def get_client_image(self, request, obj):
+    def get_client_image(self, obj):
         if obj.client.image:
             try:
-                # request = self.context["request"]
+                request = self.context["request"]
                 url = tenant_media_base_url(request, is_s3_url=obj.client.is_image_uploaded_s3)
                 return f'{url}{obj.client.image}'
             except:
