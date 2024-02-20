@@ -125,88 +125,98 @@ class SaleRecordViews(APIView):
                         logs_total_redeened_value = 0
                         # raise ValidationError(f'{sale_record.applied_loyalty_points_records}')
                         
-                        if len(loyalty_points_data) > 0:
-                            # loyalty_points_record = loyalty_points_data[0]
-                            loyalty_points_record = loyalty_points_data[0]
-                            loyalty_points = ClientLoyaltyPoint.objects.get(id = loyalty_points_record.get('client_loyalty_point'))
-                            # raise ValidationError('If part')
-                            if loyalty_points:
-                                client_points = ClientLoyaltyPoint.objects.get(id = loyalty_points_record.get('client_loyalty_point'))
-                                
-                                client_points.points_redeemed = float(client_points.points_redeemed) + float(loyalty_points_record.get('redeemed_points'))
-                                client_points.save()
+                        try:
+                            
+                            if len(loyalty_points_data) > 0:
+                                # loyalty_points_record = loyalty_points_data[0]
+                                loyalty_points_record = loyalty_points_data[0]
+                                loyalty_points = ClientLoyaltyPoint.objects.get(id = loyalty_points_record.get('client_loyalty_point'))
+                                # raise ValidationError('If part')
+                                if loyalty_points:
+                                    client_points = ClientLoyaltyPoint.objects.get(id = loyalty_points_record.get('client_loyalty_point'))
+                                    
+                                    client_points.points_redeemed = float(client_points.points_redeemed) + float(loyalty_points_record.get('redeemed_points'))
+                                    client_points.save()
 
-                                single_point_value = client_points.customer_will_get_amount / client_points.for_every_points
-                                total_redeened_value = float(single_point_value) * float(loyalty_points_record.get('redeemed_points'))
+                                    single_point_value = client_points.customer_will_get_amount / client_points.for_every_points
+                                    total_redeened_value = float(single_point_value) * float(loyalty_points_record.get('redeemed_points'))
 
-                                logs_points_redeemed = loyalty_points_record.get('redeemed_points')
-                                logs_total_redeened_value = total_redeened_value
+                                    logs_points_redeemed = loyalty_points_record.get('redeemed_points')
+                                    logs_total_redeened_value = total_redeened_value
+                        except Exception as e:
+                            return Response({'error':str(e), 'loyalty Point cal':"error in loyalty points cal"})
                             
                         else:
                             # raise ValidationError('Coming in the else part')
-                            allowed_points = LoyaltyPoints.objects.filter(
-                                                        Q(loyaltytype='Service') |
-                                                        Q(loyaltytype='Both'),
-                                                        location=request.data.get('location'),
-                                                        # amount_spend = total_price,
-                                                        is_active=True,
-                                                        is_deleted=False
-                                                    )
-                            
-                            if len(allowed_points) > 0:
-                                point = allowed_points[0]
-                                client_points, created = ClientLoyaltyPoint.objects.get_or_create(
+                            try:
+                                
+                                allowed_points = LoyaltyPoints.objects.filter(
+                                                            Q(loyaltytype='Service') |
+                                                            Q(loyaltytype='Both'),
+                                                            location=request.data.get('location'),
+                                                            # amount_spend = total_price,
+                                                            is_active=True,
+                                                            is_deleted=False
+                                                        )
+                                
+                                if len(allowed_points) > 0:
+                                    point = allowed_points[0]
+                                    client_points, created = ClientLoyaltyPoint.objects.get_or_create(
+                                        location_id=location_id,
+                                        client=sale_record.client,
+                                        loyalty_points=point, # loyalty Foreignkey
+                                    )
+
+                                    loyalty_spend_amount = point.amount_spend
+                                    loyalty_earned_points = point.number_points  # total earned points if user spend amount point.amount_spend
+
+                                    # gained points based on customer's total Checkout Bill
+
+                                    earned_points = (float(sub_total) / float(loyalty_spend_amount)) * float(loyalty_earned_points)
+                                    earned_amount = (earned_points / point.earn_points) * float(point.total_earn_from_points)
+
+                                    if created:
+                                        client_points.total_earn = earned_points
+                                        client_points.total_amount = earned_amount
+
+                                    else:
+                                        client_points.total_earn = float(client_points.total_earn) + float(earned_points)
+                                        client_points.total_amount = client_points.total_amount + float(earned_amount)
+
+                                    client_points.for_every_points = point.earn_points
+                                    client_points.customer_will_get_amount = point.total_earn_from_points
+
+                                    client_points.save()
+
+                                    LoyaltyPointLogs.objects.create(
+                                        location_id=location_id,
+                                        client=client_points.client,
+                                        client_points=client_points,
+                                        loyalty=point,
+                                        points_earned=earned_points,
+                                        points_redeemed=logs_points_redeemed,
+                                        balance=client_points.total_available_points,
+                                        actual_sale_value_redeemed=logs_total_redeened_value,
+                                        invoice=invoice.id,
+                                        checkout=sale_record.id
+                                    )
+                            except Exception as e:
+                                return Response({"error": str(e), "error occured": "loyalty else part"})
+                    try:     
+                        if len(applied_promotions) > 0:
+                            promotion_data = applied_promotions[0]
+                            DiscountPromotionSalesReport.objects.create(
+                                    checkout_id=sale_record.id,
+                                    checkout_type='Sale',
+                                    invoice=invoice,
+                                    promotion_id=promotion_data.get('promotion'),
+                                    promotion_type= promotion_data.get('promotion_type'),
+                                    user=user,
+                                    client_id=client,
                                     location_id=location_id,
-                                    client=sale_record.client,
-                                    loyalty_points=point, # loyalty Foreignkey
                                 )
-
-                                loyalty_spend_amount = point.amount_spend
-                                loyalty_earned_points = point.number_points  # total earned points if user spend amount point.amount_spend
-
-                                # gained points based on customer's total Checkout Bill
-
-                                earned_points = (float(sub_total) / float(loyalty_spend_amount)) * float(loyalty_earned_points)
-                                earned_amount = (earned_points / point.earn_points) * float(point.total_earn_from_points)
-
-                                if created:
-                                    client_points.total_earn = earned_points
-                                    client_points.total_amount = earned_amount
-
-                                else:
-                                    client_points.total_earn = float(client_points.total_earn) + float(earned_points)
-                                    client_points.total_amount = client_points.total_amount + float(earned_amount)
-
-                                client_points.for_every_points = point.earn_points
-                                client_points.customer_will_get_amount = point.total_earn_from_points
-
-                                client_points.save()
-
-                                LoyaltyPointLogs.objects.create(
-                                    location_id=location_id,
-                                    client=client_points.client,
-                                    client_points=client_points,
-                                    loyalty=point,
-                                    points_earned=earned_points,
-                                    points_redeemed=logs_points_redeemed,
-                                    balance=client_points.total_available_points,
-                                    actual_sale_value_redeemed=logs_total_redeened_value,
-                                    invoice=invoice.id,
-                                    checkout=sale_record.id
-                                )
-                            
-                    if len(applied_promotions) > 0:
-                        promotion_data = applied_promotions[0]
-                        DiscountPromotionSalesReport.objects.create(
-                                checkout_id=sale_record.id,
-                                checkout_type='Sale',
-                                invoice=invoice,
-                                promotion_id=promotion_data.get('promotion'),
-                                promotion_type= promotion_data.get('promotion_type'),
-                                user=user,
-                                client_id=client,
-                                location_id=location_id,
-                            )
+                    except Exception as e:
+                        return Response({'error':str(e), 'error occured':'error occured in applied promotion'})
                 except Exception as e:
                     return Response({'error':str(e), 'second': 'Second Try'})
                 
