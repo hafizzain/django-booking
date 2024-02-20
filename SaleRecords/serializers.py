@@ -525,7 +525,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                         commission__employee = item.get('employee'),
                         from_value__lte = float(item.get('price')),
                         category_comission__iexact = 'Retail'
-                    ).order_by('-from_value').first()
+                    ).order_by('-from_value')
                     if sale_commission:
                         raise ValidationError('Commission found')
                     raise ValidationError('Not found')
