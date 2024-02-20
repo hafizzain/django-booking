@@ -1549,7 +1549,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
     client_all_appointment = serializers.SerializerMethodField(read_only=True)
     client_all_sales = serializers.SerializerMethodField(read_only=True)
     user_id = serializers.SerializerMethodField(read_only=True)
-    client_image = serializers.SerializerMethodField(read_only=True)
+    # client_image = serializers.SerializerMethodField(read_only=True)
 
     def get_appointment_tips(self, obj):
         tips = AppointmentEmployeeTip.objects.filter(
@@ -1629,12 +1629,12 @@ class SingleNoteSerializer(serializers.ModelSerializer):
         else:
             return obj.client.mobile_number if obj.client else None
         
-    def get_client_image(self, obj):
-        is_mobile = self.context.get('is_mobile', False)
-        if is_mobile:
-            return ClientSerializer(obj.client).data if obj.client else None
-        else:
-            return obj.client.image if obj.client else None
+    # def get_client_image(self, obj):
+    #     is_mobile = self.context.get('is_mobile', False)
+    #     if is_mobile:
+    #         return ClientSerializer(obj.client).data if obj.client else None
+    #     else:
+    #         return obj.client.image if obj.client else None
         
     def get_client_all_appointment(self, obj):
         if obj.client != None:
