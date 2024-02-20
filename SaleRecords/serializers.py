@@ -526,7 +526,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                         from_value__lte = float(item.get('price')),
                         category_comission__iexact = 'Retail'
                     ).order_by('-from_value').first()
-                    
+                    product = Product.objects.get(id = item.get('product'))
                     if sale_commission:
                         calculated_commission  = sale_commission.calculated_commission(item.get('price'))
                         EmployeeCommission.objects.bulk_create([
@@ -544,6 +544,10 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                                 commission_amount = float(calculated_commission),
                                 symbol = sale_commission.symbol,
                                 sale_id = checkout_id.id,
+                                
+                                item_name= product.name,
+                                item_id=item.get('product'),
+                                quantity=item.get('quantity'),
                                 tip = 0
                             )
                         ])
@@ -555,7 +559,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                         from_value__lte = float(item.get("price")),
                         category_comission__iexact = 'Voucher'
                     ).order_by('-from_value').first()
-                    
+                    voucher = Vouchers.objects.get(id = item.get('service'))
                     if sale_commission:
                         calculated_commission  = sale_commission.calculated_commission(item.get('price'))
                         EmployeeCommission.objects.bulk_create([
@@ -573,6 +577,11 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                                 commission_amount = float(calculated_commission),
                                 symbol = sale_commission.symbol,
                                 sale_id = checkout_id.id,
+                                
+                                item_name= voucher.name,
+                                item_id=item.get('voucher'),
+                                quantity=item.get('quantity'),
+                                
                                 tip = 0
                             )
                         ])
@@ -584,7 +593,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                         from_value__lte = float(item.get("price")),
                         category_comission__iexact = 'Service'
                     ).order_by('-from_value').first()
-                    
+                    service = Service.objects.get(id = item.get('service'))
                     if sale_commission:
                         calculated_commission  = sale_commission.calculated_commission(item.get('price'))
                         EmployeeCommission.objects.bulk_create([
@@ -602,6 +611,10 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                                 commission_amount = float(calculated_commission),
                                 symbol = sale_commission.symbol,
                                 sale_id = checkout_id.id,
+                                
+                                item_name= service.name,
+                                item_id=item.get('service'),
+                                quantity=item.get('quantity'),
                                 tip = 0
                             )
                         ])    
