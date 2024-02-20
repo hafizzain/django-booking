@@ -131,6 +131,7 @@ class EmployeeCommissionAdmin(admin.ModelAdmin):
         'full_commission',
         'created_at',
     ]
+    ordering = ['-created_at']
 
     def total_sale_value(self, instance):
         return instance.sale_value * instance.quantity
