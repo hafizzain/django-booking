@@ -401,7 +401,7 @@ def get_appointments_group_services(request):
         )
     
 
-    serialized = SingleNoteSerializer(appointment_group.appointment.all(), many=True)
+    serialized = SingleNoteSerializer(appointment_group.appointment.all(), many=True, context={'request': request})
     
     # Calculate Total Sale of Client---------------------
     clients = list(appointment_group.appointment.all().values_list('client', flat=True))
