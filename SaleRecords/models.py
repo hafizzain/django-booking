@@ -42,6 +42,7 @@ class SaleRecords(CommonField):
     total_price = models.FloatField(blank=False, null=False) # with tax amount
     sub_total = models.FloatField(blank=False, null=False)  # without tax amount
     change = models.FloatField(blank=True, null=True)
+    discount_value = models.FloatField(blank=True, null=True)
 
     class Meta:
         verbose_name_plural = 'Sale Records'
@@ -161,6 +162,7 @@ class SaleRecordAppliedCoupons(CommonField):
     
     coupon_type = models.CharField(max_length = 100, default = '', blank=False, null=False)
     coupon_discounted_price = models.FloatField(default =0, blank=False, null=False) 
+    discount_percentage = models.FloatField(blank=True, null=True)
     # is_redeemed = models.BooleanField(default = False)
     
 class AppliedMemberships(CommonField):
@@ -168,6 +170,7 @@ class AppliedMemberships(CommonField):
     membership = models.ForeignKey(SaleRecordMembership, on_delete = models.SET_NULL, blank=True, null=True)
     is_redeemed = models.BooleanField(default = False)
     price = models.FloatField(blank=True, null=True)
+    discount_percentage = models.FloatField(blank=True, null=True)
     
     
 class AppliedVouchers(CommonField):
@@ -176,6 +179,7 @@ class AppliedVouchers(CommonField):
     voucher = models.ForeignKey(SaleRecordVouchers, on_delete = models.SET_NULL , blank=False, null=True)
     is_redeemed = models.BooleanField(default = False)
     price = models.FloatField(blank=True, null=True)
+    discount_percentage = models.FloatField(blank=True, null=True)
     
     
 class AppliedGiftCards(CommonField):
@@ -183,6 +187,7 @@ class AppliedGiftCards(CommonField):
     # gift_card = models.ForeignKey(GiftCards, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'sale_applied_gift_cards_records' )
     purchased_gift_card_id = models.ForeignKey(PurchasedGiftCards, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'puchased_gift_card')
     partial_price = models.FloatField(blank=True, null=True)
+    # discount_percentage = models.FloatField(blank=True, null=True)
     # is_redeemed = models.BooleanField(default = False)
     
     
