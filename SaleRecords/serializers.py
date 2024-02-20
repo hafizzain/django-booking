@@ -531,8 +531,8 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     
                     if sale_commission:
                         calculated_commission  = sale_commission.calculated_commission(item.get('price'))
-                        EmployeeCommission.objects.bulk_create([
-                            EmployeeCommission(
+                        EmployeeCommission.objects.create(
+                            
                                 user_id = user,
                                 business=checkout_id.location.business,
                                 location_id = location,
@@ -551,8 +551,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                                 item_id=item.get('product'),
                                 quantity=item.get('quantity'),
                                 tip = 0
-                            )
-                        ])
+                        )
                         
             if vouchers_list:
                 for item in vouchers_list:
@@ -564,8 +563,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     voucher = Vouchers.objects.get(id = item.get('service'))
                     if sale_commission:
                         calculated_commission  = sale_commission.calculated_commission(item.get('price'))
-                        EmployeeCommission.objects.bulk_create([
-                            EmployeeCommission(
+                        EmployeeCommission.objects.create(
                                 user_id = user,
                                 business=checkout_id.location.business,
                                 location_id = location,
@@ -586,7 +584,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                                 
                                 tip = 0
                             )
-                        ])
+                        
                         
             if service_list:
                 for item in service_list:
@@ -598,8 +596,8 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     service = Service.objects.get(id = item.get('service'))
                     if sale_commission:
                         calculated_commission  = sale_commission.calculated_commission(item.get('price'))
-                        EmployeeCommission.objects.bulk_create([
-                            EmployeeCommission(
+                        EmployeeCommission.objects.create(
+                            
                                 user_id = user,
                                 business=checkout_id.location.business,
                                 location_id = location,
@@ -619,7 +617,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                                 quantity=item.get('quantity'),
                                 tip = 0
                             )
-                        ])    
+                           
                 
         except Exception as e:
             raise ValidationError(f'Error occured in Employee Commission Calculations {str(e)}')
