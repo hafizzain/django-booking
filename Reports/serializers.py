@@ -698,11 +698,12 @@ class ServiceGroupReport(serializers.ModelSerializer):
             location = self.context["location"]
             ser_target = 0
             services_ids = obj.services.all().values_list('id', flat=True)
-            services_orders = ServiceOrder.objects.filter(
+            from SaleRecords.models import SaleRecordServices
+            services_orders = SaleRecordServices.objects.filter(
                 service__id__in = services_ids,
                 created_at__year = year,
                 created_at__month = month,
-                location__id = location
+                sale_record__location__id = location
             )
 
             for order in services_orders:
