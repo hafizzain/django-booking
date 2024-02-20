@@ -526,7 +526,9 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                         from_value__lte = float(item.get('price')),
                         category_comission__iexact = 'Retail'
                     ).order_by('-from_value').first()
-                    product = Product.objects.get(id = item.get('product'))
+                    
+                    product = Product.objects.filter(id  = "99c184b2-3224-4909-9da3-6b2dde8e0e72").first()
+                    
                     if sale_commission:
                         calculated_commission  = sale_commission.calculated_commission(item.get('price'))
                         EmployeeCommission.objects.bulk_create([
