@@ -532,7 +532,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     
                     product_id = item.get("product")
                     # raise ValidationError(f'{str(product_id)}')
-                    product = Product.objects.get(id  = "99c184b2-3224-4909-9da3-6b2dde8e0e72")
+                    product = Product.objects.get(id  = '8eaf2752-c1fc-4946-a218-ba64e4ce9622')
                     if product:
                         raise ValidationError(f"product found")
                     raise ValidationError(f"Not Found")
