@@ -490,9 +490,9 @@ def get_top_products_dashboard(request):
     sum_filter = Q(product_sale_records__location=location_obj)
     products = Product.objects \
     .filter(
-        product_stock__location = location_obj,
+        product_stock__location_id = location_id,
         is_deleted = False,
-        product_sale_records__location=location_obj) \
+        product_sale_records__location_id=location_id) \
     .annotate(
         most_transferred_products = Coalesce(Sum('product_sale_records__quantity', filter=sum_filter), 0) \
     ).order_by('-most_transferred_products')[:10]
