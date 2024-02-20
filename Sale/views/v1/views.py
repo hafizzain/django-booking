@@ -710,9 +710,9 @@ def update_service(request):
             return None
         
         image_url = get_image(request, image)
-        # if image_url != request.data.get('image'):
-            # service_id.image = image
-            # service_id.save()
+        if image_url != request.data.get('image'):
+            service_id.image = image
+            service_id.save()
         
     if location is not None:
         if type(location) == str:
@@ -853,8 +853,6 @@ def update_service(request):
                     'error': error,
                     'service': serializer.data,
                     'sum': sum,
-                    'image_url': image_url,
-                    'image': image
                 }
             },
             status=status.HTTP_200_OK
