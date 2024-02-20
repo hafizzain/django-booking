@@ -1668,7 +1668,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
         model = Appointment
         fields = ['id','selected_promotion_id','discount_price','discount_percentage','check_in_time', 'client','user_id','client_name', 'client_email', 'client_phone', 'client_all_appointment',
                   'client_all_sales', 'appointment_tips', 'notes', 'business_address',
-                  'client_type', 'client_image', 'appointmnet_service', 'customer_note', 'status']
+                  'client_type', 'appointmnet_service', 'customer_note', 'status']
 
 
 class EmployeeSerializerResponse(serializers.ModelSerializer):
