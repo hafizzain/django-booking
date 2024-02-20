@@ -530,12 +530,10 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     #     raise ValidationError('Commission found')
                     # raise ValidationError('Not found')
                     
-                    product_id = item.get("product")
+                    
                     # raise ValidationError(f'{str(product_id)}')
-                    product = Product.objects.get(id  = f'{product_id}')
-                    if product:
-                        raise ValidationError(f"product found")
-                    raise ValidationError(f"Not Found")
+                    product = Product.objects.get(id  = f'{item.get("product")}')
+                    
                     if sale_commission:
                         calculated_commission  = sale_commission.calculated_commission(item.get('price'))
                         EmployeeCommission.objects.create(
@@ -567,7 +565,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                         from_value__lte = float(item.get("price")),
                         category_comission__iexact = 'Voucher'
                     ).order_by('-from_value').first()
-                    voucher = Vouchers.objects.get(id = item.get('service'))
+                    voucher = Vouchers.objects.get(id = f'{item.get('service')}')
                     if sale_commission:
                         calculated_commission  = sale_commission.calculated_commission(item.get('price'))
                         EmployeeCommission.objects.create(
@@ -600,7 +598,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                         from_value__lte = float(item.get("price")),
                         category_comission__iexact = 'Service'
                     ).order_by('-from_value').first()
-                    service = Service.objects.get(id = item.get('service'))
+                    service = Service.objects.get(id = f'{item.get('service')}')
                     if sale_commission:
                         calculated_commission  = sale_commission.calculated_commission(item.get('price'))
                         EmployeeCommission.objects.create(
