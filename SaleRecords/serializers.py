@@ -530,13 +530,9 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     #     raise ValidationError('Commission found')
                     # raise ValidationError('Not found')
                     
-                    import uuid
-
-# Assuming item.get('employee') returns a UUID string
-                    product = item.get('product').strip('“”')  # Remove any surrounding angled quotation marks
-                    product = uuid.UUID(product)
+                    product_id = item.get("product")
                     # raise ValidationError(f'{str(product_id)}')
-                    product = Product.objects.get(id  = product)
+                    product = Product.objects.get(id  = f'{product_id}')
                     if product:
                         raise ValidationError(f"product found")
                     raise ValidationError(f"Not Found")
