@@ -15,6 +15,8 @@ from Client.models import Client
 from NStyle.Constants import StatusCodes
 from datetime import datetime,timedelta
 from django.db.models import Q
+from django.db.models import Sum, Avg
+from SaleRecords.models import *
 import calendar
 
 
@@ -52,34 +54,35 @@ def get_busines_client_appointment(request):
                                                   business_address__id = business_id, 
                                                   appointment_status__in=['Paid', 'Done']).count()
 
- 
+
     if duration is not None:
         today = datetime.today()
         day = today - timedelta(days=int(duration))
-        checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id,
-                                                       created_at__gte = day,
-                                                       appointment_service__appointment_status__in=['Paid', 'Done'])
+        checkout_orders_total = SaleRecordsAppointmentServices.objects.filter(sale_record__location__id = business_id,
+                                                    created_at__gte = day,
+                                                    appointment__status__in=['Paid', 'Done']) \
+                                                    .aggregate(total_sale=Sum('total_price'))
     else:
-        checkout_orders_total = Checkout.objects.filter(
-        is_deleted=False, 
-        location__id = business_id
-        )   
+        checkout_orders_total = SaleRecords.objects.filter(
+        is_deleted=False,
+        location_id=business_id
+        ).aggregate(total_sale=Sum('total_price'))
         
-        checkouts = AppointmentCheckout.objects.filter(
+        appointment = SaleRecordsAppointmentServices.objects.filter(
             is_deleted=False, 
-            business_address__id = business_id,
-            appointment_service__appointment_status__in=['Paid', 'Done']
-        )
+            sale_record__location__id = business_id,
+            appointment__status__in=['Paid', 'Done']
+        ).count()
         
-        for price in checkout_orders_total:
-            total_price += int(price.total_service_price or 0)
-            total_price += int(price.total_product_price or 0)
-            total_price += int(price.total_voucher_price or 0)
-            total_price += int(price.total_membership_price or 0)
+        # for price in checkout_orders_total:
+        #     total_price += int(price.total_service_price or 0)
+        #     total_price += int(price.total_product_price or 0)
+        #     total_price += int(price.total_voucher_price or 0)
+        #     total_price += int(price.total_membership_price or 0)
         
-        for price in checkouts:
-            appointment +=1
-            total_price += int(price.total_price or 0)
+        # for price in checkouts:
+        #     appointment +=1
+        #     total_price += int(price.total_price or 0)
     #     checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id)
     # for check in checkouts:
     #     appointment +=1
@@ -90,24 +93,24 @@ def get_busines_client_appointment(request):
 
     # ////////////////////////
 
-    total = 0
-    appointmemnt_sale = 0
-    order_sale = 0
-    orders_price = Order.objects.filter(is_deleted=False, location__id = business_id)
-    for order in orders_price:
-        order_sale +=1
-        if order.total_price is not  None:
-            total += float(order.total_price)
+    # total = 0
+    # appointmemnt_sale = 0
+    # order_sale = 0
+    # orders_price = Order.objects.filter(is_deleted=False, location__id = business_id)
+    # for order in orders_price:
+    #     order_sale +=1
+    #     if order.total_price is not  None:
+    #         total += float(order.total_price)
     
-    price = AppointmentCheckout.objects.filter(
-        Q(appointment_service__appointment_status = 'Paid') |
-        Q(appointment_service__appointment_status = 'Done'),
-        business_address__id = business_id
-    )
-    for order in price:
-        appointmemnt_sale +=1
-        if order.total_price is not None:
-            total += float(order.total_price)
+    # price = AppointmentCheckout.objects.filter(
+    #     Q(appointment_service__appointment_status = 'Paid') |
+    #     Q(appointment_service__appointment_status = 'Done'),
+    #     business_address__id = business_id
+    # )
+    # for order in price:
+    #     appointmemnt_sale +=1
+    #     if order.total_price is not None:
+    #         total += float(order.total_price)
     
     avg = appointment / all_apps_clients if all_apps_clients > 0 else 0
     avg = round(avg, 2)
@@ -118,7 +121,7 @@ def get_busines_client_appointment(request):
             'response' : {
                 'message' : 'Total Revenue',
                 'error_message' : None,
-                'revenue' : total,
+                'revenue' : checkout_orders_total.get('total_sale', 0),
                 'client_count':avg,
                 'footfalls': footfalls,
                 'clients_booked':all_apps_clients,
