@@ -50,7 +50,7 @@ class SaleRecords(CommonField):
 class SaleRecordServices(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, blank=True, null=True, related_name = 'services_records')
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True)
-    service = models.ForeignKey(Service, on_delete = models.SET_NULL, null = True)
+    service = models.ForeignKey(Service, on_delete = models.SET_NULL, null = True, related_name = 'service_sale_record')
     
     quantity = models.PositiveIntegerField(blank=True, null=True)
     price = models.FloatField(default = 0, blank=True, null=True)
@@ -60,7 +60,7 @@ class SaleRecordServices(CommonField):
 class SaleRecordsProducts(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, blank=True, null=True, related_name = 'products_records')
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True)
-    product = models.ForeignKey(Product, on_delete = models.SET_NULL, null = True)
+    product = models.ForeignKey(Product, on_delete = models.SET_NULL, null = True, related_name = 'product_sale_records')
     
     quantity = models.PositiveIntegerField(blank=True, null=True)
     price = models.FloatField(blank=True, null=True)
