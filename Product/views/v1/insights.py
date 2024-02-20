@@ -487,7 +487,7 @@ def get_top_products_dashboard(request):
     
     location_obj = BusinessAddress.objects.get(id=location_id)
 
-    sum_filter = Q(product_sale_records_sale_record__location=location_obj)
+    sum_filter = Q(product_sale_records__sale_record__location=location_obj)
     products = Product.objects \
     .filter(
         product_stock__location_id = location_id,
