@@ -779,26 +779,28 @@ class ReportBrandSerializer(serializers.ModelSerializer):
             month = self.context["month"]
             year = self.context["year"]
             total = 0
+            
+            from SaleRecords.models import SaleRecordsProducts
 
-            service_orders = ProductOrder.objects.filter(
+            service_orders = SaleRecordsProducts.objects.filter(
                 is_deleted = False, 
                 product__brand = obj,
                 created_at__year = year,
                 created_at__month = month,
-                location__id = location,
+                sale_record__location__id = location,
             )
             
             for ord in service_orders:
                 # create = str(ord.created_at)
                 # match = int(create.split(" ")[0].split("-")[1])
                 # if int(month) == match:
-                price = 0
-                if ord.discount_price:
-                    price = ord.discount_price
-                else:
-                    price = ord.total_price
+                # price = 0
+                # if ord.discount_price:
+                #     price = ord.discount_price
+                # else:
+                #     price = ord.total_price
 
-                total += (float(price) * float(ord.quantity))
+                total += (float(ord.price) * float(ord.quantity))
 
                 # if ord.checkout and ord.checkout.total_product_price:
                 #     total += int(ord.checkout.total_product_price)
