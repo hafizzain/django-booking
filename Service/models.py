@@ -87,12 +87,12 @@ class ServiceManager(models.QuerySet):
         service_orders_filter = Q()
         appointment_service_filter = Q(serivce_appointments__status=choices.AppointmentServiceStatus.FINISHED)
         if location:
-            service_orders_filter &= Q(service_orders__location=location)
+            service_orders_filter &= Q(service_sale_record__sale_record__location=location)
             appointment_service_filter &= Q(serivce_appointments__business_address=location)
         if duration:
             today = datetime.today()
             date = today - timedelta(days=duration)
-            service_orders_filter &= Q(service_orders__created_at__gte=date)
+            service_orders_filter &= Q(service_sale_record__sale_record__created_at__gte=date)
             appointment_service_filter &= Q(serivce_appointments__created_at__gte=date)
 
 
@@ -103,7 +103,7 @@ class ServiceManager(models.QuerySet):
                 output_field=IntegerField()
             ),
             total_orders_quantity = Coalesce(
-                Sum('service_orders__quantity', filter=service_orders_filter, distinct=True),
+                Sum('service_sale_record__quantity', filter=service_orders_filter, distinct=True),
                 0,
                 output_field=IntegerField()
             )
