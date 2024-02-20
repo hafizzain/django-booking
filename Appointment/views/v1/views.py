@@ -223,22 +223,6 @@ def get_reversal(request):
         }
     }
     return Response(data, status=status.HTTP_200_OK)
-    # return Response(
-    #     {
-    #         'status': True,
-    #         'status_code': 200,
-    #         'response': {
-    #             'message': 'Reversal get successfully!',
-    #             'count':all_reversal_count,
-    #             'pages':page_count,
-    #             'per_page_result':results_per_page,
-    #             'error_message': None,
-    #             'errors': [],
-    #             'data': data
-    #         }
-    #     },
-    #     status=status.HTTP_200_OK
-    # )
 
 
 @api_view(['GET'])
