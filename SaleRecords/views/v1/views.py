@@ -311,7 +311,9 @@ def get_sales_analytics(request):
         
         # Appointment Count
         cancel_appointment = Appointment.objects.filter(business, query, status='Cancelled').count()
-        finished_appointment = Appointment.objects.filter(business, query, status='Done').count()
+        if location_id:
+            location=Q(sale_record__location__id=location_id)
+        finished_appointment = SaleRecordsAppointmentServices.objects.filter(location, appointment_status__in=['Paid', 'Done']).count()
         
         # Total Appointment count
         total_appointment = cancel_appointment + finished_appointment
