@@ -698,21 +698,23 @@ class ServiceGroupReport(serializers.ModelSerializer):
             location = self.context["location"]
             ser_target = 0
             services_ids = obj.services.all().values_list('id', flat=True)
-            services_orders = ServiceOrder.objects.filter(
-                service__id__in = services_ids,
+            from SaleRecords.models import SaleRecordServices
+            
+            services_orders = SaleRecordServices.objects.filter(
+                service_id__in = services_ids,
                 created_at__year = year,
                 created_at__month = month,
-                location__id = location
+                sale_record__location__id = location
             )
 
             for order in services_orders:
 
-                price = 0
-                if order.discount_price:
-                    price = order.discount_price
-                else:
-                    price = order.total_price
-                ser_target += float(price) * float(order.quantity)
+                # price = 0
+                # if order.discount_price:
+                #     price = order.discount_price
+                # else:
+                #     price = order.total_price
+                ser_target += float(order.price) * float(order.quantity)
             
             appointment_services = AppointmentService.objects.filter(
                 Q(appointment_status = 'Done') |
