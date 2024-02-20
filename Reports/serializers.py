@@ -367,9 +367,10 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
                 created_at__month=month
 
             )
-            service_orders = ServiceOrder.objects.filter(
+            from SaleRecords.models import SaleRecordServices
+            service_orders = SaleRecordServices.objects.filter(
                 is_deleted=False,
-                location=obj,
+                sale_record__location=obj,
                 created_at__year=year,
                 created_at__month=month
 
@@ -382,12 +383,12 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
                     total += int(ord.price) if ord.price is not None else 0
 
             for ord in service_orders:
-                price = 0
-                if ord.discount_price:
-                    price = ord.discount_price
-                else:
-                    price = ord.total_price
-                total += (float(ord.quantity) * float(price))
+                # price = 0
+                # if ord.discount_price:
+                #     price = ord.discount_price
+                # else:
+                #     price = ord.total_price
+                total += (float(ord.quantity) * float(ord.price))
 
             return total
 
@@ -399,20 +400,20 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
             month = self.context["month"]
             year = self.context["year"]
             total = 0
-
-            service_orders = ProductOrder.objects.filter(
+            from SaleRecords.models import SaleRecordsProducts
+            service_orders = SaleRecordsProducts.objects.filter(
                 is_deleted = False, 
-                location = obj,
+                sale_record__location = obj,
                 created_at__year = year,
                 created_at__month = month,
             )
             for ord in service_orders:
-                price = 0
-                if ord.discount_price:
-                    price = ord.discount_price
-                else:
-                    price = ord.total_price
-                total += (float(ord.quantity) * float(price))
+                # price = 0
+                # if ord.discount_price:
+                #     price = ord.discount_price
+                # else:
+                #     price = ord.total_price
+                total += (float(ord.quantity) * float(ord.price))
 
             return total
 
@@ -424,20 +425,20 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
             month = self.context["month"]
             year = self.context["year"]
             total = 0
-
-            service_orders = VoucherOrder.objects.filter(
+            from SaleRecords.models import SaleRecordVouchers
+            service_orders = SaleRecordVouchers.objects.filter(
                 is_deleted = False,
-                location = obj,
+                sale_record__location = obj,
                 created_at__year = year,
                 created_at__month = month,
             )
             for ord in service_orders:
-                price = 0
-                if ord.discount_price:
-                    price = ord.discount_price
-                else:
-                    price = ord.total_price
-                total += (float(ord.quantity) * float(price))
+                # price = 0
+                # if ord.discount_price:
+                #     price = ord.discount_price
+                # else:
+                #     price = ord.total_price
+                total += (float(ord.quantity) * float(ord.price))
 
             return total
 
@@ -449,20 +450,20 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
             month = self.context["month"]
             year = self.context["year"]
             total = 0
-
-            service_orders = MemberShipOrder.objects.filter(
+            from SaleRecords.models import SaleRecordMembership
+            service_orders = SaleRecordMembership.objects.filter(
                 is_deleted=False, 
-                location = obj,
+                sale_record__location = obj,
                 created_at__year = year,
                 created_at__month = month,
             )
             for ord  in service_orders:
-                price = 0
-                if ord.discount_price:
-                    price = ord.discount_price
-                else:
-                    price = ord.total_price
-                total += (float(ord.quantity) * float(price))
+                # price = 0
+                # if ord.discount_price:
+                #     price = ord.discount_price
+                # else:
+                #     price = ord.total_price
+                total += (float(ord.quantity) * float(ord.price))
             
             return total
                 
