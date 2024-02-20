@@ -92,10 +92,10 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
             month = self.context["month"]
             year = self.context["year"]
             total = 0
-            
-            service_orders = ProductOrder.objects.filter(
+            from SaleRecords.models import SaleRecordsProducts
+            service_orders = SaleRecordsProducts.objects.filter(
                 is_deleted=False, 
-                member = obj, 
+                employee = obj, 
                 created_at__year = year,
                 created_at__month = month,
                 )
@@ -104,13 +104,13 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
                 # match = int(create.split(" ")[0].split("-")[1])
                 # if int(month) == match:
                 #     total += int(ord.total_price)
-                price = 0
-                if ord.discount_price:
-                    price = ord.discount_price
-                else:
-                    price = ord.total_price
+                # price = 0
+                # if ord.discount_price:
+                #     price = ord.discount_price
+                # else:
+                #     price = ord.total_price
                 
-                total += float(price) * float(ord.quantity)
+                total += ord.price * float(ord.quantity)
             
             return f'{total}'
                 
@@ -127,10 +127,10 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
                 appointment_status = 'Done',
                 appointment_date__icontains = year
             )
-        
-            service_orders = ServiceOrder.objects.filter(
+            from SaleRecords.models import SaleRecordServices
+            service_orders = SaleRecordServices.objects.filter(
                 is_deleted=False, 
-                member = obj,
+                employee = obj,
                 created_at__year = year,
                 created_at__month = month,
             )
@@ -145,13 +145,13 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
                 # match = int(create.split(" ")[0].split("-")[1])
                 # if int(month) == match:
                 #     total += int(ord.total_price)
-                price = 0
-                if ord.discount_price:
-                    price = ord.discount_price
-                else:
-                    price = ord.total_price
+                # price = 0
+                # if ord.discount_price:
+                #     price = ord.discount_price
+                # else:
+                #     price = ord.total_price
                 
-                total += float(price) * float(ord.quantity)
+                total += float(ord.price) * float(ord.quantity)
                                 
             return f'{total}'
             
