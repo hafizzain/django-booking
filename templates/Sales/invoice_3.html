@@ -434,13 +434,18 @@
               </div>
               <p class="text-sm">{{total}} {{currency_code}}</p>
             </div>
-            <div class="flex items-center justify-between text-primary text-sm font-bold">
-              <div>
-                <p class="text-left">{{ business_address.primary_translation.change}}</p>
-                {% if business_address.secondary_translation.change %}<p class="arabic">{{ business_address.secondary_translation.change }} {% endif %}</p>
-              </div>
-              <p class="text-sm">{{change}} {{currency_code}}</p>
-            </div>
+            
+            {% if change > 0 %}
+                <div class="flex items-center justify-between text-primary text-sm font-bold">
+                  <div>
+                    <p class="text-left">{{ business_address.primary_translation.change}}</p>
+                    {% if business_address.secondary_translation.change %}<p class="arabic">{{ business_address.secondary_translation.change }} {% endif %}</p>
+                  </div>
+                  <p class="text-sm">{{change}} {{currency_code}}</p>
+                </div>
+            {% endif %}
+              
+            
             <hr />
         {% comment %} ======================================================== pyament methods ======================================= {% endcomment %}
 
@@ -525,9 +530,7 @@
               </svg>
             </div>
           </div>
-          <div
-            class="p-[1.2rem] overflow-y-auto overflow-hidden scroll-hidden text-center flex flex-col gap-5"
-          >
+          {% comment %} <div class="p-[1.2rem] overflow-y-auto overflow-hidden scroll-hidden text-center flex flex-col gap-5">
             <hr class="border" />
 
             <div class="leading-1 text-center font-semibold">
@@ -562,7 +565,7 @@
 <!--                </p>-->
               </div>
             </div>
-          </div>
+          </div> {% endcomment %}
         </div>
       </div>
     </div>
