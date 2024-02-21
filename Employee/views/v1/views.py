@@ -7352,10 +7352,10 @@ def get_gift_card(request):
     # GiftCard show on bases of Ceruncy and location
     ceruncy = BusinessAddress.objects.filter(id=selected_location).values_list('currency', flat=True)
     gift_detils = list(GiftDetail.objects.filter(currencies__in=ceruncy).values_list('gift_card', flat=True))
-    query_set = GiftCards.objects.filter(id__in=gift_detils)
+    query_set = GiftCards.objects.filter(id__in=gift_detils, is_deleted=False)
     
     if search_text:
-        query_set = GiftCards.objects.filter(title_i__contains=search_text)
+        query_set = GiftCards.objects.filter(title_i__contains=search_text, is_deleted=False)
         
     serializer_context = {'selected_location': selected_location}
     serializer = GiftCardSerializerResponse(query_set, many=True, context=serializer_context).data
@@ -7382,7 +7382,7 @@ def get_detail_from_code(request):
         try:
             
             # Filter GiftCards based on the provided code and BusinessAddress
-            gift_card = GiftCards.objects.get(code=code)
+            gift_card = GiftCards.objects.get(code=code, is_deleted = False)
             serializer_gift_card = SingleGiftCardDetails(gift_card,
                                                         context={'location_id':location_id}).data
             
