@@ -1631,15 +1631,13 @@ class SingleNoteSerializer(serializers.ModelSerializer):
         
     def get_client_image(self, obj):
 
-        if obj.client: # walkin client has no image
-            if obj.client.image:
-                try:
-                    request = self.context["request"]
-                    url = tenant_media_base_url(request, is_s3_url=obj.client.is_image_uploaded_s3)
-                    return f'{url}{obj.client.image}'
-                except:
-                    return f'{obj.client.image}'
-            return None    
+        if obj.client and obj.client.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request, is_s3_url=obj.client.is_image_uploaded_s3)
+                return f'{url}{obj.client.image}'
+            except:
+                return f'{obj.client.image}'
         return None
     
         
