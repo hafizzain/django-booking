@@ -2098,8 +2098,9 @@ def get_memberships(request):
     search_text = request.GET.get('search_text')
     
     all_memberships = Membership.objects \
+        .filter(is_deleted=False) \
         .with_total_orders() \
-        .order_by('-total_orders').filter(is_deleted=False)
+        .order_by('-total_orders')
     all_memberships_count = all_memberships.count()
 
     if search_text:
