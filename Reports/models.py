@@ -346,6 +346,7 @@ class DiscountPromotionSalesReport(models.Model):
                                 service_price = service_price[0].price
                             if service_price:
                                 original_price += float(service_price) * float(rec.quantity)
+                                dicounted_price += rec.discounted_price
             except Exception as e:
                 raise ValidationError({'erorr occured in dicount Promotion Appointment Service': str(e) })
                             
@@ -365,6 +366,7 @@ class DiscountPromotionSalesReport(models.Model):
                                 service_price = service_price[0].price
                             if service_price:
                                 original_price += float(service_price) * float(rec.quantity)
+                                dicounted_price += rec.discounted_price
             except Exception as e:
                 raise ValidationError({'erorr occured in dicount Promotion service': str(e) })
                             
@@ -377,10 +379,9 @@ class DiscountPromotionSalesReport(models.Model):
                         if len(product_price) > 0:
                             product_actual_price = product_price[0].retail_price
                             original_price += float(product_actual_price) * float(rec.quantity)
+                            dicounted_price += rec.discounted_price
             except Exception as e:
                 raise ValidationError({'erorr occured in dicount Promotion Product': str(e) })
-                    
-                        
         # if self.checkout_type == 'Sale':
         #     services_records = SaleRecordServices.objects.filter(sale_record_id = self.checkout_id)
         return original_price, dicounted_price
@@ -428,7 +429,7 @@ class DiscountPromotionSalesReport(models.Model):
         #     self.original_price = prices.get('original_prices', 0)
         #     self.discount_price = prices.get('discounted_prices', 0)
         if not self.original_price and not self.discount_price:
-            self.original_price , self.discount_price = self.get_discounts_and_original_prices()
+            self.original_price  = self.get_discounts_and_original_prices()
         self.is_active = True
 
         super(DiscountPromotionSalesReport, self).save(*args, **kwargs)
