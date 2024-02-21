@@ -159,6 +159,7 @@ class SaleRecordTip(CommonField):
 class SaleRecordAppliedCoupons(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_coupons_records')
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL,null = True)
+    client = models.ForeignKey(Client, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'applied_coupons_client')
     
     coupon_type = models.CharField(max_length = 100, default = '', blank=False, null=False)
     coupon_discounted_price = models.FloatField(default =0, blank=False, null=False) 
@@ -171,6 +172,7 @@ class AppliedMemberships(CommonField):
     is_redeemed = models.BooleanField(default = False)
     price = models.FloatField(blank=True, null=True)
     discount_percentage = models.FloatField(blank=True, null=True)
+    client = models.ForeignKey(Client, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'applied_memberships_client')
     
     
 class AppliedVouchers(CommonField):
@@ -180,6 +182,7 @@ class AppliedVouchers(CommonField):
     is_redeemed = models.BooleanField(default = False)
     price = models.FloatField(blank=True, null=True)
     discount_percentage = models.FloatField(blank=True, null=True)
+    client = models.ForeignKey(Client, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'applied_vouchers_client')
     
     
 class AppliedGiftCards(CommonField):
@@ -203,4 +206,4 @@ class RedeemedLoyaltyPoints(CommonField):
     sale_record = models.ForeignKey(SaleRecords,  on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_loyalty_points_records')
     client_loyalty_point = models.ForeignKey(ClientLoyaltyPoint, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'loyalty_points_records')
     redeemed_points = models.PositiveSmallIntegerField(default = 0 , blank=True, null=True)
-    
+    client = models.ForeignKey(Client, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'applied_loyalty_points_client')

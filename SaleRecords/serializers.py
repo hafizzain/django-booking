@@ -158,13 +158,7 @@ class PurchasedGiftCardsSerializer(serializers.ModelSerializer):
 class SaleRecordMembershipSerializer(serializers.ModelSerializer):
     valid_till = serializers.CharField(write_only=True, required=True)
     membership_names = serializers.SerializerMethodField(read_only = True)
-    client_data = serializers.SerializerMethodField(read_only = True)
     
-    def get_client_data(self, obj):
-        if obj.client:
-            client = Client.objects.get(id = obj.client.id)
-            return ClientSerializer(client).data
-        return None 
     
     def get_membership_names(self, obj):
         return {
