@@ -214,7 +214,7 @@ class SaleRecordViews(APIView):
                                     user=user,
                                     client_id=client,
                                     location_id=location_id,
-                                    # gst = ,
+                                    gst = request.data.get('total_tax'),
                                     # original_price = ,
                                     # discount_price = ,
                                     
