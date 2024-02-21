@@ -2099,7 +2099,7 @@ def get_memberships(request):
     
     all_memberships = Membership.objects \
         .with_total_orders() \
-        .order_by('-total_orders')
+        .order_by('-total_orders').filter(is_deleted=False)
     all_memberships_count = all_memberships.count()
 
     if search_text:
@@ -2175,8 +2175,9 @@ def delete_memberships(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-
-    memberships.delete()
+    # Member ship Soft Delete
+    memberships.is_deleted = True
+    memberships.save()
     return Response(
         {
             'status': True,
