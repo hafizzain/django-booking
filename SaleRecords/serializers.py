@@ -119,7 +119,6 @@ class SaleRecordServicesSerializer(serializers.ModelSerializer):
 class SaleRecordVouchersSerializer(serializers.ModelSerializer):
     valid_till = serializers.CharField(write_only=True, required=True)
     voucher_names = serializers.SerializerMethodField(read_only = True)
-    client_data = serializers.SerializerMethodField(read_only = True)
     
     
     def get_voucher_names(self, obj):
@@ -128,11 +127,6 @@ class SaleRecordVouchersSerializer(serializers.ModelSerializer):
             'arabic_name': f"{obj.voucher.arabic_name}",
         }
     
-    def get_client_data(self, obj):
-        if obj.client:
-            client = Client.objects.get(id = obj.client.id)
-            return ClientSerializer(client).data
-        return None   
     class Meta:
         model = SaleRecordVouchers
         fields = '__all__'
@@ -215,6 +209,14 @@ class AppliedMembershipsSerializer(serializers.ModelSerializer):
         read_only_fields = ['sale_record']
         
 class AppliedVouchersSerializer(serializers.ModelSerializer):
+    client_data = serializers.SerializerMethodField(read_only = True)
+    
+    
+    def get_client_data(self, obj):
+        if obj.client:
+            client = Client.objects.get(id = obj.client.id)
+            return ClientSerializer(client).data
+        return None 
     class Meta:
         model = AppliedVouchers
         fields = "__all__"
