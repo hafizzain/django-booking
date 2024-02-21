@@ -6626,16 +6626,24 @@ def update_coupon(request):
         instance.discounted_percentage = request.data.get('discounted_percentage', instance.discounted_percentage)
         instance.client_type = request.data.get('client_type', instance.client_type)
         instance.save()
+        
         if buy_one_type == 'Service':
             instance.buy_one_get_one_service.clear()
             instance.buy_one_get_one_service.set([selectedType])
+            
+            
         if buy_one_type == 'Product':
             instance.buy_one_get_one_product.clear()
             instance.buy_one_get_one_product.set([selectedType])
+            
+            
+            
         if len(location) > 0:
             location = json.loads(location)
             instance.business.clear()
             instance.business.set(location)
+            
+            
         if len(service_group_brand) > 0:
             service_group_brand = json.loads(service_group_brand)
             for item in service_group_brand:
@@ -6662,12 +6670,11 @@ def update_coupon(request):
                     service_group_del = CouponServiceGroup.objects.filter(coupon=instance)
                     if service_group_del:
                         service_group_del.delete()
-                    coupen_serverice = CouponServiceGroup.objects.create(
+                    CouponServiceGroup.objects.create(
                         coupon=instance,
                         service_group_id=service_group,
                         service_group_discount=service_group_discount
                     )
-                    coupen_serverice.save()
         if len(service_ids) > 0:
             instance.excluded_services.clear()
             service_ids = json.loads(service_ids)
