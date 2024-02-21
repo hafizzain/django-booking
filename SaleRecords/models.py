@@ -88,6 +88,7 @@ class SaleRecordsAppointmentServices(CommonField):
     service_end_time = models.DateTimeField(blank=True, null=True)
     duration = models.CharField(max_length= 50,blank=True, null=True)
     price = models.FloatField(default = 0, blank=True, null=True)
+    discounted_price = models.FloatField(default = 0, blank=True, null=True)
     is_favourite = models.BooleanField(blank=True, null=True , default = False)
     discount_percentage = models.FloatField(blank=True, null=True)
     # reason = models.CharField(max_length = 255, blank=True, null=True)
