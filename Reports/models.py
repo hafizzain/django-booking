@@ -353,12 +353,12 @@ class DiscountPromotionSalesReport(models.Model):
             try:              
                 if service_records:
                     for rec in service_records:
-                        service_price = PriceService.objects.filter(service=rec.service, duration=rec.duration,
-                                                                    currency=self.location.currency).order_by(
-                            '-created_at')
-                        if len(service_price) > 0:
-                            service_price[0].price
-                        else:
+                        # service_price = PriceService.objects.filter(service=rec.service, duration=rec.duration,
+                        #                                             currency=self.location.currency).order_by(
+                        #     '-created_at')
+                        # if len(service_price) > 0:
+                        #     service_price[0].price
+                        # else:
                             service_price = PriceService.objects.filter(service=rec.service, 
                                                                         currency=self.location.currency).order_by(
                                 '-created_at')
