@@ -6662,11 +6662,12 @@ def update_coupon(request):
                     service_group_del = CouponServiceGroup.objects.filter(coupon=instance)
                     if service_group_del:
                         service_group_del.delete()
-                    CouponServiceGroup.objects.create(
+                    coupen_serverice = CouponServiceGroup.objects.create(
                         coupon=instance,
                         service_group_id=service_group,
                         service_group_discount=service_group_discount
                     )
+                    coupen_serverice.save()
         if len(service_ids) > 0:
             instance.excluded_services.clear()
             service_ids = json.loads(service_ids)
