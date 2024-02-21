@@ -192,11 +192,27 @@ class SaleTaxSerializer(serializers.ModelSerializer):
 # ====================================================================== Applied Items Serializer ===================================================
 
 class SaleRecordAppliedCouponsSerializer(serializers.ModelSerializer):
+    client_data = serializers.SerializerMethodField(read_only = True)
+    
+    
+    def get_client_data(self, obj):
+        if obj.client:
+            client = Client.objects.get(id = obj.client.id)
+            return ClientSerializer(client).data
+        return None 
     class Meta:
         model = SaleRecordAppliedCoupons
         fields = "__all__"
         read_only_fields = ['sale_record']
 class AppliedMembershipsSerializer(serializers.ModelSerializer):
+    client_data = serializers.SerializerMethodField(read_only = True)
+    
+    
+    def get_client_data(self, obj):
+        if obj.client:
+            client = Client.objects.get(id = obj.client.id)
+            return ClientSerializer(client).data
+        return None 
     class Meta:
         model = AppliedMemberships
         fields = "__all__"
@@ -230,6 +246,14 @@ class AppliedPromotionSerializer(serializers.ModelSerializer):
         read_only_fields = ['sale_record']
 
 class RedeemedLoyaltyPointsSerializer(serializers.ModelSerializer):
+    client_data = serializers.SerializerMethodField(read_only = True)
+    
+    
+    def get_client_data(self, obj):
+        if obj.client:
+            client = Client.objects.get(id = obj.client.id)
+            return ClientSerializer(client).data
+        return None 
     class Meta:
         model = RedeemedLoyaltyPoints
         fields = "__all__"
