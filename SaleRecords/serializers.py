@@ -364,6 +364,8 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             SaleRecordsAppointmentServices.objects.bulk_create([
                 SaleRecordsAppointmentServices(sale_record=sale_record, **data) for data in appointment_services
             ])
+            appointment_ids = [ids['appointment'] for ids in appointment_services]
+            Appointment.objects.filter(id__in = appointment_ids).update(status = 'Done')
 
             # Create records for SaleRecordServices
             SaleRecordServices.objects.bulk_create([
