@@ -18,6 +18,11 @@ from Employee.models import *
 from TragetControl.models import *
 
 
+class ClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Client
+        fields = ['id','full_name']
+
 class SaleRecordsAppointmentServicesSerializer(serializers.ModelSerializer):
     service_names = serializers.SerializerMethodField(read_only = True)
     client_data = serializers.SerializerMethodField(read_only = True)
@@ -114,6 +119,7 @@ class SaleRecordServicesSerializer(serializers.ModelSerializer):
 class SaleRecordVouchersSerializer(serializers.ModelSerializer):
     valid_till = serializers.CharField(write_only=True, required=True)
     voucher_names = serializers.SerializerMethodField(read_only = True)
+    client_data = serializers.SerializerMethodField(read_only = True)
     
     
     def get_voucher_names(self, obj):
@@ -121,6 +127,12 @@ class SaleRecordVouchersSerializer(serializers.ModelSerializer):
             'name': f"{obj.voucher.name}",
             'arabic_name': f"{obj.voucher.arabic_name}",
         }
+    
+    def get_client_data(self, obj):
+        if obj.client:
+            client = Client.objects.get(id = obj.client.id)
+            return ClientSerializer(client).data
+        return None   
     class Meta:
         model = SaleRecordVouchers
         fields = '__all__'
@@ -130,7 +142,14 @@ class SaleRecordVouchersSerializer(serializers.ModelSerializer):
 class PurchasedGiftCardsSerializer(serializers.ModelSerializer):
     gift_card_detail = serializers.SerializerMethodField(read_only = True)
     valid_till = serializers.CharField(write_only=True, required=True)
+    client_data = serializers.SerializerMethodField(read_only = True)
     
+    
+    def get_client_data(self, obj):
+        if obj.client:
+            client = Client.objects.get(id = obj.client.id)
+            return ClientSerializer(client).data
+        return None 
     
     def get_gift_card_detail(self, obj):
         if obj.gift_card:
@@ -152,6 +171,13 @@ class PurchasedGiftCardsSerializer(serializers.ModelSerializer):
 class SaleRecordMembershipSerializer(serializers.ModelSerializer):
     valid_till = serializers.CharField(write_only=True, required=True)
     membership_names = serializers.SerializerMethodField(read_only = True)
+    client_data = serializers.SerializerMethodField(read_only = True)
+    
+    def get_client_data(self, obj):
+        if obj.client:
+            client = Client.objects.get(id = obj.client.id)
+            return ClientSerializer(client).data
+        return None 
     
     def get_membership_names(self, obj):
         return {
@@ -220,12 +246,6 @@ class RedeemedLoyaltyPointsSerializer(serializers.ModelSerializer):
         fields = "__all__"
         read_only_fields = ['sale_record']
         # read_only_fields = ['sale_record']
-        
-class ClientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Client
-        fields = ['id','full_name']
-        
         
 class SaleRecordSerializer(serializers.ModelSerializer):
     
