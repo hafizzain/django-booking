@@ -726,6 +726,11 @@ class GiftCards(models.Model):
     updated_at = models.DateTimeField(null=True, blank=True)
     custom_card = models.TextField(null=True)
     is_custom_card = models.BooleanField(default=False)
+    
+    # Common Fields
+    is_active = models.BooleanField(default=True)
+    is_blocked = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
 
 
 class GiftDetail(models.Model):
@@ -739,9 +744,7 @@ class GiftDetail(models.Model):
     currencies = models.ForeignKey(Currency , on_delete=models.CASCADE , null=True,related_name='gift_detail_currencies')
     retail_price = models.FloatField(default=0, null=True, blank=True)  # Add this line for retail_price
 
-# class GiftDetails(models.Model):
-#     gift_card = models.ForeignKey(GiftCards, on_delete=models.CASCADE, null=True)
-#     price = models.FloatField(default=0, null=True)
-#     retail_price = models.FloatField(default=0, null=True)
-#     created_at = models.DateTimeField(auto_now_add=now, null=True)
-#     updated_at = models.DateTimeField(null=True, blank=True)
+    # Common Fields
+    is_active = models.BooleanField(default=True)
+    is_blocked = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
