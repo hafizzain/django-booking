@@ -2,6 +2,7 @@ import uuid
 
 from django.db import models
 from django.utils.timezone import now
+from django.core.exceptions import ValidationError
 from uuid import uuid4
 from Authentication.models import User
 from Client.models import Client
@@ -44,8 +45,7 @@ def get_ItemPrice(this_instance, orders):
                 else:
                     retail_prices = CurrencyRetailPrice.objects.filter(
                         product=item.product,
-                        currency=this_instance.location.currency
-                    ).order_by('created_at')
+                        currency=this_instance.location.currency).order_by('created_at')
                     if len(retail_prices) > 0:
                         retail_price = retail_prices[0].retail_price
                         f1 += float(retail_price) * float(order.quantity)
@@ -70,6 +70,8 @@ def get_ItemPrice(this_instance, orders):
 
     discounted_prices = d1 + (o1 - d2 - f1)
     return [o1, discounted_prices]
+
+
 
 
 def get_Appointment_ItemPrice(this_instance, orders):
@@ -149,7 +151,7 @@ def get_fixed_prices(this_instance, orders):
             if len(service_prices) > 0:
                 service_price = service_prices[0].price
             else:
-                service_prices = PriceService.objects.filter(service=item.service,
+                service_prices = PriceService.objects.filter(service=item.service, 
                                                              currency=this_instance.location.currency).order_by(
                     '-created_at')
                 if len(service_prices) > 0:
@@ -226,11 +228,13 @@ class DiscountPromotionSalesReport(models.Model):
         return str(self.id)
 
     def get_appointment_prices(self):
+        from  SaleRecords.models import SaleRecordsAppointmentServices
+        
         original_prices = 0
         discounted_prices = 0
 
-        app_checkout = AppointmentCheckout.objects.get(
-            id=self.checkout_id
+        app_checkout = SaleRecordsAppointmentServices.objects.get(
+            sale_record_id=self.checkout_id
         )
 
         orders = AppointmentService.objects.filter(
@@ -311,15 +315,92 @@ class DiscountPromotionSalesReport(models.Model):
             'original_prices': original_prices,
             'discounted_prices': discounted_prices,
         }
+        
+        
+    def get_discounts_and_original_prices(self):
+        from SaleRecords.models import SaleRecords, SaleRecordsAppointmentServices, SaleRecordServices, SaleRecordsProducts
+        
+        
+        original_price = 0 
+        dicounted_price = 0
+        
+        if self.checkout_type == 'Appointment' or self.checkout_type == 'Group Appointment' or self.checkout_type == 'Sale':
+            
+            appointment_service_records = SaleRecordsAppointmentServices.objects.filter(sale_record_id = self.checkout_id)
+            service_records = SaleRecordServices.objects.filter(sale_record_id = self.checkout_id)
+            product_records = SaleRecordsProducts.objects.filter(sale_records_id = self.checkout_id)
+            try:
+                if appointment_service_records:
+                    for rec in appointment_service_records:
+                        service_price = PriceService.objects.filter(service=rec.service, duration=rec.duration,
+                                                                    currency=self.location.currency).order_by(
+                            '-created_at')
+                        if len(service_price) > 0:
+                            service_price[0].price
+                        else:
+                            service_price = PriceService.objects.filter(service=rec.service, 
+                                                                        currency=self.location.currency).order_by(
+                                '-created_at')
+                            if len(service_price) > 0:
+                                service_price = service_price[0].price
+                            if service_price:
+                                original_price += float(service_price) * float(rec.quantity)
+            except Exception as e:
+                raise ValidationError({'erorr occured in dicount Promotion Appointment Service': str(e) })
+                            
+            try:              
+                if service_records:
+                    for rec in service_records:
+                        service_price = PriceService.objects.filter(service=rec.service, duration=rec.duration,
+                                                                    currency=self.location.currency).order_by(
+                            '-created_at')
+                        if len(service_price) > 0:
+                            service_price[0].price
+                        else:
+                            service_price = PriceService.objects.filter(service=rec.service, 
+                                                                        currency=self.location.currency).order_by(
+                                '-created_at')
+                            if len(service_price) > 0:
+                                service_price = service_price[0].price
+                            if service_price:
+                                original_price += float(service_price) * float(rec.quantity)
+            except Exception as e:
+                raise ValidationError({'erorr occured in dicount Promotion service': str(e) })
+                            
+            try:              
+                if product_records:
+                    for rec in service_records:
+                        product_price = CurrencyRetailPrice.objects.filter(
+                            product=rec.product,
+                            currency=self.location.currency).order_by('created_at')
+                        if len(product_price) > 0:
+                            product_actual_price = product_price[0].retail_price
+                            original_price += float(product_actual_price) * float(rec.quantity)
+            except Exception as e:
+                raise ValidationError({'erorr occured in dicount Promotion Product': str(e) })
+                    
+                        
+        # if self.checkout_type == 'Sale':
+        #     services_records = SaleRecordServices.objects.filter(sale_record_id = self.checkout_id)
+        return original_price, dicounted_price
+            
+            
+                
 
-    def set_gst_price(self):
-        if self.checkout_type == 'Sale':
-            checkout = Checkout.objects.get(id=self.checkout_id)
-            self.gst = checkout.tax_amount
+        
+        
+        
+        
 
-        elif self.checkout_type == 'Appointment':
-            checkout = AppointmentCheckout.objects.get(id=self.checkout_id)
-            self.gst = checkout.gst_price
+    # def set_gst_price(self):
+    #     if self.checkout_type == 'Sale' or self.checkout_type == 'Appointment' or self.checkout_type == 'Group Appointment':
+    #         from SaleRecords.models import SaleRecords
+    #         checkout = SaleRecords.objects.get(id=self.checkout_id)
+    #         self.gst = checkout.total_tax
+
+        # elif self.checkout_type == 'Appointment':
+        #     checkout = AppointmentCheckout.objects.get(id=self.checkout_id)
+        #     self.gst = checkout.gst_price
 
     def save(self, *args, **kwargs):
         if not self.promotion_name:
@@ -331,21 +412,22 @@ class DiscountPromotionSalesReport(models.Model):
             if promotion:
                 self.promotion_name = promotion['promotion_name']
 
-        if not self.gst:
-            self.set_gst_price()
+        # if not self.gst:
+        #     self.set_gst_price()
 
-        if not self.original_price:
-            if self.checkout_type == 'Sale':
-                prices = self.get_sale_prices()
-            elif self.checkout_type == 'Appointment':
-                prices = self.get_appointment_prices()
+        # if not self.original_price:
+        #     if self.checkout_type == 'Sale':
+        #         prices = self.get_sale_prices()
+        #     elif self.checkout_type == 'Appointment':
+        #         prices = self.get_appointment_prices()
 
-            else:
-                prices = {'original_prices': 0, 'discounted_prices': 0}
+        #     else:
+        #         prices = {'original_prices': 0, 'discounted_prices': 0}
 
-            self.original_price = prices.get('original_prices', 0)
-            self.discount_price = prices.get('discounted_prices', 0)
-
+        #     self.original_price = prices.get('original_prices', 0)
+        #     self.discount_price = prices.get('discounted_prices', 0)
+        if not self.original_price and not self.discount_price:
+            self.original_price , self.discount_price = self.get_discounts_and_original_prices()
         self.is_active = True
 
         super(DiscountPromotionSalesReport, self).save(*args, **kwargs)
@@ -366,9 +448,9 @@ class CouponReport(models.Model):
     discounted_percentage = models.FloatField(null=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='user_coupon', null=True, blank=True)
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, related_name='client_coupon', null=True,
-                               blank=True)
+                            blank=True)
     location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, related_name='location_coupon',
-                                 null=True, blank=True)
+                                null=True, blank=True)
     quantity = models.PositiveBigIntegerField(default=0)
     gst = models.FloatField(default=0)
     original_price = models.DecimalField(default=0, max_digits=10, decimal_places=5)
