@@ -1637,9 +1637,8 @@ class SingleNoteSerializer(serializers.ModelSerializer):
                 url = tenant_media_base_url(request, is_s3_url=obj.client.is_image_uploaded_s3)
                 return f'{url}{obj.client.image}'
             except:
-                return f'{obj.client.image}'
-        else:    
-            return None
+                return f'{obj.client.image}'    
+        return None
     
         
     def get_client_all_appointment(self, obj):
