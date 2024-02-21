@@ -20,6 +20,7 @@ class CheckoutType(models.TextChoices):
     APPOINTMENT_CHECKOUT = 'Appointment', 'Appointment Checkout'
     SALE_CHECKOUT = 'Sale','Sale Checkout'
     REFUND = 'Refund' , 'Refund'
+    GROUP_APPOINTMENT = 'Group Appointment', 'Group Appointment'
     
     
 class ItemType(models.TextChoices):
