@@ -329,7 +329,7 @@ class DiscountPromotionSalesReport(models.Model):
             appointment_service_records = SaleRecordsAppointmentServices.objects.filter(sale_record_id = self.checkout_id)
             service_records = SaleRecordServices.objects.filter(sale_record_id = self.checkout_id)
             product_records = SaleRecordsProducts.objects.filter(sale_record_id = self.checkout_id)
-            raise ValidationError(f"error {product_records.count()}")
+            # raise ValidationError(f"error {product_records.count()}")
             try:
                 if appointment_service_records:
                     for rec in appointment_service_records:
@@ -370,7 +370,7 @@ class DiscountPromotionSalesReport(models.Model):
                             
             try:              
                 if product_records:
-                    for rec in service_records:
+                    for rec in product_records:
                         product_price = CurrencyRetailPrice.objects.filter(
                             product=rec.product,
                             currency=self.location.currency).order_by('created_at')
