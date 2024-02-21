@@ -329,6 +329,7 @@ class DiscountPromotionSalesReport(models.Model):
             appointment_service_records = SaleRecordsAppointmentServices.objects.filter(sale_record_id = self.checkout_id)
             service_records = SaleRecordServices.objects.filter(sale_record_id = self.checkout_id)
             product_records = SaleRecordsProducts.objects.filter(sale_record_id = self.checkout_id)
+            raise ValidationError(f"error {product_records.count()}")
             try:
                 if appointment_service_records:
                     for rec in appointment_service_records:
