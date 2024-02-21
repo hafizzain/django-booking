@@ -384,7 +384,7 @@ class DiscountPromotionSalesReport(models.Model):
                 raise ValidationError({'erorr occured in dicount Promotion Product': str(e) })
         # if self.checkout_type == 'Sale':
         #     services_records = SaleRecordServices.objects.filter(sale_record_id = self.checkout_id)
-        return original_price, dicounted_price
+        return float(original_price), float(dicounted_price)
             
             
                 
