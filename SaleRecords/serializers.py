@@ -20,6 +20,13 @@ from TragetControl.models import *
 
 class SaleRecordsAppointmentServicesSerializer(serializers.ModelSerializer):
     service_names = serializers.SerializerMethodField(read_only = True)
+    client_data = serializers.SerializerMethodField(read_only = True)
+    
+    def get_client_data(self, obj):
+        if obj.client:
+            client = Client.objects.get(id = obj.client.id)
+            return ClientSerializer(client).data
+        return None        
     
     
     def get_service_names(self, obj):
