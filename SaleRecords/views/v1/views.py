@@ -207,13 +207,18 @@ class SaleRecordViews(APIView):
                             promotion_data = applied_promotions[0]
                             DiscountPromotionSalesReport.objects.create(
                                     checkout_id=sale_record.id,
-                                    checkout_type='Sale',
+                                    checkout_type=request.data.get('checkout_type'),
                                     invoice=invoice,
                                     promotion_id=promotion_data.get('promotion'),
                                     promotion_type= promotion_data.get('promotion_type'),
                                     user=user,
                                     client_id=client,
                                     location_id=location_id,
+                                    # gst = ,
+                                    # original_price = ,
+                                    # discount_price = ,
+                                    
+                                    
                                 )
                     except Exception as e:
                         return Response({'error':str(e), 'error occured':'error occured in applied promotion'})
