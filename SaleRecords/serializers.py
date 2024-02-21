@@ -435,21 +435,21 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             with transaction.atomic():
                 try:
                     for data in products:
-                        ProductStock.objects.filter(location = location , product_id = data.get('product')).update(
+                        ProductStock.objects.filter(location = str(location) , product_id = data.get('product')).update(
                             
-                            location_id=location,
+                            location_id=str(location),
                             product=data.get('product'),
                             sold_quantity=ExpressionWrapper(F('sold_quantity') + data.get('quantity'), output_field=IntegerField()),
                             available_quantity=ExpressionWrapper(F('available_quantity') - data.get('quantity'), output_field=IntegerField()),
                             consumed_quantity=ExpressionWrapper(F('consumed_quantity') + data.get('quantity'), output_field=IntegerField())
                         )
-                        product = ProductStock.objects.get(location_id=location, product=data.get('product'))    
+                        product = ProductStock.objects.get(location_id=str(location), product=data.get('product'))    
 
                         ProductOrderStockReport.objects.create(
                             report_choice='Sold',
                             product=data.get('product'),
                             user_id=user,
-                            location_id=location,
+                            location_id=str(location),
                             
                             before_quantity=product.available_quantity,
                             after_quantity =  product.available_quantity - data.get('quantity')
