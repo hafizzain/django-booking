@@ -2609,6 +2609,7 @@ def delete_vouchers(request):
     # Voucher Soft Delete
     voucher.is_deleted = True
     voucher.is_active = False
+    voucher.save()
     return Response(
         {
             'status': True,
