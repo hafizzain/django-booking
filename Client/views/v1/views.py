@@ -2178,6 +2178,7 @@ def delete_memberships(request):
         )
     # Member ship Soft Delete
     memberships.is_deleted = True
+    memberships.is_active = False
     memberships.save()
     return Response(
         {
@@ -2516,7 +2517,7 @@ def get_vouchers(request):
 
     if location_id and quick_sales:
         try:
-            location = BusinessAddress.objects.get(id=location_id)
+            location = BusinessAddress.objects.get(id=location_id, is_deleted=False)
         except Exception as err:
             return Response(
                 {
@@ -2534,6 +2535,7 @@ def get_vouchers(request):
                 query['voucher_vouchercurrencyprice__currency__id'] = str(location.currency.id)
     all_voucher = Vouchers.objects \
         .filter(**query) \
+        .filter(is_deleted=False) \
         .with_total_orders() \
         .order_by('-total_orders')
     all_voucher_count = all_voucher.count()
@@ -2604,8 +2606,9 @@ def delete_vouchers(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-
-    voucher.delete()
+    # Voucher Soft Delete
+    voucher.is_deleted = True
+    voucher.is_active = False
     return Response(
         {
             'status': True,
