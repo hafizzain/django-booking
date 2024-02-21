@@ -486,7 +486,7 @@
                   {% if business_address.secondary_translation.payment_method %}
                   <p class="arabic">{{ business_address.secondary_translation.payment_method}}</p>
                   {% endif %} {% endcomment %}
-                    <p class="text-[#7B7B7B]">Payment on {{created_at}} </p>
+                    <p class="text-[#7B7B7B]">Payment on {{created_at|date:"Y-m-d"}} at {{created_at|date:"H:i:s"}} </p>
                   
 
                 </div>

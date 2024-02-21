@@ -302,7 +302,7 @@ class SaleInvoice(models.Model):
                     'change': self.change,
                     # 'total' : round((float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0))), 2),
                     'total': self.total_amount,
-                    'created_at' : datetime.now().strftime('%Y-%m-%d'),
+                    'created_at' : datetime.now(),
                     'BACKEND_HOST' : settings.BACKEND_HOST,
                     'payment_type': self.payment_type,
                     'location':self.location.address_name,
