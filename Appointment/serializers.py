@@ -1631,7 +1631,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
         
     def get_client_image(self, obj):
 
-        if obj.client.image:
+        if obj.client:
             try:
                 request = self.context["request"]
                 url = tenant_media_base_url(request, is_s3_url=obj.client.is_image_uploaded_s3)
