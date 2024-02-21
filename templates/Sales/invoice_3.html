@@ -530,14 +530,14 @@
               </svg>
             </div>
           </div>
-          {% comment %} <div class="p-[1.2rem] overflow-y-auto overflow-hidden scroll-hidden text-center flex flex-col gap-5">
+          <div class="p-[1.2rem] overflow-y-auto overflow-hidden scroll-hidden text-center flex flex-col gap-5">
             <hr class="border" />
 
             <div class="leading-1 text-center font-semibold">
               <h1>Thankyou &amp; Please come again</h1>
-              <h1>شكرا من فضلك تعال مرة اخرى</h1>
+              {% comment %} <h1>شكرا من فضلك تعال مرة اخرى</h1> {% endcomment %}
             </div>
-            <hr class="border" />
+            {% comment %} <hr class="border" />
             <a href="{{BACKEND_HOST}}" class="text-left text-sm underline"
               >{{BACKEND_HOST}}</a
             >
@@ -564,8 +564,8 @@
 <!--                  غير قابلة للتحويل وغير قابلة للاسترداد-->
 <!--                </p>-->
               </div>
-            </div>
-          </div> {% endcomment %}
+            </div> {% endcomment %}
+          </div> 
         </div>
       </div>
     </div>
