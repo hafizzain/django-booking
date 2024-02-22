@@ -83,6 +83,7 @@ from django.shortcuts import get_object_or_404
 from Appointment.models import Comment
 from Appointment.serializers import *
 from rest_framework.views import APIView
+from SaleRecords.models import *
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
