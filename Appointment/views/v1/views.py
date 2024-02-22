@@ -321,7 +321,7 @@ def get_appointments_service(request):
     #Now Calculate Total Sale    
     appointment_total = appointment_checkout_all.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += appointment_total if appointment_total else 0
-    product = POSerializerForClientSales(product_order, many=True, context={'request': request, })
+    product = POSerializerForClientSale(product_order, many=True, context={'request': request, })
     
     price_values = sum(item.get('price', 0) for item in product.data)
     voucher_total_price = sum(item.get('price', 0) for item in voucher.data)
