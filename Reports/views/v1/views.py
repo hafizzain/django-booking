@@ -478,7 +478,8 @@ def get_sales_analytics(request):
                                         
             current_year_sales.append(total_monthly_sale['total'])
                 
-    # Sales channel POS -----------------------------------------
+    # Sales channel POS Reports -----------------------------------------
+        total_pos_sale = 0.0
         current_year_pos_sales = []
         for month in months:
             total_monthly_pos_sale = SaleRecords.objects.filter(created_at__year=previous_year,
@@ -487,6 +488,7 @@ def get_sales_analytics(request):
                                         .aggregate(total=Coalesce(Sum('total_price', output_field=FloatField()), Value(0, output_field=FloatField())))
             
             current_year_pos_sales.append(total_monthly_pos_sale['total'])
+            total_pos_sale = total_pos_sale + total_monthly_pos_sale['total']
             
         data = {
             'success': True,
@@ -522,7 +524,8 @@ def get_sales_analytics(request):
                     'current_year_sales': current_year_sales,
                 },
                 'sales_channel_pos' : {
-                    'current_year_pos_sale' : current_year_pos_sales
+                    'total_pos_sale' : total_pos_sale,
+                    'current_year_pos_sale' : current_year_pos_sales,
                 },
             }   
         }
