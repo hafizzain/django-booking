@@ -673,11 +673,11 @@ class POSerializerForClientSale(serializers.ModelSerializer):
         return obj.product.name
 
     def get_member(self, obj):
-        return obj.member.full_name
+        return obj.product.user.full_name
 
     class Meta:
         model = ProductOrder
-        fields = ['quantity', 'status', 'created_at', 'member', 'tip', 'payment_type', 'price',
+        fields = ['quantity', 'status', 'member', 'created_at', 'tip', 'payment_type', 'price',
                   'name', 'product_name', 'gst', 'order_type', 'product_details']
 
 
