@@ -673,14 +673,43 @@ class POSerializerForClientSale(serializers.ModelSerializer):
         return obj.product.name
 
     def get_member(self, obj):
-        return obj.employee.full_name
+        return obj.member.full_name
 
     class Meta:
         model = ProductOrder
         fields = ['quantity', 'status', 'member', 'created_at', 'tip', 'payment_type', 'price',
                   'name', 'product_name', 'gst', 'order_type', 'product_details']
 
+class POSerializerForClientSales(serializers.ModelSerializer):
+    member = serializers.SerializerMethodField(read_only=True)
+    product_name = serializers.SerializerMethodField(read_only=True)
+    order_type = serializers.SerializerMethodField(read_only=True)
+    product_details = serializers.SerializerMethodField(read_only=True)
+    price = serializers.SerializerMethodField(read_only=True)
+    name = serializers.SerializerMethodField(read_only=True)
 
+    def get_name(self, obj):
+        return obj.product.name if obj.product.name else None
+
+    def get_price(self, obj):
+        return obj.price
+
+    def get_product_details(self, obj):
+        return obj.product.description if obj.product.description else None
+
+    def get_order_type(self, obj):
+        return 'Product'
+
+    def get_product_name(self, obj):
+        return obj.product.name
+
+    def get_member(self, obj):
+        return obj.employee.full_name
+
+    class Meta:
+        model = ProductOrder
+        fields = ['quantity', 'status', 'member', 'created_at', 'tip', 'payment_type', 'price',
+                  'name', 'product_name', 'gst', 'order_type', 'product_details']
 class ProductOrderSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     member = serializers.SerializerMethodField(read_only=True)
