@@ -290,13 +290,13 @@ def get_appointments_service(request):
     
     # Client All Voucher & Membership Orders -----------------------
     voucher_order = SaleRecordVouchers.objects \
-                        .filter(sale_record__client__id=client) \
+                        .filter(sale_record__client_id=client) \
                         .select_related('sale_record', 'employee', 'voucher') \
                         .order_by('-created_at')
     
     # Client All Membership Orders -----------------------                    
     membership_order = SaleRecordMembership.objects \
-                        .filter(sale_record__client__id=client) \
+                        .filter(sale_record__client_id=client) \
                         .select_related('sale_record') \
                         .order_by('-created_at')
                             
