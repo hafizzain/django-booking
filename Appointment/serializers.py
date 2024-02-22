@@ -1730,7 +1730,7 @@ class ServiceClientSaleSerializer(serializers.ModelSerializer):
         return obj.member.full_name
 
     def get_booked_by(self, obj):
-        return f'{obj.user.first_name} {obj.user.last_name}'
+        return f'{obj.appointment.user.first_name} {obj.appointment.user.last_name}'
 
     def get_service(self, obj):
         return obj.service.name
