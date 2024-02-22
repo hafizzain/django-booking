@@ -289,21 +289,28 @@
                       </p>
                       <p class="arabic">{% get_secondary_translation item.id %}</p>
                     </div>
+                    <p class="text-[#7B7B7B]">
+                      <span>1 x </span>{{item.price}}
+                      {{currency_code}}
+                    </p>
+                  </div>
 
                     
                     {% for c in checkout_data.applied_coupons_records.all %}
                       
                       {% if item.client == c.client %}
-                      <div>
-                        <p class="text-left">
-                          Coupon Redeemed
+                      <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                    
+                        <div>
+                          <p class="text-left">
+                            Coupon Redeemed
+                          </p>
+                        </div>
+                        <p class="text-[#7B7B7B]">
+                          <span></span>{{c.coupon_discounted_price}}
+                          {{currency_code}}
                         </p>
                       </div>
-                        
-                      <p class="text-[#7B7B7B]">
-                        <span>1 x </span>{{c.coupon_discounted_price}}
-                        {{currency_code}}
-                      </p>
 
                       {% endif %}
                         
@@ -311,11 +318,7 @@
                       
 
 
-                    <p class="text-[#7B7B7B]">
-                      <span>1 x </span>{{item.price}}
-                      {{currency_code}}
-                    </p>
-                  </div>
+                    
                   {% endfor %}
                     
                     
