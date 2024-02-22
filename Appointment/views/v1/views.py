@@ -27,7 +27,7 @@ from Order.models import MemberShipOrder, ProductOrder, VoucherOrder, ServiceOrd
 from Sale.Constants.Custom_pag import AppointmentsPagination
 from Sale.serializers import (MemberShipOrderSerializer, POSerializerForClientSale,
                               MOrderSerializerForSale, VOSerializerForClientSale,
-                              SOSerializerForClientSale, POSerializerForClientSales)
+                              SOSerializerForClientSale)
 
 # from Service.models import Service
 from Service.models import Service, PriceService
