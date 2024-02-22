@@ -348,7 +348,7 @@ def get_sales_analytics(request):
         for month in months:
             total_previous_year_sale = SaleRecords.objects.filter(created_at__year=previous_year,
                                         created_at__month=month) \
-                                        .aggregate(total=Coalesce(Sum('total_price'), Value(0)))
+                                        .aggregate(total=Coalesce(Sum('total_price', output_field=FloatField()), Value(0, output_field=FloatField())))
             
             previous_year_sales.append(total_previous_year_sale.total)
         
@@ -357,7 +357,7 @@ def get_sales_analytics(request):
         for month in months:
             total_current_year_sale = SaleRecords.objects.filter(created_at__year=current_year,
                                         created_at__month=month) \
-                                        .aggregate(total=Coalesce(Sum('total_price'), Value(0)))
+                                        .aggregate(total=Coalesce(Sum('total_price', output_field=FloatField()), Value(0, output_field=FloatField())))
                                         
             current_year_sales.append(total_current_year_sale.total)
                 
