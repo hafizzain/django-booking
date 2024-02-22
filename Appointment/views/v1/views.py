@@ -3649,6 +3649,7 @@ def get_client_sale(request):
     # Product Order---------------------
     product_order = SaleRecordsProducts.objects \
         .filter(sale_record__client__id=client) \
+        .select_related('sale_record', 'employee', 'product') \
         .order_by('-created_at')
         
     product_total = product_order.aggregate(total_sale=Sum('price'))['total_sale']
@@ -3660,6 +3661,7 @@ def get_client_sale(request):
     # Service Orders----------------------
     service_orders = SaleRecordServices.objects \
         .filter(sale_record__client__id=client) \
+        .select_related('sale_record', 'employee', 'service') \
         .order_by('-created_at')
     service_total = service_orders.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += service_total if service_total else 0
@@ -3670,10 +3672,12 @@ def get_client_sale(request):
     # Voucher & Membership Orders -----------------------
     voucher_order = SaleRecordVouchers.objects \
                         .filter(sale_record__client__id=client) \
+                        .select_related('sale_record', 'employee', 'voucher') \
                         .order_by('-created_at')[:5]
     membership_order = SaleRecordMembership.objects \
-                           .filter(sale_record__client__id=client) \
-                           .order_by('-created_at')[:5]
+                        .filter(sale_record__client__id=client) \
+                        .select_related('sale_record', 'membership') \
+                        .order_by('-created_at')[:5]
     voucher_total = voucher_order.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += voucher_total if voucher_total else 0
     if voucher_order.count() > 5:
@@ -3695,7 +3699,8 @@ def get_client_sale(request):
         .filter(
         client_id=client,
         appointment__status__in=['Done', 'Paid']
-        ).order_by('-created_at')
+        ).select_related('sale_record', 'membership', 'client', 'appointment', 'service', 'employee' ) \
+        .order_by('-created_at')
     appointment_checkout_5 = appointment_checkout_all
     appointment_total = appointment_checkout_all.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += appointment_total if appointment_total else 0
