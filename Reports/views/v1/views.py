@@ -532,7 +532,7 @@ def get_sales_analytics(request):
         }
         return Response(data, status=status.HTTP_200_OK)
     except Exception as e:
-        # Handle exceptions and return an appropriate error response
+        # Handle exceptions and return error response
         error_data = {
             'success': False,
             'status_code': 400,

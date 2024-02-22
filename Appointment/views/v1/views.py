@@ -3646,10 +3646,10 @@ def get_client_sale(request):
                                                context={'request': request}).data
 
     # Product Order---------------------
-    product_order = ProductOrder.objects \
-        .filter(checkout__client=client) \
-        .select_related('product', 'member') \
+    product_order = SaleRecordsProducts.objects \
+        .filter(sale_record__client__id=client) \
         .order_by('-created_at')
+        
     product_total = product_order.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += product_total if product_total else 0
     if product_order.count() > 5:
@@ -3657,9 +3657,8 @@ def get_client_sale(request):
     product = POSerializerForClientSale(product_order, many=True, context={'request': request, })
 
     # Service Orders----------------------
-    service_orders = ServiceOrder.objects \
-        .filter(checkout__client=client) \
-        .select_related('service', 'user', 'member') \
+    service_orders = SaleRecordServices.objects \
+        .filter(sale_record__client__id=client) \
         .order_by('-created_at')
     service_total = service_orders.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += service_total if service_total else 0
@@ -3668,13 +3667,11 @@ def get_client_sale(request):
     services_data = SOSerializerForClientSale(service_orders, many=True, context={'request': request, })
 
     # Voucher & Membership Orders -----------------------
-    voucher_order = VoucherOrder.objects \
-                        .filter(checkout__client=client) \
-                        .select_related('voucher', 'member', 'user') \
+    voucher_order = SaleRecordVouchers.objects \
+                        .filter(sale_record__client__id=client) \
                         .order_by('-created_at')[:5]
-    membership_order = MemberShipOrder.objects \
-                           .filter(checkout__client=client) \
-                           .select_related('membership', 'user', 'member') \
+    membership_order = SaleRecordMembership.objects \
+                           .filter(sale_record__client__id=client) \
                            .order_by('-created_at')[:5]
     voucher_total = voucher_order.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += voucher_total if voucher_total else 0
@@ -3693,13 +3690,11 @@ def get_client_sale(request):
     voucher_membership.extend(membership.data)
 
     # Appointment Orders ------------------------------
-    appointment_checkout_all = AppointmentService.objects \
+    appointment_checkout_all = SaleRecordsAppointmentServices.objects \
         .filter(
-        appointment__client=client,
-        appointment_status__in=['Done', 'Paid']
-    ) \
-        .select_related('member', 'user', 'service') \
-        .order_by('-created_at')
+        client_id=client,
+        appointment__status__in=['Done', 'Paid']
+        ).order_by('-created_at')
     appointment_checkout_5 = appointment_checkout_all
     appointment_total = appointment_checkout_all.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += appointment_total if appointment_total else 0
