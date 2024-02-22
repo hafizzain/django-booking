@@ -10,6 +10,7 @@ from rest_framework.permissions import AllowAny
 from django.db.models import Sum, Avg
 from django.db.models import Q
 from django.db.models import Value
+from datetime import date, timedelta
 
 from SaleRecords.helpers import matching_records, loyalty_points_calculations
 from Client.Constants.client_order_email import send_order_email, send_membership_order_email
@@ -310,6 +311,7 @@ def get_sales_analytics(request):
         vouchers = SaleRecordVouchers.objects.filter(query).aggregate(total_vouchers_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
         membership = SaleRecordMembership.objects.filter(query).aggregate(total_membership_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
         gift_card = PurchasedGiftCards.objects.filter(query).aggregate(total_gift_card_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        appointment = SaleRecordsAppointmentServices.objects.filter(query).aggregate(total_appointment_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
         
         appointment_average = SaleRecordsAppointmentServices.objects.filter(query) \
                                 .aggregate(avg_appointment=Coalesce(Avg('price', output_field=FloatField()), Value(0, output_field=FloatField())))
@@ -329,10 +331,36 @@ def get_sales_analytics(request):
             product['total_product_sale'] +
             vouchers['total_vouchers_sale'] +
             membership['total_membership_sale'] +
-            gift_card['total_gift_card_sale']
+            gift_card['total_gift_card_sale'] +
+            appointment['total_appointment_sale']
         )
         avg_sale = total_sale / 5 # average of 5 sales records
         
+    # Total Sale Chat ----------------------------------------
+        
+        # Calculate Previous Year and Current Year
+        current_year = date.today().year
+        previous_year = current_year - 1
+        months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        
+        # Calculate previous year total sales for each month
+        previous_year_sales = []
+        for month in months:
+            total_previous_year_sale = SaleRecords.objects.filter(created_at__year=previous_year,
+                                        created_at__month=month) \
+                                        .aggregate(total=Coalesce(Sum('total_price'), Value(0)))
+            
+            previous_year_sales.append(total_previous_year_sale.total)
+        
+        # Calculate current year total sales for each month
+        current_year_sales = []
+        for month in months:
+            total_current_year_sale = SaleRecords.objects.filter(created_at__year=current_year,
+                                        created_at__month=month) \
+                                        .aggregate(total=Coalesce(Sum('total_price'), Value(0)))
+                                        
+            current_year_sales.append(total_current_year_sale.total)
+                
         data = {
             'success': True,
             'status_code': status.HTTP_200_OK,
@@ -361,7 +389,11 @@ def get_sales_analytics(request):
                     'cancel_appointment': cancel_appointment,
                     'finished_appointment': finished_appointment,
                     'total_appointment': total_appointment,
-                }
+                },
+                'total_sale_chart' : {
+                    'previous_year_sales': previous_year_sales,
+                    'current_year_sales': current_year_sales,
+                }    
             }   
         }
         return Response(data, status=status.HTTP_200_OK)
