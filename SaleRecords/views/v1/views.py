@@ -350,7 +350,7 @@ def get_sales_analytics(request):
                                         created_at__month=month) \
                                         .aggregate(total=Coalesce(Sum('total_price', output_field=FloatField()), Value(0, output_field=FloatField())))
             
-            previous_year_sales.append(total_previous_year_sale.total)
+            previous_year_sales.append(total_previous_year_sale['total'])
         
         # Calculate current year total sales for each month
         current_year_sales = []
@@ -359,7 +359,7 @@ def get_sales_analytics(request):
                                         created_at__month=month) \
                                         .aggregate(total=Coalesce(Sum('total_price', output_field=FloatField()), Value(0, output_field=FloatField())))
                                         
-            current_year_sales.append(total_current_year_sale.total)
+            current_year_sales.append(total_current_year_sale['total'])
                 
         data = {
             'success': True,
