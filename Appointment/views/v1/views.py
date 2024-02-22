@@ -273,32 +273,32 @@ def get_appointments_service(request):
     client = appointment.client
     
     # Client All Product Order---------------------
-    product_order = ProductOrder.objects \
-        .filter(checkout__client=client) \
-        .select_related('product', 'member') \
+    product_order = SaleRecordsProducts.objects \
+        .filter(sale_record__client__id=client) \
+        .select_related('sale_record', 'employee', 'product') \
         .order_by('-created_at')
     product_total = product_order.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += product_total if product_total else 0
     
     # Client All Service Orders----------------------
-    service_orders = ServiceOrder.objects \
-        .filter(checkout__client=client) \
-        .select_related('service', 'user', 'member') \
+    service_orders = SaleRecordServices.objects \
+        .filter(sale_record__client__id=client) \
+        .select_related('sale_record', 'employee', 'service') \
         .order_by('-created_at')
     service_total = service_orders.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += service_total if service_total else 0
     
     # Client All Voucher & Membership Orders -----------------------
-    voucher_order = VoucherOrder.objects \
-                        .filter(checkout__client=client) \
-                        .select_related('voucher', 'member', 'user') \
-                        .order_by('-created_at')[:5]
+    voucher_order = SaleRecordVouchers.objects \
+                        .filter(sale_record__client__id=client) \
+                        .select_related('sale_record', 'employee', 'voucher') \
+                        .order_by('-created_at')
     
     # Client All Membership Orders -----------------------                    
-    membership_order = MemberShipOrder.objects \
-                            .filter(checkout__client=client) \
-                            .select_related('membership', 'user', 'member') \
-                            .order_by('-created_at')[:5]
+    membership_order = SaleRecordMembership.objects \
+                        .filter(sale_record__client__id=client) \
+                        .select_related('sale_record') \
+                        .order_by('-created_at')
                             
     voucher_total = voucher_order.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += voucher_total if voucher_total else 0
