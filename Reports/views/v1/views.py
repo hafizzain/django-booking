@@ -436,7 +436,7 @@ def get_sales_analytics(request):
         # Appointment Count
         cancel_appointment = Appointment.objects.filter(business, query, status='Cancelled').count()
         if location_id:
-            query = Q(location__id=location_id)
+            query = Q(sale_record__location__id=location_id)
         finished_appointment = SaleRecordsAppointmentServices.objects.filter(query, appointment__status__in=['Paid', 'Done']).count()
         
         # Total Appointment count
@@ -479,12 +479,13 @@ def get_sales_analytics(request):
             current_year_sales.append(total_monthly_sale['total'])
                 
     # Sales channel POS Reports -----------------------------------------
+
         total_pos_sale = 0.0
         current_year_pos_sales = []
         for month in months:
             total_monthly_pos_sale = SaleRecords.objects.filter(created_at__year=current_year,
                                         created_at__month=month) \
-                                        .filter(query) \
+                                        .filter(location) \
                                         .aggregate(total=Coalesce(Sum('total_price', output_field=FloatField()), Value(0, output_field=FloatField())))
             
             current_year_pos_sales.append(total_monthly_pos_sale['total'])
