@@ -1725,6 +1725,7 @@ class ServiceClientSaleSerializer(serializers.ModelSerializer):
     service = serializers.SerializerMethodField(read_only=True)
     booked_by = serializers.SerializerMethodField(read_only=True)
     member = serializers.SerializerMethodField(read_only=True)
+    appointment_status = serializers.SerializerMethodField(read_only=True)
 
     def get_member(self, obj):
         return obj.member.full_name
@@ -1735,6 +1736,8 @@ class ServiceClientSaleSerializer(serializers.ModelSerializer):
     def get_service(self, obj):
         return obj.service.name
 
+    def get_appointment_status(self, obj):
+        return obj.appointment.status
     class Meta:
         model = AppointmentService
         fields = ['service', 'created_at', 'booked_by', 'duration',
