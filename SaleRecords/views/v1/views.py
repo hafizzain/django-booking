@@ -285,3 +285,4 @@ def single_sale_record(request):
         }
     }
     return Response(response)
+

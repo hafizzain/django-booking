@@ -14,6 +14,8 @@ urlpatterns = [
 
     path('get_promotions_and_discounts_sales_list', views.get_promotions_and_discounts_sales_list),
     path('get_promotions_and_discounts_sales_detail', views.get_promotions_and_discounts_sales_detail),
+    
+    path('get_analytics-sale-record/', views.get_sales_analytics),
 
     
 ]
