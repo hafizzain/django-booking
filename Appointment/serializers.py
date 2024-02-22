@@ -1727,10 +1727,10 @@ class ServiceClientSaleSerializer(serializers.ModelSerializer):
     member = serializers.SerializerMethodField(read_only=True)
 
     def get_member(self, obj):
-        return obj.employee.full_name
+        return obj.member.full_name
 
     def get_booked_by(self, obj):
-        return f'{obj.appointment.user.first_name} {obj.appointment.user.last_name}'
+        return f'{obj.user.first_name} {obj.user.last_name}'
 
     def get_service(self, obj):
         return obj.service.name
