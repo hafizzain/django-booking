@@ -3699,7 +3699,7 @@ def get_client_sale(request):
         .filter(
         client_id=client,
         appointment__status__in=['Done', 'Paid']
-        ).select_related('sale_record', 'membership', 'client', 'appointment', 'service', 'employee' ) \
+        ).select_related('sale_record', 'client', 'appointment', 'service', 'employee' ) \
         .order_by('-created_at')
     appointment_checkout_5 = appointment_checkout_all
     appointment_total = appointment_checkout_all.aggregate(total_sale=Sum('price'))['total_sale']
