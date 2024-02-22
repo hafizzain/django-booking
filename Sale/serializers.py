@@ -661,7 +661,7 @@ class POSerializerForClientSale(serializers.ModelSerializer):
         return obj.product.name if obj.product.name else None
 
     def get_price(self, obj):
-        return obj.product.cost_price
+        return obj.price
 
     def get_product_details(self, obj):
         return obj.product.description if obj.product.description else None
@@ -673,7 +673,7 @@ class POSerializerForClientSale(serializers.ModelSerializer):
         return obj.product.name
 
     def get_member(self, obj):
-        return obj.product.user.full_name
+        return obj.employee.full_name
 
     class Meta:
         model = ProductOrder
