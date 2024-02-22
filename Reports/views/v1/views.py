@@ -1,9 +1,13 @@
 import json
 from datetime import timedelta
 from datetime import datetime as dt
-
+from django.db.models import Sum, Avg, FloatField
+from django.db.models import Value
+from datetime import date, timedelta
 from django.db.models import CharField, Q
 from django.db.models.functions import Cast
+from django.db.models.functions import Coalesce
+
 
 from rest_framework import status
 from Reports.serializers import (BusinesAddressReportSerializer, ComissionReportsEmployeSerializer,
@@ -27,7 +31,8 @@ from Business.serializers.v1_serializers import BusinessAddressSerilaizer
 
 from Reports.models import DiscountPromotionSalesReport
 from Reports.serializers import DiscountPromotionSalesReport_serializer, DiscountPromotionSalesReport_serializerOP
-
+from TragetControl.models import *
+from SaleRecords.models import *
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -382,3 +387,140 @@ def get_sales_record(request):
     #     },
     #     status=status.HTTP_200_OK
     # )
+    
+
+# Get Sales Analytics For POS Analytics ------------------------------------------------------------------------------------------
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_sales_analytics(request):
+    location_id = request.GET.get('location_id', None)
+    year = request.GET.get('year', None)
+    month = request.GET.get('month', None)
+    today = request.GET.get('today', None)
+    
+    query = Q()
+    location = Q()
+    business= Q()
+    
+    try:    
+        if location_id:
+            location &= Q(location=location_id)
+            business &= Q(business_address=location_id)
+            
+        if year:
+            query &= Q(created_at__year=year)
+        
+        if month:
+            query &= Q(created_at__month=month)
+        
+        if today:
+            query &= Q(created_at__date=today)
+            
+        # Get Target Data    
+        service_target = ServiceTarget.objects.filter(query, location) \
+                            .aggregate(total_service_target=Coalesce(Sum('service_target', output_field=FloatField()), Value(0, output_field=FloatField())))
+        retail_target = RetailTarget.objects.filter(query, location) \
+                            .aggregate(total_retail_target=Coalesce(Sum('brand_target', output_field=FloatField()), Value(0, output_field=FloatField())))
+        
+        # Get Sale Records
+        service = SaleRecordServices.objects.filter(query).aggregate(total_service_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        product = SaleRecordsProducts.objects.filter(query).aggregate(total_product_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        vouchers = SaleRecordVouchers.objects.filter(query).aggregate(total_vouchers_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        membership = SaleRecordMembership.objects.filter(query).aggregate(total_membership_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        gift_card = PurchasedGiftCards.objects.filter(query).aggregate(total_gift_card_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        appointment = SaleRecordsAppointmentServices.objects.filter(query).aggregate(total_appointment_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        
+        appointment_average = SaleRecordsAppointmentServices.objects.filter(query) \
+                                .aggregate(avg_appointment=Coalesce(Avg('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        
+        # Appointment Count
+        cancel_appointment = Appointment.objects.filter(business, query, status='Cancelled').count()
+        if location_id:
+            query = Q(sale_record__location__id=location_id)
+        finished_appointment = SaleRecordsAppointmentServices.objects.filter(query, appointment__status__in=['Paid', 'Done']).count()
+        
+        # Total Appointment count
+        total_appointment = cancel_appointment + finished_appointment
+        
+        # Calculate the total sum
+        total_sale = (
+            service['total_service_sale'] +
+            product['total_product_sale'] +
+            vouchers['total_vouchers_sale'] +
+            membership['total_membership_sale'] +
+            gift_card['total_gift_card_sale'] +
+            appointment['total_appointment_sale']
+        )
+        avg_sale = total_sale / 5 # average of 5 sales records
+        
+    # Total Sale Chat ----------------------------------------
+        
+        # Calculate Previous Year and Current Year
+        current_year = date.today().year
+        previous_year = current_year - 1
+        months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        
+        # Calculate previous year total sales for each month
+        previous_year_sales = []
+        for month in months:
+            total_previous_year_sale = SaleRecords.objects.filter(created_at__year=previous_year,
+                                        created_at__month=month) \
+                                        .aggregate(total=Coalesce(Sum('total_price', output_field=FloatField()), Value(0, output_field=FloatField())))
+            
+            previous_year_sales.append(total_previous_year_sale['total'])
+        
+        # Calculate current year total sales for each month
+        current_year_sales = []
+        for month in months:
+            total_current_year_sale = SaleRecords.objects.filter(created_at__year=current_year,
+                                        created_at__month=month) \
+                                        .aggregate(total=Coalesce(Sum('total_price', output_field=FloatField()), Value(0, output_field=FloatField())))
+                                        
+            current_year_sales.append(total_current_year_sale['total'])
+                
+        data = {
+            'success': True,
+            'status_code': status.HTTP_200_OK,
+            'message': 'Data fetched successfully',
+            'error_message': None,
+            'data': {
+                'sales_cards':{
+                    'avg_sale': avg_sale,
+                    'appointment_average': appointment_average['avg_appointment'],
+                },
+                'sales_progress': {
+                    'service': {
+                        'total_service_target': service_target['total_service_target'],
+                        'service_total_sale': service['total_service_sale'],
+                    },
+                    'product': {
+                        'total_retail_target': retail_target['total_retail_target'],
+                        'product_total_sale': product['total_product_sale'],
+                    },
+                    'vouchers_total_sale': vouchers['total_vouchers_sale'],
+                    'membership_total_sale': membership['total_membership_sale'],
+                    'gift_card_total_sale': gift_card['total_gift_card_sale'],
+                    'total_sale': total_sale,
+                },
+                'appointment_progress': {
+                    'cancel_appointment': cancel_appointment,
+                    'finished_appointment': finished_appointment,
+                    'total_appointment': total_appointment,
+                },
+                'total_sale_chart' : {
+                    'previous_year_sales': previous_year_sales,
+                    'current_year_sales': current_year_sales,
+                }    
+            }   
+        }
+        return Response(data, status=status.HTTP_200_OK)
+    except Exception as e:
+        # Handle exceptions and return an appropriate error response
+        error_data = {
+            'success': False,
+            'status_code': 400,
+            'message': 'Internal Server Error',
+            'error_message': str(e),
+            'data': None
+        }
+        return Response(error_data, status=status.HTTP_400_BAD_REQUEST)
