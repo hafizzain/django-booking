@@ -5,8 +5,5 @@ urlpatterns = [
     path('checkout/', views.SaleRecordViews.as_view(), name= 'checkout'),
     path('sale-history/', views.SaleRecordViews.as_view(), name = 'sale-history'),
     path('single-sale-record/',views.single_sale_record, name='single-sale-record'),
-<<<<<<< HEAD
-=======
     
->>>>>>> 934f47209100b690d044163c49edbccb631c4c80
 ]
