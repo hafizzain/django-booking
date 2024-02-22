@@ -274,7 +274,7 @@ def get_appointments_service(request):
     
     # Client All Product Order---------------------
     product_order = SaleRecordsProducts.objects \
-        .filter(sale_record__client__id=client) \
+        .filter(sale_record__client=client) \
         .select_related('sale_record', 'employee', 'product') \
         .order_by('-created_at')
     product_total = product_order.aggregate(total_sale=Sum('price'))['total_sale']
