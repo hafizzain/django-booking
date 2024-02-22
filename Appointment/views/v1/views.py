@@ -3695,12 +3695,11 @@ def get_client_sale(request):
     voucher_membership.extend(membership.data)
 
     # Appointment Orders ------------------------------
-    appointment_checkout_all = SaleRecordsAppointmentServices.objects \
+    appointment_checkout_all = AppointmentService.objects \
         .filter(
         client_id=client,
         appointment__status__in=['Done', 'Paid']
-        ).select_related('sale_record', 'client', 'appointment', 'service', 'employee' ) \
-        .order_by('-created_at')
+        ).order_by('-created_at')
     appointment_checkout_5 = appointment_checkout_all
     appointment_total = appointment_checkout_all.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += appointment_total if appointment_total else 0
