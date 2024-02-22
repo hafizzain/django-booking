@@ -3676,7 +3676,7 @@ def get_client_sale(request):
                         .order_by('-created_at')[:5]
     membership_order = SaleRecordMembership.objects \
                         .filter(sale_record__client__id=client) \
-                        .select_related('sale_record', 'membership') \
+                        .select_related('sale_record') \
                         .order_by('-created_at')[:5]
     voucher_total = voucher_order.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += voucher_total if voucher_total else 0
