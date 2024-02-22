@@ -463,21 +463,31 @@ def get_sales_analytics(request):
         # Calculate previous year total sales for each month
         previous_year_sales = []
         for month in months:
-            total_previous_year_sale = SaleRecords.objects.filter(created_at__year=previous_year,
+            total_monthly_sale = SaleRecords.objects.filter(created_at__year=previous_year,
                                         created_at__month=month) \
                                         .aggregate(total=Coalesce(Sum('total_price', output_field=FloatField()), Value(0, output_field=FloatField())))
             
-            previous_year_sales.append(total_previous_year_sale['total'])
+            previous_year_sales.append(total_monthly_sale['total'])
         
         # Calculate current year total sales for each month
         current_year_sales = []
         for month in months:
-            total_current_year_sale = SaleRecords.objects.filter(created_at__year=current_year,
+            total_monthly_sale = SaleRecords.objects.filter(created_at__year=current_year,
                                         created_at__month=month) \
                                         .aggregate(total=Coalesce(Sum('total_price', output_field=FloatField()), Value(0, output_field=FloatField())))
                                         
-            current_year_sales.append(total_current_year_sale['total'])
+            current_year_sales.append(total_monthly_sale['total'])
                 
+    # Sales channel POS -----------------------------------------
+        current_year_pos_sales = []
+        for month in months:
+            total_monthly_pos_sale = SaleRecords.objects.filter(created_at__year=previous_year,
+                                        created_at__month=month) \
+                                        .filter(query) \
+                                        .aggregate(total=Coalesce(Sum('total_price', output_field=FloatField()), Value(0, output_field=FloatField())))
+            
+            current_year_pos_sales.append(total_monthly_pos_sale['total'])
+            
         data = {
             'success': True,
             'status_code': status.HTTP_200_OK,
@@ -510,7 +520,10 @@ def get_sales_analytics(request):
                 'total_sale_chart' : {
                     'previous_year_sales': previous_year_sales,
                     'current_year_sales': current_year_sales,
-                }    
+                },
+                'sales_channel_pos' : {
+                    'current_year_pos_sale' : current_year_pos_sales
+                },
             }   
         }
         return Response(data, status=status.HTTP_200_OK)
