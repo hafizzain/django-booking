@@ -7213,6 +7213,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
                     }
                 }
                 return Response(data, status=status.HTTP_200_OK)
+            
         if is_custom_card == True:
             card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,
                                             discount_to_show=discount_to_show,
@@ -7226,6 +7227,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
                     GiftDetail.objects.create(currencies_id=data['currencies'], price=data['price'],
                                             spend_amount=data['retail_price'],
                                             gift_card=card)
+                    
             serializer_context = {'selected_location': location}
             serializer = GiftCardSerializerResponse(card,context = serializer_context )
             data = {
@@ -7363,7 +7365,7 @@ def get_gift_card(request):
     # GiftCard show on bases of Ceruncy and location
     ceruncy = BusinessAddress.objects.filter(id=selected_location).values_list('currency', flat=True)
     gift_detils = list(GiftDetail.objects.filter(currencies__in=ceruncy).values_list('gift_card', flat=True))
-    query_set = GiftCards.objects.filter(id__in=gift_detils, is_deleted=False)
+    query_set = GiftCards.objects.filter(id__in=gift_detils, is_deleted=False,  is_custom_card = False)
     
     if search_text:
         query_set = GiftCards.objects.filter(title_i__contains=search_text, is_deleted=False, is_custom_card = False)
