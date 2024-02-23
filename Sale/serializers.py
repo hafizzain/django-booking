@@ -854,7 +854,7 @@ class SOSerializerForClientSale(serializers.ModelSerializer):
         return obj.member.full_name
 
     def get_user(self, obj):
-        return obj.user.full_name
+        return obj.sale_record.user.full_name
 
     def get_price(self, obj):
         return obj.current_price
