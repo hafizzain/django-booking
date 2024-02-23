@@ -1077,7 +1077,10 @@ class VoucherSerializerForClientSale(serializers.ModelSerializer):
         return 'Voucher'
 
     def get_member(self, obj):
-        return obj.employee.full_name
+        try:
+            return obj.employee.full_name
+        except:
+            return None
 
     def get_voucher(self, obj):
         return obj.voucher.name
