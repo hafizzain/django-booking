@@ -883,8 +883,7 @@ class MOrderSerializerForSale(serializers.ModelSerializer):
         try:
             return obj.member.full_name
         except:
-            return obj.employee.full_name
-
+            return None
     def get_membership(self, obj):
         return obj.membership.name
 
