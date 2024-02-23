@@ -7197,6 +7197,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         retail_price = request.data.get('retail_price', None)
         term_condition = request.data.get('term_condition', None)
         location = request.data.get('location_id', None)
+        is_custom_card = request.data.get('is_custom_card',None)
         
         if code:
             
@@ -7236,9 +7237,12 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         else:
             card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,
                                             custom_card='avaliable',
+                                            is_custom_card = is_custom_card,
                                             price=price,
                                             retail_price=retail_price,
                                             location_is=location)
+            serializer_context = {'selected_location': location}
+            serializer = GiftCardSerializerResponse(card, many = True,context = serializer_context )
 
             data = {
                 "success": True,
