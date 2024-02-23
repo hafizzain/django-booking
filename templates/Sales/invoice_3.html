@@ -315,6 +315,26 @@
                       {% endif %}
                         
                     {% endfor %}
+
+                    {% for c in checkout_data.applied_memberships_records.all %}
+                      
+                      {% if item.client == c.client %}
+                      <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                    
+                        <div>
+                          <p class="text-left">
+                            Membership Redeemed
+                          </p>
+                        </div>
+                        <p class="text-[#7B7B7B]">
+                          <span></span>{{c.price}}
+                          {{currency_code}}
+                        </p>
+                      </div>
+
+                      {% endif %}
+                        
+                    {% endfor %}
                       
 
 
