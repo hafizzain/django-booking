@@ -2912,8 +2912,7 @@ def get_client_all_gift_cards(request):
 
     query = Q(sale_record__location = location,
             spend_amount__gt=0,
-            expiry__gte=timezone.now(),
-            gift_card__is_custom_card=False) 
+            expiry__gte=timezone.now()) 
 
     if client is not None:
         query &= Q(sale_record__client = client)
