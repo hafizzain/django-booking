@@ -1053,10 +1053,31 @@ class VOSerializerForClientSale(serializers.ModelSerializer):
 
     def get_member(self, obj):
         # return obj.member.full_name
-        try:
-            return obj.member.full_name
-        except:
-            return obj.employee.full_name
+        return obj.member.full_name
+
+    def get_voucher(self, obj):
+        return obj.voucher.name
+
+    def get_price(self, obj):
+        # return obj.current_price
+        return obj.price
+
+    class Meta:
+        model = VoucherOrder
+        fields = ['voucher', 'member', 'quantity', 'order_type', 'price', 'created_at', ]
+        
+class VoucherSerializerForClientSale(serializers.ModelSerializer):
+    # client = serializers.SerializerMethodField(read_only=True)
+    member = serializers.SerializerMethodField(read_only=True)
+    voucher = serializers.SerializerMethodField(read_only=True)
+    order_type = serializers.SerializerMethodField(read_only=True)
+    price = serializers.SerializerMethodField(read_only=True)
+
+    def get_order_type(self, obj):
+        return 'Voucher'
+
+    def get_member(self, obj):
+        return obj.employee.full_name
 
     def get_voucher(self, obj):
         return obj.voucher.name

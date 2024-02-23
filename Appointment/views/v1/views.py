@@ -84,6 +84,7 @@ from Appointment.models import Comment
 from Appointment.serializers import *
 from rest_framework.views import APIView
 from SaleRecords.models import *
+from Sale.serializers import *
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -3688,7 +3689,7 @@ def get_client_sale(request):
     if membership_order.count() > 5:
         membership_order = membership_order[:5]
 
-    voucher = VOSerializerForClientSale(voucher_order, many=True, context={'request': request, })
+    voucher = VoucherSerializerForClientSale(voucher_order, many=True, context={'request': request, })
     membership = MOrderSerializerForSale(membership_order[:5], many=True, context={'request': request, })
 
     voucher_membership.extend(voucher.data)
