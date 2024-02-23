@@ -401,6 +401,7 @@ class CalanderserializerResponse(serializers.ModelSerializer):
     client_name = serializers.CharField(source='appointment.client.full_name', read_only=True)
     client_types = serializers.CharField(source='appointment.client_type', read_only=True)
     appointment_id = serializers.CharField(source='appointment.id', read_only=True)
+    appointment_status = serializers.CharField(source='appointment.status', read_only=True)
 
     appointment_group_id = serializers.SerializerMethodField(read_only=True)
 
