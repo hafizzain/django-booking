@@ -1052,13 +1052,15 @@ class VOSerializerForClientSale(serializers.ModelSerializer):
         return 'Voucher'
 
     def get_member(self, obj):
-        return obj.member.full_name
+        # return obj.member.full_name
+        obj.employee.full_name
 
     def get_voucher(self, obj):
         return obj.voucher.name
 
     def get_price(self, obj):
-        return obj.current_price
+        # return obj.current_price
+        return obj.price
 
     class Meta:
         model = VoucherOrder
