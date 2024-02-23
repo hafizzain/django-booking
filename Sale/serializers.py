@@ -1053,7 +1053,7 @@ class VOSerializerForClientSale(serializers.ModelSerializer):
 
     def get_member(self, obj):
         # return obj.member.full_name
-        obj.employee.full_name
+        return obj.employee.full_name
 
     def get_voucher(self, obj):
         return obj.voucher.name
