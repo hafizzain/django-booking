@@ -7202,17 +7202,16 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             
             code_check = GiftCards.objects.filter(code__contains=code)
         
-        
-        if code_check:
-            data = {
-                "success": True,
-                "status_code": 400,
-                "response": {
-                    "message": "Code already exists",
-                    "error_message": None,
+            if code_check:
+                data = {
+                    "success": True,
+                    "status_code": 400,
+                    "response": {
+                        "message": "Code already exists",
+                        "error_message": None,
+                    }
                 }
-            }
-            return Response(data, status=status.HTTP_200_OK)
+                return Response(data, status=status.HTTP_200_OK)
         if custom_card is None:
             card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,
                                             discount_to_show=discount_to_show,
