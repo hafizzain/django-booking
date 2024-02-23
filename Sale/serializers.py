@@ -880,7 +880,10 @@ class MOrderSerializerForSale(serializers.ModelSerializer):
         return 'Membership'
 
     def get_member(self, obj):
-        return obj.member.full_name
+        try:
+            return obj.member.full_name
+        except:
+            return obj.employee.full_name
 
     def get_membership(self, obj):
         return obj.membership.name
