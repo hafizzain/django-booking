@@ -7198,7 +7198,9 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         term_condition = request.data.get('term_condition', None)
         location = request.data.get('location_id', None)
         
-        code_check = GiftCards.objects.filter(code__contains=code)
+        if code:
+            
+            code_check = GiftCards.objects.filter(code__contains=code)
         
         
         if code_check:
@@ -7327,7 +7329,7 @@ def update_gift_card(request):
         gift_details.delete()
         for data in currency_gift_card_price:
             GiftDetail.objects.create(currencies_id=data['currencies'], price=data['price'],
-                                      retail_price=data['retail_price'], gift_card_id=id)
+                                    retail_price=data['retail_price'], gift_card_id=id)
     data = {
         "success": True,
         "status_code": 200,
