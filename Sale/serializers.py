@@ -888,8 +888,10 @@ class MOrderSerializerForSale(serializers.ModelSerializer):
         return obj.membership.name
 
     def get_price(self, obj):
-        return obj.current_price
-
+        try:
+            return obj.current_price
+        except:
+            return obj.price
     class Meta:
         model = MemberShipOrder
         fields = ['membership', 'order_type', 'member', 'quantity', 'price', 'created_at']
