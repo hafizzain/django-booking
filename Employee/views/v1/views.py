@@ -7358,7 +7358,7 @@ def get_gift_card(request):
     query_set = GiftCards.objects.filter(id__in=gift_detils, is_deleted=False)
     
     if search_text:
-        query_set = GiftCards.objects.filter(title_i__contains=search_text, is_deleted=False)
+        query_set = GiftCards.objects.filter(title_i__contains=search_text, is_deleted=False, is_custom_card = False)
         
     serializer_context = {'selected_location': selected_location}
     serializer = GiftCardSerializerResponse(query_set, many=True, context=serializer_context).data
