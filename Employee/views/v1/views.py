@@ -7217,32 +7217,35 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,
                                             discount_to_show=discount_to_show,
                                             custom_card=None, term_condition=term_condition,
+                                            is_custom_card = is_custom_card,
                                             location_id = location)
+            
             # currency_gift_card_price = json.loads(currency_gift_card_price)
             if len(currency_gift_card_price) > 0:
                 for data in currency_gift_card_price:
                     GiftDetail.objects.create(currencies_id=data['currencies'], price=data['price'],
                                             spend_amount=data['retail_price'],
                                             gift_card=card)
+            serializer_context = {'selected_location': location}
+            serializer = GiftCardSerializerResponse(card,context = serializer_context )
             data = {
                 "success": True,
                 "status_code": 200,
                 "response": {
                     "message": "Gift card created Successfully",
                     "error_message": None,
-                    # "data": serializer.data
+                    "data": serializer.data
                 }
             }
             return Response(data, status=status.HTTP_200_OK)
         else:
             card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,
                                             custom_card='avaliable',
-                                            is_custom_card = is_custom_card,
+                                            # is_custom_card = is_custom_card,
                                             price=price,
                                             retail_price=retail_price,
                                             location_is=location)
-            serializer_context = {'selected_location': location}
-            serializer = GiftCardSerializerResponse(card, many = True,context = serializer_context )
+        
 
             data = {
                 "success": True,
@@ -7250,7 +7253,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
                 "response": {
                     "message": "giftcard get successfully",
                     "error_message": None,
-                    "data": serializer.data
+                    # "data": serializer.data
                 }
             }
             return Response(data, status=status.HTTP_200_OK)
