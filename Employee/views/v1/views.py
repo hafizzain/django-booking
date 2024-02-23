@@ -7213,7 +7213,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
                     }
                 }
                 return Response(data, status=status.HTTP_200_OK)
-        if custom_card is None:
+        if is_custom_card == True:
             card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,
                                             discount_to_show=discount_to_show,
                                             custom_card=None, term_condition=term_condition,
