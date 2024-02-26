@@ -3647,7 +3647,6 @@ def create_comment(request):
 def get_comment(request):
     group_appointment = request.query_params.get('group_appointment', None)
     appointment = request.query_params.get('appointment_id', None)
-    group_appointment = request.query_params.get('group_appointment', None)
     paginator = AppointmentsPagination()
     paginator.page_size = 10
     
