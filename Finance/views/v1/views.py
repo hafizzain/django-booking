@@ -217,9 +217,9 @@ class RefundAPIView(APIView):
                         for order in product_orders:
                                 # raise ValueError('comming here')
                                 refund_product = RefundProduct.objects.get(checkouts = invoice.checkout_instance.id,product=order.product)
-                                raise ValueError('comign here')
+                                # raise ValueError('comign here')
                                 
-                                raise ValueError(f'comitn here refund p :{refund_product.id} actual p: {order.product.id}')
+                                # raise ValueError(f'comitn here refund p :{refund_product.id} actual p: {order.product.id}')
                                 # newOrder = order
                                 # newOrder.pk = None
                                 # newOrder.sale_record = newCheckoutInstance
@@ -235,14 +235,14 @@ class RefundAPIView(APIView):
                                 # return Response({'product orders count': refund_product.count()})
                                 # Create a new SaleRecordsProducts instance for the refund
                                 
-                                product = SaleRecordsProducts.objects.create(
+                                SaleRecordsProducts.objects.create(
                                     sale_record= newCheckoutInstance,
                                     employee=order.employee,  
                                     product=order.product,
                                     quantity = refund_product.refunded_quantity,
                                     price = float(-refund_product.refunded_amount),
                                 )
-                                product.save()
+                                
                             
                             
                         # service_orders = SaleRecordServices.objects.filter(sale_record=invoice.checkout_instance, service__id__in = refunded_services_ids) 
