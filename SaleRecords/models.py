@@ -185,12 +185,18 @@ class AppliedVouchers(CommonField):
     discount_percentage = models.FloatField(blank=True, null=True)
     client = models.ForeignKey(Client, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'applied_vouchers_client')
     
+class RedeemedLoyaltyPoints(CommonField):
+    sale_record = models.ForeignKey(SaleRecords,  on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_loyalty_points_records')
+    client_loyalty_point = models.ForeignKey(ClientLoyaltyPoint, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'loyalty_points_records')
+    redeemed_points = models.PositiveSmallIntegerField(default = 0 , blank=True, null=True)
+    client = models.ForeignKey(Client, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'applied_loyalty_points_client')
     
 class AppliedGiftCards(CommonField):
     sale_record = models.ForeignKey(SaleRecords,  on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_gift_cards_records')
     # gift_card = models.ForeignKey(GiftCards, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'sale_applied_gift_cards_records' )
     purchased_gift_card_id = models.ForeignKey(PurchasedGiftCards, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'puchased_gift_card')
     partial_price = models.FloatField(blank=True, null=True)
+    client = models.ForeignKey(Client, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'applied_gift_cards_client')
     # discount_percentage = models.FloatField(blank=True, null=True)
     # is_redeemed = models.BooleanField(default = False)
     
@@ -203,8 +209,3 @@ class AppliedPromotion(CommonField):
     promotion_type = models.CharField(max_length = 255 , blank=True, null=True)
     
     
-class RedeemedLoyaltyPoints(CommonField):
-    sale_record = models.ForeignKey(SaleRecords,  on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_loyalty_points_records')
-    client_loyalty_point = models.ForeignKey(ClientLoyaltyPoint, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'loyalty_points_records')
-    redeemed_points = models.PositiveSmallIntegerField(default = 0 , blank=True, null=True)
-    client = models.ForeignKey(Client, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'applied_loyalty_points_client')
