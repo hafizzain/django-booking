@@ -920,71 +920,85 @@
                 {% if checkout_data.appointment_services.all %}
 
                 {% for item in checkout_data.appointment_services.all %}
-                <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                    {% set applied_coupons = [] %}
+                    {% set applied_memberships = [] %}
 
-                  <div>
-                    <h3>{{item.client.full_name}}</h3>
-                    <p class="text-left">
-                      {{item.service.name}}
-                      {% if item.discount_percentage %}
-                      (Discount {{ item.discount_percentage}} %)
+                    {% for c in checkout_data.applied_coupons_records.all %}
+                      {% if item.client == c.client and c not in applied_coupons %}
+                          {% set applied_coupons = applied_coupons|add([c]) %}
                       {% endif %}
-                    </p>
-                    <p class="arabic">{% get_secondary_translation item.id %}</p>
-                  </div>
-                  <p class="text-[#7B7B7B]">
-                    <span>1 x </span>{{item.price}}
-                    {{currency_code}}
-                  </p>
-                </div>
+                    {% endfor %}
+                
+                    {% for m in checkout_data.applied_memberships_records.all %}
+                        {% if item.client.id == m.client.id and m not in applied_memberships %}
+                            {% set applied_memberships = applied_memberships|add([m]) %}
+                        {% endif %}
+                    {% endfor %}
 
+                    <div class="flex items-center justify-between text-primary text-sm font-semibold">
 
-                {% for c in checkout_data.applied_coupons_records.all %}
+                      <div>
+                        <h3>{{item.client.full_name}}</h3>
+                        <p class="text-left">
+                          {{item.service.name}}
+                          {% if item.discount_percentage %}
+                          (Discount {{ item.discount_percentage}} %)
+                          {% endif %}
+                        </p>
+                        <p class="arabic">{% get_secondary_translation item.id %}</p>
+                      </div>
+                      <p class="text-[#7B7B7B]">
+                        <span>1 x </span>{{item.price}}
+                        {{currency_code}}
+                      </p>
+                    </div>
 
-                {% if item.client == c.client %}
-                <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                
+                {% if applied_memberships %}
+                  {% for m in applied_memberships %}
 
-                  <div>
-                    <p class="text-left">
-                      Coupon Redeemed
-                    </p>
-                  </div>
-                  <p class="text-[#7B7B7B]">
-                    <span></span>{{c.coupon_discounted_price}}
-                    {{currency_code}}
-                  </p>
-                </div>
+                  {% if item.client == c.client %}
+                    <div class="flex items-center justify-between text-primary text-sm font-semibold">
+
+                      <div>
+                        <p class="text-left">
+                          Membership Redeemed
+                        </p>
+                      </div>
+                      <p class="text-[#7B7B7B]">
+                        <span></span>{{m.price}}
+                        {{currency_code}}
+                      </p>
+                    </div>
+
+                  {% endif %}
+
+                  {% endfor %}
 
                 {% endif %}
+                  
+                
+                {% for c in applied_coupons %}
+
+                  {% if item.client == c.client %}
+                      <div class="flex items-center justify-between text-primary text-sm font-semibold">
+
+                        <div>
+                          <p class="text-left">
+                            Coupon Redeemed
+                          </p>
+                        </div>
+                        <p class="text-[#7B7B7B]">
+                          <span></span>{{c.price}}
+                          {{currency_code}}
+                        </p>
+                      </div>
+                  {% endif %}
 
                 {% endfor %}
-
-                {% for c in checkout_data.applied_memberships_records.all %}
-
-                {% if item.client == c.client %}
-                <div class="flex items-center justify-between text-primary text-sm font-semibold">
-
-                  <div>
-                    <p class="text-left">
-                      Membership Redeemed
-                    </p>
-                  </div>
-                  <p class="text-[#7B7B7B]">
-                    <span></span>{{c.price}}
-                    {{currency_code}}
-                  </p>
-                </div>
-
-                {% endif %}
-
+                
+                {% comment %}======================== Here is ending the appointment_service  ============={% endcomment %}
                 {% endfor %}
-
-
-
-
-                {% endfor %}
-
-
                 {% endif %}
                 {% comment %} ===============================if there is any gift_cards_records in the checkout_data
                 ========================{% endcomment %}
