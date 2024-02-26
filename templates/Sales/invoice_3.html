@@ -318,7 +318,7 @@
 
                     {% for c in checkout_data.applied_memberships_records.all %}
                       
-                      {% if item.client == c.client %}
+                      {% if item.client.id == c.client.id %}
                       <div class="flex items-center justify-between text-primary text-sm font-semibold">
                     
                         <div>
