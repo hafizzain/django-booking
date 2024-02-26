@@ -848,8 +848,11 @@
               <div class="text-left flex flex-col gap-1">
                 <div class="flex items-center justify-between text-sm font-semibold">
                   <p class="text-left">
-                    {{ business_address.primary_translation.items}} {% if business_address.secondary_translation.items
-                    %}<span class="arabic">{{ business_address.secondary_translation.items }} {% endif %}</span>
+                    {{ business_address.primary_translation.items}} 
+                    {% if business_address.secondary_translation.items%}
+                    <span class="arabic">{{ business_address.secondary_translation.items }} 
+                      {% endif %}
+                    </span>
                   </p>
                   <p>{{ business_address.primary_translation.amount}} {% if
                     business_address.secondary_translation.amount %}<span class="arabic">{{
