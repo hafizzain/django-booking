@@ -216,7 +216,7 @@ class RefundAPIView(APIView):
 
                         for order in product_orders:
                                 # raise ValueError('comming here')
-                                refund_product = RefundProduct.objects.get(checkouts = invoice.checkout_instance,product=order.product)
+                                refund_product = RefundProduct.objects.get(checkouts = invoice.checkout_instance.id,product=order.product)
                                 raise ValueError('comign here')
                                 
                                 raise ValueError(f'comitn here refund p :{refund_product.id} actual p: {order.product.id}')
