@@ -173,6 +173,7 @@ class RefundAPIView(APIView):
                     # newCheckoutInstance.is_refund = True
                     newCheckoutInstance.save()
                     newCheckoutInstance.checkout_type = 'Refund'
+                    newCheckoutInstance.is_refund = True
                     newCheckoutInstance.sub_total = float(-refund_price)
                     newCheckoutInstance.total_price = float(-refund_price)
                     newCheckoutInstance.save()

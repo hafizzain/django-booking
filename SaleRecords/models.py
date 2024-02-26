@@ -28,6 +28,7 @@ class SaleRecords(CommonField):
     # refunds_data = models.ForeignKey(Refund, on_delete = models.SET_NULL, null = True, blank=True, related_name = 'sale_record_refunds') 
     
     checkout_type = models.CharField(choices = CheckoutType.choices, max_length = 50) 
+    is_refund = models.BooleanField(default = False)
     
     
     # Client info
