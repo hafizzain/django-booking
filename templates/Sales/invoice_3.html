@@ -275,73 +275,86 @@
                   {% comment %} ===============================if there is any appointment_services in the checkout_data ========================{% endcomment %}
                   
                   {% if checkout_data.appointment_services.all %}
-                  
+                  {% comment %} declared the veriables {% endcomment %}
+                    {% set applied_coupons = [] %}
+                    {% set applied_memberships = [] %}
+                    
+
+
                   {% for item in checkout_data.appointment_services.all %}
-                  <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                    
-                    <div>
-                      <h3>{{item.client.full_name}}</h3>
-                      <p class="text-left">
-                        {{item.service.name}}
-                        {% if item.discount_percentage %}
-                        (Discount {{ item.discount_percentage}} %)
-                        {% endif %}
-                      </p>
-                      <p class="arabic">{% get_secondary_translation item.id %}</p>
-                    </div>
-                    <p class="text-[#7B7B7B]">
-                      <span>1 x </span>{{item.price}}
-                      {{currency_code}}
-                    </p>
-                  </div>
 
-                    
-                    {% for c in checkout_data.applied_coupons_records.all %}
-                      
-                      {% if item.client == c.client %}
-                      <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                    
-                        <div>
-                          <p class="text-left">
-                            Coupon Redeemed
-                          </p>
-                        </div>
-                        <p class="text-[#7B7B7B]">
-                          <span></span>{{c.coupon_discounted_price}}
-                          {{currency_code}}
-                        </p>
-                      </div>
+                        {% for c in checkout_data.applied_coupons_records.all %}
+                            {% if item.client == c.client and c not in applied_coupons %}
+                                {% set applied_coupons = applied_coupons|add([c]) %}
+                            {% endif %}
+                        {% endfor %}
+                
+                        {% for m in checkout_data.applied_memberships_records.all %}
+                            {% if item.client.id == m.client.id and m not in applied_memberships %}
+                                {% set applied_memberships = applied_memberships|add([m]) %}
+                            {% endif %}
+                        {% endfor %}
 
-                      {% endif %}
                         
-                    {% endfor %}
-
-                    {% for c in checkout_data.applied_memberships_records.all %}
+                    <div class="flex items-center justify-between text-primary text-sm font-semibold">
                       
-                      {% if item.client.id == c.client.id %}
-                      <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                      <div>
+                        <h3>{{item.client.full_name}}</h3>
+                        <p class="text-left">
+                          {{item.service.name}}
+                          {% if item.discount_percentage %}
+                          (Discount {{ item.discount_percentage}} %)
+                          {% endif %}
+                        </p>
+                        <p class="arabic">{% get_secondary_translation item.id %}</p>
+                      </div>
+                      <p class="text-[#7B7B7B]">
+                        <span>1 x </span>{{item.price}}
+                        {{currency_code}}
+                      </p>
+                    </div>
+                  {% endfor %}
                     
+                    {% if applied_memberships %}
+                      <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                      
                         <div>
                           <p class="text-left">
                             Membership Redeemed
                           </p>
                         </div>
-                        <p class="text-[#7B7B7B]">
-                          <span></span>{{c.price}}
-                          {{currency_code}}
-                        </p>
+                        
+                        {% for m in applied_memberships %}
+                          <p class="text-[#7B7B7B]">
+                            <span></span>{{m.price}}
+                            {{currency_code}}
+                          </p>
+                        {% endfor %}
+                          
                       </div>
 
-                      {% endif %}
-                        
-                    {% endfor %}
+                    {% endif %}
+
+                    {% if applied_coupons %}
+                      <div class="flex items-center justify-between text-primary text-sm font-semibold">
                       
+                        <div>
+                          <p class="text-left">
+                            Membership Redeemed
+                          </p>
+                        </div>
+                        
+                        {% for c in applied_coupons %}
+                          <p class="text-[#7B7B7B]">
+                            <span></span>{{m.coupon_discounted_price}}
+                            {{currency_code}}
+                          </p>
+                        {% endfor %}
+                          
+                      </div>
 
+                    {% endif %}
 
-                    
-                  {% endfor %}
-                    
-                    
                   {% endif %}
                   {% comment %} ===============================if there is any gift_cards_records in the checkout_data ========================{% endcomment %}
 
