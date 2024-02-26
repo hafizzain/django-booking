@@ -858,11 +858,9 @@
                       {{business_address.secondary_translation.amount}} {% endif %}</span></p>
                 </div>
 
-                {% comment %}======================================================== checkout_data
-                =============================================={% endcomment %}
+                {% comment %}======================================================== checkout_data =============================================={% endcomment %}
 
-                {% comment %} ===============================if there is any product records in the checkout
-                ========================{% endcomment %}
+                {% comment %} ===============================if there is any product records in the checkout========================{% endcomment %}
                 {% if checkout_data.products_records.all %}
 
                 {% for item in checkout_data.products_records.all %}
@@ -885,8 +883,7 @@
 
                 {% endif %}
 
-                {% comment %} ===============================if there is any service records in the checkout
-                ========================{% endcomment %}
+                {% comment %} ===============================if there is any service records in the checkout========================{% endcomment %}
 
                 {% if checkout_data.services_records.all %}
 
@@ -914,14 +911,14 @@
                 {% endif %}
 
 
-                {% comment %} ===============================if there is any appointment_services in the checkout_data
-                ========================{% endcomment %}
+                {% comment %} ===============================if there is any appointment_services in the checkout_data ========================{% endcomment %}
 
                 {% if checkout_data.appointment_services.all %}
 
                 {% for item in checkout_data.appointment_services.all %}
                     {% set applied_coupons = [] %}
                     {% set applied_memberships = [] %}
+                    {% set applied_vouchers = [] %}
 
                     {% for c in checkout_data.applied_coupons_records.all %}
                       {% if item.client == c.client and c not in applied_coupons %}
@@ -1000,8 +997,7 @@
                 {% comment %}======================== Here is ending the appointment_service  ============={% endcomment %}
                 {% endfor %}
                 {% endif %}
-                {% comment %} ===============================if there is any gift_cards_records in the checkout_data
-                ========================{% endcomment %}
+                {% comment %} ===============================if there is any gift_cards_records in the checkout_data ========================{% endcomment %}
 
                 {% if checkout_data.gift_cards_records.all %}
 
@@ -1025,8 +1021,7 @@
 
 
                 {% endif %}
-                {% comment %} =============================== if there is any membership_records in the checkout data
-                ========================{% endcomment %}
+                {% comment %} =============================== if there is any membership_records in the checkout data ========================{% endcomment %}
 
                 {% if checkout_data.membership_records.all %}
 
@@ -1052,8 +1047,7 @@
 
                 {% endif %}
 
-                {% comment %} =============================== if there is any vouchers_records in the checkout_data
-                ========================{% endcomment %}
+                {% comment %} =============================== if there is any vouchers_records in the checkout_data ========================{% endcomment %}
 
                 {% if checkout_data.vouchers_records.all %}
 
@@ -1095,8 +1089,7 @@
 
             </div>
 
-            {% comment %}=========================================== total_tip
-            ================================================================={% endcomment %}
+            {% comment %}=========================================== total_tip ================================================================={% endcomment %}
 
             {% if total_tip %}
             <div class="flex items-center justify-between text-primary text-sm font-bold">
@@ -1109,8 +1102,7 @@
             </div>
             {% endif %}
 
-            {% comment %}============================================ tax details
-            ================================================================{% endcomment %}
+            {% comment %}============================================ tax details ================================================================{% endcomment %}
 
             {% if tax_applied or tax_applied1 %}
             <p>{{ business_address.primary_translation.taxes }}</p>
@@ -1137,8 +1129,7 @@
             {% endif %}
 
             <hr>
-            {% comment %}=================================================== Payment methods Details
-            =========================={% endcomment %}
+            {% comment %}=================================================== Payment methods Details =========================={% endcomment %}
 
 
           </div>
@@ -1164,8 +1155,7 @@
 
 
           <hr />
-          {% comment %} ======================================================== pyament methods
-          ======================================= {% endcomment %}
+          {% comment %} ======================================================== pyament methods ======================================= {% endcomment %}
 
           {% comment %} <p class="font-semibold text-black text-left">{{
             business_address.primary_translation.payment_method}}</p>
@@ -1203,8 +1193,7 @@
           <div class="text-left flex flex-col gap-1">
             <div class="flex items-center justify-between text-primary text-sm font-bold">
 
-              {% comment %}============================================= Main div for payment methods show
-              ===================================================={% endcomment %}
+              {% comment %}============================================= Main div for payment methods show ===================================================={% endcomment %}
               <div class="flex items-center justify-between text-primary text-sm w-full">
                 <div>
 
@@ -1228,8 +1217,7 @@
                 </div>
               </div>
 
-              {% comment %}=========================================== payment methods ends here
-              ==============================================================={% endcomment %}
+              {% comment %}=========================================== payment methods ends here ==============================================================={% endcomment %}
             </div>
           </div>
         </div>
