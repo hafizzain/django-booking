@@ -559,7 +559,7 @@ def create_client(request):
     if images is not None:
         # ids = json.loads(images)
         # ids = images
-        ids = [int(id) for id in images] # Extract and convert to integers
+        ids = [id for id in images if isinstance(id, int)]  # Extract and convert to integers
         for id in ids:
             ClientImages.objects.filter(id=id).update(client_id=client.id)
 
