@@ -215,6 +215,7 @@ class RefundAPIView(APIView):
                         # return Response({'product orders count': product_orders.count()})
 
                         for order in product_orders:
+                            raise ValueError('comign here')
                             try:
                                 # raise ValueError('comming here')
                                 refund_product = RefundProduct.objects.get(checkouts = invoice.checkout_instance,product__id=order.product.id)
