@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from django.utils import timezone
 from threading import Thread
 from django.http import JsonResponse
 from Appointment.models import Appointment, AppointmentCheckout
@@ -12,13 +13,18 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q, F, IntegerField
+from Client.helpers import calculate_validity
 from Service.models import Service
 from Business.models import Business, BusinessAddress
+from SaleRecords.models import SaleRecordMembership , SaleRecordVouchers
 from Product.models import Product
 from Utility.models import Country, Currency, ExceptionRecord, Language, State, City
 from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, \
     DiscountMembership, LoyaltyPoints, Subscription, Rewards, Promotion, Membership, Vouchers, ClientLoyaltyPoint, \
-    LoyaltyPointLogs, VoucherCurrencyPrice, ClientImages, Comments
+    LoyaltyPointLogs, VoucherCurrencyPrice, ClientImages
+    
+from SaleRecords.models import PurchasedGiftCards
+from SaleRecords.serializers import PurchasedGiftCardsSerializer
 from Client.serializers import (SingleClientSerializer, ClientSerializer, ClientGroupSerializer,
                                 LoyaltyPointsSerializer,
                                 SubscriptionSerializer, RewardSerializer, PromotionSerializer, MembershipSerializer,
@@ -27,12 +33,12 @@ from Client.serializers import (SingleClientSerializer, ClientSerializer, Client
                                 ClientMembershipsSerializer,
                                 ClientDropdownSerializer, CustomerDetailedLoyaltyPointsLogsSerializerOP,
                                 ClientImagesSerializerResponses,
-                                ClientImageSerializer, ClientResponse,
+                                ClientImageSerializer,
                                 )
 from Business.serializers.v1_serializers import BusinessAddressSerilaizer
 from Utility.models import NstyleFile
 
-from Sale.Constants.Custom_pag import CustomPagination
+from Sale.Constants.Custom_pag import CustomPagination, AppointmentsPagination
 
 import json
 from NStyle.Constants import StatusCodes
@@ -44,6 +50,9 @@ from Order.models import Checkout
 from Appointment import choices
 from Appointment.models import Appointment
 from Appointment.serializers import PaidUnpaidAppointmentSerializer, ClientImagesSerializerResponse
+from Appointment.models import Comment
+from Appointment.serializers import CommentSerializer
+from Authentication.models import User
 
 
 @transaction.atomic
@@ -548,7 +557,9 @@ def create_client(request):
         about_us=about_us,
     )
     if images is not None:
-        ids = json.loads(images)
+        # ids = json.loads(images)
+        # ids = images
+        ids = [id for id in images if isinstance(id, int)]  # Extract and convert to integers
         for id in ids:
             ClientImages.objects.filter(id=id).update(client_id=client.id)
 
@@ -2086,7 +2097,9 @@ def create_memberships(request):
 def get_memberships(request):
     location_id = request.GET.get('location_id')
     search_text = request.GET.get('search_text')
+    
     all_memberships = Membership.objects \
+        .filter(is_deleted=False) \
         .with_total_orders() \
         .order_by('-total_orders')
     all_memberships_count = all_memberships.count()
@@ -2104,7 +2117,12 @@ def get_memberships(request):
     all_memberships = paginator.get_page(page_number)
 
     serialized = MembershipSerializer(all_memberships, many=True,
-                                      context={'request': request, 'location_id': location_id})
+                                    context={'request': request, 'location_id': location_id})
+    filtered_memberships = [membership for membership in serialized.data if membership["currency_membership"]]
+    
+    
+    
+    
     return Response(
         {
             'status': 200,
@@ -2115,7 +2133,8 @@ def get_memberships(request):
                 'pages': page_count,
                 'per_page_result': per_pege_results,
                 'error_message': None,
-                'membership': serialized.data
+                # 'membership': serialized.data
+                'membership':filtered_memberships
             }
         },
         status=status.HTTP_200_OK
@@ -2158,8 +2177,10 @@ def delete_memberships(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-
-    memberships.delete()
+    # Member ship Soft Delete
+    memberships.is_deleted = True
+    memberships.is_active = False
+    memberships.save()
     return Response(
         {
             'status': True,
@@ -2257,8 +2278,10 @@ def update_memberships(request):
         membership.save()
 
     errors.append(services)
+    
     for serv in services:
         service_id = serv['service']
+        percentage = serv['percentage']
         if 'duration' in serv:
             duration = serv['duration']
         else:
@@ -2271,8 +2294,11 @@ def update_memberships(request):
             try:
                 membership_service, created = DiscountMembership.objects.get_or_create(
                     service=service_instance,
-                    membership=membership
+                    membership=membership,
+                    # percentage = percentage
                 )
+                if membership_service:
+                    membership_service.percentage = percentage
             except Exception as err:
                 errors.append(str(err))
             else:
@@ -2378,6 +2404,8 @@ def create_vouchers(request):
     # valid_for = request.data.get('valid_for', None)
 
     validity = request.data.get('validity', None)
+    expiry_date = calculate_validity(validity)
+    
     # validity = "5 Min"
 
     sales = request.data.get('sales', None)
@@ -2431,6 +2459,7 @@ def create_vouchers(request):
         validity=validity,
         voucher_type=voucher_type,
         sales=sales,
+        end_date = expiry_date,
         discount_percentage=discount_percentage,
     )
     if currency_voucher_price is not None:
@@ -2489,7 +2518,7 @@ def get_vouchers(request):
 
     if location_id and quick_sales:
         try:
-            location = BusinessAddress.objects.get(id=location_id)
+            location = BusinessAddress.objects.get(id=location_id, is_deleted=False)
         except Exception as err:
             return Response(
                 {
@@ -2507,6 +2536,7 @@ def get_vouchers(request):
                 query['voucher_vouchercurrencyprice__currency__id'] = str(location.currency.id)
     all_voucher = Vouchers.objects \
         .filter(**query) \
+        .filter(is_deleted=False) \
         .with_total_orders() \
         .order_by('-total_orders')
     all_voucher_count = all_voucher.count()
@@ -2577,8 +2607,10 @@ def delete_vouchers(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-
-    voucher.delete()
+    # Voucher Soft Delete
+    voucher.is_deleted = True
+    voucher.is_active = False
+    voucher.save()
     return Response(
         {
             'status': True,
@@ -2870,6 +2902,57 @@ def get_client_available_loyalty_points(request):
     )
 
 
+# new api added
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_client_all_gift_cards(request):
+    location = request.GET.get('location_id')
+    client = request.GET.get('client_id', None)
+    code = request.GET.get('code', None)
+    
+
+    query = Q(sale_record__location = location,
+            spend_amount__gt=0,
+            expiry__gte=timezone.now(),
+            ) 
+
+    if client is not None:
+        query &= Q(sale_record__client = client)
+        
+    if code is not None:
+        # query &= Q(gift_card__code = code)
+        # if not query.exists():
+            query &= Q(sale_code = code)
+        
+    client_gift_cards = PurchasedGiftCards.objects.filter(query)
+    
+    
+    if not client_gift_cards.exists():
+        return Response({
+            'status': True,
+            'status_code': 200,
+            'response': {
+                "message": "Enter a valid gift card",
+                'error_message': "No gift card with the provided code and location ID",
+                'status': 404,
+                'client_gift_cards': None
+            }
+        })
+    serializer = PurchasedGiftCardsSerializer(client_gift_cards, many = True)
+    
+    return Response({
+        'status': True,
+            'status_code': 200,
+            'response': {
+                "message": "Gift card details retrieved successfully",
+                'error_message': None,
+                'status': 200,
+                'client_gift_cards': serializer.data
+            }
+    })
+
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_client_all_vouchers(request):
@@ -2877,9 +2960,10 @@ def get_client_all_vouchers(request):
     client_id = request.GET.get('client_id', None)
 
     try:
-        client_vouchers = VoucherOrder.objects.filter(
-            client__id=client_id,
-            end_date__gt=datetime.now()
+        client_vouchers = SaleRecordVouchers.objects.filter(
+            sale_record__client__id=client_id,
+            sale_record__location__id = location_id,
+            # voucher__end_date__gt=datetime.now()
         )
 
     except Exception as error:
@@ -2919,13 +3003,12 @@ def get_client_all_memberships(request):
 
     today_date = datetime.now()
     today_date = today_date.strftime('%Y-%m-%d')
-    client_membership = MemberShipOrder.objects.filter(
-
-        location__id=location_id,
+    client_membership = SaleRecordMembership.objects.filter(
+        sale_record__location__id=location_id,
+        expiry__gte=timezone.now(),
         # created_at__lt = F('end_date'),
         # end_date__gte = today_date,
-        client__id=client_id,
-
+        sale_record__client__id=client_id,
     )
 
     # return JsonResponse({'data': client_membership})
@@ -3530,8 +3613,22 @@ def get_client_images(request):
 def create_comment(request):
     comment = request.data.get('comment', None)
     employee_id = request.data.get('employee_id', None)
-    comment = Comments.objects.create(employee_id=employee_id, comment=comment)
-    client_data = ClientResponse(comment, many=False).data
+    user_id = request.data.get('user_id', None)
+    appointment = request.data.get('appointment_id', None)
+    group_appointment = request.data.get('group_appointment', None)
+    
+    
+    if appointment:
+        appointment = Appointment.objects.get(id=appointment)
+    
+        
+    comment = Comment.objects.create(employee_id=employee_id,
+                                    comment=comment,
+                                    user_id=user_id,
+                                    appointment=appointment,
+                                    group_appointment_id=group_appointment)
+    
+    client_data = CommentSerializer(comment, many=False).data  
     return Response(
         {
             'status': True,
@@ -3545,38 +3642,41 @@ def create_comment(request):
         status=status.HTTP_201_CREATED
     )
 
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_comment(request):
-    employee_id = request.query_params.get('employee_id', None)
-    if employee_id:
-        comment = Comments.objects.filter(employee_id=employee_id)
-        client_data = ClientResponse(comment, many=False).data
-        return Response(
-            {
-                'status': True,
-                'status_code': 200,
-                'response': {
-                    'message': 'Comment added successfully',
-                    'error_message': [],
-                    'data': client_data
-                }
-            },
-            status=status.HTTP_201_CREATED
-        )
-    else:
-        comment = Comments.objects.all()
-        client_data = ClientResponse(comment, many=True).data
-        return Response(
-            {
-                'status': True,
-                'status_code': 200,
-                'response': {
-                    'message': 'Comment added successfully',
-                    'error_message': [],
-                    'data': client_data
-                }
-            },
-            status=status.HTTP_201_CREATED
-        )
+    group_appointment = request.query_params.get('group_appointment', None)
+    appointment = request.query_params.get('appointment_id', None)
+    
+    query = Q()
+    if group_appointment:
+        query &= Q(group_appointment=group_appointment)
+    elif appointment:
+        query &= Q(appointment=appointment)
+
+    comment = Comment.objects.filter(query)
+    
+    paginator = AppointmentsPagination()
+    paginator.page_size = 10
+    comment = paginator.paginate_queryset(comment, request)
+    
+    client_data = CommentSerializer(comment, many=True).data
+    
+    data = {
+        'status': True,
+        'status_code': 200,
+        'status_code_text': '200',
+        "response": {
+            "message": "Comment get Successfully",
+            "error_message": None,
+            "data": client_data,
+            'count': paginator.page.paginator.count,
+            'next': paginator.get_next_link(),
+            'previous': paginator.get_previous_link(),
+            'current_page': paginator.page.number,
+            'per_page': paginator.page_size,
+            'total_pages': paginator.page.paginator.num_pages,
+        }
+    }
+    
+    return Response(data, status=201)

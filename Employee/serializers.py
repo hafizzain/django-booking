@@ -29,7 +29,8 @@ from .models import (EmployeDailySchedule, Employee, EmployeeProfessionalInfo,
                      )
 from Authentication.models import AccountType, User
 from django_tenants.utils import tenant_context
-
+from Business.models import BusinessAddress
+from Product.models import CurrencyRetailPrice
 
 class VacationDetailsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -1004,6 +1005,11 @@ class HolidaysSerializer(serializers.ModelSerializer):
         model = Holiday
         fields = "__all__"
 
+class Allscedulae(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeDailySchedule
+        fields = "__all__"
+
 
 class VacationSerializerResponse(serializers.ModelSerializer):
     class Meta:
@@ -1127,7 +1133,8 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
 
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'vacation','is_leo_day', 'is_holidays', 'is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date',
+        fields = ['id', 'vacation', 'is_leo_day', 'is_holidays', 'is_holiday', 'date', 'is_vacation', 'is_leave',
+                  'from_date',
                   'is_working_schedule',
                   'day', 'end_time_shift', 'end_time', 'is_weekend', 'vacation_status', 'note',
                   'start_time']
@@ -1158,7 +1165,7 @@ class ScheduleSerializerResponse(serializers.ModelSerializer):
 
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'title', 'date', 'employee','is_weekend','vacation','from_date']
+        fields = ['id', 'title', 'date', 'employee', 'is_weekend', 'vacation', 'from_date']
 
 
 class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
@@ -1336,6 +1343,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         #     Q(is_vacation=True, vacation_status='accepted'),
         #     **query
         # )
+        # qs = EmployeDailySchedule.objects.filter(employee=obj, **query)
         qs = EmployeDailySchedule.objects.filter(employee=obj)
         qs = qs.exclude(vacation_status='pending')
         # qs = qs.annotate(
@@ -2045,16 +2053,68 @@ class GiftCardDetails(serializers.ModelSerializer):
         model = GiftDetail
         fields = "__all__"
 
+class CurrencySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Currency
+        fields = ['id', 'code']
 
 class GiftCardSerializerResponse(serializers.ModelSerializer):
     gift_card_details = GiftCardDetails(many=True)
+    currency = serializers.SerializerMethodField(read_only=True)
+    # retails_price = serializers.SerializerMethodField(read_only=True)
+    
+    def get_currency(self, obj):
+        selected_location = self.context.get('selected_location')
+        
+        if selected_location:
+            business_address = BusinessAddress.objects.get(id=selected_location)
+            currency = business_address.currency
 
+            if currency:
+                currency_data = CurrencySerializer(currency).data
+            
+                return currency_data
+            else:
+                return None
+        else:
+            currency = Currency.objects.all()
+
+            currency_data = CurrencySerializer(currency, many=True).data
+            
+            return currency_data
+        
     class Meta:
         model = GiftCards
         fields = "__all__"
-
-
+        
 class EmployeDailyScheduleResponse(serializers.ModelSerializer):
     class Meta:
         model = EmployeDailySchedule
         fields = "__all__"
+
+class SingleGiftCardDetails(serializers.ModelSerializer):
+    gift_card_details = serializers.SerializerMethodField(read_only=True)
+    class Meta:
+        model = GiftCards
+        fields = "__all__"
+        
+    def get_gift_card_details(self, obj):
+        location_id = self.context.get('location_id')
+        # Retrieve the BusinessAddress based on the provided location_id
+        business_address = BusinessAddress.objects.get(id=location_id)
+        currency=business_address.currency
+
+        #Filter the GiftDetail based on the provided currency
+        query = GiftDetail.objects.filter(currencies=currency) \
+                                    .filter(gift_card=obj)
+        
+        #Serialize the GiftDetail
+        return GiftCardRetailPriceSerializer(query, many= True).data
+class GiftCardRetailPriceSerializer(serializers.ModelSerializer):
+    currency_code = serializers.CharField(source='currencies.code')
+    currency = serializers.CharField(source='currencies.id')
+    spend_amount = serializers.CharField(read_only=True)
+    class Meta:
+        model = GiftDetail
+        fields = ['currency_code','spend_amount','currency','price']
+        

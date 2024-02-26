@@ -535,8 +535,12 @@ class ServiceSerializerMainpage(serializers.ModelSerializer):
     price = serializers.SerializerMethodField(read_only=True)
 
     def get_price(self, obj):
+    
         ser = obj.service_priceservice.order_by('-created_at').first()
-        return ser.price
+        if ser:
+            return ser.price
+        else:
+            return None
 
     def get_service_group(self, obj):
         group = obj.servicegroup_services.filter(is_deleted=False)
@@ -657,7 +661,7 @@ class POSerializerForClientSale(serializers.ModelSerializer):
         return obj.product.name if obj.product.name else None
 
     def get_price(self, obj):
-        return obj.current_price
+        return obj.product.cost_price
 
     def get_product_details(self, obj):
         return obj.product.description if obj.product.description else None
@@ -669,11 +673,11 @@ class POSerializerForClientSale(serializers.ModelSerializer):
         return obj.product.name
 
     def get_member(self, obj):
-        return obj.member.full_name
+        return obj.employee.full_name
 
     class Meta:
         model = ProductOrder
-        fields = ['quantity', 'status', 'created_at', 'member', 'tip', 'payment_type', 'price',
+        fields = ['quantity', 'status', 'member', 'created_at', 'tip', 'payment_type', 'price',
                   'name', 'product_name', 'gst', 'order_type', 'product_details']
 
 
@@ -847,13 +851,16 @@ class SOSerializerForClientSale(serializers.ModelSerializer):
         return obj.service.name
 
     def get_member(self, obj):
-        return obj.member.full_name
+        # return obj.member.full_name
+        return obj.employee.full_name
 
     def get_user(self, obj):
-        return obj.user.full_name
+        # return obj.user.full_name
+        return obj.sale_record.user.full_name
 
     def get_price(self, obj):
-        return obj.current_price
+        # return obj.current_price
+        return obj.price
 
     class Meta:
         model = ServiceOrder
@@ -873,14 +880,18 @@ class MOrderSerializerForSale(serializers.ModelSerializer):
         return 'Membership'
 
     def get_member(self, obj):
-        return obj.member.full_name
-
+        try:
+            return obj.member.full_name
+        except:
+            return None
     def get_membership(self, obj):
         return obj.membership.name
 
     def get_price(self, obj):
-        return obj.current_price
-
+        try:
+            return obj.current_price
+        except:
+            return obj.price
     class Meta:
         model = MemberShipOrder
         fields = ['membership', 'order_type', 'member', 'quantity', 'price', 'created_at']
@@ -1045,13 +1056,51 @@ class VOSerializerForClientSale(serializers.ModelSerializer):
         return 'Voucher'
 
     def get_member(self, obj):
-        return obj.member.full_name
+        # return obj.member.full_name
+        try:
+            return obj.member.full_name
+        except:
+            return None
 
     def get_voucher(self, obj):
-        return obj.voucher.name
+        try:
+            return obj.voucher.name
+        except:
+            return None
 
     def get_price(self, obj):
-        return obj.current_price
+        # return obj.current_price
+        return obj.price
+
+    class Meta:
+        model = VoucherOrder
+        fields = ['voucher', 'member', 'quantity', 'order_type', 'price', 'created_at', ]
+        
+class VoucherSerializerForClientSale(serializers.ModelSerializer):
+    # client = serializers.SerializerMethodField(read_only=True)
+    member = serializers.SerializerMethodField(read_only=True)
+    voucher = serializers.SerializerMethodField(read_only=True)
+    order_type = serializers.SerializerMethodField(read_only=True)
+    price = serializers.SerializerMethodField(read_only=True)
+
+    def get_order_type(self, obj):
+        return 'Voucher'
+
+    def get_member(self, obj):
+        try:
+            return obj.employee.full_name
+        except:
+            return None
+
+    def get_voucher(self, obj):
+        try:
+            return obj.voucher.name
+        except:
+            return None
+
+    def get_price(self, obj):
+        # return obj.current_price
+        return obj.price
 
     class Meta:
         model = VoucherOrder

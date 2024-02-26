@@ -4,6 +4,7 @@ from Appointment.views.v1 import views
 urlpatterns = [
     # Appointment
     path('create_appointment/', views.create_appointment),
+    path('create_group_appointment/', views.create_group_appointment),
     path('get_calendar_appointment/', views.get_calendar_appointment),
     path('create_reversal/', views.create_reversal),
     # path('get_all_appointments/',views.get_all_appointments),
@@ -13,6 +14,7 @@ urlpatterns = [
     path('get_today_appointments/', views.get_today_appointments),
     path('get_single_appointments/', views.get_single_appointments),
     path('get_appointments_service/', views.get_appointments_service),
+    path('get_appointments_group_services/', views.get_appointments_group_services),
 
     # new apis for latest requirements
     path('appointment_service_status_update/', views.appointment_service_status_update),
@@ -74,4 +76,8 @@ urlpatterns = [
     path('missed_opportunities/<uuid:id>/', views.MissedOpportunityListCreate.as_view(), name='missed-opportunities-delete'),
 
     path('update_reversal/', views.update_reversals),
+    path('appointment_check_in/', views.update_appointment_check_in),
+    path('group_appointment_check_in/', views.update_group_appointment_check_in),
+    path('appointment_time_report/', views.appointment_time_report),
+    
 ]

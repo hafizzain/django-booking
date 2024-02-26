@@ -8,6 +8,7 @@ from Utility.Campaign import send_refund_email
 from Finance.models import Refund, RefundCoupon, AllowRefunds,AllowRefundPermissionsEmployees, RefundProduct, RefundServices
 from Finance.serializers import RefundSerializer, CouponSerializer, AllowRefundsSerializer
 from Finance.helpers import short_uuid, check_permission, check_days
+from SaleRecords.models import SaleRecordsAppointmentServices, SaleRecordsProducts, SaleRecordServices
 from Invoices.models import SaleInvoice
 from Client.serializers import SaleInvoiceSerializer
 from Client.models import Client
@@ -15,6 +16,17 @@ from Client.models import Client
 
 from Appointment.models import AppointmentCheckout, AppointmentService
 from Order.models import Checkout, ProductOrder, ServiceOrder
+
+
+from django.core.exceptions import ObjectDoesNotExist
+
+
+
+
+
+
+
+
 
 @api_view(['GET'])
 def check_permission_view(request):
@@ -137,6 +149,7 @@ class RefundAPIView(APIView):
             user = request.user
             request.data['user'] = user.id
             expiry_date = request.data.get('expiry_date')
+        
             serializer = RefundSerializer(data=request.data, context={'request': request})
             # return Response({'data': serializer.validated_data}, status=status.HTTP_200_OK)
             if serializer.is_valid():
@@ -147,6 +160,7 @@ class RefundAPIView(APIView):
                 # refunded_products_ids = list(refundprodcts.objects.filter().values_list('id', flat=True))
                 refunded_products_ids = refund_instance.refunded_products.values_list('product__id', flat=True)
                 refunded_services_ids = refund_instance.refunded_services.values_list('service__id', flat=True)
+                # return Response({'refund services count': refunded_services_ids.count(), 'refund product count': refunded_products_ids })
                 # return Response({'refund product list': refunded_products_ids, 'refund service list': refunded_services_ids})
                 #      create invoice
                 try:    
@@ -158,59 +172,106 @@ class RefundAPIView(APIView):
                     newCheckoutInstance.pk = None 
                     # newCheckoutInstance.is_refund = True
                     newCheckoutInstance.save()
-                    newCheckoutInstance.previous_checkout = checkout_instance
+                    newCheckoutInstance.checkout_type = 'Refund'
+                    newCheckoutInstance.sub_total = float(-refund_price)
+                    newCheckoutInstance.total_price = float(-refund_price)
                     newCheckoutInstance.save()
 
-                    
-
-                    if checkout_type == 'appointment': 
-                        newAppointment = checkout_instance.appointment 
+                    if checkout_type == 'Appointment': 
+                        print('coming here')
+                        newAppointment = checkout_instance.appointment_services.appointment
                         newAppointment.pk = None 
                         newAppointment.save() 
                         
-                        order_items = AppointmentService.objects.get_active_appointment_services(appointment = checkout_instance.appointment, service__id__in = refunded_services_ids) 
-
+                        order_items = SaleRecordsAppointmentServices.objects.filter(appointment = invoice.checkout_instance.appointment_services.appointment, service__id__in = refunded_services_ids) 
+                        # return Response({'Appointment order count ': order_items.count() })
+                        # for order in order_items:
+                        #     order.pk = None
+                        #     order.is_refund = 'refund'
+                        #     order.price = float(-RefundServices.objects.get(service__id = order.id).refunded_amount)
+                        #     # order.tip = 0
+                        #     # order.gst = 0
+                        #     # order.tax_amount = 0
+                        #     order.appointment = newAppointment
+                        #     order.save()
+                        
+                        
                         for order in order_items:
-                            order.pk = None
-                            order.is_refund = 'refund'
-                            order.total_price = -RefundServices.objects.get(service__id = order.id).refunded_amount
-                            order.tip = 0
-                            order.gst = 0
-                            # order.tax_amount = 0
-                            order.appointment = newAppointment
-                            order.save()
-                            
+                            refunded_services = RefundServices.objects.get(checkouts = invoice.checkout_instance,service__id = order.service.id)
+                            SaleRecordsAppointmentServices.objects.create(
+                                sale_record = newCheckoutInstance,
+                                appointment = newAppointment,
+                                employee = order.employee, 
+                                service = order.service,
+                                service_start_time = order.service_start_time,
+                                service_end_time = order.service_end_time,
+                                quantity = 1,
+                                price = float(-refunded_services.price)
+                            )
+                    
                         # or you can do it in loop
                     else: 
-                        product_orders = ProductOrder.objects.filter(checkout=checkout_instance, product__id__in = refunded_products_ids) 
-                        # product_orders.update(pk = None, checkout=newCheckoutInstance) 
-                        
+                        product_orders = SaleRecordsProducts.objects.filter(sale_record=invoice.checkout_instance, product__id__in = refunded_products_ids) 
+                        # return Response({'product orders count': product_orders.count()})
+
                         for order in product_orders:
-                            order.pk = None
-                            order.checkout = newCheckoutInstance
-                            order.quantity = -RefundProduct.objects.get(product__id = order.id).refunded_quantity
-                            order.tip = 0
-                            order.gst = 0
-                            # order.tax_amount = 0
-                            order.is_refund = 'refund'
-                            order.price = RefundProduct.objects.get(product__id = order.id).refunded_amount 
-                            order.save()
+                                # raise ValueError('comming here')
+                                refund_product = RefundProduct.objects.get(checkouts = invoice.checkout_instance.id,product=order.product)
+                                # raise ValueError('comign here')
+                                
+                                # raise ValueError(f'comitn here refund p :{refund_product.id} actual p: {order.product.id}')
+                                # newOrder = order
+                                # newOrder.pk = None
+                                # newOrder.sale_record = newCheckoutInstance
+                                # newOrder.save()
+                                # newOrder.quantity = refund_product.refunded_quantity
+                                # newOrder.price = float(-refund_product.refunded_amount)
+                                # newOrder.save()
+                                
+                                # order.sale_record = newCheckoutInstance
+                                
+                                # return Response({'new checkout instance id': newCheckoutInstance.id})
+                                # raise ValueError('Coming here')
+                                # return Response({'product orders count': refund_product.count()})
+                                # Create a new SaleRecordsProducts instance for the refund
+                                
+                                SaleRecordsProducts.objects.create(
+                                    sale_record= newCheckoutInstance,
+                                    employee=order.employee,  
+                                    product=order.product,
+                                    quantity = refund_product.refunded_quantity,
+                                    price = float(-refund_product.refunded_amount),
+                                )
+                                
                             
-                        service_orders = ServiceOrder.objects.filter(checkout=checkout_instance, service__id__in = refunded_services_ids) 
-                        # service_orders.update(pk = None, checkout=newCheckoutInstance) 
-                        for order in service_orders:
-                            order.pk = None
-                            order.checkout = newCheckoutInstance
-                            order.is_refund = 'refund'
-                            order.price = -RefundServices.objects.get(service__id = order.id).refunded_amount
-                            order.save()
+                            
+                        # service_orders = SaleRecordServices.objects.filter(sale_record=invoice.checkout_instance, service__id__in = refunded_services_ids) 
+                        # # service_orders.update(pk = None, checkout=newCheckoutInstance) 
+                        # for order in service_orders:
+                        #     try :
+                        #         refunded_services = RefundServices.objects.get(checkouts = invoice.checkout_instance,service__id = order.service.id)
+                        #         SaleRecordServices.objects.create(
+                        #             sale_record = newCheckoutInstance,
+                        #             employee = order.employee,
+                        #             service = order.service,
+                        #             quantity = 1,
+                        #             price = float(-refunded_services.price)
+                        #         )
+                        #     except ObjectDoesNotExist:
+                        #         print(f"No RefundProduct found for product ID {order.product.id}")
+                            
                         
                     newInvoice = invoice 
                     newInvoice.pk = None 
                     newInvoice.invoice_type = 'refund'
-                    newInvoice.total_product_price = float(-refund_price)
+                    newInvoice.payment_type = 'Cash'
+                    newInvoice.client_type = 'Walk_in'
+                    newInvoice.sub_total = float(-refund_price)
+                    newInvoice.total_amount = float(-refund_price)
                     newInvoice.checkout = str(newCheckoutInstance.id) 
-                    newInvoice.checkout_type = 'refund'
+                    newInvoice.total_tax = 0
+                    newInvoice.total_tip = 0
+                    # newInvoice.checkout_type = 'refund'
                     newInvoice.payment_type = payment_type
                     newInvoice.save() 
 

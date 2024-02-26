@@ -187,30 +187,43 @@ class HolidayApiView(APIView):
 
     @transaction.atomic
     def delete(self, request, pk):
-        holiday_data = {}
-        holiday = Holiday.objects.filter(id=pk)
-        if holiday:
-            holiday_first = Holiday.objects.filter(id=pk).first()
-            holiday_data = {
-                'start_date': holiday_first.start_date,
-                'end_date': holiday_first.end_date if holiday_first.end_date else None,
-            }
-        holiday.delete()
+        try:
+            holiday = Holiday.objects.get(id=pk)
+        except:
+            return Response(
+                {
+                    "success": False,
+                    "status_code": 404,
+                    "response": {
+                        "message": "Holiday not found",
+                        "error_message": None,
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        query = {}
+        if holiday.start_date and holiday.end_date:
+            query['date__date__range'] = (holiday.start_date, holiday.end_date if holiday.end_date else '3000-12-29')
+        else:
+            query['date__date'] = holiday.start_date
+
         holiday_schedule = EmployeDailySchedule.objects.filter(
             is_holiday=True,
-            from_date=holiday_data['start_date'],
-            to_date=holiday_data['end_date']
+            **query,
         )
         holiday_schedule.delete()
-        # holidays = Holiday.objects.all()
-        # holidays.delete()
+        holiday.delete()
+
         data = {
             "success": True,
             "status_code": 200,
             "response": {
                 "message": "Holiday deleted successfully",
                 "error_message": None,
-                "data": None
+                "data": None,
+                'end_date' : str(holiday.end_date),
+                'start_date' : str(holiday.start_date)
             }
         }
         return Response(data, status=status.HTTP_200_OK)

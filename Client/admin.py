@@ -30,11 +30,15 @@ class VoucherCurrencyPriceAdmin(admin.ModelAdmin):
 class LoyaltyPointLogsAdmin(admin.ModelAdmin):
     list_display= [
         'id',
+        'checkout',
         'points_earned',
         'points_redeemed',
         'balance',
         'actual_sale_value_redeemed',
+        'created_at'
     ]
+    ordering = ['-created_at']
+    
 @admin.register(LoyaltyPoints)
 class LoyaltyPointsAdmin(admin.ModelAdmin):
     list_display= [
@@ -44,6 +48,7 @@ class LoyaltyPointsAdmin(admin.ModelAdmin):
         'earn_points',
         'total_earn_from_points',
     ]
+    ordering = ['-created_at']
 
 
 @admin.register(ClientLoyaltyPoint)
@@ -58,6 +63,7 @@ class ClientLoyaltyPointAdmin(admin.ModelAdmin):
         'total_available_points',
         'created_at',
     ]
+    ordering = ['-created_at']
 
     def client_name(self, obj):
         if obj.client:

@@ -134,6 +134,7 @@ class Employee(models.Model):
 
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
+    in_active_date = models.DateField(null=True)
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(null=True, blank=True)
@@ -186,7 +187,7 @@ class EmployeeSelectedService(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='employee_service')
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_selected_service')
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-    level = models.CharField(max_length=100, choices=LEVEL_CHOICE, default='Average',
+    level = models.CharField(max_length=255, choices=LEVEL_CHOICE, default='Average',
                              verbose_name='Employee Service Level')
 
     def __str__(self):
@@ -706,10 +707,10 @@ class GiftCards(models.Model):
     ]
     term_condition = models.TextField(null=True)
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-    name = models.TextField(null=True, blank=True)
+    # name = models.TextField(null=True, blank=True)
     title = models.TextField(null=True, blank=True)
     gift_card_value = models.FloatField(default=0, null=True)
-    retail_price = models.FloatField(default=0, null=True)
+    # retail_price = models.FloatField(default=0, null=True, blank = True)
     expire_date = models.DateField(auto_now_add=now, null=True)
     start_date = models.DateField(null=True)
     end_date = models.DateField(null=True)
@@ -724,24 +725,26 @@ class GiftCards(models.Model):
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)
     custom_card = models.TextField(null=True)
-    price = models.FloatField(default=0, null=True)
-    retail_price = models.FloatField(default=0, null=True)
+    is_custom_card = models.BooleanField(default=False)
+    
+    # Common Fields
+    is_active = models.BooleanField(default=True)
+    is_blocked = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
 
 
 class GiftDetail(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     gift_card = models.ForeignKey(GiftCards, on_delete=models.CASCADE, null=True,related_name='gift_card_details')
     price = models.FloatField(default=0, null=True)
-    retail_price = models.FloatField(default=0, null=True)
+    spend_amount = models.FloatField(default=0, null=True)
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)
     currency = models.TextField(null=True)
     currencies = models.ForeignKey(Currency , on_delete=models.CASCADE , null=True,related_name='gift_detail_currencies')
+    retail_price = models.FloatField(default=0, null=True, blank=True)  # Add this line for retail_price
 
-
-class GiftDetails(models.Model):
-    gift_card = models.ForeignKey(GiftCards, on_delete=models.CASCADE, null=True)
-    price = models.FloatField(default=0, null=True)
-    retail_price = models.FloatField(default=0, null=True)
-    created_at = models.DateTimeField(auto_now_add=now, null=True)
-    updated_at = models.DateTimeField(null=True, blank=True)
+    # Common Fields
+    is_active = models.BooleanField(default=True)
+    is_blocked = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)

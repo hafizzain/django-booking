@@ -3,7 +3,7 @@ from django.contrib import admin
 from .models import(CommissionSchemeSetting, EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeePermissionSetting, EmployeeModulePermission, 
                     EmployeeMarketingPermission ,StaffGroup , CategoryCommission,
                     StaffGroupModulePermission , Attendance , 
-                    Payroll, Asset, AssetDocument, EmployeeSelectedService, Vacation, EmployeeCommission )
+                    Payroll, Asset, AssetDocument, EmployeeSelectedService, Vacation, EmployeeCommission, GiftCards, GiftDetail )
 # Register your models here.
 
 @admin.register(Vacation)
@@ -131,6 +131,7 @@ class EmployeeCommissionAdmin(admin.ModelAdmin):
         'full_commission',
         'created_at',
     ]
+    ordering = ['-created_at']
 
     def total_sale_value(self, instance):
         return instance.sale_value * instance.quantity
@@ -190,6 +191,15 @@ class CategoryCommissionAdmin(admin.ModelAdmin):
         
         return '-------'
 
+@admin.register(GiftCards)
+class GiftCardsAdmin(admin.ModelAdmin):
+    list_display = ['id']
+    
+    
+    
+@admin.register(GiftDetail)
+class GiftCardsAdmin(admin.ModelAdmin):
+    list_display = ['id']
 # from django.db.migrations.recorder import MigrationRecorder
 # @admin.register(MigrationRecorder.Migration)
 # class MigrationRecorderAdmin(admin.ModelAdmin):

@@ -206,9 +206,10 @@ class ClientImages(models.Model):
     file_type = models.TextField(null=True, blank=True)
 
 
-class Comments(CommonField):
-    comment = models.TextField(null=True)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
+# class Comments(CommonField):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_comment',null=True)
+#     comment = models.TextField(null=True)
+#     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
 
 
 class ClientGroup(models.Model):
@@ -367,6 +368,8 @@ class Vouchers(models.Model):
 
     sales = models.FloatField(default=0)
     price = models.FloatField(default=0)
+    
+    end_date = models.DateTimeField(blank=True, null=True)
 
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
