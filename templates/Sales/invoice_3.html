@@ -295,7 +295,7 @@
                             {% endif %}
                         {% endfor %}
 
-                        
+
                     <div class="flex items-center justify-between text-primary text-sm font-semibold">
                       
                       <div>
@@ -313,46 +313,57 @@
                         {{currency_code}}
                       </p>
                     </div>
-                  {% endfor %}
+                  
                     
                     {% if applied_memberships %}
-                      <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                    {% for m in applied_memberships %}
                       
-                        <div>
-                          <p class="text-left">
-                            Membership Redeemed
-                          </p>
-                        </div>
-                        
-                        {% for m in applied_memberships %}
-                          <p class="text-[#7B7B7B]">
-                            <span></span>{{m.price}}
-                            {{currency_code}}
-                          </p>
-                        {% endfor %}
+                      {% if item.client == m.client %}
+                        <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                      
+                          <div>
+                            <p class="text-left">
+                              Membership Redeemed
+                            </p>
+                          </div>
                           
-                      </div>
-
+                            <p class="text-[#7B7B7B]">
+                              <span></span>{{m.price}}
+                              {{currency_code}}
+                            </p>
+                          
+                        </div>
+                      {% endif %}
+                        {% endfor %}
                     {% endif %}
 
                     {% if applied_coupons %}
-                      <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                      {% for c in applied_coupons %}
                       
-                        <div>
-                          <p class="text-left">
-                            Membership Redeemed
-                          </p>
-                        </div>
+                      {% if item.client == c.client %}
+                          <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                            
+                            <div>
+                              <p class="text-left">
+                                Coupon Redeemed
+                              </p>
+                            </div>
+                            
+                            
+                              <p class="text-[#7B7B7B]">
+                                <span></span>{{c.coupon_discounted_price}}
+                                {{currency_code}}
+                              </p>
+                            
+                              
+                          </div>
+                      {% endif %}
+                      {% endfor %}
                         
-                        {% for c in applied_coupons %}
-                          <p class="text-[#7B7B7B]">
-                            <span></span>{{m.coupon_discounted_price}}
-                            {{currency_code}}
-                          </p>
-                        {% endfor %}
-                          
-                      </div>
-
+                        
+                        
+                        
+                      {% endfor %}
                     {% endif %}
 
                   {% endif %}
