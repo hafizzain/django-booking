@@ -215,10 +215,9 @@ class RefundAPIView(APIView):
                         # return Response({'product orders count': product_orders.count()})
 
                         for order in product_orders:
-                            raise ValueError('comign here')
-                            try:
                                 # raise ValueError('comming here')
                                 refund_product = RefundProduct.objects.get(checkouts = invoice.checkout_instance,product__id=order.product.id)
+                                raise ValueError('comign here')
                                 
                                 raise ValueError(f'comitn here refund p :{refund_product.id} actual p: {order.product.id}')
                                 # newOrder = order
@@ -244,9 +243,7 @@ class RefundAPIView(APIView):
                                     price = float(-refund_product.refunded_amount),
                                 )
                                 product.save()
-                            except ObjectDoesNotExist:
-                                # Handle the case where RefundProduct does not exist for the current order's product ID
-                                print(f"No RefundProduct found for product ID {order.product.id}")
+                            
                             
                         # service_orders = SaleRecordServices.objects.filter(sale_record=invoice.checkout_instance, service__id__in = refunded_services_ids) 
                         # # service_orders.update(pk = None, checkout=newCheckoutInstance) 
