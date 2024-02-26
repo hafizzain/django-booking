@@ -208,7 +208,7 @@ class RefundAPIView(APIView):
                                 service_start_time = order.service_start_time,
                                 service_end_time = order.service_end_time,
                                 quantity = 1,
-                                price = float(-refunded_services.price)
+                                price = float(-refunded_services.refunded_amount)
                             )
                     
                         # or you can do it in loop
@@ -242,7 +242,7 @@ class RefundAPIView(APIView):
                                     employee = order.employee,
                                     service = order.service,
                                     quantity = 1,
-                                    price = float(-refunded_services.price)
+                                    price = float(-refunded_services.refunded_amount)
                                 )
                             except ObjectDoesNotExist:
                                 print(f"No RefundProduct found for product ID {order.product.id}")
