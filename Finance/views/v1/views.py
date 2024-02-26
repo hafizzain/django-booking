@@ -160,7 +160,7 @@ class RefundAPIView(APIView):
                 # refunded_products_ids = list(refundprodcts.objects.filter().values_list('id', flat=True))
                 refunded_products_ids = refund_instance.refunded_products.values_list('product__id', flat=True)
                 refunded_services_ids = refund_instance.refunded_services.values_list('service__id', flat=True)
-                return Response({'refund services count': refunded_services_ids.count(), 'refund product count': refunded_products_ids })
+                # return Response({'refund services count': refunded_services_ids.count(), 'refund product count': refunded_products_ids })
                 # return Response({'refund product list': refunded_products_ids, 'refund service list': refunded_services_ids})
                 #      create invoice
                 try:    
@@ -212,6 +212,7 @@ class RefundAPIView(APIView):
                         # or you can do it in loop
                     else: 
                         product_orders = SaleRecordsProducts.objects.filter(sale_record=invoice.checkout_instance, product__id__in = refunded_products_ids) 
+                        return Response({'product orders count': product_orders.count()})
 
                         for order in product_orders:
                             try:
