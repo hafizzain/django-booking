@@ -1063,7 +1063,10 @@ class VOSerializerForClientSale(serializers.ModelSerializer):
             return None
 
     def get_voucher(self, obj):
-        return obj.voucher.name
+        try:
+            return obj.voucher.name
+        except:
+            return None
 
     def get_price(self, obj):
         # return obj.current_price
