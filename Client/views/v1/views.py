@@ -3653,7 +3653,7 @@ def get_comment(request):
     
     query = Q()
     if group_appointment:
-            query &= Q(group_appointment='d90ff9be-c066-4452-b113-a1a9c27152f3')
+            query &= Q(group_appointment=group_appointment)
             
     if appointment:
         query &= Q(appointment=appointment)
