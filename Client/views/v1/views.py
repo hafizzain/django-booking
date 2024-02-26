@@ -558,7 +558,8 @@ def create_client(request):
     )
     if images is not None:
         # ids = json.loads(images)
-        ids = images
+        # ids = images
+        ids = [id for id in images if isinstance(id, int)]  # Extract and convert to integers
         for id in ids:
             ClientImages.objects.filter(id=id).update(client_id=client.id)
 
@@ -3646,6 +3647,7 @@ def create_comment(request):
 def get_comment(request):
     group_appointment = request.query_params.get('group_appointment', None)
     appointment = request.query_params.get('appointment_id', None)
+    group_appointment = request.query_params.get('group_appointment', None)
     paginator = AppointmentsPagination()
     paginator.page_size = 10
     

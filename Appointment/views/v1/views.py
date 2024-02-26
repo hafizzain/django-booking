@@ -1639,6 +1639,7 @@ def create_group_appointment(request):
     group_appointments = request.data.get('group_appointments', [])
     business_id = request.data.get('business', None)
     business_address_id = request.data.get('business_address', None)
+    appointment_notes = request.data.get('appointment_notes', None)
 
 
     if not all([group_appointments, business_id]):
@@ -1690,7 +1691,7 @@ def create_group_appointment(request):
     else:
         business_address = None
 
-    group_instance = AppointmentGroup.objects.create(group_name='appointment_group')
+    group_instance = AppointmentGroup.objects.create(group_name='appointment_group', group_notes=appointment_notes)
     all_appointments = []
 
     for g_app in group_appointments:
