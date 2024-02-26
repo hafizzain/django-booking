@@ -3645,79 +3645,38 @@ def create_comment(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_comment(request):
-    
     group_appointment = request.query_params.get('group_appointment', None)
     appointment = request.query_params.get('appointment_id', None)
-    paginator = AppointmentsPagination()
-    paginator.page_size = 10
     
     query = Q()
     if group_appointment:
-            query &= Q(group_appointment=group_appointment)
-            
-            comment = Comment.objects.filter(query)
-            comment = paginator.paginate_queryset(comment, request)
-            client_data = CommentSerializer(comment, many=True).data
-            data = {
-                'status': True,
-                'status_code': 200,
-                'status_code_text': '200',
-                "response": {
-                    "message": "Comment get Successfully",
-                    "error_message": None,
-                    "data": client_data,
-                    'count': paginator.page.paginator.count,
-                    'next': paginator.get_next_link(),
-                    'previous': paginator.get_previous_link(),
-                    'current_page': paginator.page.number,
-                    'per_page': paginator.page_size,
-                    'total_pages': paginator.page.paginator.num_pages,
-                }
-            }
-            return Response(data, status=201)
-            
-    if appointment:
+        query &= Q(group_appointment=group_appointment)
+    elif appointment:
         query &= Q(appointment=appointment)
-        
-        comment = Comment.objects.filter(query)
-        comment = paginator.paginate_queryset(comment, request)
-        client_data = CommentSerializer(comment, many=True).data
-        data = {
-            'status': True,
-            'status_code': 200,
-            'status_code_text': '200',
-            "response": {
-                "message": "Comment get Successfully",
-                "error_message": None,
-                "data": client_data,
-                'count': paginator.page.paginator.count,
-                'next': paginator.get_next_link(),
-                'previous': paginator.get_previous_link(),
-                'current_page': paginator.page.number,
-                'per_page': paginator.page_size,
-                'total_pages': paginator.page.paginator.num_pages,
-            }
-        }
-        return Response(data, status=201)
+
+    comment = Comment.objects.filter(query)
     
-    else:
-        comment = Comment.objects.all()
-        comment = paginator.paginate_queryset(comment, request)
-        client_data = CommentSerializer(comment, many=True).data
-        data = {
-            'status': True,
-            'status_code': 200,
-            'status_code_text': '200',
-            "response": {
-                "message": "Comment get Successfully",
-                "error_message": None,
-                "data": client_data,
-                'count': paginator.page.paginator.count,
-                'next': paginator.get_next_link(),
-                'previous': paginator.get_previous_link(),
-                'current_page': paginator.page.number,
-                'per_page': paginator.page_size,
-                'total_pages': paginator.page.paginator.num_pages,
-            }
+    paginator = AppointmentsPagination()
+    paginator.page_size = 10
+    comment = paginator.paginate_queryset(comment, request)
+    
+    client_data = CommentSerializer(comment, many=True).data
+    
+    data = {
+        'status': True,
+        'status_code': 200,
+        'status_code_text': '200',
+        "response": {
+            "message": "Comment get Successfully",
+            "error_message": None,
+            "data": client_data,
+            'count': paginator.page.paginator.count,
+            'next': paginator.get_next_link(),
+            'previous': paginator.get_previous_link(),
+            'current_page': paginator.page.number,
+            'per_page': paginator.page_size,
+            'total_pages': paginator.page.paginator.num_pages,
         }
-        return Response(data, status=201)
+    }
+    
+    return Response(data, status=201)
