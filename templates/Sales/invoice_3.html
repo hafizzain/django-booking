@@ -823,13 +823,12 @@
           <h1 class="font-bold text-xl normal-case">
             <p>{{ business_address.primary_translation.invoice }} </p>
               {% if business_address.secondary_translation.invoice %} 
-              <p><span class="arabic">{{ business_address.secondary_translation.invoices }} 
-                {% endif %}</span></p>
+              <p class="arabic">{{ business_address.secondary_translation.invoices }} 
+                {% endif %}</p>
             #{{invoice_id}}
-          </h1>
+          </h1> 
 
-          <div
-            class="w-full bg-[#F9F9F9] text-[#7B7B7B] border rounded-md mx-auto p-2 px-4 flex justify-between items-center gap-2 text-sm text-center">
+          <div class="w-full bg-[#F9F9F9] text-[#7B7B7B] border rounded-md mx-auto p-2 px-4 flex justify-between items-center gap-2 text-sm text-center">
             <div>
               <p>{{created_at}}</p>
             </div>
