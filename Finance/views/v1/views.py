@@ -222,13 +222,14 @@ class RefundAPIView(APIView):
                                 # raise ValueError('Coming here')
                                 # return Response({'product orders count': refund_product.count()})
                                 # Create a new SaleRecordsProducts instance for the refund
-                                SaleRecordsProducts.objects.create(
+                                product = SaleRecordsProducts.objects.create(
                                     sale_record= newCheckoutInstance,
                                     employee=order.employee,  
                                     product=order.product,
                                     quantity = refund_product.refunded_quantity,
                                     price = float(-refund_product.refunded_amount),
                                 )
+                                product.save()
                             except ObjectDoesNotExist:
                                 # Handle the case where RefundProduct does not exist for the current order's product ID
                                 print(f"No RefundProduct found for product ID {order.product.id}")
