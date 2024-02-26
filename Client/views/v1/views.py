@@ -3645,14 +3645,14 @@ def create_comment(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_comment(request):
-    group_appointment = request.query_params.get('group_appointment', None)
+    group_appo_id = request.query_params.get('group_appointment', None)
     appointment = request.query_params.get('appointment_id', None)
     paginator = AppointmentsPagination()
     paginator.page_size = 10
     
     query = Q()
-    if group_appointment:
-            query &= Q(group_appointment=group_appointment)
+    if group_appo_id:
+            query &= Q(group_appointment=group_appo_id)
             
     if appointment:
         query &= Q(appointment=appointment)
