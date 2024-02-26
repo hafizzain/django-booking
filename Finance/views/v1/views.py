@@ -217,7 +217,7 @@ class RefundAPIView(APIView):
                         for order in product_orders:
                             try:
                                 refund_product = RefundProduct.objects.get(checkouts = invoice.checkout_instance,product__id=order.product.id)
-                                return Response({'product orders count': product_orders.count()})
+                                return Response({'product orders count': refund_product.count()})
                                 # Create a new SaleRecordsProducts instance for the refund
                                 SaleRecordsProducts.objects.create(
                                     sale_record=newCheckoutInstance,
