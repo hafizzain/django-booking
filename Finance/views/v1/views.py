@@ -121,8 +121,9 @@ class RefundAPIView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
         query = Q()
         if service_group:
-            services =list(ServiceGroup.objects.get(id=service_group).services.all().values_list('id', flat=True))
-            query &= Q(service__in=services)
+            services =ServiceGroup.objects.get(id=service_group).services.all()
+            services_list = list(services.values_list('id', flat=True))
+            query &= Q(service__in=services_list)
             
         if request.GET.get('type') == 'Service':
             refunds = RefundServices.objects.filter(query).order_by('-created_at')
@@ -130,7 +131,7 @@ class RefundAPIView(APIView):
             paginator = self.pagination_class()
             result_page = paginator.paginate_queryset(refunds, request)
             refund_serializer = RefundServiceSerializer(result_page, many=True)
-            if not refunds.is_valid():
+            if not refunds:
                 response_data = {
                     'success': False,
                     'status_code': 400,
