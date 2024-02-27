@@ -13,6 +13,7 @@ from SaleRecords.models import SaleRecordsAppointmentServices, SaleRecordsProduc
 from Invoices.models import SaleInvoice
 from Client.serializers import SaleInvoiceSerializer
 from Client.models import Client
+from Service.models import ServiceGroup
 
 
 from Appointment.models import AppointmentCheckout, AppointmentService
@@ -68,9 +69,23 @@ class RefundAPIView(APIView):
     pagination_class = PageNumberPagination
     page_size = 10
     def get(self, request, *args, **kwargs):
+        location_id = request.GET.get('location_id', None)
+        search_txt = request.GET.get('search_text', None)
+        service_group = request.GET.get('service_group', None)
+        brand_id = request.GET.get('brand_id', None)
         
+        query = Q()
+        if location_id:
+            query &= Q(refund__location_id=location_id)
+            
+        if search_txt:
+            query &= Q(refund__client__full_name__icontains=search_txt) | Q(product__name__icontains=search_txt)
+            
+        if brand_id:
+            query &= Q(product__brand_id=brand_id)
+            
         if request.GET.get('type') == 'Product':
-            refunds = RefundProduct.objects.all().order_by('-created_at')
+            refunds = RefundProduct.objects.filter().order_by('-created_at')
             
             paginator = self.pagination_class()
             result_page = paginator.paginate_queryset(refunds, request)
@@ -104,9 +119,13 @@ class RefundAPIView(APIView):
                 }
             }
             return Response(response_data, status=status.HTTP_200_OK)
-        
+        query = Q()
+        if service_group:
+            services =list(ServiceGroup.objects.get(id=service_group).services.all().values_list('id', flat=True))
+            query &= Q(service__in=services)
+            
         if request.GET.get('type') == 'Service':
-            refunds = RefundServices.objects.all().order_by('-created_at')
+            refunds = RefundServices.objects.filter(query).order_by('-created_at')
             
             paginator = self.pagination_class()
             result_page = paginator.paginate_queryset(refunds, request)
