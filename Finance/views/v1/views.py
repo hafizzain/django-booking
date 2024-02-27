@@ -6,7 +6,7 @@ from django.db.models import Q
 from Utility.Campaign import send_refund_email
 
 from Finance.models import Refund, RefundCoupon, AllowRefunds,AllowRefundPermissionsEmployees, RefundProduct, RefundServices
-from Finance.serializers import RefundSerializer, CouponSerializer, AllowRefundsSerializer
+from Finance.serializers import RefundSerializer, CouponSerializer, AllowRefundsSerializer, RefundProductSerializer , RefundServiceSerializer
 from Finance.helpers import short_uuid, check_permission, check_days
 from SaleRecords.models import SaleRecordsAppointmentServices, SaleRecordsProducts, SaleRecordServices
 from Invoices.models import SaleInvoice
@@ -68,11 +68,9 @@ class RefundAPIView(APIView):
     def get(self, request, *args, **kwargs):
         
         if request.GET.get('type') == 'Product':
-            refunds = Refund.objects.select_related(
-                'refund_invoice_id', 'user') \
-                .prefetch_related('refunded_products').all()
+            refunds = RefundProduct.objects.all()
             
-            refund_serializer = RefundSerializer(refunds, many=True)
+            refund_serializer = RefundProductSerializer(refunds, many=True)
             if not refunds:
                 response_data = {
                     'success': False,
@@ -98,11 +96,9 @@ class RefundAPIView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
         
         if request.GET.get('type') == 'Service':
-            refunds = Refund.objects.select_related(
-                'refund_invoice_id', 'user') \
-                .prefetch_related('refunded_services').all()
+            refunds = RefundServices.objects.all()
             
-            refund_serializer = RefundSerializer(refunds, many=True)
+            refund_serializer = RefundServiceSerializer(refunds, many=True)
             if not refunds:
                 response_data = {
                     'success': False,
