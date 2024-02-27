@@ -166,7 +166,7 @@ class RefundAPIView(APIView):
                 try:    
                     invoice = SaleInvoice.objects.get(id=refund_invoice_id) 
                     checkout_instance = invoice.checkout_instance 
-                    checkout_instance.is_refund = True
+                    # checkout_instance.is_refund = True
                     checkout_instance.save() 
                     newCheckoutInstance = checkout_instance  
                     newCheckoutInstance.pk = None 
@@ -200,6 +200,7 @@ class RefundAPIView(APIView):
                         
                         for order in order_items:
                             refunded_services = RefundServices.objects.get(checkouts = invoice.checkout_instance.id,service = order.service)
+                            
                             SaleRecordsAppointmentServices.objects.create(
                                 sale_record = newCheckoutInstance,
                                 appointment = newAppointment,
@@ -214,7 +215,7 @@ class RefundAPIView(APIView):
                         # or you can do it in loop
                     else: 
                         product_orders = SaleRecordsProducts.objects.filter(sale_record=invoice.checkout_instance, product__id__in = refunded_products_ids) 
-                        # return Response({'product orders count': product_orders.count()})
+                        return Response({'product orders count': product_orders.count()})
 
                         for order in product_orders:
                                 # raise ValueError('comming here')
@@ -235,7 +236,7 @@ class RefundAPIView(APIView):
                         service_orders = SaleRecordServices.objects.filter(sale_record=invoice.checkout_instance, service__id__in = refunded_services_ids) 
                         # service_orders.update(pk = None, checkout=newCheckoutInstance) 
                         for order in service_orders:
-                            try :
+                            
                                 refunded_services = RefundServices.objects.get(checkouts = invoice.checkout_instance.id,service = order.service)
                                 SaleRecordServices.objects.create(
                                     sale_record = newCheckoutInstance,
@@ -244,8 +245,7 @@ class RefundAPIView(APIView):
                                     quantity = 1,
                                     price = float(-refunded_services.refunded_amount)
                                 )
-                            except ObjectDoesNotExist:
-                                print(f"No RefundProduct found for product ID {order.product.id}")
+                            
                             
                         
                     newInvoice = invoice 
