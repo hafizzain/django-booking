@@ -920,19 +920,21 @@
                 {% set applied_vouchers = [] %}
 
 
+                {% for c in checkout_data.applied_coupons_records.all %}
+                    {% if item.client == c.client and c not in applied_coupons %}
+                        {% set _ = applied_coupons.append(c) %}
+                    {% endif %}
+                {% endfor %}
+
+                {% for m in checkout_data.applied_memberships_records.all %}
+                    {% if item.client.id == m.client.id and m not in applied_memberships %}
+                        {% set _ = applied_memberships.append(m) %}
+                    {% endif %}
+                {% endfor %}
+
+                
                 {% for item in checkout_data.appointment_services.all %}
 
-                    {% for c in checkout_data.applied_coupons_records.all %}
-                        {% if item.client == c.client and c not in applied_coupons %}
-                            {% set _ = applied_coupons.append(c) %}
-                        {% endif %}
-                    {% endfor %}
-
-                    {% for m in checkout_data.applied_memberships_records.all %}
-                        {% if item.client.id == m.client.id and m not in applied_memberships %}
-                            {% set _ = applied_memberships.append(m) %}
-                        {% endif %}
-                    {% endfor %}
 
                     <div class="flex items-center justify-between text-primary text-sm font-semibold">
 
@@ -953,48 +955,48 @@
                     </div>
 
                 
-                {% if applied_memberships %}
-                  {% for m in applied_memberships %}
+                  {% if applied_memberships %}
+                    {% for m in applied_memberships %}
 
-                  {% if item.client == c.client %}
-                    <div class="flex items-center justify-between text-primary text-sm font-semibold">
-
-                      <div>
-                        <p class="text-left">
-                          Membership Redeemed
-                        </p>
-                      </div>
-                      <p class="text-[#7B7B7B]">
-                        <span></span>{{m.price}}
-                        {{currency_code}}
-                      </p>
-                    </div>
-
-                  {% endif %}
-
-                  {% endfor %}
-
-                {% endif %}
-                  
-                
-                {% for c in applied_coupons %}
-
-                  {% if item.client == c.client %}
+                    {% if item.client == c.client %}
                       <div class="flex items-center justify-between text-primary text-sm font-semibold">
 
                         <div>
                           <p class="text-left">
-                            Coupon Redeemed
+                            Membership Redeemed
                           </p>
                         </div>
                         <p class="text-[#7B7B7B]">
-                          <span></span>{{c.price}}
+                          <span></span>{{m.price}}
                           {{currency_code}}
                         </p>
                       </div>
-                  {% endif %}
 
-                {% endfor %}
+                    {% endif %}
+
+                    {% endfor %}
+
+                  {% endif %}
+                  
+                
+                  {% for c in applied_coupons %}
+
+                    {% if item.client == c.client %}
+                        <div class="flex items-center justify-between text-primary text-sm font-semibold">
+
+                          <div>
+                            <p class="text-left">
+                              Coupon Redeemed
+                            </p>
+                          </div>
+                          <p class="text-[#7B7B7B]">
+                            <span></span>{{c.price}}
+                            {{currency_code}}
+                          </p>
+                        </div>
+                    {% endif %}
+
+                  {% endfor %}
                 
                 {% comment %}======================== Here is ending the appointment_service  ============={% endcomment %}
                 {% endfor %}
