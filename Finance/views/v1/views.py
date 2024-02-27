@@ -215,7 +215,7 @@ class RefundAPIView(APIView):
                         # or you can do it in loop
                     else: 
                         product_orders = SaleRecordsProducts.objects.filter(sale_record=invoice.checkout_instance, product__id__in = refunded_products_ids) 
-                        return Response({'product orders count': product_orders.count()})
+                        # return Response({'product orders count': product_orders.count()})
 
                         for order in product_orders:
                                 # raise ValueError('comming here')
