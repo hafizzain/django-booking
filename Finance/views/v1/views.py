@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import api_view, permission_classes
 from django.db.models import Q
 from Utility.Campaign import send_refund_email
@@ -64,13 +65,16 @@ def check_permission_view(request):
         return Response({'erorr': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 class RefundAPIView(APIView):
-
+    pagination_class = PageNumberPagination
+    page_size = 10
     def get(self, request, *args, **kwargs):
         
         if request.GET.get('type') == 'Product':
             refunds = RefundProduct.objects.all()
             
-            refund_serializer = RefundProductSerializer(refunds, many=True)
+            paginator = self.pagination_class()
+            result_page = paginator.paginate_queryset(refunds, request)
+            refund_serializer = RefundProductSerializer(result_page, many=True)
             if not refunds:
                 response_data = {
                     'success': False,
@@ -83,6 +87,12 @@ class RefundAPIView(APIView):
                 }
                 return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
             response_data = {
+                'count': paginator.page.paginator.count,
+                'next': paginator.get_next_link(),
+                'previous': paginator.get_previous_link(),
+                'current_page': paginator.page.number,
+                'per_page': self.page_size,
+                'total_pages': paginator.page.paginator.num_pages,
                 'success': True,
                 'status_code': 200,
                 'response': {
@@ -98,7 +108,9 @@ class RefundAPIView(APIView):
         if request.GET.get('type') == 'Service':
             refunds = RefundServices.objects.all()
             
-            refund_serializer = RefundServiceSerializer(refunds, many=True)
+            paginator = self.pagination_class()
+            result_page = paginator.paginate_queryset(refunds, request)
+            refund_serializer = RefundServiceSerializer(result_page, many=True)
             if not refunds:
                 response_data = {
                     'success': False,
@@ -111,6 +123,12 @@ class RefundAPIView(APIView):
                 }
                 return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
             response_data = {
+                'count': paginator.page.paginator.count,
+                'next': paginator.get_next_link(),
+                'previous': paginator.get_previous_link(),
+                'current_page': paginator.page.number,
+                'per_page': self.page_size,
+                'total_pages': paginator.page.paginator.num_pages,
                 'success': True,
                 'status_code': 200,
                 'response': {
