@@ -9,17 +9,50 @@ from Finance.models import Refund, RefundProduct, RefundServices, RefundCoupon, 
 
 
 class RefundProductSerializer(serializers.ModelSerializer):
-    class Meta:
+    refund_data  = serializers.SerializerMethodField(read_only = True)
+    product_data = serializers.SerializerMethodField(read_only = True)
+    
+    
+    def get_refund_data(self, obj):
+        return {
+            'refund_type':obj.refund.refund_type,
+            'client': obj.refund.client.full_name,
+            'location': obj.refund.location
+        }
+        
+    def get_product_data(self, obj):
+        return{
+            'product_name': obj.product.name,
+            
+        }
+        
+    class Meta: 
         model = RefundProduct
         fields = '__all__'
-        read_only_fields = ['refund']
+        read_only_fields = ['refund', 'refund_data', 'product_data']
 
 
 class RefundServiceSerializer(serializers.ModelSerializer):
+    refund_data  = serializers.SerializerMethodField(read_only = True)
+    service_data = serializers.SerializerMethodField(read_only = True)
+    
+    
+    def get_refund_data(self, obj):
+        return {
+            'refund_type':obj.refund.refund_type,
+            'client': obj.refund.client.full_name if obj.refund.client else None,
+            'location': obj.refund.location
+        }
+        
+    def get_service_data(self, obj):
+        return{
+            'service_name': obj.service.name
+        }
+        
     class Meta:
         model = RefundServices
         fields = '__all__'
-        read_only_fields = ['refund']
+        read_only_fields = ['refund','refund_data','service_data']
 
 class CouponSerializer(serializers.ModelSerializer):
     # related_refund = RefundSerializer(read_only=True)
