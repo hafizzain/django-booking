@@ -96,7 +96,7 @@ class RefundAPIView(APIView):
                     'status_code': 400,
                     'response': {
                         'message': 'No Records found',
-                        'error_message': refund_serializer.errors,
+                        'error_message': None,
                         'data': None
                     }
                 }
