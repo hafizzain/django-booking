@@ -23,6 +23,7 @@ class RefundProductSerializer(serializers.ModelSerializer):
     def get_product_data(self, obj):
         return{
             'product_name': obj.product.name,
+            'brand': obj.product.brand.name
             
         }
         
