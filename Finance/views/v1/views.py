@@ -76,7 +76,7 @@ class RefundAPIView(APIView):
         
         query = Q()
         if location_id:
-            query &= Q(refund__location_id=location_id)
+            query &= Q(refund__location=location_id)
             
         if search_txt:
             query &= Q(refund__client__full_name__icontains=search_txt) | Q(product__name__icontains=search_txt)
@@ -85,7 +85,7 @@ class RefundAPIView(APIView):
             query &= Q(product__brand_id=brand_id)
             
         if request.GET.get('type') == 'Product':
-            refunds = RefundProduct.objects.filter().order_by('-created_at')
+            refunds = RefundProduct.objects.filter(query).order_by('-created_at')
             
             paginator = self.pagination_class()
             result_page = paginator.paginate_queryset(refunds, request)
