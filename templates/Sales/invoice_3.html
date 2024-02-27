@@ -914,21 +914,23 @@
                 {% comment %} ===============================if there is any appointment_services in the checkout_data ========================{% endcomment %}
 
                 {% if checkout_data.appointment_services.all %}
+                
+                {% set applied_coupons = [] %}
+                {% set applied_memberships = [] %}
+                {% set applied_vouchers = [] %}
+
 
                 {% for item in checkout_data.appointment_services.all %}
-                    {% set applied_coupons = [] %}
-                    {% set applied_memberships = [] %}
-                    {% set applied_vouchers = [] %}
 
                     {% for c in checkout_data.applied_coupons_records.all %}
-                      {% if item.client == c.client and c not in applied_coupons %}
-                          {% set applied_coupons = applied_coupons|add([c]) %}
-                      {% endif %}
+                        {% if item.client == c.client and c not in applied_coupons %}
+                            {% set _ = applied_coupons.append(c) %}
+                        {% endif %}
                     {% endfor %}
-                
+
                     {% for m in checkout_data.applied_memberships_records.all %}
                         {% if item.client.id == m.client.id and m not in applied_memberships %}
-                            {% set applied_memberships = applied_memberships|add([m]) %}
+                            {% set _ = applied_memberships.append(m) %}
                         {% endif %}
                     {% endfor %}
 
