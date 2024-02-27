@@ -915,7 +915,7 @@
 
                 {% if checkout_data.appointment_services.all %}
                 
-                  {% set applied_coupons = [] %}
+                  {% comment %} {% set applied_coupons = [] %}
                   {% set applied_memberships = [] %}
                   {% set applied_vouchers = [] %}
 
@@ -926,7 +926,7 @@
 
                   {% for m in checkout_data.applied_memberships_records.all %}
                       {% set _ = applied_memberships.append(m) %}
-                  {% endfor %}
+                  {% endfor %} {% endcomment %}
 
 
                   {% for item in checkout_data.appointment_services.all %}
@@ -950,7 +950,7 @@
                         </p>
                       </div>
 
-                  
+{% comment %}                   
                     {% if applied_memberships %}
                       {% for m in applied_memberships %}
 
@@ -994,7 +994,7 @@
                         {% endif %}
 
                       {% endfor %}
-                    {% endif %}
+                    {% endif %} {% endcomment %}
                     
                   
                 
