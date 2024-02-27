@@ -94,7 +94,9 @@ class RefundAPIView(APIView):
         }
         return Response(response_data, status=status.HTTP_200_OK)
 
-    '''
+
+    def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
+        '''
     POST REQUEST FOR THE REFUND
     Payload formate:
             {
@@ -136,8 +138,6 @@ class RefundAPIView(APIView):
 
 
             '''
-
-    def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
         refund_invoice_id = request.data.get('refund_invoice_id')
         refund_price = request.data.get('total_refund_amount')
         payment_type = request.data.get('payment_type')
