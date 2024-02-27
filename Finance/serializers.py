@@ -16,7 +16,7 @@ class RefundProductSerializer(serializers.ModelSerializer):
     def get_refund_data(self, obj):
         return {
             'refund_type':obj.refund.refund_type,
-            'client': obj.refund.client.full_name,
+            'client': obj.refund.client.full_name if obj.refund.client else None,
             'location': obj.refund.location
         }
         
