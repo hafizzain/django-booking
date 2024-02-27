@@ -47,7 +47,8 @@ class RefundServiceSerializer(serializers.ModelSerializer):
         
     def get_service_data(self, obj):
         return{
-            'service_name': obj.service.name
+            'service_name': obj.service.name,
+            'service group': obj.service.servicegroup_services.name
         }
         
     class Meta:
