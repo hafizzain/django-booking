@@ -130,7 +130,7 @@ class RefundAPIView(APIView):
             paginator = self.pagination_class()
             result_page = paginator.paginate_queryset(refunds, request)
             refund_serializer = RefundServiceSerializer(result_page, many=True)
-            if not refunds:
+            if not refunds.is_valid():
                 response_data = {
                     'success': False,
                     'status_code': 400,
