@@ -166,11 +166,11 @@ class RefundAPIView(APIView):
                 try:    
                     invoice = SaleInvoice.objects.get(id=refund_invoice_id) 
                     checkout_instance = invoice.checkout_instance 
-                    # checkout_instance.is_refund = True
+                    checkout_instance.is_refund = True
                     checkout_instance.save() 
                     newCheckoutInstance = checkout_instance  
                     newCheckoutInstance.pk = None 
-                    # newCheckoutInstance.is_refund = True
+                    newCheckoutInstance.is_refund = True
                     newCheckoutInstance.save()
                     newCheckoutInstance.checkout_type = 'Refund'
                     newCheckoutInstance.is_refund = True
