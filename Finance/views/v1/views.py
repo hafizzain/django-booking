@@ -231,6 +231,7 @@ class RefundAPIView(APIView):
                     if checkout_type == 'Appointment': 
                         print('coming here')
                         appointment_services  = SaleRecordsAppointmentServices.objects.get(sale_record = checkout_instance)
+                        raise ValueError(f'Coming here {appointment_services.count()}')
                         newAppointment = appointment_services.appointment
                         newAppointment.pk = None 
                         newAppointment.save() 
