@@ -66,33 +66,67 @@ def check_permission_view(request):
 class RefundAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
-        refunds = Refund.objects.select_related(
-            'client', 'business', 'location', 'refund_invoice_id', 'user') \
-            .prefetch_related('refunded_products', 'related_refund_coupon').all()
-        refund_serializer = RefundSerializer(refunds, many=True)
-        if not refunds:
+        
+        if request.GET.get('type') == 'Product':
+            refunds = Refund.objects.select_related(
+                'refund_invoice_id', 'user') \
+                .prefetch_related('refunded_products').all()
+            
+            refund_serializer = RefundSerializer(refunds, many=True)
+            if not refunds:
+                response_data = {
+                    'success': False,
+                    'status_code': 400,
+                    'response': {
+                        'message': 'No Records found',
+                        'error_message': refund_serializer.errors,
+                        'data': None
+                    }
+                }
+                return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
             response_data = {
-                'success': False,
-                'status_code': 400,
+                'success': True,
+                'status_code': 200,
                 'response': {
-                    'message': 'No Records found',
-                    'error_message': refund_serializer.errors,
-                    'data': None
+                    'message': 'Record fetched successfully',
+                    'error_message': None,
+                    'data': {
+                        'refunds': refund_serializer.data,
+                    }
                 }
             }
-            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
-        response_data = {
-            'success': True,
-            'status_code': 200,
-            'response': {
-                'message': 'Record created successfully',
-                'error_message': None,
-                'data': {
-                    'refunds': refund_serializer.data,
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+        if request.GET.get('type') == 'Service':
+            refunds = Refund.objects.select_related(
+                'refund_invoice_id', 'user') \
+                .prefetch_related('refunded_services').all()
+            
+            refund_serializer = RefundSerializer(refunds, many=True)
+            if not refunds:
+                response_data = {
+                    'success': False,
+                    'status_code': 400,
+                    'response': {
+                        'message': 'No Records found',
+                        'error_message': refund_serializer.errors,
+                        'data': None
+                    }
+                }
+                return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+            response_data = {
+                'success': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Record fetched successfully',
+                    'error_message': None,
+                    'data': {
+                        'refunds': refund_serializer.data,
+                    }
                 }
             }
-        }
-        return Response(response_data, status=status.HTTP_200_OK)
+            return Response(response_data, status=status.HTTP_200_OK)
+            
 
 
     def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
