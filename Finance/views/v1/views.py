@@ -70,7 +70,7 @@ class RefundAPIView(APIView):
     def get(self, request, *args, **kwargs):
         
         if request.GET.get('type') == 'Product':
-            refunds = RefundProduct.objects.all()
+            refunds = RefundProduct.objects.all().order_by('-created_at')
             
             paginator = self.pagination_class()
             result_page = paginator.paginate_queryset(refunds, request)
@@ -106,7 +106,7 @@ class RefundAPIView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
         
         if request.GET.get('type') == 'Service':
-            refunds = RefundServices.objects.all()
+            refunds = RefundServices.objects.all().order_by('-created_at')
             
             paginator = self.pagination_class()
             result_page = paginator.paginate_queryset(refunds, request)
