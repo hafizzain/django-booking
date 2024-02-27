@@ -89,7 +89,7 @@ class RefundAPIView(APIView):
                     'message': 'Record fetched successfully',
                     'error_message': None,
                     'data': {
-                        'refunds': refund_serializer.data,
+                        'products': refund_serializer.data,
                     }
                 }
             }
@@ -117,7 +117,7 @@ class RefundAPIView(APIView):
                     'message': 'Record fetched successfully',
                     'error_message': None,
                     'data': {
-                        'refunds': refund_serializer.data,
+                        'services': refund_serializer.data,
                     }
                 }
             }
