@@ -307,10 +307,14 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                 f'Error Occured while getting the invoice in the serializer {str(e)}')
 
     def get_client_data(self, obj):
-        if obj.client:
-            client = Client.objects.get(id=obj.client.id)
-            return ClientSerializer(client).data
-        return None
+        try:
+            if obj.client:
+                client = Client.objects.get(id=obj.client.id)
+                return ClientSerializer(client).data
+            return None
+        except Exception as e:
+            raise ValidationError(
+                f'Error Occured while getting the client data in the serializer {str(e)}')
 
     def validate(self, data):
         # Validate that there is at least one record in appointment_services, services_records, and products_records
