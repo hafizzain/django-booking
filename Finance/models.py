@@ -50,9 +50,10 @@ class RefundCoupon(CommonField):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, blank= True, null= True)  
     
     refund_coupon_code = models.CharField(max_length=50, unique=True)
+    checkout_id = models.CharField(blank=True, max_length=255, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     expiry_date = models.DateField()
-    coupon_type = models.CharField(max_length = 20)
+    coupon_type = models.CharField(max_length = 20, default = 'refund')
     is_used = models.BooleanField(default=False)
     
     related_refund = models.ForeignKey(Refund, on_delete=models.CASCADE, null=True,  related_name='related_refund_coupon')
