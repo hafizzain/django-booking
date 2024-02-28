@@ -41,28 +41,22 @@ class SaleRecordsAppointmentServicesSerializer(serializers.ModelSerializer):
     def get_service_names(self, obj):
         try:
             from Invoices.models import InvoiceTranslation
-            try:
-                secondary_invoice_traslation = InvoiceTranslation.objects.filter(
-                    id=obj.sale_record.location.secondary_translation.id).first()
-                try:
-                    translation = obj.service.servicetranlations_set.filter(
-                        language__id=secondary_invoice_traslation.language.id).first()
-                except Exception as e:
-                    raise ValidationError(f'Error Occured while getting the  Translation {str(e)}')
-            except :
-                translation = None
-            
-            
+
+            secondary_invoice_traslation = InvoiceTranslation.objects.filter(
+                id=obj.sale_record.location.secondary_translation.id).first()
+            translation = obj.service.servicetranlations_set.filter(
+                language__id=secondary_invoice_traslation.language.id).first()
             if translation:
                 return {
-                    'name': f"{obj.service.name}"if obj.service.name else None,
-                    'arabic_name': f"{obj.service.arabic_name}"if obj.service.arabic_name else None,
-                    'secondary_name': f"{translation.service_name}"if translation.service_name else None,
+                    'name': f"{obj.service.name}",
+                    'arabic_name': f"{obj.service.arabic_name}",
+                    'secondary_name': f"{translation.service_name}"
                 }
             else:
                 return {
-                    'name': f"{obj.service.name}"if obj.service.name else None,
-                    'arabic_name': f"{obj.service.arabic_name}"if obj.service.arabic_name else None,
+                    'name': f"{obj.service.name}",
+                    'arabic_name': f"{obj.service.arabic_name}",
+                    'secondary_name': f""
                 }
         except Exception as e:
             raise ValidationError(
@@ -80,23 +74,23 @@ class SaleRecordProductsSerializer(serializers.ModelSerializer):
     def get_product_names(self, obj):
         try:
             from Invoices.models import InvoiceTranslation
-            try:
-                secondary_invoice_traslation = InvoiceTranslation.objects.filter(
-                    id=obj.sale_record.location.secondary_translation.id).first()
-                translation = obj.product.producttranslations_set.filter(
-                    language__id=secondary_invoice_traslation.language.id).first()
-            except : 
-                translation=None
+
+            secondary_invoice_traslation = InvoiceTranslation.objects.filter(
+                id=obj.sale_record.location.secondary_translation.id).first()
+            translation = obj.product.producttranslations_set.filter(
+                language__id=secondary_invoice_traslation.language.id).first()
+
             if translation:
                 return {
-                    'name': f"{obj.product.name}"if obj.product.name else None,
-                    'arabic_name': f"{obj.product.arabic_name}"if obj.product.arabic_name else None,
-                    'secondary_name': f"{translation.product_name}"if translation.product_name else None,
+                    'name': f"{obj.product.name}",
+                    'arabic_name': f"{obj.product.arabic_name}",
+                    'secondary_name': f"{translation.product_name}"
                 }
             else:
                 return {
-                    'name': f"{obj.product.name}"if obj.product.name else None,
-                    'arabic_name': f"{obj.product.arabic_name}"if obj.product.arabic_name else None, 
+                    'name': f"{obj.product.name}",
+                    'arabic_name': f"{obj.product.arabic_name}",
+                    'secondary_name': f""
                 }
         except Exception as e:
             raise ValidationError(
@@ -117,37 +111,39 @@ class SaleRecordServicesSerializer(serializers.ModelSerializer):
     def get_service_names(self, obj):
         try:
             from Invoices.models import InvoiceTranslation
-
+            # try:
             secondary_invoice_traslation = InvoiceTranslation.objects.filter(
-                id=obj.sale_record.location.secondary_translation.id
-            ).first()
-
+                    id=obj.sale_record.location.secondary_translation.id).first()
+            
+            # except Exception as e:except Exception as e:
+            #     raise ValidationError(f"error getting the secondary translation in service{e}")
+            #     raise ValidationError(f"error getting the secondary translation in service{e}")
+            
+            
             if secondary_invoice_traslation:
                 translation = obj.service.servicetranlations_set.filter(
-                    language__id=secondary_invoice_traslation.language.id
-                ).first()
-                if translation:
-                    return {
-                        'name': obj.service.name if obj.service.name else None,
-                        'arabic_name': obj.service.arabic_name if obj.service.arabic_name else None,
-                        'secondary_name': translation.service_name if translation.service_name else None,
-                    }
-                else:
-                    return {
-                        'name': obj.service.name if obj.service.name else None,
-                        'arabic_name': obj.service.arabic_name if obj.service.arabic_name else None,
-                        'secondary_name': ""
-                    }
+                    language__id=secondary_invoice_traslation.language.id).first()
             else:
                 return {
-                    'name': obj.service.name if obj.service.name else None,
-                    'arabic_name': obj.service.arabic_name if obj.service.arabic_name else None,
-                    'secondary_name': ""
+                    'name': f'{obj.service.name}' if obj.service.name else None,
+                    'arabic_name': f'{obj.service.arabic_name}' if obj.service.name else None,
+                    'secondary_name': f""
+                }
+            if translation:
+                return {
+                    'name': f"{obj.service.name}",
+                    'arabic_name': f"{obj.service.arabic_name}",
+                    'secondary_name': f"{translation.service_name}"
+                }
+            else:
+                return {
+                    'name': f"{obj.service.name}",
+                    'arabic_name': f"{obj.service.arabic_name}",
+                    'secondary_name': f""
                 }
         except Exception as e:
             raise ValidationError(
-                f'Error Occurred while getting the service names: {str(e)}'
-        )
+                f'Error Occured while getting the service names {str(e)}')
 
     class Meta:
         model = SaleRecordServices
