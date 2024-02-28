@@ -11,6 +11,7 @@ from Invoices.models import SaleInvoice
 from Finance.choices import *
 from Utility.models import CommonField
 
+
 # Create your models here.
 
 class Refund(CommonField):
@@ -45,15 +46,15 @@ class RefundServices(CommonField):
     checkouts = models.CharField(null=True, blank=True, max_length=150)
 
 class RefundCoupon(CommonField):
-    # from SaleRecords.models import SaleRecords
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     client = models.ForeignKey(Client, on_delete=models.CASCADE, blank= True, null= True)  
     
     refund_coupon_code = models.CharField(max_length=50, unique=True)
+    checkout_id = models.CharField(blank=True, max_length=255, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     expiry_date = models.DateField()
+    coupon_type = models.CharField(max_length = 20, default = 'refund')
     is_used = models.BooleanField(default=False)
-    checkout_id = models.CharField(max_length = 255, blank=True, null=True)
     
     related_refund = models.ForeignKey(Refund, on_delete=models.CASCADE, null=True,  related_name='related_refund_coupon')
 
