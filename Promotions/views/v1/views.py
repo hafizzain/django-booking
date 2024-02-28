@@ -6759,7 +6759,10 @@ def get_coupon(request):
         coupon = Coupon.objects.get(code=coupon_code)
     except Coupon.DoesNotExist:
         try:
-            refund = RefundCoupon.objects.get(refund_coupon_code = coupon_code)
+            try:
+                refund = RefundCoupon.objects.get(refund_coupon_code = coupon_code)
+            except Exception as e:
+                raise ValueError(f'{e}')
             serializer = RefundCouponSerializer(refund)
             return Response(
                     {
@@ -6779,14 +6782,14 @@ def get_coupon(request):
                     },
                     status=status.HTTP_200_OK
                 )
-        except:
+        except Exception as e:
             return Response(
                 {
                     'status': False,
                     'status_code': 400,
                     'response': {
                         'message': 'Enter a valid coupon',
-                        'error_message': None,
+                        'error_message': f'Error in refund{e}',
 
                     }
                 },
