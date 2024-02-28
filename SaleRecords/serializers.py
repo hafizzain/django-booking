@@ -116,24 +116,35 @@ class SaleRecordServicesSerializer(serializers.ModelSerializer):
             from Invoices.models import InvoiceTranslation
 
             secondary_invoice_traslation = InvoiceTranslation.objects.filter(
-                id=obj.sale_record.location.secondary_translation.id).first()
-            translation = obj.service.servicetranlations_set.filter(
-                language__id=secondary_invoice_traslation.language.id).first()
-            if translation:
-                return {
-                    'name': f"{obj.service.name}"if obj.service.name else None,
-                    'arabic_name': f"{obj.service.arabic_name}"if obj.service.arabic_name else None,
-                    'secondary_name': f"{translation.service_name}"if translation.service_name else None,
-                }
+                id=obj.sale_record.location.secondary_translation.id
+            ).first()
+
+            if secondary_invoice_traslation:
+                translation = obj.service.servicetranlations_set.filter(
+                    language__id=secondary_invoice_traslation.language.id
+                ).first()
+                if translation:
+                    return {
+                        'name': obj.service.name if obj.service.name else None,
+                        'arabic_name': obj.service.arabic_name if obj.service.arabic_name else None,
+                        'secondary_name': translation.service_name if translation.service_name else None,
+                    }
+                else:
+                    return {
+                        'name': obj.service.name if obj.service.name else None,
+                        'arabic_name': obj.service.arabic_name if obj.service.arabic_name else None,
+                        'secondary_name': ""
+                    }
             else:
                 return {
-                    'name': f"{obj.service.name}"if obj.service.name else None,
-                    'arabic_name': f"{obj.service.arabic_name}"if obj.service.arabic_name else None,
-                    'secondary_name': f""
+                    'name': obj.service.name if obj.service.name else None,
+                    'arabic_name': obj.service.arabic_name if obj.service.arabic_name else None,
+                    'secondary_name': ""
                 }
         except Exception as e:
             raise ValidationError(
-                f'Error Occured while getting the service names {str(e)}')
+                f'Error Occurred while getting the service names: {str(e)}'
+        )
 
     class Meta:
         model = SaleRecordServices
