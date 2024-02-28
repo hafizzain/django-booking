@@ -6775,7 +6775,7 @@ def get_coupon(request):
                             },
                             status=status.HTTP_400_BAD_REQUEST
                         )
-                if location is not refund.related_refund.location:
+                if location is not refund.related_refund.location.id:
                     return Response(
                             {
                                 'status': False,
