@@ -24,7 +24,9 @@ def matching_records(is_quick_sale = None,location=None, range_start=None, range
             filters &= Q(client=client)
         
         if search_text is not None:
-            sale_invoice = list(SaleInvoice.objects.filter(id__icontains = search_text).values_list('checkout', flat=True))
+            # Apply Search Filters on Invoice ID and Client Name
+            sale_invoice = list(SaleInvoice.objects.filter(id__icontains = search_text) \
+                        .values_list('checkout', flat=True))
             filters &= Q(client__full_name__icontains = search_text) | Q(id__in = sale_invoice)
             
         
