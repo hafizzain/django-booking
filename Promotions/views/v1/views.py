@@ -6762,7 +6762,7 @@ def get_coupon(request):
             try:
                 refund = RefundCoupon.objects.get(refund_coupon_code = coupon_code, is_used = False)
                 
-                if total_price < refund.amount:
+                if float(total_price) < refund.amount:
                     return Response(
                             {
                                 'status': False,
