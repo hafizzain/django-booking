@@ -914,6 +914,12 @@
                 {% comment %} ===============================if there is any appointment_services in the checkout_data ========================{% endcomment %}
 
                 {% if checkout_data.appointment_services.all %}
+
+                
+                {% comment %} {% with  applied_coupons = []  %}
+                  
+                {% endwith %} {% endcomment %}
+                  
                 
                   {% comment %} {% set applied_coupons = [] %}
                   {% set applied_memberships = [] %}
@@ -950,7 +956,7 @@
                         </p>
                       </div>
 
-{% comment %}                   
+                {% comment %}                   
                     {% if applied_memberships %}
                       {% for m in applied_memberships %}
 
@@ -994,7 +1000,9 @@
                         {% endif %}
 
                       {% endfor %}
-                    {% endif %} {% endcomment %}
+                    {% endif %} 
+                    
+                {% endcomment %}
                     
                   
                 

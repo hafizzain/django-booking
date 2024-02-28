@@ -8,10 +8,12 @@ from Business.models import StockNotificationSetting
 from Sale.Constants.stock_lowest import stock_lowest
 from Sale.Constants.tunrover import ProductTurnover
 from Invoices.models import SaleInvoice
+from SaleRecords.models import *
 from Product.models import ProductStock, ProductOrderStockReport
 from Client.serializers import SaleInvoiceSerializer
+from Finance.models import RefundCoupon
+from Finance.serializers import CouponSerializer
 
-from SaleRecords.models import *
 from Invoices.models import SaleInvoice
 from Client.helpers import calculate_validity
 from Employee.models import *
@@ -357,8 +359,18 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     applied_loyalty_points_records = RedeemedLoyaltyPointsSerializer(many=True)
 
     invoice = serializers.SerializerMethodField(read_only=True)
-
     client_data = serializers.SerializerMethodField(read_only=True)
+    refund_coupons = serializers.SerializerMethodField(read_only = True)
+    
+    
+    def get_coupons(self, obj):
+        try:
+            coupon = RefundCoupon.objects.get(checkout_id = obj.id)
+            return CouponSerializer(coupon)
+        except:
+            return None
+        
+        
 
     def get_invoice(self, obj):
         try:
