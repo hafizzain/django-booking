@@ -955,7 +955,7 @@
                   {% endfor %} {% endcomment %}
 
 
-                  {% comment %} {% for item in checkout_data.appointment_services.all %} {% endcomment %}
+                  {% for item in checkout_data.appointment_services.all %}
 
 
                   <h2>{{item.client.full_name}}</h2>
@@ -982,7 +982,7 @@
 
                       {% endif %}
                     
-                {% endfor %}
+                  {% endfor %}
 
                 {% comment %}                   
                     {% if applied_memberships %}
