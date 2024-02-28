@@ -10,7 +10,7 @@ from Product.models import Product
 from Service.models import Service
 from Employee.models import Employee, GiftCards
 from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs, LoyaltyPoints, ClientLoyaltyPoint
-from Finance.models import Refund
+from Finance.models import Refund, RefundCoupon
 from Appointment.models import  Appointment, AppointmentGroup
 # from Invoices.models import SaleInvoice
 
@@ -161,6 +161,7 @@ class SaleRecordTip(CommonField):
 class SaleRecordAppliedCoupons(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_coupons_records')
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL,null = True)
+    refund_coupon = models.ForeignKey(RefundCoupon, on_delete=models.SET_NULL,null = True)
     client = models.ForeignKey(Client, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'applied_coupons_client')
     
     coupon_type = models.CharField(max_length = 100, default = '', blank=False, null=False)

@@ -916,9 +916,25 @@
                 {% if checkout_data.appointment_services.all %}
 
                 
-                {% comment %} {% with  applied_coupons = []  %}
+                {% for item in checkout_data.appointment_services.all %}
+                  {% with applied_coupons = []  %}
+
+                      
+                      
+                    {% for item in checkout_data.applied_coupons_records.all %}
+                      
+                    {% endfor %}
+                      
+                      
+                    
+                      
+                    
+                  {% endwith %} 
+
                   
-                {% endwith %} {% endcomment %}
+                {% endfor %}
+                  
+                
                   
                 
                   {% comment %} {% set applied_coupons = [] %}
