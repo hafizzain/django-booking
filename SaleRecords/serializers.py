@@ -84,7 +84,10 @@ class SaleRecordProductsSerializer(serializers.ModelSerializer):
                     'secondary_name': f"{translation.product_name}"if translation.product_name else None,
                 }
             else:
-                return None
+                return {
+                    'name': f"{obj.product.name}"if obj.product.name else None,
+                    'arabic_name': f"{obj.product.arabic_name}"if obj.product.arabic_name else None, 
+                }
         except Exception as e:
             raise ValidationError(
                 f'Error Occured while getting the product names {str(e)}')
