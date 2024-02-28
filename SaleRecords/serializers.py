@@ -363,7 +363,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     refund_coupons = serializers.SerializerMethodField(read_only = True)
     
     
-    def get_coupons(self, obj):
+    def get_refund_coupons(self, obj):
         try:
             coupon = RefundCoupon.objects.get(checkout_id = obj.id)
             return CouponSerializer(coupon)
