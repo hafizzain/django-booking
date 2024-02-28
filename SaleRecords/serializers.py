@@ -82,14 +82,14 @@ class SaleRecordProductsSerializer(serializers.ModelSerializer):
 
             if translation:
                 return {
-                    'name': f"{obj.product.name}",
-                    'arabic_name': f"{obj.product.arabic_name}",
-                    'secondary_name': f"{translation.product_name}"
+                    'name': f"{obj.product.name}"if obj.product.name else None,
+                    'arabic_name': f"{obj.product.arabic_name}"if obj.product.arabic_name else None,
+                    'secondary_name': f"{translation.product_name}"if translation.product_name else None,
                 }
             else:
                 return {
-                    'name': f"{obj.product.name}",
-                    'arabic_name': f"{obj.product.arabic_name}",
+                    'name': f"{obj.product.name}"if obj.product.name else None,
+                    'arabic_name': f"{obj.product.arabic_name}"if obj.product.arabic_name else None,
                     'secondary_name': f""
                 }
         except Exception as e:
@@ -118,14 +118,14 @@ class SaleRecordServicesSerializer(serializers.ModelSerializer):
                 language__id=secondary_invoice_traslation.language.id).first()
             if translation:
                 return {
-                    'name': f"{obj.service.name}",
-                    'arabic_name': f"{obj.service.arabic_name}",
-                    'secondary_name': f"{translation.service_name}"
+                    'name': f"{obj.service.name}"if obj.service.name else None,
+                    'arabic_name': f"{obj.service.arabic_name}"if obj.service.arabic_name else None,
+                    'secondary_name': f"{translation.service_name}"if translation.service_name else None,
                 }
             else:
                 return {
-                    'name': f"{obj.service.name}",
-                    'arabic_name': f"{obj.service.arabic_name}",
+                    'name': f"{obj.service.name}"if obj.service.name else None,
+                    'arabic_name': f"{obj.service.arabic_name}"if obj.service.arabic_name else None,
                     'secondary_name': f""
                 }
         except Exception as e:
