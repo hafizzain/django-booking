@@ -44,8 +44,11 @@ class SaleRecordsAppointmentServicesSerializer(serializers.ModelSerializer):
             try:
                 secondary_invoice_traslation = InvoiceTranslation.objects.filter(
                     id=obj.sale_record.location.secondary_translation.id).first()
-                translation = obj.service.servicetranlations_set.filter(
-                    language__id=secondary_invoice_traslation.language.id).first()
+                try:
+                    translation = obj.service.servicetranlations_set.filter(
+                        language__id=secondary_invoice_traslation.language.id).first()
+                except Exception as e:
+                    raise ValidationError(f'Error Occured while getting the  Translation {str(e)}')
             except :
                 translation = None
             
