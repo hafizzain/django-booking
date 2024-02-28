@@ -115,8 +115,8 @@ class SaleRecordServicesSerializer(serializers.ModelSerializer):
                 secondary_invoice_traslation = InvoiceTranslation.objects.filter(
                     id=obj.sale_record.location.secondary_translation.id).first()
             
-            except Exception as e:
-                raise ValidationError(f"error getting the secondary translation in service{e}")
+            except:
+                secondary_invoice_traslation = None
             #     raise ValidationError(f"error getting the secondary translation in service{e}")
             
             
