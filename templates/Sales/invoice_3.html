@@ -923,7 +923,7 @@
                       
                     {% for c in checkout_data.applied_coupons_records.all %}
                       
-                      {% if item.client == c.client and item not in applied_coupons %}
+                      {% if item.client == c.client and c not in applied_coupons %}
                         
                       {% endif %}
                         
@@ -955,26 +955,34 @@
                   {% endfor %} {% endcomment %}
 
 
-                  {% for item in checkout_data.appointment_services.all %}
+                  {% comment %} {% for item in checkout_data.appointment_services.all %} {% endcomment %}
 
 
-                      <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                  <h2>{{item.client.full_name}}</h2>
+                  {% for data in checkout_data.appointment_services.all %}
+                  
+                      {% if item.client == data.client %}
+                        
+                          <div class="flex items-center justify-between text-primary text-sm font-semibold">
 
-                        <div>
-                          <h3>{{item.client.full_name}}</h3>
-                          <p class="text-left">
-                            {{item.service.name}}
-                            {% if item.discount_percentage %}
-                            (Discount {{ item.discount_percentage}} %)
-                            {% endif %}
-                          </p>
-                          <p class="arabic">{% get_secondary_translation item.id %}</p>
-                        </div>
-                        <p class="text-[#7B7B7B]">
-                          <span>1 x </span>{{item.price}}
-                          {{currency_code}}
-                        </p>
-                      </div>
+                            <div>
+                              <p class="text-left">
+                                {{data.service.name}}
+                                {% if data.discount_percentage %}
+                                (Discount {{ data.discount_percentage}} %)
+                                {% endif %}
+                              </p>
+                              <p class="arabic">{% get_secondary_translation item.id %}</p>
+                            </div>
+                            <p class="text-[#7B7B7B]">
+                              <span>1 x </span>{{item.price}}
+                              {{currency_code}}
+                            </p>
+                          </div>
+
+                      {% endif %}
+                    
+                {% endfor %}
 
                 {% comment %}                   
                     {% if applied_memberships %}
@@ -1127,8 +1135,7 @@
             <div class="flex items-center justify-between text-primary text-sm font-bold">
               <div>
                 <p>{{ business_address.primary_translation.tips }}</p>
-                {% if business_address.secondary_translation.tips %}<p class="arabic">{{
-                  business_address.secondary_translation.tips }} {% endif %}</p>
+                {% if business_address.secondary_translation.tips %}<p class="arabic">{{business_address.secondary_translation.tips }} {% endif %}</p>
               </div>
               <p>{{ total_tip }} {{ currency_code }}</p>
             </div>
