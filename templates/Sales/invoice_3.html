@@ -958,14 +958,14 @@
                   {% for item in checkout_data.appointment_services.all %}
 
 
-                  <h2>{{item.client.full_name}}</h2>
                   {% for data in checkout_data.appointment_services.all %}
                   
-                      {% if item.client == data.client %}
-                        
-                          <div class="flex items-center justify-between text-primary text-sm font-semibold">
-
-                            <div>
+                  {% if item.appointment == data.appointment %}
+                  
+                  <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                    
+                          <div>
+                              <h2>{{item.client.full_name}}</h2>
                               <p class="text-left">
                                 {{data.service.name}}
                                 {% if data.discount_percentage %}
