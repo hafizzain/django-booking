@@ -53,11 +53,7 @@ class SaleRecordsAppointmentServicesSerializer(serializers.ModelSerializer):
                     'secondary_name': f"{translation.service_name}"
                 }
             else:
-                return {
-                    'name': f"{obj.service.name}",
-                    'arabic_name': f"{obj.service.arabic_name}",
-                    'secondary_name': f""
-                }
+                return None
         except Exception as e:
             raise ValidationError(
                 f'Error Occured while getting the service names appointment services {str(e)}')
@@ -87,11 +83,7 @@ class SaleRecordProductsSerializer(serializers.ModelSerializer):
                     'secondary_name': f"{translation.product_name}"if translation.product_name else None,
                 }
             else:
-                return {
-                    'name': f"{obj.product.name}"if obj.product.name else None,
-                    'arabic_name': f"{obj.product.arabic_name}"if obj.product.arabic_name else None,
-                    'secondary_name': f""
-                }
+                return None
         except Exception as e:
             raise ValidationError(
                 f'Error Occured while getting the product names {str(e)}')
