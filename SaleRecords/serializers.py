@@ -70,12 +70,13 @@ class SaleRecordProductsSerializer(serializers.ModelSerializer):
     def get_product_names(self, obj):
         try:
             from Invoices.models import InvoiceTranslation
-
-            secondary_invoice_traslation = InvoiceTranslation.objects.filter(
-                id=obj.sale_record.location.secondary_translation.id).first()
-            translation = obj.product.producttranslations_set.filter(
-                language__id=secondary_invoice_traslation.language.id).first()
-
+            try:
+                secondary_invoice_traslation = InvoiceTranslation.objects.filter(
+                    id=obj.sale_record.location.secondary_translation.id).first()
+                translation = obj.product.producttranslations_set.filter(
+                    language__id=secondary_invoice_traslation.language.id).first()
+            except : 
+                translation=None
             if translation:
                 return {
                     'name': f"{obj.product.name}"if obj.product.name else None,
