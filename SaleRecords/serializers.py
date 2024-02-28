@@ -125,20 +125,20 @@ class SaleRecordServicesSerializer(serializers.ModelSerializer):
                     language__id=secondary_invoice_traslation.language.id).first()
             else:
                 return {
-                    'name': f'{obj.service.name}' if obj.service.name else None,
-                    'arabic_name': f'{obj.service.arabic_name}' if obj.service.name else None,
+                    'name': f'{obj.service.name}' if obj.service.name else "",
+                    'arabic_name': f'{obj.service.arabic_name}' if obj.service.arabic_name else "",
                     'secondary_name': f""
                 }
             if translation:
                 return {
-                    'name': f"{obj.service.name}",
-                    'arabic_name': f"{obj.service.arabic_name}",
-                    'secondary_name': f"{translation.service_name}"
+                    'name': f"{obj.service.name}" if obj.service.name else "",
+                    'arabic_name': f"{obj.service.arabic_name}" if obj.service.name else "",
+                    'secondary_name': f"{translation.service_name} " if obj.service.name else "",
                 }
             else:
                 return {
-                    'name': f"{obj.service.name}",
-                    'arabic_name': f"{obj.service.arabic_name}",
+                    'name': f"{obj.service.name}"  if obj.service.name else "",
+                    'arabic_name': f"{obj.service.arabic_name}"  if obj.service.name else "",
                     'secondary_name': f""
                 }
         except Exception as e:
