@@ -6776,6 +6776,7 @@ def get_coupon(request):
                             status=status.HTTP_400_BAD_REQUEST
                         )
                 if str(location) is not str(refund.related_refund.location.id):
+                    raise ValueError(f'coming location{location} and refund location {refund.related_refund.location.id}')
                     return Response(
                             {
                                 'status': False,
