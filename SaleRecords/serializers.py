@@ -52,14 +52,14 @@ class SaleRecordsAppointmentServicesSerializer(serializers.ModelSerializer):
             
             if translation:
                 return {
-                    'name': f"{obj.service.name}",
-                    'arabic_name': f"{obj.service.arabic_name}",
-                    'secondary_name': f"{translation.service_name}"
+                    'name': f"{obj.service.name}"if obj.service.name else None,
+                    'arabic_name': f"{obj.service.arabic_name}"if obj.service.arabic_name else None,
+                    'secondary_name': f"{translation.service_name}"if translation.service_name else None,
                 }
             else:
                 return {
-                    'name': f"{obj.service.name}",
-                    'arabic_name': f"{obj.service.arabic_name}",
+                    'name': f"{obj.service.name}"if obj.service.name else None,
+                    'arabic_name': f"{obj.service.arabic_name}"if obj.service.arabic_name else None,
                 }
         except Exception as e:
             raise ValidationError(
