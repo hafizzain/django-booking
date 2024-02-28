@@ -2,6 +2,7 @@ from .models import SaleRecords
 from django.db.models import Q
 from Client.models import LoyaltyPoints, LoyaltyPointLogs, ClientLoyaltyPoint
 from django.core.exceptions import ValidationError
+from Invoices.models import SaleInvoice
 
 def matching_records(is_quick_sale = None,location=None, range_start=None, range_end=None, services=None, client=None , search_text = None):
     try:
@@ -17,13 +18,14 @@ def matching_records(is_quick_sale = None,location=None, range_start=None, range
             filters &= Q(created_at__lte=range_end)
 
         if services is not None:
-            filters &= Q(services=services)
+            filters &= Q(services_records__service=services)
 
         if client is not None:
             filters &= Q(client=client)
         
         if search_text is not None:
-            filters &= Q(client__full_name__icontains = search_text)
+            sale_invoice = list(SaleInvoice.objects.filter(checkout__icontains = search_text).values_list('checkout', flat=True))
+            filters &= Q(client__full_name__icontains = search_text) | Q(id__in = sale_invoice)
             
         
         if is_quick_sale:
