@@ -913,10 +913,10 @@
 
                 {% comment %} ===============================if there is any appointment_services in the checkout_data ========================{% endcomment %}
 
-                {% comment %} {% if checkout_data.appointment_services.all %}
+                {% if checkout_data.appointment_services.all %}
 
                 
-                {% for item in checkout_data.appointment_services.all %}
+                {% comment %} {% for item in checkout_data.appointment_services.all %}
                   {% with applied_coupons = []  %}
 
                       
