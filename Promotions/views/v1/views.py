@@ -6760,7 +6760,49 @@ def get_coupon(request):
     except Coupon.DoesNotExist:
         try:
             try:
-                refund = RefundCoupon.objects.get(refund_coupon_code = coupon_code)
+                refund = RefundCoupon.objects.get(refund_coupon_code = coupon_code, is_used = False)
+                
+                if total_price < refund.amount:
+                    return Response(
+                            {
+                                'status': False,
+                                'status_code': 400,
+                                'response': {
+                                    'message': 'Coupon can not be implement',
+                                    'error_message': None,
+
+                                }
+                            },
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+                if location is not refund.related_refund.location:
+                    return Response(
+                            {
+                                'status': False,
+                                'status_code': 400,
+                                'response': {
+                                    'message': 'This coupon code is not available on this location',
+                                    'error_message': None,
+
+                                }
+                            },
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+                if client_id and client_id is refund.client:
+                    return Response(
+                            {
+                                'status': False,
+                                'status_code': 400,
+                                'response': {
+                                    'message': 'Coupon does not valid for selected client',
+                                    'error_message': None,
+
+                                }
+                            },
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+                    
+                    
             except Exception as e:
                 raise ValueError(f'{e}')
             serializer = RefundCouponSerializer(refund)
