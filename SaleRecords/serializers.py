@@ -111,12 +111,12 @@ class SaleRecordServicesSerializer(serializers.ModelSerializer):
     def get_service_names(self, obj):
         try:
             from Invoices.models import InvoiceTranslation
-            # try:
-            secondary_invoice_traslation = InvoiceTranslation.objects.filter(
+            try:
+                secondary_invoice_traslation = InvoiceTranslation.objects.filter(
                     id=obj.sale_record.location.secondary_translation.id).first()
             
-            # except Exception as e:except Exception as e:
-            #     raise ValidationError(f"error getting the secondary translation in service{e}")
+            except Exception as e:
+                raise ValidationError(f"error getting the secondary translation in service{e}")
             #     raise ValidationError(f"error getting the secondary translation in service{e}")
             
             
@@ -132,13 +132,13 @@ class SaleRecordServicesSerializer(serializers.ModelSerializer):
             if translation:
                 return {
                     'name': f"{obj.service.name}" if obj.service.name else "",
-                    'arabic_name': f"{obj.service.arabic_name}" if obj.service.name else "",
-                    'secondary_name': f"{translation.service_name} " if obj.service.name else "",
+                    'arabic_name': f"{obj.service.arabic_name}" if obj.service.arabic_name else "",
+                    'secondary_name': f"{translation.service_name} " if translation.service_name else "",
                 }
             else:
                 return {
                     'name': f"{obj.service.name}"  if obj.service.name else "",
-                    'arabic_name': f"{obj.service.arabic_name}"  if obj.service.name else "",
+                    'arabic_name': f"{obj.service.arabic_name}"  if obj.service.arabic_name else "",
                     'secondary_name': f""
                 }
         except Exception as e:
