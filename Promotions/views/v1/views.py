@@ -6776,9 +6776,9 @@ def get_coupon(request):
                             status=status.HTTP_400_BAD_REQUEST
                         )
                 if location != refund.related_refund.location.id:
-                    return True
+                    return Response({'True':"True"})
                 else:
-                    return False
+                    return Response({'False':"False"})
                     # raise ValueError(f'coming location{location} and refund location {refund.related_refund.location.id}')
                     return Response(
                             {
