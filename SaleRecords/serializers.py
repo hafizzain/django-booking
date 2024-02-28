@@ -53,7 +53,10 @@ class SaleRecordsAppointmentServicesSerializer(serializers.ModelSerializer):
                     'secondary_name': f"{translation.service_name}"
                 }
             else:
-                return None
+                return {
+                    'name': f"{obj.service.name}",
+                    'arabic_name': f"{obj.service.arabic_name}",
+                }
         except Exception as e:
             raise ValidationError(
                 f'Error Occured while getting the service names appointment services {str(e)}')
