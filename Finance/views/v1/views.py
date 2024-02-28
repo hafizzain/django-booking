@@ -290,7 +290,7 @@ class RefundAPIView(APIView):
 
                         for order in product_orders:
                                 # raise ValueError('comming here')
-                                refund_product = RefundProduct.objects.get(checkouts = invoice.checkout_instance.id,product=order.product)
+                                refund_product = RefundProduct.objects.get(checkouts = invoice.checkout_instance.id,product__id=order.product.id)
                                 # raise ValueError('comign here')
                                 
                                 
@@ -308,7 +308,7 @@ class RefundAPIView(APIView):
                         # service_orders.update(pk = None, checkout=newCheckoutInstance) 
                         for order in service_orders:
                             
-                                refunded_services = RefundServices.objects.get(checkouts = invoice.checkout_instance.id,service = order.service)
+                                refunded_services = RefundServices.objects.get(checkouts = invoice.checkout_instance.id,service__id = order.service.id)
                                 SaleRecordServices.objects.create(
                                     sale_record = newCheckoutInstance,
                                     employee = order.employee,
