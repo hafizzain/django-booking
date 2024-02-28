@@ -913,7 +913,7 @@
 
                 {% comment %} ===============================if there is any appointment_services in the checkout_data ========================{% endcomment %}
 
-                {% if checkout_data.appointment_services.all %}
+                {% comment %} {% if checkout_data.appointment_services.all %}
 
                 
                 {% for item in checkout_data.appointment_services.all %}
@@ -921,8 +921,12 @@
 
                       
                       
-                    {% for item in checkout_data.applied_coupons_records.all %}
+                    {% for c in checkout_data.applied_coupons_records.all %}
                       
+                      {% if item.client == c.client and item not in applied_coupons %}
+                        
+                      {% endif %}
+                        
                     {% endfor %}
                       
                       
@@ -932,7 +936,7 @@
                   {% endwith %} 
 
                   
-                {% endfor %}
+                {% endfor %} {% endcomment %}
                   
                 
                   
