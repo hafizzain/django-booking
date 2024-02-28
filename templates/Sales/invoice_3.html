@@ -959,7 +959,8 @@
                   {% for item in checkout_data.appointment_services.all %}
                   
                   <h2>{{item.client.full_name}}</h2>
-                  {% for data in checkout_data.appointment_services.all %}
+                    
+                  {% for data in checkout_data.appointment_services.filter(client = item.client) %}
                   
                   {% if item.appointment == data.appointment %}
                   
