@@ -7,7 +7,7 @@ from django.db.models import Q
 from Utility.Campaign import send_refund_email
 
 from Finance.models import Refund, RefundCoupon, AllowRefunds,AllowRefundPermissionsEmployees, RefundProduct, RefundServices
-from Finance.serializers import RefundSerializer, CouponSerializer, AllowRefundsSerializer, RefundProductSerializer , RefundServiceSerializer
+from Finance.serializers import RefundSerializer, RefundCouponSerializer, AllowRefundsSerializer, RefundProductSerializer , RefundServiceSerializer
 from Finance.helpers import short_uuid, check_permission, check_days
 from SaleRecords.models import SaleRecordsAppointmentServices, SaleRecordsProducts, SaleRecordServices
 from Invoices.models import SaleInvoice
@@ -349,6 +349,7 @@ class RefundAPIView(APIView):
                     coupon_data = {
                         'user': request.user.id,
                         'client': client,
+                        'coupon_type': 'refund',
                         'checkout_id': str(newCheckoutInstance.id),
                         'refund_coupon_code': f"{short_uuid(refund_instance.id)}",
                         'amount': refund_instance.total_refund_amount,
@@ -356,7 +357,7 @@ class RefundAPIView(APIView):
                         'related_refund': refund_instance.id,
                     }
                     try:
-                        coupon_serializer = CouponSerializer(data=coupon_data)
+                        coupon_serializer = RefundCouponSerializer(data=coupon_data)
                         coupon_serializer.is_valid(raise_exception=True)
                         coupon_serializer.save()
                     except Exception as e:
@@ -409,7 +410,7 @@ class RefundedCoupons(APIView):
     def get(self, request, *args, **kwargs):
         coupons = RefundCoupon.objects.select_related(
             'related_refund__business', 'related_refund__location').all()
-        serializer = CouponSerializer(coupons, many=True)
+        serializer = RefundCouponSerializer(coupons, many=True)
         if not coupons:
             response_data = {
                 'success': False,

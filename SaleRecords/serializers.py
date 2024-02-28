@@ -12,7 +12,7 @@ from SaleRecords.models import *
 from Product.models import ProductStock, ProductOrderStockReport
 from Client.serializers import SaleInvoiceSerializer
 from Finance.models import RefundCoupon
-from Finance.serializers import CouponSerializer
+from Finance.serializers import RefundCouponSerializer
 
 from Invoices.models import SaleInvoice
 from Client.helpers import calculate_validity
@@ -366,7 +366,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     def get_refund_coupons(self, obj):
         try:
             coupon = RefundCoupon.objects.get(checkout_id = obj.id)
-            return CouponSerializer(coupon).data
+            return RefundCouponSerializer(coupon).data
         except:
             return None
         

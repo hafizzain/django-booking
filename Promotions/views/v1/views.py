@@ -50,7 +50,8 @@ from django.db.models import Q
 
 from django_tenants.utils import tenant_context
 from django.db import transaction
-
+from Finance.models import RefundCoupon
+from Finance.serializers import RefundCouponSerializer
 
 @transaction.atomic
 @api_view(['POST'])
@@ -6757,6 +6758,8 @@ def get_coupon(request):
     try:
         coupon = Coupon.objects.get(code=coupon_code)
     except:
+        refund = RefundCoupon.objects.get(refund_coupon_code = coupon_code)
+    else:
         return Response(
             {
                 'status': False,
@@ -6930,7 +6933,10 @@ def get_coupon(request):
                     },
                     status=status.HTTP_400_BAD_REQUEST
                 )
-    serializer = CouponSerializer(coupon, context={'request': request})
+    if refund:
+        serializer = RefundCouponSerializer(refund)
+    else:
+        serializer = CouponSerializer(coupon, context={'request': request})
     return Response(
         {
             'status': True,
