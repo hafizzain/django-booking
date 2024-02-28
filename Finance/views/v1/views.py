@@ -349,6 +349,7 @@ class RefundAPIView(APIView):
                     coupon_data = {
                         'user': request.user.id,
                         'client': client,
+                        'checkout_id': newCheckoutInstance.id,
                         'refund_coupon_code': f"{short_uuid(refund_instance.id)}",
                         'amount': refund_instance.total_refund_amount,
                         'expiry_date': expiry_date,
