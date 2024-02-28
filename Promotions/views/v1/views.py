@@ -6771,11 +6771,11 @@ def get_coupon(request):
                         'response': {
                             'message': 'Coupon redeemed successfully!',
                             'error_message': None,
-                            'coupon_id': coupon.id,
-                            'usage_limit':coupon.usage_limit,
-                            'user_limit': coupon.user_limit,
+                            'coupon_id': refund.id,
+                            'usage_limit':refund.is_used,
+                            # 'user_limit': coupon.user_limit,
                             'coupon': serializer.data,
-                            'coupon.amount_spent':coupon.amount_spent,
+                            'amount_spent':refund.amount,
                             'total_price':total_price
 
                         }
