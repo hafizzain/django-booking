@@ -394,16 +394,6 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             raise ValidationError(
                 f'Error Occured while getting the client data in the serializer {str(e)}')
     
-    def get_services_records(self, obj):
-        try:
-            invoice = SaleInvoice.objects.get(checkout=obj.id)
-            refund_appointment_services = RefundServices.objects.filter(refund__refund_invoice_id=invoice.id)
-            # return RefundServiceSerializer(refund_appointment_services, many=True).data
-            return True
-        except Exception as e:
-            raise ValidationError(
-                f'Error Occured while getting the appointment services in the serializer {str(e)}')
-
     def validate(self, data):
         # Validate that there is at least one record in appointment_services, services_records, and products_records
 
