@@ -727,6 +727,7 @@ class GiftCards(models.Model):
     custom_card = models.TextField(null=True)
     is_custom_card = models.BooleanField(default=False)
     price = models.FloatField(default=0, null=True, blank=True)
+    location_is = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True,)
     
     # Common Fields
     is_active = models.BooleanField(default=True)
