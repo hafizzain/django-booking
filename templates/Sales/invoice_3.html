@@ -864,21 +864,152 @@
                 {% if checkout_data.products_records.all %}
 
                 {% for item in checkout_data.products_records.all %}
-                <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                  <div>
-                    <p class="text-left">
-                      {{item.product.name}}
-                      {% if item.discount_percentage %}
-                      (Discount {{ item.discount_percentage}} %)
+                          <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                            <div>
+                              <p class="text-left">
+                                {{item.product.name}}
+                                {% if item.discount_percentage %}
+                                (Discount {{ item.discount_percentage}} %)
+                                {% endif %}
+                              </p>
+                              <p class="arabic">{% get_secondary_translation item.id %}</p>
+                            </div>
+                            <p class="text-[#7B7B7B]">
+                              <span>{{item.quantity}} x </span>{{item.price}}
+                              {{currency_code}}
+                            </p>
+                          </div>
+
+
+                        {% if checkout_data.applied_coupons_records.all %}
+                                              
+                          {% for coupon in checkout_data.applied_coupons_records.all %}
+                            {% if coupon.client.id == item.sale_record.client.id %}
+                            
+                            
+                            <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                              <div>
+                                  <p class="text-left">
+                                    <strong><h2>Coupon Redeemed</h2></strong>
+                                  </p>
+                              </div>
+                              <p class="text-[#7B7B7B]">
+                                  <span></span>{{ coupon.coupon_discounted_price }}
+                                  {{ currency_code }}
+                              </p>
+                            </div>
+                        
+                            {% endif %}
+                          {% endfor %}
+                            
+                      
                       {% endif %}
-                    </p>
-                    <p class="arabic">{% get_secondary_translation item.id %}</p>
-                  </div>
-                  <p class="text-[#7B7B7B]">
-                    <span>{{item.quantity}} x </span>{{item.price}}
-                    {{currency_code}}
-                  </p>
-                </div>
+
+
+                      {% comment %} membership printing {% endcomment %}
+                      {% if checkout_data.applied_memberships_records.all %}
+                          
+                          {% for m in checkout_data.applied_memberships_records.all %}
+                            {% if m.client.id == item.sale_record.client.id %}
+                            
+                            
+                            <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                              <div>
+                                  <p class="text-left">
+                                    <strong><h2>Membership Redeemed</h2></strong>
+                                  </p>
+                              </div>
+                              <p class="text-[#7B7B7B]">
+                                  <span></span>{{ m.price }}
+                                  {{ currency_code }}
+                              </p>
+                            </div>
+                        
+                            {% endif %}
+                          {% endfor %}
+                            
+                      
+                      {% endif %}
+                      
+
+
+                      {% if checkout_data.applied_vouchers_records.all %}
+                          
+                          {% for v in checkout_data.applied_vouchers_records.all %}
+                            {% if v.client.id == item.sale_record.client.id %}
+                            
+                            
+                            <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                              <div>
+                                  <p class="text-left">
+                                    <strong><h2>Vouchers Redeemed</h2></strong>
+                                  </p>
+                              </div>
+                              <p class="text-[#7B7B7B]">
+                                  <span></span>{{ v.price }}
+                                  {{ currency_code }}
+                              </p>
+                            </div>
+                        
+                            {% endif %}
+                          {% endfor %}
+                            
+                      
+                      {% endif %}
+
+                      {% if checkout_data.applied_loyalty_points_records.all %}
+                          
+                          {% for l in checkout_data.applied_loyalty_points_records.all %}
+                            {% if l.client.id == item.sale_record.client.id %}
+                            
+                            
+                            <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                              <div>
+                                  <p class="text-left">
+                                    <strong><h2>LoyaltyPoints Redeemed</h2></strong>
+                                  </p>
+                              </div>
+                              <p class="text-[#7B7B7B]">
+                                  <span></span>{{ l.redeemed_points }}
+                              </p>
+                            </div>
+                            
+                            
+                            
+                            {% endif %}
+                          {% endfor %}
+                            
+                      
+                      {% endif %}
+
+                      {% if checkout_data.applied_gift_cards_records.all %}
+                          
+                          {% for g in checkout_data.applied_gift_cards_records.all %}
+                            {% if g.client.id == item.sale_record.client.id %}
+                            
+                            
+                            <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                              <div>
+                                  <p class="text-left">
+                                    <strong><h2>LoyaltyPoints Redeemed</h2></strong>
+                                  </p>
+                              </div>
+                              <p class="text-[#7B7B7B]">
+                                  <span></span>{{ g.partial_price }}
+                                  {{ currency_code }}
+                              </p>
+                            </div>
+                            
+                            
+                            
+                            {% endif %}
+                          {% endfor %}
+                            
+                      
+                      {% endif %}
+
+
+
                 {% endfor %}
 
                 {% endif %}
@@ -889,22 +1020,149 @@
 
                 {% for item in checkout_data.services_records.all %}
 
-                <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                  <div>
-                    <h3> {{item.client.full_name}}</h3>
-                    <p class="text-left">
-                      {{item.service.name}}
-                      {% if item.discount_percentage %}
-                      (Discount {{ item.discount_percentage}} %)
-                      {% endif %}
+                  <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                    <div>
+                      <h3> {{item.client.full_name}}</h3>
+                      <p class="text-left">
+                        {{item.service.name}}
+                        {% if item.discount_percentage %}
+                        (Discount {{ item.discount_percentage}} %)
+                        {% endif %}
+                      </p>
+                      <p class="arabic">{% get_secondary_translation item.id %}</p>
+                    </div>
+                    <p class="text-[#7B7B7B]">
+                      <span>{{item.quantity}} x </span>{{item.price}}
+                      {{currency_code}}
                     </p>
-                    <p class="arabic">{% get_secondary_translation item.id %}</p>
                   </div>
-                  <p class="text-[#7B7B7B]">
-                    <span>{{item.quantity}} x </span>{{item.price}}
-                    {{currency_code}}
-                  </p>
-                </div>
+
+                {% if checkout_data.applied_coupons_records.all %}
+                                              
+                          {% for coupon in checkout_data.applied_coupons_records.all %}
+                            {% if coupon.client.id == item.sale_record.client.id %}
+                            
+                            
+                            <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                              <div>
+                                  <p class="text-left">
+                                    <strong><h2>Coupon Redeemed</h2></strong>
+                                  </p>
+                              </div>
+                              <p class="text-[#7B7B7B]">
+                                  <span></span>{{ coupon.coupon_discounted_price }}
+                                  {{ currency_code }}
+                              </p>
+                            </div>
+                        
+                            {% endif %}
+                          {% endfor %}
+                            
+                      
+                      {% endif %}
+
+
+                      {% comment %} membership printing {% endcomment %}
+                      {% if checkout_data.applied_memberships_records.all %}
+                          
+                          {% for m in checkout_data.applied_memberships_records.all %}
+                            {% if m.client.id == item.sale_record.client.id %}
+                            
+                            
+                            <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                              <div>
+                                  <p class="text-left">
+                                    <strong><h2>Membership Redeemed</h2></strong>
+                                  </p>
+                              </div>
+                              <p class="text-[#7B7B7B]">
+                                  <span></span>{{ m.price }}
+                                  {{ currency_code }}
+                              </p>
+                            </div>
+                        
+                            {% endif %}
+                          {% endfor %}
+                            
+                      
+                      {% endif %}
+                      
+
+
+                      {% if checkout_data.applied_vouchers_records.all %}
+                          
+                          {% for v in checkout_data.applied_vouchers_records.all %}
+                            {% if v.client.id == item.sale_record.client.id %}
+                            
+                            
+                            <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                              <div>
+                                  <p class="text-left">
+                                    <strong><h2>Vouchers Redeemed</h2></strong>
+                                  </p>
+                              </div>
+                              <p class="text-[#7B7B7B]">
+                                  <span></span>{{ v.price }}
+                                  {{ currency_code }}
+                              </p>
+                            </div>
+                        
+                            {% endif %}
+                          {% endfor %}
+                            
+                      
+                      {% endif %}
+
+                      {% if checkout_data.applied_loyalty_points_records.all %}
+                          
+                          {% for l in checkout_data.applied_loyalty_points_records.all %}
+                            {% if l.client.id == item.sale_record.client.id %}
+                            
+                            
+                            <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                              <div>
+                                  <p class="text-left">
+                                    <strong><h2>LoyaltyPoints Redeemed</h2></strong>
+                                  </p>
+                              </div>
+                              <p class="text-[#7B7B7B]">
+                                  <span></span>{{ l.redeemed_points }}
+                              </p>
+                            </div>
+                            
+                            
+                            
+                            {% endif %}
+                          {% endfor %}
+                            
+                      
+                      {% endif %}
+
+                      {% if checkout_data.applied_gift_cards_records.all %}
+                          
+                          {% for g in checkout_data.applied_gift_cards_records.all %}
+                            {% if g.client.id == item.sale_record.client.id %}
+                            
+                            
+                            <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                              <div>
+                                  <p class="text-left">
+                                    <strong><h2>LoyaltyPoints Redeemed</h2></strong>
+                                  </p>
+                              </div>
+                              <p class="text-[#7B7B7B]">
+                                  <span></span>{{ g.partial_price }}
+                                  {{ currency_code }}
+                              </p>
+                            </div>
+                            
+                            
+                            
+                            {% endif %}
+                          {% endfor %}
+                            
+                      
+                      {% endif %}
                 {% endfor %}
 
 
@@ -915,7 +1173,7 @@
                 
                 {% if checkout_data.appointment_services.all and clients %}
                         {% for c in clients %}
-                          <h2>{{c.client.full_name}}</h2>
+                          <strong><h2>{{c.client.full_name}}</h2></strong>
                           
                           {% for data in checkout_data.appointment_services.all %}
                                 {% if data.client.id == c.client.id %}
@@ -938,7 +1196,7 @@
                                           </div>
                                 {% endif %}
 
-                                
+
                                 {% comment %} coupon printing {% endcomment %}
                                 {% if checkout_data.applied_coupons_records.all %}
                                     
@@ -957,14 +1215,14 @@
                                             {{ currency_code }}
                                         </p>
                                       </div>
-                                      
-                                      
-                                      
+                                  
                                       {% endif %}
                                     {% endfor %}
                                       
                                 
                                 {% endif %}
+
+
                                 {% comment %} membership printing {% endcomment %}
                                 {% if checkout_data.applied_memberships_records.all %}
                                     
@@ -983,14 +1241,14 @@
                                             {{ currency_code }}
                                         </p>
                                       </div>
-                                      
-                                      
-                                      
+                                  
                                       {% endif %}
                                     {% endfor %}
                                       
                                 
                                 {% endif %}
+                                
+
 
                                 {% if checkout_data.applied_vouchers_records.all %}
                                     
@@ -1009,9 +1267,7 @@
                                             {{ currency_code }}
                                         </p>
                                       </div>
-                                      
-                                      
-                                      
+                                  
                                       {% endif %}
                                     {% endfor %}
                                       
