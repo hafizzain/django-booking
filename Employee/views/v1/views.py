@@ -7264,7 +7264,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
         id = request.query_params.get('id', None)
         if id is not None:
             giftcard = GiftCards.objects.get(id=id, is_deleted=False)
-            if giftcard.exists():
+            if giftcard :
                 #Soft delete the gift card
                 giftcard.is_deleted = True
                 giftcard.is_active = False
