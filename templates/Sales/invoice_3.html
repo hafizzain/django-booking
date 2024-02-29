@@ -913,13 +913,14 @@
 
                 {% comment %} ===============================if there is any appointment_services in the checkout_data ========================{% endcomment %}
 
-                {% comment %} {% if checkout_data.appointment_services.all %}
+                {% if checkout_data.appointment_services.all %}
                 
                 {% with previous_client = '' %}
                         {% for item in checkout_data.appointment_services.all %}
                               
                               {% if item.client != previous_client %}
                                 <h2>{{item.client.full_name}}</h2>
+                                {% continue %}
                               {% endif %}
                                 
                               
@@ -948,14 +949,24 @@
 
                               
                           {% endfor %}
-                          {% with previous_client=outer.client %}
+                          {% set previous_client=outer.client %}
                         
                         {% endfor %}
                 {% endwith %}
                   
-                {% endif %} {% endcomment %}
+                {% endif %} 
 
-                {% if checkout_data.appointment_services %}
+                {% comment %} {% if checkout_data.appointment_services %} {% endcomment %}
+                
+                {% comment %} {% with client = []  %}
+                
+                {% for item in checkout_data.appointment_services %}
+                  
+                {% endfor %}
+                  
+                  
+                {% endwith %}
+                  
                   
                   
                   {% if clients_list %}
@@ -983,7 +994,7 @@
     
                     {% endfor %}
                   {% endif %}
-                {% endif %} 
+                {% endif %}  {% endcomment %}
 
                 
                 {% comment %} ===============================if there is any gift_cards_records in the checkout_data ========================{% endcomment %}
