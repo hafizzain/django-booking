@@ -914,11 +914,14 @@
                 {% comment %} ===============================if there is any appointment_services in the checkout_data ========================{% endcomment %}
                 
                 {% if checkout_data.appointment_services.all %}
+                {% set previous_client = None %}
 
                       {% for item in checkout_data.appointment_services.all %}
                         
                             {% if item.client != previous_client %}
                                 <h2>{{ item.client.full_name }}</h2>
+                            {%endif%}
+                            {% set previous_client = item.client %}
                                 {% for data in checkout_data.appointment_services.all %}
                                     {% if data.client == item.client %}
                                         <div class="flex items-center justify-between text-primary text-sm font-semibold">
@@ -939,7 +942,7 @@
                                     {% endif %}
                                 {% endfor %}
                                 {% comment %} {% set previous_client = item.client %} {% endcomment %}
-                            {% endif %}
+                            
                           
                           
                       {% endfor %}
