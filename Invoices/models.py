@@ -276,7 +276,7 @@ class SaleInvoice(models.Model):
             
             return sale_records
         except Exception as e:
-            return None, f"{e}"
+            return  f"{e}"
     
     
     def save(self, *args, **kwargs):
@@ -315,7 +315,7 @@ class SaleInvoice(models.Model):
                     'business_address':self.location,
                     'tax': self.total_tax,
                     'checkout_data':checkout_data,
-                    'clients': clients,
+                    # 'clients': clients,
                     # 'redeemed_points':self.get_client_loyalty_points(),
                     # 'coupon_data':coupon_data,
                     # **tax_details,
