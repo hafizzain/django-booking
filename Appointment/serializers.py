@@ -1646,16 +1646,9 @@ class SingleNoteSerializer(serializers.ModelSerializer):
         if obj.client != None:
             appointment_checkout_all = AppointmentService.objects \
                 .filter(
-                appointment__client=obj.client,
-                appointment_status__in=['Done', 'Paid']
-            ) \
-                .select_related('member', 'user', 'service') \
-                .order_by('-created_at')
-            # appointment_checkout_all = AppointmentService.objects \
-            #     .filter(
-            #     appointment__client_id=obj.client,
-            #     appointment__status__in=['Done', 'Paid']
-            #     ).order_by('-created_at')
+                appointment__client_id=obj.client,
+                appointment__status__in=['Done', 'Paid']
+                ).order_by('-created_at')
             return appointment_checkout_all.count()
         else:
             return 0

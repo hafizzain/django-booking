@@ -321,6 +321,7 @@ def get_appointments_service(request):
     appointment_total = appointment_checkout_all.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += appointment_total if appointment_total else 0
     product = POSerializerForClientSale(product_order, many=True, context={'request': request, })
+    # appointment = ServiceClientSaleSerializer(appointment_checkout_all, many=True)
     
     price_values = sum(item.get('price', 0) for item in product.data)
     voucher_total_price = sum(item.get('price', 0) for item in voucher.data)
