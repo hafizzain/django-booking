@@ -915,10 +915,6 @@
                 
                 {% if checkout_data.appointment_services.all %}
 
-                      
-                      
-                      
-                      
                       {% for item in checkout_data.appointment_services.all %}
                         {% with previous_client = item.client  %}
                             {% if item.client != previous_client %}
@@ -947,7 +943,7 @@
                           {% endwith %}
                           
                       {% endfor %}
-                      {% endwith %}
+                      
 
 
                 {% endif %}
