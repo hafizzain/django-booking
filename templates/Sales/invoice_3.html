@@ -915,10 +915,12 @@
                 
                 {% if checkout_data.appointment_services.all and clients %}
                         {% for c in clients %}
-                          <h2>{{c}}</h2>
+                          {% comment %} <h2>{{c}}</h2> {% endcomment %}
                           
                           {% for data in checkout_data.appointment_services.all %}
                                 {% if data.client.id == c %}
+                                        <h2>data.client</h2>
+
                                           <div class="flex items-center justify-between text-primary text-sm font-semibold">
                                             <div>
                                                 <p class="text-left">
@@ -927,7 +929,7 @@
                                                         (Discount {{ data.discount_percentage }} %)
                                                     {% endif %}
                                                 </p>
-                                                <p class="arabic">{% get_secondary_translation item.id %}</p>
+                                                <p class="arabic">{% get_secondary_translation data.id %}</p>
                                             </div>
                                             <p class="text-[#7B7B7B]">
                                                 <span>1 x </span>{{ item.price }}
