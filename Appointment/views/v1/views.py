@@ -313,11 +313,9 @@ def get_appointments_service(request):
     # Client All Appointment Orders ------------------------------
     appointment_checkout_all = AppointmentService.objects \
         .filter(
-        appointment__client=client,
-        appointment_status__in=['Done', 'Paid']
-        ) \
-        .select_related('member', 'user', 'service') \
-        .order_by('-created_at')
+        appointment__client_id=client,
+        appointment__status__in=['Done', 'Paid']
+        ).order_by('-created_at')
     
     #Now Calculate Total Sale    
     appointment_total = appointment_checkout_all.aggregate(total_sale=Sum('price'))['total_sale']
