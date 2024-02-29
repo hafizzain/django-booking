@@ -398,7 +398,8 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         try:
             invoice = SaleInvoice.objects.get(checkout=obj.id)
             refund_appointment_services = RefundServices.objects.filter(refund__refund_invoice_id=invoice.id)
-            return RefundServiceSerializer(refund_appointment_services, many=True).data
+            # return RefundServiceSerializer(refund_appointment_services, many=True).data
+            return True
         except Exception as e:
             raise ValidationError(
                 f'Error Occured while getting the appointment services in the serializer {str(e)}')
