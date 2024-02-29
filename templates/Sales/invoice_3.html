@@ -915,7 +915,7 @@
                 
                 {% if checkout_data.appointment_services.all %}
                 
-                {% with %}
+                {% with previous_client %}
                   {% for item in checkout_data.appointment_services.all %}
                         {% set previous_client=outer.client %}
                               
