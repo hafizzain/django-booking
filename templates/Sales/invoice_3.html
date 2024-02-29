@@ -991,35 +991,35 @@
 
 
                 {% if checkout_data.appointment_services.all %}
-                    {% with previous_client='' %}
-                        {% for item in checkout_data.appointment_services.all %}
-                            {% if item.client != previous_client %}
-                                {% with previous_client=item.client %}
-                                    <h2>{{ item.client.full_name }}</h2>
-                                {% endwith %}
-                            {% endif %}
-                            {% for data in checkout_data.appointment_services.all %}
-                                {% if data.client == item.client %}
-                                    <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                                        <div>
-                                            <p class="text-left">
-                                                {{ data.service.name }}
-                                                {% if data.discount_percentage %}
-                                                    (Discount {{ data.discount_percentage }} %)
-                                                {% endif %}
-                                            </p>
-                                            <p class="arabic">{% get_secondary_translation data.id %}</p>
-                                        </div>
-                                        <p class="text-[#7B7B7B]">
-                                            <span>1 x </span>{{ data.price }}
-                                            {{ currency_code }}
-                                        </p>
-                                    </div>
-                                {% endif %}
-                            {% endfor %}
-                        {% endfor %}
-                    {% endwith %}
-                {% endif %}
+                      {% with seen_clients=set() %}
+                          {% for item in checkout_data.appointment_services.all %}
+                              {% if item.client not in seen_clients %}
+                                  {% with seen_clients.add(item.client) %}
+                                      <h2>{{ item.client.full_name }}</h2>
+                                  {% endwith %}
+                                  {% for data in checkout_data.appointment_services.all %}
+                                      {% if data.client == item.client %}
+                                          <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                                              <div>
+                                                  <p class="text-left">
+                                                      {{ data.service.name }}
+                                                      {% if data.discount_percentage %}
+                                                          (Discount {{ data.discount_percentage }} %)
+                                                      {% endif %}
+                                                  </p>
+                                                  <p class="arabic">{% get_secondary_translation data.id %}</p>
+                                              </div>
+                                              <p class="text-[#7B7B7B]">
+                                                  <span>1 x </span>{{ data.price }}
+                                                  {{ currency_code }}
+                                              </p>
+                                          </div>
+                                      {% endif %}
+                                  {% endfor %}
+                              {% endif %}
+                          {% endfor %}
+                      {% endwith %}
+                  {% endif %}
 
                 {% comment %} ===============================if there is any gift_cards_records in the checkout_data ========================{% endcomment %}
 
