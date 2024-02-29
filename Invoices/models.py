@@ -291,7 +291,8 @@ class SaleInvoice(models.Model):
                 
                 checkout_data = self.get_all_order_items()
                 if self.checkout_type == 'Appointment' or self.checkout_type == 'Group Appointment':
-                    client = checkout_data.appointment_services.values_list('client').distinct()
+                    client = checkout_data.appointment_services.filter(client__isnull = False).distinct('client')
+                    
                     
                     
                     raise ValueError(client.count())
