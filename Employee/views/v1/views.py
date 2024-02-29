@@ -7363,26 +7363,39 @@ def get_gift_card(request):
     search_text = request.query_params.get('search_text', None)
     
     # GiftCard show on bases of Ceruncy and location
-    ceruncy = BusinessAddress.objects.filter(id=selected_location).values_list('currency', flat=True)
-    gift_detils = list(GiftDetail.objects.filter(currencies__in=ceruncy).values_list('gift_card', flat=True))
-    query_set = GiftCards.objects.filter(id__in=gift_detils, is_deleted=False,  is_custom_card = False)
-    
-    if search_text:
-        query_set = GiftCards.objects.filter(title__icontains=search_text, is_deleted=False, is_custom_card = False)
+    if selected_location is not None:
+        ceruncy = BusinessAddress.objects.filter(id=selected_location).values_list('currency', flat=True)
+        gift_detils = list(GiftDetail.objects.filter(currencies__in=ceruncy).values_list('gift_card', flat=True))
+        query_set = GiftCards.objects.filter(id__in=gift_detils, is_deleted=False,  is_custom_card = False)
         
-    serializer_context = {'selected_location': selected_location}
-    serializer = GiftCardSerializerResponse(query_set, many=True, context=serializer_context).data
-    data = {
-        "success": True,
-        "status_code": 200,
-        "response": {
-            "message": "gift card get successfully",
-            "error_message": None,
-            "results": serializer
+        if search_text:
+            query_set = GiftCards.objects.filter(title__icontains=search_text, is_deleted=False, is_custom_card = False)
+            
+        serializer_context = {'selected_location': selected_location}
+        serializer = GiftCardSerializerResponse(query_set, many=True, context=serializer_context).data
+        data = {
+            "success": True,
+            "status_code": 200,
+            "response": {
+                "message": "gift card get successfully",
+                "error_message": None,
+                "results": serializer
+            }
         }
-    }
-    return Response(data, status=status.HTTP_200_OK)
-
+        return Response(data, status=status.HTTP_200_OK)
+    else:
+        query_set = GiftCards.objects.filter(is_deleted=False)
+        serializer = GiftCardSerializerResponse(query_set, many=True).data
+        data = {
+            "success": True,
+            "status_code": 200,
+            "response": {
+                "message": "All gift card get successfully",
+                "error_message": None,
+                "results": serializer
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
