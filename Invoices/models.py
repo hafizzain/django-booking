@@ -275,7 +275,7 @@ class SaleInvoice(models.Model):
             
             return sale_records, None
         except Exception as e:
-            return f"{e}"
+            return None, f"{e}"
     
     
     def save(self, *args, **kwargs):
