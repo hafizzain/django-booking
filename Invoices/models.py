@@ -268,9 +268,11 @@ class SaleInvoice(models.Model):
         from SaleRecords.models import SaleRecords
         try:
             sale_records = SaleRecords.objects.get(id = self.checkout)
-        
+            clients = sale_records.appointment_services.values_list('client', flat = True).distinct()
+            if sale_records.checkout_type == "Appointment" or sale_records.checkout_type == "Group Appointment":
+                return sale_records, clients
             
-            return sale_records
+            return sale_records, None
         except Exception as e:
             return False
     
@@ -285,7 +287,7 @@ class SaleInvoice(models.Model):
                 # checkout_redeem_data = self.get_checkout_redeemed_data()
                 # coupon_data = self.get_checkout_coupon_data()
                 
-                checkout_data = self.get_all_order_items()
+                checkout_data, clients = self.get_all_order_items()
 
                 context = {
                     'client': self.client,
@@ -309,6 +311,7 @@ class SaleInvoice(models.Model):
                     'business_address':self.location,
                     'tax': self.total_tax,
                     'checkout_data':checkout_data,
+                    'clients': clients,
                     # 'redeemed_points':self.get_client_loyalty_points(),
                     # 'coupon_data':coupon_data,
                     # **tax_details,

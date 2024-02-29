@@ -915,13 +915,13 @@
                 
                 {% if checkout_data.appointment_services.all %}
                 {% comment %} {% set previous_client = None %} {% endcomment %}
-
-                      {% for item in checkout_data.appointment_services.all %}
+                      {% if clients %} 
+                      {% for item in clients.all %}
                         
-                            {% if item.client != previous_client %}
+                            {% comment %} {% if item.client != previous_client %}
                                 <h2>{{ item.client.full_name }}</h2>
-                                {% set previous_client = item.client %}
-                            {%endif%}
+                                 {% set previous_client = item.client %} 
+                            {%endif%} {% endcomment %}
                                 {% for data in checkout_data.appointment_services.all %}
                                     {% if data.client == item.client %}
                                         <div class="flex items-center justify-between text-primary text-sm font-semibold">
@@ -946,9 +946,8 @@
                           
                           
                       {% endfor %}
-                      
-
-
+                      {% endif %}
+                    
                 {% endif %}
 
                 {% comment %} {% if checkout_data.appointment_services %} {% endcomment %}
