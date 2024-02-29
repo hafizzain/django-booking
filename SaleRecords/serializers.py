@@ -668,7 +668,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         else:
             pass
 
-    def employee_commission_calculation(self, location=None, user=None,  sub_total=None, checkout_id=None, products_list=None, vouchers_list=None, service_list=None):
+    def employee_commission_calculation(self, location=None, user=None,  sub_total=None, checkout_id=None, products_list=None, vouchers_list=None, service_list=None, appintment_services_list = None):
         try:
             if products_list:
                 for item in products_list:
@@ -777,6 +777,41 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                             quantity=item.get('quantity'),
                             tip=0
                         )
+            if appintment_services_list:
+                for item in appintment_services_list:
+                    
+                    sale_commission = CategoryCommission.objects.filter(
+                        commission__employee=item.get('employee'),
+                        from_value__lte=float(item.get("price")),
+                        category_comission__iexact='Service'
+                    ).order_by('-from_value').first()
+                    service = Service.objects.get(id=f'{item.get("service")}')
+                    if sale_commission:
+                        calculated_commission = sale_commission.calculated_commission(
+                            item.get('price'))
+                        EmployeeCommission.objects.create(
+
+                            user_id=user,
+                            business=checkout_id.location.business,
+                            location_id=location,
+                            employee=item.get('employee'),
+                            commission=sale_commission.commission,
+                            category_commission=sale_commission,
+                            commission_category=sale_commission.category_comission,
+                            commission_type=sale_commission.comission_choice,
+                            sale_value=float(item.get('price')),
+                            commission_rate=float(
+                                sale_commission.commission_percentage),
+                            commission_amount=float(calculated_commission),
+                            symbol=sale_commission.symbol,
+                            sale_id=checkout_id.id,
+
+                            item_name=service.name,
+                            item_id=item.get('service'),
+                            quantity=item.get('quantity'),
+                            tip=0
+                        )
+                    
 
         except Exception as e:
             raise ValidationError(
