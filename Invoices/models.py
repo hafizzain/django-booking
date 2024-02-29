@@ -295,7 +295,7 @@ class SaleInvoice(models.Model):
                     
                     
                     
-                    raise ValueError(client.count())
+                    # raise ValueError(client.count())
                 context = {
                     'client': self.client,
                     'invoice_by' : self.user.user_full_name if self.user else '',
