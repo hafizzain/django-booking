@@ -269,12 +269,13 @@ class SaleInvoice(models.Model):
         try:
             sale_records = SaleRecords.objects.get(id = self.checkout)
             clients = sale_records.appointment_services.values_list('client', flat = True).distinct()
+            raise ValueError(f"{clients.count()}")
             if sale_records.checkout_type == "Appointment" or sale_records.checkout_type == "Group Appointment":
                 return sale_records, clients
             
             return sale_records, None
         except Exception as e:
-            return False
+            return f"{e}"
     
     
     def save(self, *args, **kwargs):
