@@ -1651,7 +1651,11 @@ class SingleNoteSerializer(serializers.ModelSerializer):
             ) \
                 .select_related('member', 'user', 'service') \
                 .order_by('-created_at')
-            # client_all_appointment = appointment_checkout_all.aggregate(total_sale=Sum('price')).get('total_sale', 0)
+            # appointment_checkout_all = AppointmentService.objects \
+            #     .filter(
+            #     appointment__client_id=obj.client,
+            #     appointment__status__in=['Done', 'Paid']
+            #     ).order_by('-created_at')
             return appointment_checkout_all.count()
         else:
             return 0
