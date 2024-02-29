@@ -278,7 +278,7 @@ class SaleInvoice(models.Model):
             
                 
                 return sale_records, grouped_data
-            return sale_records
+            return sale_records, None
         except Exception as e:
             return False
     
