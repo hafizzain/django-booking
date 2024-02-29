@@ -916,7 +916,7 @@
                 {% if checkout_data.appointment_services.all %}
                 {% comment %} {% set previous_client = None %} {% endcomment %}
                       {% if clients %} 
-                      {% for item in clients.all %}
+                      {% for item in clients %}
                         
                             {% comment %} {% if item.client != previous_client %}
                                 <h2>{{ item.client.full_name }}</h2>
