@@ -268,9 +268,10 @@ class SaleInvoice(models.Model):
         from SaleRecords.models import SaleRecords
         try:
             sale_records = SaleRecords.objects.get(id = self.checkout)
-            clients = sale_records.appointment_services.values_list('client', flat = True).distinct()
-            raise ValueError(f"{clients.count()}")
+            
             if sale_records.checkout_type == "Appointment" or sale_records.checkout_type == "Group Appointment":
+                clients = sale_records.appointment_services.values_list('client', flat = True).distinct()
+                raise ValueError(f"{clients.count()}")
                 return sale_records, clients
             
             return sale_records, None
