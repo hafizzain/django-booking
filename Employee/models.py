@@ -710,7 +710,7 @@ class GiftCards(models.Model):
     # name = models.TextField(null=True, blank=True)
     title = models.TextField(null=True, blank=True)
     gift_card_value = models.FloatField(default=0, null=True)
-    # retail_price = models.FloatField(default=0, null=True, blank = True)
+    retail_price = models.FloatField(default=0, null=True, blank = True)
     expire_date = models.DateField(auto_now_add=now, null=True)
     start_date = models.DateField(null=True)
     end_date = models.DateField(null=True)
