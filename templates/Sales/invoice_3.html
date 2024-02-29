@@ -914,47 +914,34 @@
                 {% comment %} ===============================if there is any appointment_services in the checkout_data ========================{% endcomment %}
                 
                 {% if checkout_data.appointment_services.all %}
-                
-                {% with previous_client %}
-                  {% for item in checkout_data.appointment_services.all %}
-                        {% set previous_client=outer.client %}
-                              
-                              {% if item.client != previous_client %}
-                                <h2>{{item.client.full_name}}</h2>
-                                {% continue %}
-                              {% endif %}
-                                
-                              
+                      {% set previous_client = None %}
+                      {% for item in checkout_data.appointment_services.all %}
+                          {% if item.client != previous_client %}
+                              <h2>{{ item.client.full_name }}</h2>
+                              {% set previous_client = item.client %}
+                          {% endif %}
+                          
                           {% for data in checkout_data.appointment_services.all %}
-                            
-                            {% if data.client == item.client %}
-                            
-                                <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                              
-                                    <div>
-                                        <p class="text-left">
-                                          {{data.service.name}}
-                                          {% if data.discount_percentage %}
-                                          (Discount {{ data.discount_percentage}} %)
-                                          {% endif %}
-                                        </p>
-                                        <p class="arabic">{% get_secondary_translation item.id %}</p>
-                                    </div>
+                              {% if data.client == item.client %}
+                                  <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                                      <div>
+                                          <p class="text-left">
+                                              {{ data.service.name }}
+                                              {% if data.discount_percentage %}
+                                                  (Discount {{ data.discount_percentage }} %)
+                                              {% endif %}
+                                          </p>
+                                          <p class="arabic">{% get_secondary_translation item.id %}</p>
+                                      </div>
                                       <p class="text-[#7B7B7B]">
-                                        <span>1 x </span>{{item.price}}
-                                        {{currency_code}}
+                                          <span>1 x </span>{{ item.price }}
+                                          {{ currency_code }}
                                       </p>
-                                </div>
-
-                            {% endif %}
-
-                              
+                                  </div>
+                              {% endif %}
                           {% endfor %}
-                        
-                        {% endfor %}
-                {% endwith %}
-                  
-                {% endif %} 
+                      {% endfor %}
+                  {% endif %}
 
                 {% comment %} {% if checkout_data.appointment_services %} {% endcomment %}
                 
