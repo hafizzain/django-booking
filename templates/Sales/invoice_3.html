@@ -919,7 +919,7 @@
                           
                           {% for data in checkout_data.appointment_services.all %}
                                 {% if data.client.id == c.client.id %}
-                                        <h2>{{data.client}}</h2>
+                                        {% comment %} <h2>{{data.client}}</h2> {% endcomment %}
 
                                           <div class="flex items-center justify-between text-primary text-sm font-semibold">
                                             <div>
