@@ -960,7 +960,7 @@
                   
                   <h2>{{item.client.full_name}}</h2>
                     
-                  {% for data in checkout_data.appointment_services.filter(client = item.client) %}
+                  {% for data in checkout_data.appointment_services.all %}
                   
                   {% if item.appointment == data.appointment %}
                   
