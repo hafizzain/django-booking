@@ -681,7 +681,8 @@ def update_client(request):
     if serialized.is_valid():
         serialized.save()
     if images is not None:
-        ids = json.loads(images)
+        # ids = json.loads(images)
+        ids = [id for id in images if isinstance(id, int)]  # Extract and convert to integers
         # Get all existing images for the client
         existing_images = ClientImages.objects.filter(client_id=client.id)
 
