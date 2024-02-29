@@ -957,11 +957,13 @@
 
                 {% if checkout_data.appointment_services.all %}
                     {% for item in checkout_data.appointment_services.all %}
-                        {% if item.client != previous_client %}
+                        {% if item.client == previous_client %}
+                              {% continue %}
                             <h2>{{ item.client.full_name }}</h2>
                         {% endif %}
 
                         {% with previous_client=item.client %}
+                              
                             {% for data in checkout_data.appointment_services.all %}
                                 {% if data.client == item.client %}
                                     <div class="flex items-center justify-between text-primary text-sm font-semibold">
@@ -982,6 +984,7 @@
                                 {% endif %}
                             {% endfor %}
                         {% endwith %}
+                        
                     {% endfor %}
                 {% endif %}
                 {% comment %} ===============================if there is any gift_cards_records in the checkout_data ========================{% endcomment %}
