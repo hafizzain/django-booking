@@ -915,18 +915,11 @@
                 
                 {% if checkout_data.appointment_services.all and clients %}
                         {% for c in clients %}
-                          {% comment %} <h2>{{c}}</h2> {% endcomment %}
-                          
-                          
-
-                              <h2>{{c.client.full_name}}</h2>
-                          
-                          
-                            
+                          <h2>{{c.full_name}}</h2>
                           
                           {% for data in checkout_data.appointment_services.all %}
                                 {% if data.client.id == c.id %}
-                                        {% comment %} <h2>{{data.client}}</h2> {% endcomment %}
+                                        <h2>{{data.client}}</h2>
 
                                           <div class="flex items-center justify-between text-primary text-sm font-semibold">
                                             <div>
