@@ -917,17 +917,15 @@
                         {% for c in clients %}
                           {% comment %} <h2>{{c}}</h2> {% endcomment %}
                           
-                          {% for client in checkout_data.appointment_services.all %}
-                            {% if client.client.id == c %}
-
-                              <h2>{{client.client.full_name}}</h2>
                           
-                            {% endif %}
-                          {% endfor %}
+
+                              <h2>{{c.client.full_name}}</h2>
+                          
+                          
                             
                           
                           {% for data in checkout_data.appointment_services.all %}
-                                {% if data.client.id == c %}
+                                {% if data.client.id == c.id %}
                                         {% comment %} <h2>{{data.client}}</h2> {% endcomment %}
 
                                           <div class="flex items-center justify-between text-primary text-sm font-semibold">
