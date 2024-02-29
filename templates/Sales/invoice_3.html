@@ -993,9 +993,7 @@
                 {% if checkout_data.appointment_services.all %}
                     {% with previous_client='' %}
                         {% for item in checkout_data.appointment_services.all %}
-                            {% if item.client == previous_client %}
-                                {% continue %}
-                            {% else %}
+                            {% if item.client != previous_client %}
                                 {% with previous_client=item.client %}
                                     <h2>{{ item.client.full_name }}</h2>
                                 {% endwith %}
