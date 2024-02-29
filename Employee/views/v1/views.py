@@ -7263,7 +7263,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
     def delete(self, request, *args, **kwargs):
         id = request.query_params.get('id', None)
         if id is not None:
-            giftcard = GiftCards.objects.filter(id=id)
+            giftcard = GiftCards.objects.get(id=id, is_deleted=False)
             if giftcard.exists():
                 #Soft delete the gift card
                 giftcard.is_deleted = True
