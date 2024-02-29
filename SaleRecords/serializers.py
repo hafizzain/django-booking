@@ -18,6 +18,8 @@ from Invoices.models import SaleInvoice
 from Client.helpers import calculate_validity
 from Employee.models import *
 from TragetControl.models import *
+from Finance.models import *
+from Finance.serializers import *
 
 
 class ClientSerializer(serializers.ModelSerializer):
@@ -392,10 +394,11 @@ class SaleRecordSerializer(serializers.ModelSerializer):
             raise ValidationError(
                 f'Error Occured while getting the client data in the serializer {str(e)}')
     
-    def get_appointment_services(self, obj):
+    def get_services_records(self, obj):
         try:
-            appointment_services = SaleRecordsAppointmentServices.objects.filter(sale_record=obj.id)
-            return SaleRecordsAppointmentServicesSerializer(appointment_services, many=True).data
+            invoice = SaleInvoice.objects.get(checkout=obj.id)
+            refund_appointment_services = RefundServices.objects.filter(refund__refund_invoice_id=invoice.id)
+            return RefundServiceSerializer(refund_appointment_services, many=True).data
         except Exception as e:
             raise ValidationError(
                 f'Error Occured while getting the appointment services in the serializer {str(e)}')
