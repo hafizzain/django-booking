@@ -269,12 +269,12 @@ class SaleInvoice(models.Model):
         try:
             sale_records = SaleRecords.objects.get(id = self.checkout)
             
-            if self.checkout_type == "Appointment" or self.checkout_type == "Group Appointment":
-                clients = sale_records.appointment_services.values_list('client', flat = True).distinct()
-                raise ValueError(f"{clients.count()}")
-                return sale_records, clients
+            # if self.checkout_type == "Appointment" or self.checkout_type == "Group Appointment":
+            #     clients = sale_records.appointment_services.values_list('client', flat = True).distinct()
+            #     raise ValueError(f"{clients.count()}")
+            #     return sale_records, clients
             
-            return sale_records, None
+            return sale_records
         except Exception as e:
             return None, f"{e}"
     
@@ -289,8 +289,10 @@ class SaleInvoice(models.Model):
                 # checkout_redeem_data = self.get_checkout_redeemed_data()
                 # coupon_data = self.get_checkout_coupon_data()
                 
-                checkout_data, clients = self.get_all_order_items()
-
+                checkout_data = self.get_all_order_items()
+                if self.checkout_type == 'Appointment' or self.checkout_type == 'Group Appointment':
+                    client = checkout_data.appointment_services.values_list('client', flat = True).distinct()
+                    raise ValueError(client.count())
                 context = {
                     'client': self.client,
                     'invoice_by' : self.user.user_full_name if self.user else '',
