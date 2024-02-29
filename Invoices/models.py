@@ -276,7 +276,7 @@ class SaleInvoice(models.Model):
             
             return sale_records
         except Exception as e:
-            return None, f"{e}"
+            return  f"{e}"
     
     
     def save(self, *args, **kwargs):
@@ -292,7 +292,7 @@ class SaleInvoice(models.Model):
                 checkout_data = self.get_all_order_items()
                 if self.checkout_type == 'Appointment' or self.checkout_type == 'Group Appointment':
                     client = checkout_data.appointment_services.values_list('client', flat = True).distinct()
-                    raise ValueError(client.count())
+                    # raise ValueError(client.count())
                 context = {
                     'client': self.client,
                     'invoice_by' : self.user.user_full_name if self.user else '',
@@ -315,7 +315,7 @@ class SaleInvoice(models.Model):
                     'business_address':self.location,
                     'tax': self.total_tax,
                     'checkout_data':checkout_data,
-                    'clients': clients,
+                    'clients': client,
                     # 'redeemed_points':self.get_client_loyalty_points(),
                     # 'coupon_data':coupon_data,
                     # **tax_details,
