@@ -267,18 +267,14 @@ class SaleInvoice(models.Model):
     def get_all_order_items (self):
         from SaleRecords.models import SaleRecords
         try:
-            grouped_data = {}
+            clients_list = []
             sale_records = SaleRecords.objects.get(id = self.checkout)
-            if sale_records.checkout_type == "Appointment" or sale_records.checkout_type == 'Group Appointment':
-                for data in sale_records.appointment_services.all:
-                    appointment_id = data.appointment
-                    if appointment_id not in grouped_data:
-                        grouped_data[appointment_id] = []
-                    grouped_data[appointment_id].append(data)
+            if sale_records.checkout_type == 'Appointment' or sale_records.checkout_type == 'Group Appointment':
+                for client in sale_records.appointment_service.all:
+                    if client not in clients_list:
+                        clients_list.append(client.client)
             
-                
-                return sale_records, grouped_data
-            return sale_records, None
+            return sale_records, clients_list
         except Exception as e:
             return False
     
@@ -293,7 +289,7 @@ class SaleInvoice(models.Model):
                 # checkout_redeem_data = self.get_checkout_redeemed_data()
                 # coupon_data = self.get_checkout_coupon_data()
                 
-                checkout_data, appointment_service_data = self.get_all_order_items()
+                checkout_data, clients_list = self.get_all_order_items()
 
                 context = {
                     'client': self.client,
@@ -317,7 +313,7 @@ class SaleInvoice(models.Model):
                     'business_address':self.location,
                     'tax': self.total_tax,
                     'checkout_data':checkout_data,
-                    'appointment_service': appointment_service_data,
+                    'clients_list': clients_list,
                     # 'redeemed_points':self.get_client_loyalty_points(),
                     # 'coupon_data':coupon_data,
                     # **tax_details,
