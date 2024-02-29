@@ -15,7 +15,7 @@ urlpatterns = [
     path('get_promotions_and_discounts_sales_list', views.get_promotions_and_discounts_sales_list),
     path('get_promotions_and_discounts_sales_detail', views.get_promotions_and_discounts_sales_detail),
     
-    path('get_analytics-get_service_optimizedsale-record/', views.get_sales_analytics),
+    path('get_analytics_optimizedsale-record/', views.get_sales_analytics),
 
     
 ]
