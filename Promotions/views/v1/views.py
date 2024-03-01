@@ -6814,8 +6814,8 @@ def get_coupon(request):
                                 status=status.HTTP_400_BAD_REQUEST
                             )
                     
-                if client_type == str('In_Saloon'):
-                    if client_id is refund.client.id or client_type is refund.related_refund.client_type :
+                # if client_type == str('In_Saloon'):
+                if client_id is refund.client.id or client_type is refund.related_refund.client_type :
                             return Response(
                                     {
                                         'status': False,
