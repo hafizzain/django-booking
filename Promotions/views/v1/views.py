@@ -6792,7 +6792,7 @@ def get_coupon(request):
                             },
                             status=status.HTTP_400_BAD_REQUEST
                         )
-                if (client_id and client_id != refund.client.id):
+                if (client_id or client_id != refund.client.id):
                     return Response(
                             {
                                 'status': False,
