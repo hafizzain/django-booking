@@ -79,20 +79,20 @@ class RefundSerializer(serializers.ModelSerializer):
         will be update for all the products!
         '''
         try:
-            [ProductStock.objects.filter(product=product_data["product"], location = location).update(refunded_quantity=ExpressionWrapper(F('refunded_quantity') + product_data["refunded_quantity"], output_field=IntegerField()))
-                                for product_data in refunded_products_data]
-            [ProductStock.objects.filter(product=product_data["product"], location=location).update(sold_quantity= ExpressionWrapper(F('sold_quantity') - product_data["refunded_quantity"], output_field=IntegerField()), 
-                                                                                                        available_quantity=ExpressionWrapper(F('available_quantity') + product_data['refunded_quantity'], output_field=IntegerField()), 
-                                                                                                        is_refunded=True)
-            for product_data in refunded_products_data if product_data['in_stock'] == True]
+            # [ProductStock.objects.filter(product=product_data["product"], location = location).update(refunded_quantity=ExpressionWrapper(F('refunded_quantity') + product_data["refunded_quantity"], output_field=IntegerField()))
+            #                     for product_data in refunded_products_data]
+            # [ProductStock.objects.filter(product=product_data["product"], location=location).update(sold_quantity= ExpressionWrapper(F('sold_quantity') - product_data["refunded_quantity"], output_field=IntegerField()), 
+            #                                                                                             available_quantity=ExpressionWrapper(F('available_quantity') + product_data['refunded_quantity'], output_field=IntegerField()), 
+            #                                                                                             is_refunded=True)
+            # for product_data in refunded_products_data if product_data['in_stock'] == True]
             
-            # for product_data in refunded_products_data:
-            #     if product_data['in_stock'] == True:
-            #         ProductStock.objects.filter(product = product_data['product'], location = location)\
-            #             .update(sold_quantity = ExpressionWrapper(F('sold_quantity') + product_data['refunded_quantity'],output_field=IntegerField()),
-            #                     available_quantity = ExpressionWrapper(F('available_quantity')+ product_data['refunded_quantity'], output_field=IntegerField()),
-            #                     is_refunded = True)
-            #     ProductStock.objects.filter(product = product_data["product"] , location = location).update(refunded_quantity =F('refunded_quantity') + product_data["refunded_quantity"])
+            for product_data in refunded_products_data:
+                if product_data['in_stock'] == True:
+                    ProductStock.objects.filter(product = product_data['product'], location = location)\
+                        .update(sold_quantity = ExpressionWrapper(F('sold_quantity') + product_data['refunded_quantity'],output_field=IntegerField()),
+                                available_quantity = ExpressionWrapper(F('available_quantity')+ product_data['refunded_quantity'], output_field=IntegerField()),
+                                is_refunded = True)
+                ProductStock.objects.filter(product = product_data["product"] , location = location).update(refunded_quantity =F('refunded_quantity') + product_data["refunded_quantity"])
         except Exception as e:
             return ({'error': str(e)})
         
