@@ -6815,7 +6815,7 @@ def get_coupon(request):
                             )
                     
                 # if client_type == str('In_Saloon'):
-                if client_id != refund.client:
+                if client_id != refund.client.id:
                             return Response(
                                     {
                                         'status': False,
