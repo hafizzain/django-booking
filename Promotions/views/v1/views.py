@@ -6769,7 +6769,7 @@ def get_coupon(request):
                                 'status': False,
                                 'status_code': 400,
                                 'response': {
-                                    'message': 'Coupon can not be implement',
+                                    'message': 'Refund Coupon can not be implement',
                                     'error_message': None,
 
                                 }
@@ -6786,7 +6786,7 @@ def get_coupon(request):
                                 'status': False,
                                 'status_code': 400,
                                 'response': {
-                                    'message': 'This coupon code is not available on this location',
+                                    'message': 'This refund coupon code is not available on this location',
                                     'error_message': None,
 
                                 }
@@ -6800,7 +6800,7 @@ def get_coupon(request):
                                     'status': False,
                                     'status_code': 400,
                                     'response': {
-                                        'message': 'Please Enter a Valid Client Type',
+                                        'message': 'Please Enter a Valid Refund Client Type',
                                         'error_message': None,
 
                                     }
@@ -6815,7 +6815,7 @@ def get_coupon(request):
                                         'status': False,
                                         'status_code': 400,
                                         'response': {
-                                            'message': 'Coupon does not valid for selected client',
+                                            'message': 'Refund Coupon does not valid for selected client',
                                             'error_message': None,
                                             
 
