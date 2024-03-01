@@ -6817,6 +6817,7 @@ def get_coupon(request):
                                         'response': {
                                             'message': 'Coupon does not valid for selected client',
                                             'error_message': None,
+                                            
 
                                         }
                                     },
