@@ -348,7 +348,7 @@ class RefundAPIView(APIView):
                 if expiry_date:
                     coupon_data = {
                         'user': request.user.id,
-                        'client_id': client,
+                        'client': client,
                         'coupon_type': 'refund',
                         'checkout_id': str(newCheckoutInstance.id),
                         'refund_coupon_code': f"{short_uuid(refund_instance.id)}",
