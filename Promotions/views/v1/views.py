@@ -6763,8 +6763,11 @@ def get_coupon(request):
             try:
                 # raise ValueError('comin here')
                 refund = RefundCoupon.objects.get(refund_coupon_code = str(coupon_code), is_used = False)
-                
-                raise ValueError(f'{refund.count()}')
+                if refund:
+                    
+                    raise ValueError(f'True')
+                else: 
+                    raise ValueError('False')
                 
                 if float(total_price) < refund.amount:
                     return Response(
