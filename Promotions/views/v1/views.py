@@ -6761,8 +6761,10 @@ def get_coupon(request):
     except Coupon.DoesNotExist:
         try:
             try:
-                raise ValueError('comin here')
+                # raise ValueError('comin here')
                 refund = RefundCoupon.objects.get(refund_coupon_code = str(coupon_code), is_used = False)
+                
+                raise ValueError(f'{refund.count()}')
                 
                 if float(total_price) < refund.amount:
                     return Response(
@@ -6855,7 +6857,7 @@ def get_coupon(request):
                     'status_code': 400,
                     'response': {
                         'message': 'Enter a valid coupon',
-                        'error_message': f'Error in refund{e}',
+                        'error_message': f'Error in refund {e}',
 
                     }
                 },
