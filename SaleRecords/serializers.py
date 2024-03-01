@@ -45,11 +45,21 @@ class SaleRecordsAppointmentServicesSerializer(serializers.ModelSerializer):
     def get_service_names(self, obj):
         try:
             from Invoices.models import InvoiceTranslation
-
-            secondary_invoice_traslation = InvoiceTranslation.objects.filter(
-                id=obj.sale_record.location.secondary_translation.id).first()
-            translation = obj.service.servicetranlations_set.filter(
-                language__id=secondary_invoice_traslation.language.id).first()
+            try:
+                secondary_invoice_traslation = InvoiceTranslation.objects.filter(
+                    id=obj.sale_record.location.secondary_translation.id).first()
+            except:
+                secondary_invoice_traslation = None
+                
+            if secondary_invoice_traslation:
+                translation = obj.service.servicetranlations_set.filter(
+                    language__id=secondary_invoice_traslation.language.id).first()
+            else:
+                return {
+                    'name': f"{obj.service.name}"if obj.service.name else "",
+                    'arabic_name': f"{obj.service.arabic_name}"if obj.service.arabic_name else "",
+                    'secondary_name': f""
+                }
             if translation:
                 return {
                     'name': f"{obj.service.name}",
