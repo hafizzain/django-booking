@@ -6761,7 +6761,7 @@ def get_coupon(request):
     except Coupon.DoesNotExist:
         try:
             try:
-                refund = RefundCoupon.objects.get(refund_coupon_code = coupon_code, is_used = False)
+                refund = RefundCoupon.objects.get(refund_coupon_code = str(coupon_code), is_used = False)
                 
                 if float(total_price) < refund.amount:
                     return Response(
