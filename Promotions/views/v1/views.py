@@ -6760,7 +6760,7 @@ def get_coupon(request):
         coupon = Coupon.objects.get(code=coupon_code)
     except Coupon.DoesNotExist:
         try:
-            try:
+           
                 refund = RefundCoupon.objects.get(refund_coupon_code = coupon_code, is_used = False)
                 
                 if float(total_price) < refund.amount:
@@ -6809,7 +6809,7 @@ def get_coupon(request):
                             )
                     
                 if client_id:
-                    if ( client_id == refund.client.id and str(client_type) == str(refund.related_refund.client_type )):
+                    if ( client_id != refund.client.id and client_type != refund.related_refund.client_type ):
                             return Response(
                                     {
                                         'status': False,
@@ -6825,28 +6825,26 @@ def get_coupon(request):
                                 )
                 
                     
-                    
-            except Exception as e:
-                raise ValueError(f'{e}')
-            serializer = RefundCouponSerializer(refund)
-            return Response(
-                    {
-                        'status': True,
-                        'status_code': 201,
-                        'response': {
-                            'message': 'Coupon redeemed successfully!',
-                            'error_message': None,
-                            'coupon_id': refund.id,
-                            'usage_limit':refund.is_used,
-                            # 'user_limit': coupon.user_limit,
-                            'coupon': serializer.data,
-                            'amount_spent':refund.amount,
-                            'total_price':total_price
 
-                        }
-                    },
-                    status=status.HTTP_200_OK
-                )
+                serializer = RefundCouponSerializer(refund)
+                return Response(
+                        {
+                            'status': True,
+                            'status_code': 201,
+                            'response': {
+                                'message': 'Coupon redeemed successfully!',
+                                'error_message': None,
+                                'coupon_id': refund.id,
+                                'usage_limit':refund.is_used,
+                                # 'user_limit': coupon.user_limit,
+                                'coupon': serializer.data,
+                                'amount_spent':refund.amount,
+                                'total_price':total_price
+
+                            }
+                        },
+                        status=status.HTTP_200_OK
+                    )
         except Exception as e:
             return Response(
                 {
