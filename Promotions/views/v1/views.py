@@ -6799,7 +6799,7 @@ def get_coupon(request):
                             },
                             status=status.HTTP_400_BAD_REQUEST
                         )
-                    
+                raise ValueError(f'client_type {client_type} and Refund client_type {refund.related_refund.client_type} ')
                 if client_type is not refund.related_refund.client_type:
                     return Response(
                                 {
