@@ -6809,7 +6809,7 @@ def get_coupon(request):
                             )
                     
                 if client_type == str('In_Saloon'):
-                    if (client_id and client_id != refund.client.id):
+                    if (client_id and client_id != refund.client.id and client_type == refund.related_refund.client_type ):
                             return Response(
                                     {
                                         'status': False,
