@@ -6794,7 +6794,7 @@ def get_coupon(request):
                             status=status.HTTP_400_BAD_REQUEST
                         )
                     
-                if(client_type is not refund.related_refund.client_type):
+                if(str(client_type) is not str(refund.related_refund.client_type)):
                     return Response(
                                 {
                                     'status': False,
@@ -6808,7 +6808,7 @@ def get_coupon(request):
                                 status=status.HTTP_400_BAD_REQUEST
                             )
                     
-                if client_type == 'In_Saloon':
+                if client_type == str('In_Saloon'):
                     if (client_id and client_id != refund.client.id):
                             return Response(
                                     {
