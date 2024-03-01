@@ -6753,6 +6753,7 @@ def get_coupon(request):
     coupon_code = request.query_params.get('coupon_code', None)
     client_type = request.query_params.get('client_type', None)
     client_id = request.query_params.get('client_id', None)
+    client_type = request.query_params.get('client_type')
     total_price = request.query_params.get('totalPriceWithoutTax',None)
     location = request.query_params.get('location_id',None)
     try:
@@ -6792,19 +6793,36 @@ def get_coupon(request):
                             },
                             status=status.HTTP_400_BAD_REQUEST
                         )
-                if (client_id or client_id != refund.client.id):
+                    
+                if(client_type is not refund.related_refund.client_type):
                     return Response(
-                            {
-                                'status': False,
-                                'status_code': 400,
-                                'response': {
-                                    'message': 'Coupon does not valid for selected client',
-                                    'error_message': None,
+                                {
+                                    'status': False,
+                                    'status_code': 400,
+                                    'response': {
+                                        'message': 'Please Enter a Valid Client Type',
+                                        'error_message': None,
 
-                                }
-                            },
-                            status=status.HTTP_400_BAD_REQUEST
-                        )
+                                    }
+                                },
+                                status=status.HTTP_400_BAD_REQUEST
+                            )
+                    
+                if client_type == 'In_Saloon':
+                    if (client_id and client_id != refund.client.id):
+                            return Response(
+                                    {
+                                        'status': False,
+                                        'status_code': 400,
+                                        'response': {
+                                            'message': 'Coupon does not valid for selected client',
+                                            'error_message': None,
+
+                                        }
+                                    },
+                                    status=status.HTTP_400_BAD_REQUEST
+                                )
+                
                     
                     
             except Exception as e:
