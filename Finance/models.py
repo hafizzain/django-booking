@@ -17,6 +17,7 @@ from Utility.models import CommonField
 class Refund(CommonField):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name = 'User id') 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, verbose_name = 'Client id', blank=True, null=True)
+    client_type = models.CharField(max_length = 100 , blank=True, null=True)
     business = models.ForeignKey(Business, on_delete=models.CASCADE, verbose_name ='Business id')
     location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, verbose_name = 'location id')
     refund_invoice_id = models.ForeignKey(SaleInvoice, on_delete=models.CASCADE, verbose_name = 'Invoice id')
