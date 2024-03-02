@@ -386,7 +386,7 @@ class RefundAPIView(APIView):
                             'data': {
                                 'refund': RefundSerializer(serializer.instance).data,
                                 # 'coupon': CouponSerializer(coupon_serializer.instance).data,
-                                'invoice': SaleInvoiceSerializer(newInvoice).data
+                                'invoice': SaleInvoiceSerializer(invoice).data
                             }
                         }
                     }
@@ -400,7 +400,7 @@ class RefundAPIView(APIView):
                             'error_message': None,
                             'data': {
                                 'refund': RefundSerializer(serializer.instance).data,
-                                'invoice': SaleInvoiceSerializer(newInvoice).data, 
+                                'invoice': SaleInvoiceSerializer(invoice).data, 
                             }
                         }
                     }
