@@ -319,19 +319,34 @@ class RefundAPIView(APIView):
                             
                             
                         
-                    newInvoice = invoice 
-                    newInvoice.pk = None 
-                    newInvoice.invoice_type = 'refund'
-                    newInvoice.payment_type = 'Cash'
-                    newInvoice.client_type = 'Walk_in'
-                    newInvoice.sub_total = float(-refund_price)
-                    newInvoice.total_amount = float(-refund_price)
-                    newInvoice.checkout = str(newCheckoutInstance.id) 
-                    newInvoice.total_tax = 0
-                    newInvoice.total_tip = 0
-                    # newInvoice.checkout_type = 'refund'
-                    newInvoice.payment_type = payment_type
-                    newInvoice.save() 
+                    # newInvoice = invoice 
+                    # newInvoice.pk = None 
+                    # newInvoice.invoice_type = 'refund'
+                    # newInvoice.payment_type = 'Cash'
+                    # newInvoice.client_type = 'Walk_in'
+                    # newInvoice.sub_total = float(-refund_price)
+                    # newInvoice.total_amount = float(-refund_price)
+                    # newInvoice.checkout = str(newCheckoutInstance.id) 
+                    # newInvoice.total_tax = 0
+                    # newInvoice.total_tip = 0
+                    # # newInvoice.checkout_type = 'refund'
+                    # newInvoice.payment_type = payment_type
+                    # newInvoice.save() 
+                    invoice = SaleInvoice.objects.create(
+                        user=user,
+                        client=invoice.client,
+                        location=invoice.location,
+                        payment_type=payment_type,
+                        invoice_type='refund',
+                        change=0,
+                        checkout_type='refund',
+                        sub_total=float(-refund_price),
+                        total_amount=float(-refund_price),
+                        total_tax=0,
+                        total_tip=0,
+                        checkout=newCheckoutInstance.id,
+                    )
+                    invoice.save()
 
                     try:
                         client_instance = Client.objects.get(id=client)
