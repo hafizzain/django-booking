@@ -344,7 +344,7 @@ class RefundAPIView(APIView):
                         total_amount=float(-refund_price),
                         total_tax=0,
                         total_tip=0,
-                        checkout=newCheckoutInstance.ids,
+                        checkout=newCheckoutInstance.id,
                     )
                     invoice.save()
 
