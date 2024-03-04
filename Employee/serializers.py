@@ -1019,6 +1019,7 @@ class VacationSerializerResponse(serializers.ModelSerializer):
 class ScheduleSerializerOP(serializers.ModelSerializer):
     is_holidays = serializers.SerializerMethodField(read_only=True)
     vacation = VacationSerializerResponse()
+    brake_time = serializers.SerializerMethodField(read_only=True)
 
     def get_is_holidays(self, obj):
         pass
@@ -1132,10 +1133,18 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
         # except Exception as ex:
         #     return str(ex)
 
+        def get_brake_time(self, obj):
+            try:
+                # employee = EmployeDailySchedule.objects.get(id=employee)
+                break_time = BrakeTime.objects.get(employee=obj.employee)
+                return BrakeTimeSerializer(break_time, many=True).data
+            except:
+                return None
     class Meta:
         model = EmployeDailySchedule
         fields = ['id', 'vacation', 'is_leo_day', 'is_holidays', 'is_holiday', 'date', 'is_vacation', 'is_leave',
                   'from_date',
+                  'get_brake_time',
                   'is_working_schedule',
                   'day', 'end_time_shift', 'end_time', 'is_weekend', 'vacation_status', 'note',
                   'start_time']
@@ -1271,7 +1280,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     schedule = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     leave_data = serializers.SerializerMethodField(read_only=True)
-    brake_time = serializers.SerializerMethodField(read_only=True)
+    break_time = serializers.SerializerMethodField(read_only=True)
 
     # false_scedule =  serializers.SerializerMethodField(read_only=True)
 
@@ -1289,8 +1298,8 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     def get_brake_time(self, obj):
         try:
             # employee = EmployeDailySchedule.objects.get(id=employee)
-            brake_time = BrakeTime.objects.get(employee=obj.id)
-            return BrakeTimeSerializer(brake_time).data
+            break_time = BrakeTime.objects.get(employee=obj.id)
+            return BrakeTimeSerializer(break_time, many=True).data
         except:
             return None
         
@@ -1378,7 +1387,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['id', 'leave_data', 'full_name',  'image', 'brake_time', 'schedule', 'created_at', 'is_active', 'is_deleted',
+        fields = ['id', 'leave_data', 'full_name',  'image', 'break_time', 'schedule', 'created_at', 'is_active', 'is_deleted',
                   'is_blocked']
 
 
