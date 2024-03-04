@@ -7618,7 +7618,7 @@ class BrakeTimeView(APIView):
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
     @transaction.atomic
-    def put(self, request, pk=None):
+    def put(self, request, pk):
         pk = request.query_params.get('id', None)
         
         if pk is None:
