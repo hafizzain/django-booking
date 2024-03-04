@@ -7618,7 +7618,7 @@ class BrakeTimeView(APIView):
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
     @transaction.atomic
-    def put(self, request):
+    def put(self, request, pk=None):
         pk = request.query_params.get('id', None)
         
         if pk is None:
@@ -7627,8 +7627,7 @@ class BrakeTimeView(APIView):
                 "status_code": 400,
                 "response": {
                     "message": "Id is missing in the request",
-                    "error_message": None,
-                    "data": serializer.data
+                    "error_message":'Comment Id missing',
                 }
             }
             return Response(data, status=status.HTTP_200_OK)
@@ -7661,6 +7660,18 @@ class BrakeTimeView(APIView):
 
     @transaction.atomic
     def delete(self, request, pk=None):
+        pk = request.query_params.get('id', None)
+        
+        if pk is None:
+            data = {
+                "success": False,
+                "status_code": 400,
+                "response": {
+                    "message": "Id is missing in the request",
+                    "error_message": 'Comment Id missing',
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
         BrakeTime = get_object_or_404(BrakeTime, id=pk)
         BrakeTime.delete()
         data = {
