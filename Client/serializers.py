@@ -423,7 +423,7 @@ class MembershipSerializer(serializers.ModelSerializer):
             
     class Meta:
         model = Membership
-        fields = ['id', 'name', 'arabic_name', 'is_expired', 'valid_for','discount','description', 
+        fields = ['id', 'name','is_installment', 'arabic_name', 'is_expired', 'valid_for','discount','description', 
                   'term_condition','products', 'services', 'currency_membership']
         read_only_fields = ['arabic_name', 'is_expired']
 
