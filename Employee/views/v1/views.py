@@ -7500,7 +7500,7 @@ def get_employee_comment(request):
         return Response(data, status=status.HTTP_200_OK)
     
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def create_employee_comment(request):
     comment = request.data.get('comment', None)
     employee_id = request.data.get('employee_id', None)
