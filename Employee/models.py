@@ -447,7 +447,15 @@ class VacationDetails(models.Model):
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)
 
-
+class BrakeTime(CommonField):
+    location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='location_brake_time')
+    employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True, related_name='employee_brake_time')
+    
+    start_time = models.TimeField(null=True, blank=True)
+    end_time = models.TimeField(null=True, blank=True)
+    date = models.DateField(null=True, blank=True)
+    is_brake_time = models.BooleanField(default=False)
+    
 class EmployeDailySchedule(models.Model):
     DAYS_CHOICE = [
         ('Monday', 'Monday'),
