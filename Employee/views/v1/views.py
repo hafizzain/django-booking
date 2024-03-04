@@ -7490,9 +7490,13 @@ class EmployeeCommentView(APIView):
 
     @transaction.atomic
     def post(self, request):
+        
         user = request.user
-        request.data['user'] = user.id
-        serializer = CommentSerializer(data=request.data, context={'request': request})
+        # Create a mutable copy of request.data
+        mutable_data = request.data.copy()
+        mutable_data['user'] = user.id
+
+        serializer = CommentSerializer(data=mutable_data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             data = {
