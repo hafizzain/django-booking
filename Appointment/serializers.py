@@ -776,6 +776,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             # 'unavailable_time',
             'appointments',
             'appointments_service',
+            'working_schedule',
         ]
 
 
