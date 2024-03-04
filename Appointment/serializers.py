@@ -1882,7 +1882,10 @@ class MissedOpportunityBasicSerializer(serializers.ModelSerializer):
         fields = ['id', 'client_name', 'client_type', 'note', 'date_time', 'services', 'dependency']
 
 
-
+class EmployeeCommentResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = ['id', 'full_name']
 class ClientImagesSerializerResponse(serializers.ModelSerializer):
     class Meta:
         model = ClientImages
@@ -1890,6 +1893,7 @@ class ClientImagesSerializerResponse(serializers.ModelSerializer):
         
 class CommentSerializer(serializers.ModelSerializer):
     user = UserSerializerResponse()
+    employee = EmployeeCommentResponseSerializer()
     class Meta:
         model = Comment
         fields = '__all__'
