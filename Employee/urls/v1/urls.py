@@ -128,6 +128,6 @@ urlpatterns = [
     path('get-employee-brake-time/', BrakeTimeView.as_view()),
     path('get-employee-brake-time/<str:pk>/', BrakeTimeView.as_view()),
     path('create-employee-brake-time/', BrakeTimeView.as_view()),
-    path('update-employee-brake-time/<str:pk>/', BrakeTimeView.as_view()),
+    path('update-employee-brake-time/', BrakeTimeView.as_view()),
     path('delete-employee-brake-time/', BrakeTimeView.as_view()),
 ]
