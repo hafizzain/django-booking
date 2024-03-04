@@ -7451,7 +7451,7 @@ def get_employee_comment(request):
         location_id = request.GET.get('location_id', None)
         use_pagination = not request.GET.get('no_pagination', None)
 
-        query = Q()
+        query = Q(appointment__isnull=False, group_appointment__isnull=False)
         if location_id:
             query &= Q(location_id=location_id)
 
