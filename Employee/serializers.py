@@ -1019,7 +1019,7 @@ class VacationSerializerResponse(serializers.ModelSerializer):
 class ScheduleSerializerOP(serializers.ModelSerializer):
     is_holidays = serializers.SerializerMethodField(read_only=True)
     vacation = VacationSerializerResponse()
-    brake_time = serializers.SerializerMethodField(read_only=True)
+    break_time = serializers.SerializerMethodField(read_only=True)
 
     def get_is_holidays(self, obj):
         pass
@@ -1133,18 +1133,18 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
         # except Exception as ex:
         #     return str(ex)
 
-        def get_brake_time(self, obj):
-            try:
-                # employee = EmployeDailySchedule.objects.get(id=employee)
-                break_time = BrakeTime.objects.get(employee=obj.employee)
-                return BrakeTimeSerializer(break_time, many=True).data
-            except:
-                return None
+    def get_break_time(self, request, obj):
+        try:
+            daily_schedule = EmployeDailySchedule.objects.filter(employee=obj.id)
+            break_time = BrakeTime.objects.get(employee=obj.id, date=daily_schedule.data)
+            return BrakeTimeSerializer(break_time, many=True).data
+        except:
+            return None
     class Meta:
         model = EmployeDailySchedule
         fields = ['id', 'vacation', 'is_leo_day', 'is_holidays', 'is_holiday', 'date', 'is_vacation', 'is_leave',
                   'from_date',
-                  'get_brake_time',
+                  'break_time',
                   'is_working_schedule',
                   'day', 'end_time_shift', 'end_time', 'is_weekend', 'vacation_status', 'note',
                   'start_time']
