@@ -418,10 +418,17 @@ class CalanderserializerResponse(serializers.ModelSerializer):
 
     def get_service(self, obj):
         return ServiceAppointmentSerializer(obj.service).data
+    
+class BrakeTimeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = EmployeDailySchedule
+        fields = ['employee','is_brake_time', 'date' ,'start_time', 'end_time']
 class EmployeeAppointmentSerializer(serializers.ModelSerializer):
     employee = serializers.SerializerMethodField()
     appointments = serializers.SerializerMethodField()
     appointments_service = serializers.SerializerMethodField()
+    working_schedule = serializers.SerializerMethodField()
     
 
     # unavailable_time = serializers.SerializerMethodField()
@@ -753,6 +760,12 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
     def get_employee(self, obj):
         try:
             return EmployeAppoinmentSerializer(obj, context=self.context).data
+        except:
+            return None
+        
+    def get_working_schedule(self, obj):
+        try:
+            return BrakeTimeSerializer(obj, context=self.context).data
         except:
             return None
 
