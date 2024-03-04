@@ -491,6 +491,7 @@ class EmployeDailySchedule(models.Model):
     is_leo_day = models.BooleanField(default=False)
     is_holiday = models.BooleanField(default=False)
     is_schedule = models.BooleanField(default=False)
+    is_brake_time = models.BooleanField(default=False)
     is_working_schedule = models.BooleanField(default=False)
     is_holiday_due_to_update = models.BooleanField(default=False)
     last_state_of_schedule = models.TextField(null=True)
