@@ -7451,14 +7451,14 @@ def get_employee_comment(request):
         location_id = request.GET.get('location_id', None)
         use_pagination = not request.GET.get('no_pagination', None)
 
-        query = Q(appointment__isnull=False, group_appointment__isnull=False)
+        query = Q()
         if location_id:
             query &= Q(location_id=location_id)
 
         if employee_id:
             query &= Q(employee_id=employee_id)
 
-        comments = Comment.objects.filter(query, is_deleted=False).order_by('-created_at')
+        comments = Comment.objects.filter(query, is_deleted=False).filter(employee__isnull=False).order_by('-created_at')
 
         if use_pagination:
             paginator = AppointmentsPagination()
@@ -7618,7 +7618,8 @@ class BrakeTimeView(APIView):
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
     @transaction.atomic
-    def put(self, request, pk):
+    def put(self, request,):
+        pk = request.query_params.get('id', None)
         
         brake_time = get_object_or_404(BrakeTime, id=pk)
         serializer = BrakeTimeSerializer(brake_time, data=request.data)
