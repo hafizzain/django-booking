@@ -123,4 +123,11 @@ urlpatterns = [
     # Employee Comments
     path('get-employee-comment-list/', get_employee_comment),
     path('create-employee-comment/', create_employee_comment),
+    
+    # Employee Brake Time
+    path('get-employee-brake-time/', BrakeTimeView.as_view()),
+    path('get-employee-brake-time/<str:pk>/', BrakeTimeView.as_view()),
+    path('create-employee-brake-time/', BrakeTimeView.as_view()),
+    path('update-employee-brake-time/<str:pk>/', BrakeTimeView.as_view()),
+    path('delete-employee-brake-time/', BrakeTimeView.as_view()),
 ]

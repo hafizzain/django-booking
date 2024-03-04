@@ -28,6 +28,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
 from Employee.serializers import (EmployeSerializer, EmployeInformationsSerializer,
                                   Payroll_Working_device_attendence_ScheduleSerializer,
@@ -7526,3 +7527,136 @@ def create_employee_comment(request):
         },
         status=status.HTTP_201_CREATED
     )
+
+@permission_classes([IsAuthenticated])
+class BrakeTimeView(APIView):
+    permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination
+    page_size = 10
+    
+    def get(self, request, pk=None):
+        no_pagination = request.GET.get('no_pagination', None)
+        location = request.GET.get('location', None)
+
+        if pk is not None:
+            braketime = get_object_or_404(BrakeTime, id=pk)
+            serialized = BrakeTimeSerializer(braketime)
+            data = {
+                "success": True,
+                "status_code": 200,
+                "response": {
+                    "message": "Brake time get Successfully",
+                    "error_message": None,
+                    "data": serialized.data
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            query = Q()
+            if location: 
+                query &= Q(location_id=location)
+            braketime = BrakeTime.objects.filter(query).order_by('-created_at')
+            serialized = BrakeTimeSerializer(braketime, many=True)
+            if no_pagination:
+                data = {
+                    "success": True,
+                    "status_code": 200,
+                    "response": {
+                        "message": "BrakeTime get Successfully",
+                        "error_message": None,
+                        "data": serialized.data
+                    }
+                }
+                return Response(data, status=status.HTTP_200_OK)
+            else:
+                paginator = self.pagination_class()
+                result_page = paginator.paginate_queryset(braketime, request)
+                serializer = BrakeTimeSerializer(result_page, many=True)
+                data = {
+                    'count': paginator.page.paginator.count,
+                    'next': paginator.get_next_link(),
+                    'previous': paginator.get_previous_link(),
+                    'current_page': paginator.page.number,
+                    'per_page': self.page_size,
+                    'total_pages': paginator.page.paginator.num_pages,
+                    "success": True,
+                    "status_code": 200,
+                    "response": {
+                        "message": "Campaign get Successfully",
+                        "error_message": None,
+                        "data": serializer.data
+                    }
+                }
+                return Response(data, status=status.HTTP_200_OK)
+
+    @transaction.atomic
+    def post(self, request):
+        
+        serializer = BrakeTimeSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                "success": True,
+                "status_code": 201,
+                "response": {
+                    "message": "Brake Time Add successfully",
+                    "error_message": None,
+                    "data": serializer.data
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            data = {
+                "success": False,
+                "status_code": 400,
+                "response": {
+                    "message": "Brake Time Not Add",
+                    "error_message": serializer.errors,
+                    "data": None
+                }
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+    @transaction.atomic
+    def put(self, request, pk):
+        
+        brake_time = get_object_or_404(BrakeTime, id=pk)
+        serializer = BrakeTimeSerializer(brake_time, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                "success": True,
+                "status_code": 201,
+                "response": {
+                    "message": "Brake Time updated successfully",
+                    "error_message": None,
+                    "data": serializer.data
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            data = {
+                "success": False,
+                "status_code": 400,
+                "response": {
+                    "message": "Brake time not updated",
+                    "error_message": serializer.errors,
+                    "data": None
+                }
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+    @transaction.atomic
+    def delete(self, request, pk):
+        BrakeTime = get_object_or_404(BrakeTime, id=pk)
+        BrakeTime.delete()
+        data = {
+            "success": True,
+            "status_code": 200,
+            "response": {
+                "message": "Brake time deleted successfully",
+                "error_message": None,
+                "data": None
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)

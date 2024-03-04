@@ -31,6 +31,7 @@ from Authentication.models import AccountType, User
 from django_tenants.utils import tenant_context
 from Business.models import BusinessAddress
 from Product.models import CurrencyRetailPrice
+from Employee.models import *
 
 class VacationDetailsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -2118,3 +2119,7 @@ class GiftCardRetailPriceSerializer(serializers.ModelSerializer):
         model = GiftDetail
         fields = ['currency_code','spend_amount','currency','price']
         
+class BrakeTimeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BrakeTime
+        fields = "__all__"        
