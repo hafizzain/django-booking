@@ -1149,24 +1149,21 @@ class EmployeeSerializerResponse(serializers.ModelSerializer):
 
 class ScheduleSerializerResponse(serializers.ModelSerializer):
     employee = EmployeeSerializerResponse()
+    brake_time = serializers.SerializerMethodField(read_only=True) 
     # grouped_data = serializers.SerializerMethodField(read_only=True)
     date = serializers.DateTimeField(format="%Y-%m-%d", input_formats=['iso-8601', 'date'])
 
-    # def get_grouped_data(self, obj):
-    #     employee_list = []
-    #     # Retrieve all records with the same title and date
-    #     matching_records = EmployeDailySchedule.objects.filter(title=obj.title, date=obj.date)
-    #
-    #     # Populate checker_list with the IDs of the matching records
-    #     for record in matching_records:
-    #         employee_list.append(str(record.employee_id))
-    #     qs = Employee.objects.filter(id__in=employee_list)
-    #     response = EmployeeSerializerResponse(qs , many=True).data
-    #     return response
+    def get_brake_time(self, obj):
+        try:
+            employee = EmployeDailySchedule.objects.get(id=obj.employee)
+            brake_time = BrakeTime.objects.get(employee=employee)
+            return BrakeTimeSerializer(brake_time).data
+        except:
+            return None
 
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'title', 'date', 'employee', 'is_weekend', 'vacation', 'from_date']
+        fields = ['id', 'title', 'date', 'employee', 'brake_time', 'is_weekend', 'vacation', 'from_date']
 
 
 class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
