@@ -483,6 +483,7 @@ class Membership(models.Model):
 
     description = models.CharField(max_length=300, null=True, blank=True)
     percentage = models.FloatField(default=0)
+    is_installment = models.BooleanField(default = False)
 
     valid_for = models.CharField(choices=VALIDITY_CHOICE, default='7 Days', verbose_name='Validity for Days or Months',
                                  max_length=20)

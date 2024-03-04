@@ -1929,6 +1929,7 @@ def create_memberships(request):
     price = request.data.get('price', None)
     tax_rate = request.data.get('tax_rate', None)
     discount = request.data.get('discount', None)
+    is_installment = request.data.get('is_installment',None)
     currency_membership_price = request.data.get('currency_membership_price', None)  # CurrencyPriceMembership
 
     if not all([business, name, valid_for, ]):
@@ -1979,6 +1980,7 @@ def create_memberships(request):
 
         # New Require
         description=description,
+        is_installment = is_installment,
         # color = color,
         term_condition=terms_condition,
 
@@ -2205,6 +2207,7 @@ def update_memberships(request):
     services = request.data.get('services', None)
     product = request.data.get('product', None)
     products = request.data.get('products', None)
+    is_installment = request.data.get('is_installment',None)
     membership_type = request.data.get('membership_type', None)
     currency_membership = request.data.get('currency_membership', None)
     check = True
@@ -2241,6 +2244,9 @@ def update_memberships(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    if is_installment:
+        membership.is_installment = is_installment
+        membership.save()
     if membership_type == 'Product':
         try:
             product_id = Product.objects.get(id=product)
