@@ -2,6 +2,7 @@ from django.urls import path, include
 
 from Employee.views.v1 import views
 from rest_framework.routers import DefaultRouter
+from Employee.views.v1.views import *
 
 router = DefaultRouter()
 router.register('giftcards', views.GiftCardViewSet, basename='giftcard')
@@ -118,4 +119,8 @@ urlpatterns = [
     # Set_passeord
     path('set_password/', views.set_password),
     path('check_employee_existance/', views.check_employee_existance),
+    
+    # Employee Comments
+    path('get-employee-comment-list/', EmployeeCommentView.as_view()),
+    path('create-employee-comment/', EmployeeCommentView.as_view()),
 ]

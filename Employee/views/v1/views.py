@@ -27,6 +27,8 @@ from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSION
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
 from Employee.serializers import (EmployeSerializer, EmployeInformationsSerializer,
                                   Payroll_Working_device_attendence_ScheduleSerializer,
                                   Payroll_Working_deviceScheduleSerializer, Payroll_WorkingScheduleSerializer,
@@ -77,6 +79,7 @@ from Utility.Constants.get_from_public_schema import get_country_from_public, ge
 from Sale.Constants.Custom_pag import CustomPagination
 from Employee.serializers import *
 from SaleRecords.models import *
+from Appointment.serializers import *
 
 @transaction.atomic
 @api_view(['POST'])
@@ -7438,4 +7441,75 @@ def get_detail_from_code(request):
 
             # Return a 404 Not Found response
             return Response(data, status=status.HTTP_200_OK)
-        
+
+class EmployeeCommentView(APIView):
+    permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination
+    page_size = 10
+
+    def get(self, request, pk=None):
+        employee_id = request.GET.get('employee_id', None)
+        location_id = request.GET.get('location_id', None)
+        use_pagination = not request.GET.get('no_pagination', None)
+
+        query = Q()
+        if location_id:
+            query &= Q(location_id=location_id)
+
+        if employee_id:
+            query &= Q(employee_id=employee_id)
+
+        comments = Comment.objects.filter(query, is_deleted=False).order_by('-created_at')
+
+        if use_pagination:
+            paginator = self.pagination_class()
+            result_page = paginator.paginate_queryset(comments, request)
+            serializer = CommentSerializer(result_page, many=True)
+            data = {
+                'count': paginator.page.paginator.count,
+                'next': paginator.get_next_link(),
+                'previous': paginator.get_previous_link(),
+                'current_page': paginator.page.number,
+                'per_page': self.page_size,
+            }
+        else:
+            serializer = CommentSerializer(comments, many=True)
+            data = {}
+
+        data.update({
+            "success": True,
+            "status_code": status.HTTP_200_OK,
+            "response": {
+                "message": "Comments retrieved successfully",
+                "error_message": None,
+                "data": serializer.data
+            }
+        })
+
+        return Response(data, status=status.HTTP_200_OK)
+
+    @transaction.atomic
+    def post(self, request):
+        serializer = CommentSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                "success": True,
+                "status_code": 201,
+                "response": {
+                    "message": "Comment added successfully",
+                    "error_message": None,
+                    "data": serializer.data
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            data = {
+                "success": False,
+                "status_code": 400,
+                "response": {
+                    "message": "Invalid Data",
+                    "error_message": serializer.errors
+                }
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)

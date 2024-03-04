@@ -225,7 +225,7 @@ class Comment(CommonField):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)  
     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True, blank=True, related_name='appointment_comment')
     group_appointment = models.ForeignKey(AppointmentGroup, on_delete=models.CASCADE, null=True, blank=True, related_name='group_appointment_comment')
-
+    location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='location_comment')
 
 class AppointmentServiceCustomManager(models.QuerySet):
 
