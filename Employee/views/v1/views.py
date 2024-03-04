@@ -80,6 +80,7 @@ from Sale.Constants.Custom_pag import CustomPagination
 from Employee.serializers import *
 from SaleRecords.models import *
 from Appointment.serializers import *
+from Sale.Constants.Custom_pag import CustomPagination, AppointmentsPagination
 
 @transaction.atomic
 @api_view(['POST'])
@@ -7442,12 +7443,9 @@ def get_detail_from_code(request):
             # Return a 404 Not Found response
             return Response(data, status=status.HTTP_200_OK)
 
-class EmployeeCommentView(APIView):
-    permission_classes = [IsAuthenticated]
-    pagination_class = PageNumberPagination
-    page_size = 10
-
-    def get(self, request, pk=None):
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_employee_comment(request):
         employee_id = request.GET.get('employee_id', None)
         location_id = request.GET.get('location_id', None)
         use_pagination = not request.GET.get('no_pagination', None)
@@ -7462,60 +7460,69 @@ class EmployeeCommentView(APIView):
         comments = Comment.objects.filter(query, is_deleted=False).order_by('-created_at')
 
         if use_pagination:
-            paginator = self.pagination_class()
-            result_page = paginator.paginate_queryset(comments, request)
-            serializer = CommentSerializer(result_page, many=True)
+            paginator = AppointmentsPagination()
+            paginator.page_size = 10
+            comment = paginator.paginate_queryset(comments, request)
+            
+            client_data = CommentSerializer(comment, many=True).data
+            
             data = {
-                'count': paginator.page.paginator.count,
-                'next': paginator.get_next_link(),
-                'previous': paginator.get_previous_link(),
-                'current_page': paginator.page.number,
-                'per_page': self.page_size,
+                'status': True,
+                'status_code': 200,
+                'status_code_text': '200',
+                "response": {
+                    "message": "Comment get Successfully",
+                    "error_message": None,
+                    "data": client_data,
+                    'count': paginator.page.paginator.count,
+                    'next': paginator.get_next_link(),
+                    'previous': paginator.get_previous_link(),
+                    'current_page': paginator.page.number,
+                    'per_page': paginator.page_size,
+                    'total_pages': paginator.page.paginator.num_pages,
+                }
             }
+    
+            return Response(data, status=201) 
         else:
-            serializer = CommentSerializer(comments, many=True)
-            data = {}
-
-        data.update({
-            "success": True,
-            "status_code": status.HTTP_200_OK,
-            "response": {
-                "message": "Comments retrieved successfully",
-                "error_message": None,
-                "data": serializer.data
+            client_data = CommentSerializer(comments, many=True).data
+            data = {
+                'status': True,
+                'status_code': 200,
+                'status_code_text': '200',
+                "response": {
+                    "message": "Comment get Successfully",
+                    "error_message": None,
+                    "data": client_data,
+                }
             }
-        })
 
         return Response(data, status=status.HTTP_200_OK)
-
-    @transaction.atomic
-    def post(self, request):
-        
-        user = request.user
-        # Create a mutable copy of request.data
-        mutable_data = request.data.copy()
-        mutable_data['user'] = user.id
-
-        serializer = CommentSerializer(data=mutable_data, context={'request': request})
-        if serializer.is_valid():
-            serializer.save()
-            data = {
-                "success": True,
-                "status_code": 201,
-                "response": {
-                    "message": "Comment added successfully",
-                    "error_message": None,
-                    "data": serializer.data
-                }
+    
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def create_employee_comment(request):
+    comment = request.data.get('comment', None)
+    employee_id = request.data.get('employee_id', None)
+    location_id = request.data.get('location_id', None)
+    
+    user_id = request.user.id
+    comment = Comment.objects.create(employee_id=employee_id,
+                                    comment=comment,
+                                    user_id=user_id,
+                                    location_id = location_id
+                                    )
+    comment.save()
+    client_data = CommentSerializer(comment, many=False).data  
+    return Response(
+        {
+            'status': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Comment added successfully',
+                'error_message': [],
+                'data': client_data
             }
-            return Response(data, status=status.HTTP_200_OK)
-        else:
-            data = {
-                "success": False,
-                "status_code": 400,
-                "response": {
-                    "message": "Invalid Data",
-                    "error_message": serializer.errors
-                }
-            }
-            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+        },
+        status=status.HTTP_201_CREATED
+    )

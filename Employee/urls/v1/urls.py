@@ -121,6 +121,6 @@ urlpatterns = [
     path('check_employee_existance/', views.check_employee_existance),
     
     # Employee Comments
-    path('get-employee-comment-list/', EmployeeCommentView.as_view()),
-    path('create-employee-comment/', EmployeeCommentView.as_view()),
+    path('get-employee-comment-list/', get_employee_comment),
+    path('create-employee-comment/', create_employee_comment),
 ]
