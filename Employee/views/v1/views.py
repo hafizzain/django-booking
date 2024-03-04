@@ -7672,8 +7672,8 @@ class BrakeTimeView(APIView):
                 }
             }
             return Response(data, status=status.HTTP_200_OK)
-        BrakeTime = get_object_or_404(BrakeTime, id=pk)
-        BrakeTime.delete()
+        brake_time = get_object_or_404(BrakeTime, id=pk)
+        brake_time.delete()
         data = {
             "success": True,
             "status_code": 200,
