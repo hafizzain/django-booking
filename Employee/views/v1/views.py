@@ -761,6 +761,8 @@ def get_workingschedule(request):
                                                                                  'start_date': start_date,
                                                                                  'end_date': end_date,
                                                                                  'location_id': location_id})
+        employe_brake_time=BrakeTime.objects.all()
+        brake_time = BrakeTimeSerializer(employe_brake_time, many=True).data
         # result = EmployeDailySchedule.objects.filter(is_holiday=True)
         # s = EmployeDailyScheduleResponse(result, many=True).data
         return Response(
@@ -772,7 +774,8 @@ def get_workingschedule(request):
                 'response': {
                     'message': 'All Employee',
                     'error_message': None,
-                    'employees': serialized.data
+                    'employees': serialized.data,
+                    'brake_time': brake_time
                 }
             },
             status=status.HTTP_200_OK
@@ -782,7 +785,8 @@ def get_workingschedule(request):
                                                                        from_date__month=month, location_id=location_id)
         serialized = ScheduleSerializerResponse(employee_ids_in_schedule, many=True, context={'request': request,
                                                                                               'location_id': location_id})
-
+        employe_brake_time=BrakeTime.objects.all()
+        brake_time = BrakeTimeSerializer(employe_brake_time, many=True).data
         return Response(
             {
                 'employee_ids_in_schedule': str(employee_ids_in_schedule),
@@ -791,7 +795,8 @@ def get_workingschedule(request):
                 'response': {
                     'message': 'All Employee',
                     'error_message': None,
-                    'employees': serialized.data
+                    'employees': serialized.data,
+                    'brake_time': brake_time
                 }
             },
             status=status.HTTP_200_OK
