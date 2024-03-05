@@ -82,4 +82,4 @@ class RedeemedLoyaltyPointsAdmn(admin.ModelAdmin):
 
 @admin.register(MembershipInstallments)
 class MembershipInstallmentAdmin(admin.ModelAdmin):
-    list_display = ['membership','paid_installment']
+    list_display = ['paid_installment']
