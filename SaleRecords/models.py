@@ -12,6 +12,10 @@ from Employee.models import Employee, GiftCards
 from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs, LoyaltyPoints, ClientLoyaltyPoint
 from Finance.models import Refund, RefundCoupon
 from Appointment.models import  Appointment, AppointmentGroup
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+
+
 # from Invoices.models import SaleInvoice
 
 # from Business.models import
@@ -124,6 +128,11 @@ class SaleRecordMembership(CommonField):
 # class MembershipInstallments(CommonField):
 #     memberhsip = models.ForeignKey(SaleRecordMembership, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'installment_memberships')
 #     paid_installment = models.FloatField(blank=True, null=True)
+
+# @receiver(pre_save, sender = SaleRecordMembership)
+# def next_installement_expiry(sender, instance , **kwargs):
+#     if instance.
+
     
     
 class PurchasedGiftCards(CommonField):
