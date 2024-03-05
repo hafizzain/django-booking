@@ -100,7 +100,7 @@ class RefundAPIView(APIView):
                         'data': None
                     }
                 }
-                return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+                return Response(response_data, status=status.HTTP_200_OK)
             response_data = {
                 'count': paginator.page.paginator.count,
                 'next': paginator.get_next_link(),

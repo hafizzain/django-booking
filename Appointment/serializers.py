@@ -30,7 +30,7 @@ from . import choices
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Utility.models import ExceptionRecord
 from Service.models import Service
-from Appointment.models import Comment
+from Appointment.models import *
 from Client.serializers import UserSerializerResponse
 
 
@@ -1918,3 +1918,8 @@ class GroupCheckInSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentGroup
         fields = "__all__"
+        
+# class EmployeeUpAndDownSaleSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = EmployeeUpAndDownSale
+#         fields = "__all__"

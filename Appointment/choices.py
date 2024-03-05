@@ -39,4 +39,7 @@ class MissedOpportunityReason(models.TextChoices):
     TECHNICIAN = 'Technician', 'Technician'
     OUT_OF_STOCK = 'Out of stock', 'Out of stock'
 
-
+# class EmployeeUpAndDownSaleChoices(models.TextChoices):
+#         UPSALE = 'UpSale', 'UpSale'
+#         DOWNSALE = 'DownSale', 'DownSale'
+        
