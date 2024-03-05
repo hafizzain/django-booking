@@ -1340,11 +1340,7 @@
                                 (Discount {{ data.discount_percentage }} %)
                             {% endif %}
                         </p>
-                        
-                        {% if {% get_secondary_translation data.id %} %}
-                          <p class="arabic">{% get_secondary_translation data.id %}</p>
-                        {% endif %}
-                        
+                        <p class="arabic">{% get_secondary_translation data.id %}</p>
                     </div>
                     <p class="text-[#7B7B7B]">
                         <span>1 x </span>{{ data.price }}
