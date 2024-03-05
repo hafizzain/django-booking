@@ -349,6 +349,12 @@ class RedeemedLoyaltyPointsSerializer(serializers.ModelSerializer):
         read_only_fields = ['sale_record']
         # read_only_fields = ['sale_record']
 
+class MembershipInstallmentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MembershipInstallments
+        fields = "__all__"
+        read_only_fields = ['membership']
+
 
 class SaleRecordSerializer(serializers.ModelSerializer):
 

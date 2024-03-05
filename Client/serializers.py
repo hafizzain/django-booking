@@ -4,7 +4,7 @@ from Business.models import BusinessAddress
 from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
 from Order.models import VoucherOrder, MemberShipOrder, Checkout
-from SaleRecords.models import SaleRecordMembership, SaleRecordVouchers
+from SaleRecords.models import SaleRecordMembership, SaleRecordVouchers, MembershipInstallments
 from Order.serializers import CreatedAtCheckoutSerializer
 from Product.models import Product
 from Service.models import Service
@@ -17,6 +17,8 @@ from Invoices.models import SaleInvoice
 from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip, AppointmentService, Appointment
 from Order.models import Checkout, Order
 from Utility.serializers import StateSerializer, CitySerializer
+
+
 # from Sale.serializers import SaleOrders_CheckoutSerializer, SaleOrders_AppointmentCheckoutSerializer
 
 
@@ -585,8 +587,19 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     discount_type = serializers.SerializerMethodField(read_only=True)
     products = serializers.SerializerMethodField()
     services = serializers.SerializerMethodField()
+    installment_data = serializers.SerializerMethodField(read_only = True)
     # employee = serializers.SerializerMethodField()
-
+    
+    def get_installment_data(self, obj):
+        from SaleRecords.serializers import MembershipInstallmentsSerializer
+        try:
+            installments = MembershipInstallments.objects.filter(membership = obj.membership)
+            if installments:
+                return MembershipInstallmentsSerializer(installments, many = True).data
+            return None
+        except Exception as e:
+            return f'error occured while getting the installments error:{e}'
+        
     def get_products(self, obj):
         try:
             pro = DiscountMembership.objects.filter(membership=obj.membership, service__isnull=True)
@@ -666,7 +679,8 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
             'created_at',
             # 'discount_percentage', 
             'membership_price', 
-            'discount_type' 
+            'discount_type' ,
+            'installment_data'
         ]
 
 

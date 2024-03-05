@@ -3030,7 +3030,7 @@ def get_client_all_memberships(request):
             )
 
     # return JsonResponse({'data': client_membership})
-    serializer = ClientMembershipsSerializer(client_membership, many=True)
+    serializer = ClientMembershipsSerializer(client_membership, many=True, context = {'request': request})
 
     return Response(
         {
