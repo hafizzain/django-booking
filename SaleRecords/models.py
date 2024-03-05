@@ -115,6 +115,7 @@ class SaleRecordMembership(CommonField):
     end_date = models.DateTimeField(blank=True, null=True)
     expiry = models.DateTimeField(blank=True, null=True)
     installment_months = models.SmallIntegerField(blank=True, null=True)
+    next_insallment_date =  models.DateTimeField(blank=True, null=True)
     # employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_membership_employee')
     
     price = models.FloatField(blank=True, null=True) 
