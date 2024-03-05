@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.db.models import Sum, Avg
 from django.db.models import Q
 from django.db.models import Value
@@ -286,3 +286,25 @@ def single_sale_record(request):
     }
     return Response(response)
 
+
+
+@api_view(['POST'])
+@permission_classes('IsAuthenticated')
+def pay_installment(request):
+    membership_id = request.data.get('membership')
+    paid_installment = request.data.get('paid_installment')
+    
+    MembershipInstallments.objects.create(
+        membership_id = membership_id,
+        paid_installment = paid_installment
+    )
+    response_data = {
+                    'success': True,
+                    'status_code': 200,
+                    'response': {
+                        'message': 'Installment Paid successfully!',
+                        'error_message': None,
+                        'data': None
+                    }
+    }
+    return Response(response_data,status=status.HTTP_201_CREATED)
