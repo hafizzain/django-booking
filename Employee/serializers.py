@@ -1137,8 +1137,8 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
         try:
             employee_obj = self.context.get('obj')
             location = self.context.get('location_id', None)
-            daily_schedule =list(EmployeDailySchedule.objects.filter(employee=employee_obj.id).values_list('date', flat=True)).first()
-            break_time = BrakeTime.objects.filter(employee=employee_obj.id, date__in=daily_schedule, location=location)
+            daily_schedule = EmployeDailySchedule.objects.filter(employee=employee_obj.id).first()
+            break_time = BrakeTime.objects.filter(employee=employee_obj.id, date=daily_schedule.date, location=location)
             return BrakeTimeSerializer(break_time).data
         except:
             return None
