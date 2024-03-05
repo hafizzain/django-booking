@@ -1329,6 +1329,28 @@
                 {% endif %}
 
 
+
+                
+                {% if checkout_data.appointment_services.all %}
+                  <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                    <div>
+                        <p class="text-left">
+                            {{ data.service.name }}
+                            {% if data.discount_percentage %}
+                                (Discount {{ data.discount_percentage }} %)
+                            {% endif %}
+                        </p>
+                        <p class="arabic">{% get_secondary_translation data.id %}</p>
+                    </div>
+                    <p class="text-[#7B7B7B]">
+                        <span>1 x </span>{{ data.price }}
+                        {{ currency_code }}
+                    </p>
+                  </div>
+                {% endif %}
+                  
+
+
                 {% comment %} <div class="flex items-center justify-between text-primary text-sm font-semibold">
                   <div>
                       <p class="text-left">
