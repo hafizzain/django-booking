@@ -1172,7 +1172,7 @@
                   
                 
                   
-                {% if checkout_data.appointment_services.all and clients  %}
+                  {% if checkout_data.appointment_services.all and clients  %}
                         {% for c in clients %}
                           <strong><h2>{{c.client.full_name}}</h2></strong>
                           
@@ -1330,7 +1330,7 @@
                           {% endfor %}
                         {% endfor %}
                 
-                {% endif %}
+                  {% endif %}
 
                 {% else %}
                   
