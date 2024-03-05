@@ -1168,7 +1168,11 @@
                 
                 {% comment %} ===============================if there is any appointment_services in the checkout_data ========================{% endcomment %}
                 
-                {% if checkout_data.appointment_services.all and clients %}
+                {% if checkout_data.checkout_type == "Group Appointment" and checkout_data.client_type == 'In_Saloon' %}
+                  
+                
+                  
+                  {% if checkout_data.appointment_services.all and clients  %}
                         {% for c in clients %}
                           <strong><h2>{{c.client.full_name}}</h2></strong>
                           
@@ -1187,11 +1191,12 @@
                                                 <p class="arabic">{% get_secondary_translation data.id %}</p>
                                             </div>
                                             <p class="text-[#7B7B7B]">
-                                                <span>1 x </span>{{ item.price }}
+                                                <span>1 x </span>{{ data.price }}
                                                 {{ currency_code }}
                                             </p>
                                           </div>
                                 {% endif %}
+                          {% endfor %}
 
 
                                 {% comment %} coupon printing {% endcomment %}
@@ -1323,10 +1328,40 @@
                                 {% endif %}
 
 
-                          {% endfor %}
+                          
                         {% endfor %}
                 
+                  {% endif %}
+
+                {% else %}
+                  
+                  {% for data in  checkout_data.appointment_services.all %}
+
+                    <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                                            <div>
+                                                <p class="text-left">
+                                                    {{ data.service.name }}
+                                                    {% if data.discount_percentage %}
+                                                        (Discount {{ data.discount_percentage }} %)
+                                                    {% endif %}
+                                                </p>
+                                                <p class="arabic">{% get_secondary_translation data.id %}</p>
+                                            </div>
+                                            <p class="text-[#7B7B7B]">
+                                                <span>1 x </span>{{ data.price }}
+                                                {{ currency_code }}
+                                            </p>
+                      </div>
+                  {% endfor %}
+                    
+
                 {% endif %}
+
+                
+                
+                  
+                
+                  
 
 
                 {% comment %} <div class="flex items-center justify-between text-primary text-sm font-semibold">
