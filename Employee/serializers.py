@@ -1133,9 +1133,10 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
         # except Exception as ex:
         #     return str(ex)
 
-    def get_break_time(self, request, obj):
+    def get_break_time(self, obj):
         try:
-            daily_schedule = EmployeDailySchedule.objects.filter(employee=obj.id)
+            employee_obj = self.context.get('obj')
+            daily_schedule = EmployeDailySchedule.objects.filter(employee=employee_obj.id)
             break_time = BrakeTime.objects.get(employee=obj.id, date=daily_schedule.data)
             return BrakeTimeSerializer(break_time, many=True).data
         except:
@@ -1368,8 +1369,8 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         #         default=Value(False),
         #         output_field=BooleanField()
         #     )
-        # ).filter(is_vacation_accepted=True)
-        return ScheduleSerializerOP(qs, many=True, context=self.context).data
+        # ).filter(is_vacation_accepted=True) context=self.context).data
+        return ScheduleSerializerOP(qs, many=True, context={'obj': obj}).data
 
     # def get_false_scedule(self, obj):
     #     qs = EmployeDailySchedule.objects.filter(employee=obj, is_weekend=False)
