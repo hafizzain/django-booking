@@ -16,15 +16,14 @@ from django.db.models import Q, F, IntegerField
 from Client.helpers import calculate_validity
 from Service.models import Service
 from Business.models import Business, BusinessAddress
-from SaleRecords.models import SaleRecordMembership , SaleRecordVouchers
 from Product.models import Product
 from Utility.models import Country, Currency, ExceptionRecord, Language, State, City
 from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, \
     DiscountMembership, LoyaltyPoints, Subscription, Rewards, Promotion, Membership, Vouchers, ClientLoyaltyPoint, \
     LoyaltyPointLogs, VoucherCurrencyPrice, ClientImages
     
-from SaleRecords.models import PurchasedGiftCards
-from SaleRecords.serializers import PurchasedGiftCardsSerializer
+from SaleRecords.models import PurchasedGiftCards, SaleRecordMembership, SaleRecordVouchers
+from SaleRecords.serializers import PurchasedGiftCardsSerializer, SaleRecordMembershipSerializer
 from Client.serializers import (SingleClientSerializer, ClientSerializer, ClientGroupSerializer,
                                 LoyaltyPointsSerializer,
                                 SubscriptionSerializer, RewardSerializer, PromotionSerializer, MembershipSerializer,
@@ -3007,16 +3006,28 @@ def get_client_all_vouchers(request):
 def get_client_all_memberships(request):
     location_id = request.GET.get('location_id', None)
     client_id = request.GET.get('client_id', None)
+    installment = request.GET.get('installment', None)
+    
 
     today_date = datetime.now()
     today_date = today_date.strftime('%Y-%m-%d')
-    client_membership = SaleRecordMembership.objects.filter(
-        sale_record__location__id=location_id,
-        expiry__gte=timezone.now(),
-        # created_at__lt = F('end_date'),
-        # end_date__gte = today_date,
-        sale_record__client__id=client_id,
-    )
+    if installment:
+        client_membership = SaleRecordMembership.objects.filter(
+            sale_record__location__id=location_id,
+            expiry__gte=timezone.now(),
+            # created_at__lt = F('end_date'),
+            # end_date__gte = today_date,
+            sale_record__client__id=client_id,
+            membership__is_installment = installment
+        )
+    else:
+        client_membership = SaleRecordMembership.objects.filter(
+                sale_record__location__id=location_id,
+                expiry__gte=timezone.now(),
+                # created_at__lt = F('end_date'),
+                # end_date__gte = today_date,
+                sale_record__client__id=client_id,
+            )
 
     # return JsonResponse({'data': client_membership})
     serializer = ClientMembershipsSerializer(client_membership, many=True)
