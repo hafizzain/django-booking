@@ -3006,20 +3006,28 @@ def get_client_all_vouchers(request):
 def get_client_all_memberships(request):
     location_id = request.GET.get('location_id', None)
     client_id = request.GET.get('client_id', None)
-    installment = request.GET.get('installment', False)
+    installment = request.GET.get('installment', None)
     
 
     today_date = datetime.now()
     today_date = today_date.strftime('%Y-%m-%d')
-    
-    client_membership = SaleRecordMembership.objects.filter(
-        sale_record__location__id=location_id,
-        expiry__gte=timezone.now(),
-        # created_at__lt = F('end_date'),
-        # end_date__gte = today_date,
-        sale_record__client__id=client_id,
-        membership__is_installment = installment
-    )
+    if installment:
+        client_membership = SaleRecordMembership.objects.filter(
+            sale_record__location__id=location_id,
+            expiry__gte=timezone.now(),
+            # created_at__lt = F('end_date'),
+            # end_date__gte = today_date,
+            sale_record__client__id=client_id,
+            membership__is_installment = installment
+        )
+    else:
+        client_membership = SaleRecordMembership.objects.filter(
+                sale_record__location__id=location_id,
+                expiry__gte=timezone.now(),
+                # created_at__lt = F('end_date'),
+                # end_date__gte = today_date,
+                sale_record__client__id=client_id,
+            )
 
     # return JsonResponse({'data': client_membership})
     serializer = ClientMembershipsSerializer(client_membership, many=True)
