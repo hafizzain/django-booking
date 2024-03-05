@@ -1137,11 +1137,11 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
         try:
             employee_obj = self.context.get('obj')
             location = self.context.get('location_id', None)
-            daily_schedule = EmployeDailySchedule.objects.filter(employee=employee_obj.id).values_list('date', flat=True)
-            break_time = BrakeTime.objects.filter(employee=employee_obj.id, date=obj.date, location=location)
+            break_time = BrakeTime.objects.filter(employee=employee_obj.id, date=obj.date, location=location) \
+                                            .select_related('employee', 'location')
             return BrakeTimeSerializer(break_time, many=True).data
-        except Exception as err:
-            return str(err)
+        except:
+            return None
     class Meta:
         model = EmployeDailySchedule
         fields = ['id', 'vacation', 'is_leo_day', 'is_holidays', 'is_holiday', 'date', 'is_vacation', 'is_leave',
@@ -1160,21 +1160,12 @@ class EmployeeSerializerResponse(serializers.ModelSerializer):
 
 class ScheduleSerializerResponse(serializers.ModelSerializer):
     employee = EmployeeSerializerResponse()
-    brake_time = serializers.SerializerMethodField(read_only=True) 
     # grouped_data = serializers.SerializerMethodField(read_only=True)
     date = serializers.DateTimeField(format="%Y-%m-%d", input_formats=['iso-8601', 'date'])
 
-    def get_brake_time(self, obj):
-        try:
-            employee = EmployeDailySchedule.objects.get(id=obj.employee)
-            brake_time = BrakeTime.objects.get(employee=employee)
-            return BrakeTimeSerializer(brake_time).data
-        except:
-            return None
-
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'title', 'date', 'employee', 'brake_time', 'is_weekend', 'vacation', 'from_date']
+        fields = ['id', 'title', 'date', 'employee', 'is_weekend', 'vacation', 'from_date']
 
 
 class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
@@ -1282,8 +1273,6 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     schedule = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     leave_data = serializers.SerializerMethodField(read_only=True)
-    break_time = serializers.SerializerMethodField(read_only=True)
-
     # false_scedule =  serializers.SerializerMethodField(read_only=True)
 
     def get_leave_data(self, obj):
@@ -1295,15 +1284,6 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
             leave_data = LeaveManagementSerializer(leave_management, many=False).data
             return leave_data
         except Exception as ex:
-            return None
-
-    def get_break_time(self, obj):
-        try:
-            # employee = EmployeDailySchedule.objects.get(id=employee)
-            location = self.context.get('location_id', None)
-            break_time = BrakeTime.objects.filter(employee=obj.id, location_id=location)
-            return BrakeTimeSerializer(break_time, many=True).data
-        except :
             return None
         
     def get_schedule(self, obj):
@@ -1391,7 +1371,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['id', 'leave_data', 'full_name',  'image', 'break_time', 'schedule', 'created_at', 'is_active', 'is_deleted',
+        fields = ['id', 'leave_data', 'full_name',  'image', 'schedule', 'created_at', 'is_active', 'is_deleted',
                   'is_blocked']
 
 
