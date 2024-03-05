@@ -499,6 +499,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     membership=data['membership'],
                     price=float(data['price'] * data['quantity']),
                     quantity=data['quantity'],
+                    installment_months = data['installment_months'],
                     expiry=calculate_validity(data['valid_till']),
                 ) for data in membership_records
             ])
