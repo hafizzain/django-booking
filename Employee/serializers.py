@@ -1295,7 +1295,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         except Exception as ex:
             return None
 
-    def get_brake_time(self, obj):
+    def get_break_time(self, obj):
         try:
             # employee = EmployeDailySchedule.objects.get(id=employee)
             break_time = BrakeTime.objects.get(employee=obj.id)
