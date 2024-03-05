@@ -1137,11 +1137,11 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
         try:
             employee_obj = self.context.get('obj')
             location = self.context.get('location_id', None)
-            daily_schedule =list(EmployeDailySchedule.objects.filter(employee=employee_obj.id).values_list('date', flat=True))
-            break_time = BrakeTime.objects.filter(employee=employee_obj.id, date__in=daily_schedule)
+            daily_schedule =list(EmployeDailySchedule.objects.filter(employee=employee_obj.id).values_list('date', flat=True)).first()
+            break_time = BrakeTime.objects.filter(employee=employee_obj.id, date__in=daily_schedule, location=location)
             return BrakeTimeSerializer(break_time, many=True).data
-        except Exception as err:
-            return str(err)
+        except:
+            return None
     class Meta:
         model = EmployeDailySchedule
         fields = ['id', 'vacation', 'is_leo_day', 'is_holidays', 'is_holiday', 'date', 'is_vacation', 'is_leave',
