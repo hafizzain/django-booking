@@ -17,7 +17,7 @@ from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Order.models import Checkout
 from . import choices
 from Utility.models import CommonField
-from .choices import AppointmentServiceStatus
+from .choices import *
 
 
 
@@ -693,3 +693,14 @@ class Reversal(CommonField):
     appointment_services = models.ForeignKey(AppointmentService, on_delete=models.CASCADE, null=True)
     generated_by = models.TextField(null=True, blank=True)
     request_status = models.TextField(default="", null=True)
+
+
+# class EmployeeUpAndDownSale(CommonField):
+#     location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='location_up_and_down_sale')
+#     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, blank=True, related_name='employee_up_and_down_sale')
+#     service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_up_and_down_sale')
+    
+#     old_price = models.FloatField(default=0, null=True, blank=True)
+#     new_price = models.FloatField(default=0, null=True, blank=True)
+#     price_difference = models.FloatField(default=0, null=True, blank=True)
+#     status = models.models.CharField(choices=EmployeeUpAndDownSaleChoices.choices, max_length=30)
