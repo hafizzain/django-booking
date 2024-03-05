@@ -32,7 +32,7 @@ def get_secondary_translation(order_id):
         
         return ''
     except Exception as e:
-        return f"exception occure in secondary translation : {str(e)}"
+        return ""
 
 @register.simple_tag
 def get_primary_translation(order_id):
@@ -62,4 +62,4 @@ def get_primary_translation(order_id):
         
         return ''
     except Exception as e:
-        return f"exception occure in primary translation : {str(e)}"
+        return ''
