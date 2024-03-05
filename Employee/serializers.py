@@ -1299,9 +1299,10 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     def get_break_time(self, obj):
         try:
             # employee = EmployeDailySchedule.objects.get(id=employee)
-            break_time = BrakeTime.objects.get(employee=obj.id)
+            location = self.context.get('location_id', None)
+            break_time = BrakeTime.objects.filter(employee=obj.id, location_id=location)
             return BrakeTimeSerializer(break_time, many=True).data
-        except:
+        except :
             return None
         
     def get_schedule(self, obj):
