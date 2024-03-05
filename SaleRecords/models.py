@@ -114,10 +114,16 @@ class SaleRecordMembership(CommonField):
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
     expiry = models.DateTimeField(blank=True, null=True)
+    installment_months = models.SmallIntegerField(blank=True, null=True)
     # employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_membership_employee')
     
     price = models.FloatField(blank=True, null=True) 
     quantity = models.PositiveSmallIntegerField(blank=True, null=True) 
+    
+# class MembershipInstallments(CommonField):
+#     memberhsip = models.ForeignKey(SaleRecordMembership, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'installment_memberships')
+#     paid_installment = models.FloatField(blank=True, null=True)
+    
     
 class PurchasedGiftCards(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'gift_cards_records')
