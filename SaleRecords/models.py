@@ -91,7 +91,7 @@ class SaleRecordsAppointmentServices(CommonField):
     
     
     service_status = models.CharField(choices = AppointmentStatus.choices,max_length = 50, default = AppointmentStatus.BOOKED, blank=False, null=False)
-    # quantity = models.PositiveIntegerField(blank=True, null=True)
+    quantity = models.PositiveIntegerField(blank=True, null=True)
     service_start_time = models.DateTimeField(blank=True, null=True)
     service_end_time = models.DateTimeField(blank=True, null=True)
     duration = models.CharField(max_length= 50,blank=True, null=True)
