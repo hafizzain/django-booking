@@ -1136,8 +1136,9 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
     def get_break_time(self, obj):
         try:
             employee_obj = self.context.get('obj')
+            location = self.context.get('location_id', None)
             daily_schedule = EmployeDailySchedule.objects.filter(employee=employee_obj.id)
-            break_time = BrakeTime.objects.get(employee=employee_obj.id, date=daily_schedule.date)
+            break_time = BrakeTime.objects.filter(employee=employee_obj.id, date=daily_schedule.date, location=location)
             return BrakeTimeSerializer(break_time, many=True).data
         except:
             return None
@@ -1371,7 +1372,8 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         #         output_field=BooleanField()
         #     )
         # ).filter(is_vacation_accepted=True) context=self.context).data
-        return ScheduleSerializerOP(qs, many=True, context={'obj': obj}).data
+        location = self.context.get('location_id', None)
+        return ScheduleSerializerOP(qs, many=True, context={'obj': obj, 'location_id': location}).data
 
     # def get_false_scedule(self, obj):
     #     qs = EmployeDailySchedule.objects.filter(employee=obj, is_weekend=False)
