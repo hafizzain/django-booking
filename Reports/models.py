@@ -345,7 +345,7 @@ class DiscountPromotionSalesReport(models.Model):
                             if len(service_price) > 0:
                                 service_price = service_price[0].price
                             if service_price:
-                                original_price += float(service_price) * float(rec.quantity)
+                                original_price += float(service_price) * float(1)
                                 dicounted_price += float(rec.price)
             except Exception as e:
                 raise ValidationError({'erorr occured in dicount Promotion Appointment Service': str(e) })
