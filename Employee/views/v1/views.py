@@ -7542,7 +7542,7 @@ class BrakeTimeView(APIView):
                 "success": True,
                 "status_code": 200,
                 "response": {
-                    "message": "Brake time get Successfully",
+                    "message": "Break Time Get Successfully",
                     "error_message": None,
                     "data": serialized.data
                 }
@@ -7559,7 +7559,7 @@ class BrakeTimeView(APIView):
                     "success": True,
                     "status_code": 200,
                     "response": {
-                        "message": "BrakeTime get Successfully",
+                        "message": "Break Time Get Successfully",
                         "error_message": None,
                         "data": serialized.data
                     }
@@ -7579,7 +7579,7 @@ class BrakeTimeView(APIView):
                     "success": True,
                     "status_code": 200,
                     "response": {
-                        "message": "Campaign get Successfully",
+                        "message": "Break Time Get Successfully",
                         "error_message": None,
                         "data": serializer.data
                     }
@@ -7596,7 +7596,7 @@ class BrakeTimeView(APIView):
                 "success": True,
                 "status_code": 201,
                 "response": {
-                    "message": "Brake Time Add successfully",
+                    "message": "Break Time Add successfully",
                     "error_message": None,
                     "data": serializer.data
                 }
@@ -7607,7 +7607,7 @@ class BrakeTimeView(APIView):
                 "success": False,
                 "status_code": 400,
                 "response": {
-                    "message": "Brake Time Not Add",
+                    "message": "Break Time Not Add",
                     "error_message": serializer.errors,
                     "data": None
                 }
@@ -7637,7 +7637,7 @@ class BrakeTimeView(APIView):
                 "success": True,
                 "status_code": 201,
                 "response": {
-                    "message": "Brake Time updated successfully",
+                    "message": "Break Time updated successfully",
                     "error_message": None,
                     "data": serializer.data
                 }
@@ -7648,7 +7648,7 @@ class BrakeTimeView(APIView):
                 "success": False,
                 "status_code": 400,
                 "response": {
-                    "message": "Brake time not updated",
+                    "message": "Break time not updated",
                     "error_message": serializer.errors,
                     "data": None
                 }
@@ -7675,7 +7675,7 @@ class BrakeTimeView(APIView):
             "success": True,
             "status_code": 200,
             "response": {
-                "message": "Brake time deleted successfully",
+                "message": "Break time deleted successfully",
                 "error_message": None,
                 "data": None
             }
