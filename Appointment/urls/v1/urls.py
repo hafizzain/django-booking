@@ -80,6 +80,6 @@ urlpatterns = [
     path('group_appointment_check_in/', views.update_group_appointment_check_in),
     path('appointment_time_report/', views.appointment_time_report),
     
-    path('get_Employee-Up-And-DownSale/', views.get_EmployeeUpAndDownSale),
+    path('get_employee-up-and-downSale/', views.get_EmployeeUpAndDownSale),
     
 ]

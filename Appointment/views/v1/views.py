@@ -5127,9 +5127,10 @@ def appointment_time_report(request):
 def get_EmployeeUpAndDownSale(request):
     location = request.GET.get('location', None)
     employee = request.GET.get('employee', None)
-    date = request.GET.get('date', None)
+    star_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
     
-    query = Q()
+    query = Q(status__in=['UpSale','DownSale'])
     if location:
         query &= Q(location_id=location)
         
@@ -5138,6 +5139,9 @@ def get_EmployeeUpAndDownSale(request):
     
     if date:
         query &= Q(created_at=date)
+        
+    if star_date and end_date:
+        query &= Q(created_at__range=(star_date,end_date))
         
     employee_sales = EmployeeUpAndDownSale.objects.filter(query) \
                                 .select_related('location', 'employee','service')
