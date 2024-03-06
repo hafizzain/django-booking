@@ -81,4 +81,5 @@ urlpatterns = [
     path('appointment_time_report/', views.appointment_time_report),
     
     path('get_Employee-Up-And-DownSale/', views.get_EmployeeUpAndDownSale),
+    path('get_EmployeeUpAndDownSale/', views.get_EmployeeUpAndDownSale),
 ]
