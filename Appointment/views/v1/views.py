@@ -2503,12 +2503,13 @@ def update_appointment_service(request):
                     if final_price > 0:
                         up_and_down_sale.price = final_price
                         up_and_down_sale.status = 'UpSale'
-                        up_and_down_sale.save()
+                        
                     if final_price < 0:
                         final_price = abs(final_price)
                         up_and_down_sale.price = final_price
                         up_and_down_sale.status = 'DownSale'
-                        up_and_down_sale.save()
+                        
+                up_and_down_sale.save()    
                     
                 # If a new service is added change the status of 
                 # appointment to started
