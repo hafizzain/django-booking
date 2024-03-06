@@ -2458,13 +2458,13 @@ def update_appointment_service(request):
             except Exception as err:
                 errors.append(str(err))
 
-            # up_and_down_sale = EmployeeUpAndDownSale.objects.create(
-            #     employee = member_id,
-            #     service = service_id,
-            #     new_price=price,
-            # )
-            # up_and_down_sale.save()
-            # old_price = 0
+            up_and_down_sale = EmployeeUpAndDownSale.objects.create(
+                employee = member_id,
+                service = service_id,
+                new_price=price,
+            )
+            up_and_down_sale.save()
+            old_price = 0
             
             try:
                 # below is just a workaround
@@ -2481,8 +2481,8 @@ def update_appointment_service(request):
                     service_appointment.business_address = appointment.business_address
                     service_appointment.status = choices.AppointmentServiceStatus.BOOKED
                 
-                # old_price = service_appointment.price
-                # up_and_down_sale.old_price = old_price
+                old_price = service_appointment.price
+                up_and_down_sale.old_price = old_price
                 
                 service_appointment.appointment_date = appointment_date
                 service_appointment.appointment_time = date_time
@@ -2495,16 +2495,17 @@ def update_appointment_service(request):
                 service_appointment.is_favourite = is_favourite
                 service_appointment.save()
 
-                # final_price = old_price - price
-                # if final_price > 0:
-                #     up_and_down_sale.price = final_price
-                #     up_and_down_sale.status = 'UpSale'
-                #     up_and_down_sale.save()
-                # if final_price < 0:
-                #     final_price = abs(final_price)
-                #     up_and_down_sale.price = final_price
-                #     up_and_down_sale.status = 'DownSale'
-                #     up_and_down_sale.save()
+                final_price = old_price - price
+                if old_price != price:
+                    if final_price > 0:
+                        up_and_down_sale.price = final_price
+                        up_and_down_sale.status = 'UpSale'
+                        up_and_down_sale.save()
+                    if final_price < 0:
+                        final_price = abs(final_price)
+                        up_and_down_sale.price = final_price
+                        up_and_down_sale.status = 'DownSale'
+                        up_and_down_sale.save()
                     
                 # If a new service is added change the status of 
                 # appointment to started
