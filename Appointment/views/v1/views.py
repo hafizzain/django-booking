@@ -2472,6 +2472,8 @@ def update_appointment_service(request):
                 if id:
                     service_appointment = AppointmentService.objects.get(id=str(id))
                     old_price = service_appointment.price
+                    up_and_down_sale.location = service_appointment.business_address
+                    up_and_down_sale.save()
                     if is_deleted == True:
                         service_appointment.delete()
                         continue
@@ -2485,7 +2487,6 @@ def update_appointment_service(request):
                 
                 
                 up_and_down_sale.old_price = old_price
-                final_price = old_price - price
                 
                 service_appointment.appointment_date = appointment_date
                 service_appointment.appointment_time = date_time
@@ -2499,15 +2500,15 @@ def update_appointment_service(request):
                 service_appointment.save()
 
                 # Up and down Sale Logic ------------------------------
-                
+                final_price = old_price - price
                 if old_price != price:
                     if old_price > price:
-                        up_and_down_sale.price = final_price
+                        up_and_down_sale.price_difference = final_price
                         up_and_down_sale.status = 'UpSale'
                         
                     if old_price < price:
                         final_price = abs(final_price)
-                        up_and_down_sale.price = final_price
+                        up_and_down_sale.price_difference = final_price
                         up_and_down_sale.status = 'DownSale'
                         
                 up_and_down_sale.save()    
