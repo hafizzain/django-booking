@@ -274,9 +274,9 @@ def get_appointments_service(request):
     # Calculate Total Sale of Client---------------------
     client = appointment.client
     
-    # Product Order---------------------
+     # Product Order---------------------
     product_order = SaleRecordsProducts.objects \
-        .filter(sale_record__client_id=client) \
+        .filter(sale_record__client__id=client) \
         .select_related('sale_record', 'employee', 'product') \
         .order_by('-created_at')
         
@@ -288,7 +288,7 @@ def get_appointments_service(request):
 
     # Service Orders----------------------
     service_orders = SaleRecordServices.objects \
-        .filter(sale_record__client_id=client) \
+        .filter(sale_record__client__id=client) \
         .select_related('sale_record', 'employee', 'service') \
         .order_by('-created_at')
     service_total = service_orders.aggregate(total_sale=Sum('price'))['total_sale']
@@ -297,15 +297,24 @@ def get_appointments_service(request):
         service_orders = service_orders[:5]
     services_data = SOSerializerForClientSale(service_orders, many=True, context={'request': request, })
 
-    # Voucher & Membership Orders -----------------------
+    # Voucher Orders -----------------------
     voucher_order = SaleRecordVouchers.objects \
-                        .filter(sale_record__client_id=client) \
+                        .filter(sale_record__client__id=client) \
                         .select_related('sale_record', 'employee', 'voucher') \
                         .order_by('-created_at')
+                        
+    # Gift Card Orders -----------------------
+    purchased_gift_cards =PurchasedGiftCards.objects \
+                        .filter(sale_record__client__id=client) \
+                        .select_related('sale_record', 'gift_card') \
+                        .order_by('-created_at')                  
+        
+    # Membership Orders -----------------------                    
     membership_order = SaleRecordMembership.objects \
-                        .filter(sale_record__client_id=client) \
+                        .filter(sale_record__client__id=client) \
                         .select_related('sale_record') \
                         .order_by('-created_at')
+                        
     voucher_total = voucher_order.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += voucher_total if voucher_total else 0
     if voucher_order.count() > 5:
@@ -316,8 +325,14 @@ def get_appointments_service(request):
     if membership_order.count() > 5:
         membership_order = membership_order[:5]
 
+    gift_cards_total = purchased_gift_cards.aggregate(total_sale=Sum('price'))['total_sale']
+    total_sale += gift_cards_total if gift_cards_total else 0
+    if purchased_gift_cards.count() > 5:
+        purchased_gift_cards = purchased_gift_cards[:5]
+        
     voucher = VoucherSerializerForClientSale(voucher_order, many=True, context={'request': request, })
     membership = MOrderSerializerForSale(membership_order[:5], many=True, context={'request': request, })
+    gift_cards = PurchasedGiftCardsSerializer(purchased_gift_cards, many=True, context={'request': request, })
 
     voucher_membership.extend(voucher.data)
     voucher_membership.extend(membership.data)
@@ -3782,6 +3797,7 @@ def get_client_sale(request):
                 'voucher': voucher_membership,
                 'appointment': appointment.data,
                 'membership' : membership.data,
+                'Gift Cards' : gift_cards.data,
                 'appointments_count': appointment_checkout_all.count(),
                 'total_sales': total_sale,
                 'quick_sale_count': quick_sale_count,
