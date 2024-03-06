@@ -32,6 +32,8 @@ from Utility.models import ExceptionRecord
 from Service.models import Service
 from Appointment.models import *
 from Client.serializers import UserSerializerResponse
+from Employee.serializers import *
+from Employee.models import *
 
 
 class SerializerResponse(serializers.ModelSerializer):
@@ -425,6 +427,18 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
     
 
     # unavailable_time = serializers.SerializerMethodField()
+    
+    def get_brake_time(self, employee_instance, location_id=None, selected_date=None):
+        try:
+        
+            brake_time = BrakeTime.objects.filter(employee_id=employee_instance,
+                                                location_id=location_id,
+                                                date=selected_date) \
+                                            .select_related('employee', 'location')
+                                            
+            return BrakeTimeSerializer(brake_time, many=True).data
+        except Exception as err:
+            return None
 
     def get_appointment_id(self, obj):
         return None
@@ -614,6 +628,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
 
     def get_appointments(self, obj):
         selected_date = self.context.get('selected_date', None)
+        location_id = self.context.get('location_id', None)
         if not selected_date:
             return []
         appoint_services = AppointmentService.objects.filter(
@@ -629,6 +644,10 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             sorted_appointments = sorted(appoint_services, key=lambda a: a.appointment_time)
 
             selected_data = []
+            
+            brake_time_data = self.get_brake_time(obj,location_id,selected_date)
+            selected_data.append(brake_time_data)
+            
             for appointment in sorted_appointments:
                 app_id = appointment.id
                 appointment_time = appointment.appointment_time
