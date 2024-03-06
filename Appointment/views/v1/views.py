@@ -2458,6 +2458,7 @@ def update_appointment_service(request):
             except Exception as err:
                 errors.append(str(err))
 
+            # Create UP and Down sale -----------------------------------
             up_and_down_sale = EmployeeUpAndDownSale.objects.create(
                 employee = member_id,
                 service = service_id,
@@ -2495,6 +2496,7 @@ def update_appointment_service(request):
                 service_appointment.is_favourite = is_favourite
                 service_appointment.save()
 
+                # Up and down Sale Logic ------------------------------
                 final_price = old_price - price
                 if old_price != price:
                     if final_price > 0:
