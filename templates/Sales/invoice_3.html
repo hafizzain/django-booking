@@ -1168,7 +1168,7 @@
                 
                 {% comment %} ===============================if there is any appointment_services in the checkout_data ========================{% endcomment %}
                 
-                {% if checkout_data.checkout_type == "Group Appointment" and checkout_data.client_type == 'In_Saloon' %}
+                {% if (checkout_data.checkout_type == "Group Appointment" or checkout_data.checkout_type == "Appointment") and checkout_data.client_type == 'In_Saloon' %}
                   
                 
                   
