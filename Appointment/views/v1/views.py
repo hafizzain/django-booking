@@ -2485,6 +2485,7 @@ def update_appointment_service(request):
                 
                 
                 up_and_down_sale.old_price = old_price
+                final_price = old_price - price
                 
                 service_appointment.appointment_date = appointment_date
                 service_appointment.appointment_time = date_time
@@ -2498,7 +2499,7 @@ def update_appointment_service(request):
                 service_appointment.save()
 
                 # Up and down Sale Logic ------------------------------
-                final_price = old_price - price
+                
                 if old_price != price:
                     if old_price > price:
                         up_and_down_sale.price = final_price
@@ -5165,7 +5166,7 @@ def get_EmployeeUpAndDownSale(request):
 
 @api_view(['DELETE'])
 @permission_classes([AllowAny])
-def get_EmployeeUpAndDownSale(request):
+def delete_EmployeeUpAndDownSale(request):
     id = request.data.GET.get('id', None)
     employee = EmployeeUpAndDownSale.objects.get(id=id)
     employee.delete()
