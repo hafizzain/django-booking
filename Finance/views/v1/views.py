@@ -357,6 +357,7 @@ class RefundAPIView(APIView):
                         
                     #send email to client running on thread
                     send_refund_email(client_email=client_email)  
+                    
                 except Exception as e:
                         return Response({'Error': str(e), 'error':'Second Try'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
