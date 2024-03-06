@@ -2471,6 +2471,7 @@ def update_appointment_service(request):
                 # below is just a workaround
                 if id:
                     service_appointment = AppointmentService.objects.get(id=str(id))
+                    old_price = service_appointment.price
                     if is_deleted == True:
                         service_appointment.delete()
                         continue
@@ -2482,7 +2483,7 @@ def update_appointment_service(request):
                     service_appointment.business_address = appointment.business_address
                     service_appointment.status = choices.AppointmentServiceStatus.BOOKED
                 
-                old_price = service_appointment.price
+                
                 up_and_down_sale.old_price = old_price
                 
                 service_appointment.appointment_date = appointment_date
