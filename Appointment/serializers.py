@@ -1935,6 +1935,7 @@ class GroupCheckInSerializer(serializers.ModelSerializer):
         fields = "__all__"
         
 class EmployeeUpAndDownSaleSerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.full_name')
     class Meta:
         model = EmployeeUpAndDownSale
         fields = "__all__"
