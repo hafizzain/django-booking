@@ -275,7 +275,7 @@ def get_appointments_service(request):
     
     # Product Order---------------------
     product_order = SaleRecordsProducts.objects \
-        .filter(sale_record__client__id=client) \
+        .filter(sale_record__client_id=client) \
         .select_related('sale_record', 'employee', 'product') \
         .order_by('-created_at')
         
@@ -287,7 +287,7 @@ def get_appointments_service(request):
 
     # Service Orders----------------------
     service_orders = SaleRecordServices.objects \
-        .filter(sale_record__client__id=client) \
+        .filter(sale_record__client_id=client) \
         .select_related('sale_record', 'employee', 'service') \
         .order_by('-created_at')
     service_total = service_orders.aggregate(total_sale=Sum('price'))['total_sale']
@@ -298,11 +298,11 @@ def get_appointments_service(request):
 
     # Voucher & Membership Orders -----------------------
     voucher_order = SaleRecordVouchers.objects \
-                        .filter(sale_record__client__id=client) \
+                        .filter(sale_record__client_id=client) \
                         .select_related('sale_record', 'employee', 'voucher') \
                         .order_by('-created_at')
     membership_order = SaleRecordMembership.objects \
-                        .filter(sale_record__client__id=client) \
+                        .filter(sale_record__client_id=client) \
                         .select_related('sale_record') \
                         .order_by('-created_at')
     voucher_total = voucher_order.aggregate(total_sale=Sum('price'))['total_sale']
