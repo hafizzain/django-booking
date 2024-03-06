@@ -1,5 +1,5 @@
 from django.contrib import admin
-from Appointment.models import Appointment, AppointmentGroup, AppointmentService, AppointmentNotes, AppointmentCheckout, AppointmentLogs, LogDetails
+from Appointment.models import Appointment, AppointmentGroup, AppointmentService, AppointmentNotes, AppointmentCheckout, AppointmentLogs, LogDetails, EmployeeUpAndDownSale
 from Service.models import ServiceGroup
 
 
@@ -16,7 +16,9 @@ class AppointmentCheckoutAdmin(admin.ModelAdmin):
     list_display = ['id', 'business_address', 'is_promotion', 'created_at', 'total_price']
     # search_fields = ('id')
 
-
+@admin.register(EmployeeUpAndDownSale)
+class EmployeeUpAndDownSaleAdmin(admin.ModelAdmin):
+    list_display = ['id','old_price','new_price','price_difference','status']
 
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
