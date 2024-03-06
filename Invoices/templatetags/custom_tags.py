@@ -11,9 +11,9 @@ from SaleRecords.models import *
 def get_secondary_translation(order_id):
     try:
         
-        service_order = SaleRecordServices.objects.filter(id=order_id).first()
-        product_order = SaleRecordsProducts.objects.filter(id=order_id).first()
-        appointment_order = SaleRecordsAppointmentServices.objects.filter(id=order_id).first()
+        service_order = SaleRecordServices.objects.filter(id=str(order_id)).first()
+        product_order = SaleRecordsProducts.objects.filter(id=str(order_id)).first()
+        appointment_order = SaleRecordsAppointmentServices.objects.filter(id=str(order_id)).first()
 
         if service_order and service_order.sale_record.location.secondary_translation:
             secondary_invoice_traslation = InvoiceTranslation.objects.filter(id=service_order.sale_record.location.secondary_translation.id).first()
@@ -32,7 +32,7 @@ def get_secondary_translation(order_id):
         
         return ''
     except Exception as e:
-        return f"exception occure in secondary translation : {str(e)}"
+        return ""
 
 @register.simple_tag
 def get_primary_translation(order_id):
@@ -62,4 +62,4 @@ def get_primary_translation(order_id):
         
         return ''
     except Exception as e:
-        return f"exception occure in primary translation : {str(e)}"
+        return ''

@@ -27,6 +27,9 @@ from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSION
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
+from rest_framework.pagination import PageNumberPagination
 from Employee.serializers import (EmployeSerializer, EmployeInformationsSerializer,
                                   Payroll_Working_device_attendence_ScheduleSerializer,
                                   Payroll_Working_deviceScheduleSerializer, Payroll_WorkingScheduleSerializer,
@@ -77,6 +80,8 @@ from Utility.Constants.get_from_public_schema import get_country_from_public, ge
 from Sale.Constants.Custom_pag import CustomPagination
 from Employee.serializers import *
 from SaleRecords.models import *
+from Appointment.serializers import *
+from Sale.Constants.Custom_pag import CustomPagination, AppointmentsPagination
 
 @transaction.atomic
 @api_view(['POST'])
@@ -756,8 +761,6 @@ def get_workingschedule(request):
                                                                                  'start_date': start_date,
                                                                                  'end_date': end_date,
                                                                                  'location_id': location_id})
-        # result = EmployeDailySchedule.objects.filter(is_holiday=True)
-        # s = EmployeDailyScheduleResponse(result, many=True).data
         return Response(
             {
                 'start_date': start_date, 'end_date': end_date,
@@ -767,7 +770,7 @@ def get_workingschedule(request):
                 'response': {
                     'message': 'All Employee',
                     'error_message': None,
-                    'employees': serialized.data
+                    'employees': serialized.data,
                 }
             },
             status=status.HTTP_200_OK
@@ -777,7 +780,6 @@ def get_workingschedule(request):
                                                                        from_date__month=month, location_id=location_id)
         serialized = ScheduleSerializerResponse(employee_ids_in_schedule, many=True, context={'request': request,
                                                                                               'location_id': location_id})
-
         return Response(
             {
                 'employee_ids_in_schedule': str(employee_ids_in_schedule),
@@ -786,7 +788,7 @@ def get_workingschedule(request):
                 'response': {
                     'message': 'All Employee',
                     'error_message': None,
-                    'employees': serialized.data
+                    'employees': serialized.data,
                 }
             },
             status=status.HTTP_200_OK
@@ -7253,7 +7255,7 @@ class GiftCardViewSet(viewsets.ModelViewSet):
                 "success": True,
                 "status_code": 200,
                 "response": {
-                    "message": "giftcard get successfully",
+                    "message": "Gift card created Successfully",
                     "error_message": None,
                     # "data": serializer.data
                 }
@@ -7263,8 +7265,8 @@ class GiftCardViewSet(viewsets.ModelViewSet):
     def delete(self, request, *args, **kwargs):
         id = request.query_params.get('id', None)
         if id is not None:
-            giftcard = GiftCards.objects.filter(id=id)
-            if giftcard.exists():
+            giftcard = GiftCards.objects.get(id=id, is_deleted=False)
+            if giftcard :
                 #Soft delete the gift card
                 giftcard.is_deleted = True
                 giftcard.is_active = False
@@ -7363,26 +7365,39 @@ def get_gift_card(request):
     search_text = request.query_params.get('search_text', None)
     
     # GiftCard show on bases of Ceruncy and location
-    ceruncy = BusinessAddress.objects.filter(id=selected_location).values_list('currency', flat=True)
-    gift_detils = list(GiftDetail.objects.filter(currencies__in=ceruncy).values_list('gift_card', flat=True))
-    query_set = GiftCards.objects.filter(id__in=gift_detils, is_deleted=False,  is_custom_card = False)
-    
-    if search_text:
-        query_set = GiftCards.objects.filter(title__icontains=search_text, is_deleted=False, is_custom_card = False)
+    if selected_location is not None:
+        ceruncy = BusinessAddress.objects.filter(id=selected_location).values_list('currency', flat=True)
+        gift_detils = list(GiftDetail.objects.filter(currencies__in=ceruncy).values_list('gift_card', flat=True))
+        query_set = GiftCards.objects.filter(id__in=gift_detils, is_deleted=False,  is_custom_card = False)
         
-    serializer_context = {'selected_location': selected_location}
-    serializer = GiftCardSerializerResponse(query_set, many=True, context=serializer_context).data
-    data = {
-        "success": True,
-        "status_code": 200,
-        "response": {
-            "message": "gift card get successfully",
-            "error_message": None,
-            "results": serializer
+        if search_text:
+            query_set = GiftCards.objects.filter(title__icontains=search_text, is_deleted=False, is_custom_card = False)
+            
+        serializer_context = {'selected_location': selected_location}
+        serializer = GiftCardSerializerResponse(query_set, many=True, context=serializer_context).data
+        data = {
+            "success": True,
+            "status_code": 200,
+            "response": {
+                "message": "gift card get successfully",
+                "error_message": None,
+                "results": serializer
+            }
         }
-    }
-    return Response(data, status=status.HTTP_200_OK)
-
+        return Response(data, status=status.HTTP_200_OK)
+    else:
+        query_set = GiftCards.objects.filter(is_deleted=False)
+        serializer = GiftCardSerializerResponse(query_set, many=True).data
+        data = {
+            "success": True,
+            "status_code": 200,
+            "response": {
+                "message": "All gift card get successfully",
+                "error_message": None,
+                "results": serializer
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -7425,4 +7440,244 @@ def get_detail_from_code(request):
 
             # Return a 404 Not Found response
             return Response(data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_employee_comment(request):
+        employee_id = request.GET.get('employee_id', None)
+        location_id = request.GET.get('location_id', None)
+        use_pagination = not request.GET.get('no_pagination', None)
+
+        query = Q()
+        if location_id:
+            query &= Q(location_id=location_id)
+
+        if employee_id:
+            query &= Q(employee_id=employee_id)
+
+        comments = Comment.objects.filter(query, is_deleted=False).filter(employee__isnull=False).order_by('-created_at')
+
+        if use_pagination:
+            paginator = AppointmentsPagination()
+            paginator.page_size = 10
+            comment = paginator.paginate_queryset(comments, request)
+            
+            client_data = CommentSerializer(comment, many=True).data
+            
+            data = {
+                'status': True,
+                'status_code': 200,
+                'status_code_text': '200',
+                "response": {
+                    "message": "Comment get Successfully",
+                    "error_message": None,
+                    "data": client_data,
+                    'count': paginator.page.paginator.count,
+                    'next': paginator.get_next_link(),
+                    'previous': paginator.get_previous_link(),
+                    'current_page': paginator.page.number,
+                    'per_page': paginator.page_size,
+                    'total_pages': paginator.page.paginator.num_pages,
+                }
+            }
+    
+            return Response(data, status=201) 
+        else:
+            client_data = CommentSerializer(comments, many=True).data
+            data = {
+                'status': True,
+                'status_code': 200,
+                'status_code_text': '200',
+                "response": {
+                    "message": "Comment get Successfully",
+                    "error_message": None,
+                    "data": client_data,
+                }
+            }
+
+        return Response(data, status=status.HTTP_200_OK)
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_employee_comment(request):
+    comment = request.data.get('comment', None)
+    employee_id = request.data.get('employee_id', None)
+    location_id = request.data.get('location_id', None)
+    
+    user_id = request.user.id
+    comment = Comment.objects.create(employee_id=employee_id,
+                                    comment=comment,
+                                    user_id=user_id,
+                                    location_id = location_id
+                                    )
+    comment.save()
+    client_data = CommentSerializer(comment, many=False).data  
+    return Response(
+        {
+            'status': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Comment added successfully',
+                'error_message': [],
+                'data': client_data
+            }
+        },
+        status=status.HTTP_201_CREATED
+    )
+
+@permission_classes([IsAuthenticated])
+class BrakeTimeView(APIView):
+    permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination
+    page_size = 10
+    
+    def get(self, request, pk=None):
+        no_pagination = request.GET.get('no_pagination', None)
+        location = request.GET.get('location', None)
+
+        if pk is not None:
+            braketime = get_object_or_404(BrakeTime, id=pk)
+            serialized = BrakeTimeSerializer(braketime)
+            data = {
+                "success": True,
+                "status_code": 200,
+                "response": {
+                    "message": "Break Time Get Successfully",
+                    "error_message": None,
+                    "data": serialized.data
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            query = Q()
+            if location: 
+                query &= Q(location_id=location)
+            braketime = BrakeTime.objects.filter(query).order_by('-created_at')
+            serialized = BrakeTimeSerializer(braketime, many=True)
+            if no_pagination:
+                data = {
+                    "success": True,
+                    "status_code": 200,
+                    "response": {
+                        "message": "Break Time Get Successfully",
+                        "error_message": None,
+                        "data": serialized.data
+                    }
+                }
+                return Response(data, status=status.HTTP_200_OK)
+            else:
+                paginator = self.pagination_class()
+                result_page = paginator.paginate_queryset(braketime, request)
+                serializer = BrakeTimeSerializer(result_page, many=True)
+                data = {
+                    'count': paginator.page.paginator.count,
+                    'next': paginator.get_next_link(),
+                    'previous': paginator.get_previous_link(),
+                    'current_page': paginator.page.number,
+                    'per_page': self.page_size,
+                    'total_pages': paginator.page.paginator.num_pages,
+                    "success": True,
+                    "status_code": 200,
+                    "response": {
+                        "message": "Break Time Get Successfully",
+                        "error_message": None,
+                        "data": serializer.data
+                    }
+                }
+                return Response(data, status=status.HTTP_200_OK)
+
+    @transaction.atomic
+    def post(self, request):
         
+        serializer = BrakeTimeSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                "success": True,
+                "status_code": 201,
+                "response": {
+                    "message": "Break Time Add successfully",
+                    "error_message": None,
+                    "data": serializer.data
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            data = {
+                "success": False,
+                "status_code": 400,
+                "response": {
+                    "message": "Break Time Not Add",
+                    "error_message": serializer.errors,
+                    "data": None
+                }
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+    @transaction.atomic
+    def put(self, request, pk=None):
+        pk = request.query_params.get('id', None)
+        
+        if pk is None:
+            data = {
+                "success": False,
+                "status_code": 400,
+                "response": {
+                    "message": "Id is missing in the request",
+                    "error_message":'Comment Id missing',
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+            
+        brake_time = get_object_or_404(BrakeTime, id=pk)
+        serializer = BrakeTimeSerializer(brake_time, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                "success": True,
+                "status_code": 201,
+                "response": {
+                    "message": "Break Time updated successfully",
+                    "error_message": None,
+                    "data": serializer.data
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            data = {
+                "success": False,
+                "status_code": 400,
+                "response": {
+                    "message": "Break time not updated",
+                    "error_message": serializer.errors,
+                    "data": None
+                }
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+    @transaction.atomic
+    def delete(self, request, pk=None):
+        pk = request.query_params.get('id', None)
+        
+        if pk is None:
+            data = {
+                "success": False,
+                "status_code": 400,
+                "response": {
+                    "message": "Id is missing in the request",
+                    "error_message": 'Comment Id missing',
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        brake_time = get_object_or_404(BrakeTime, id=pk)
+        brake_time.delete()
+        data = {
+            "success": True,
+            "status_code": 200,
+            "response": {
+                "message": "Break time deleted successfully",
+                "error_message": None,
+                "data": None
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)

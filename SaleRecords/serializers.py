@@ -8,14 +8,18 @@ from Business.models import StockNotificationSetting
 from Sale.Constants.stock_lowest import stock_lowest
 from Sale.Constants.tunrover import ProductTurnover
 from Invoices.models import SaleInvoice
+from SaleRecords.models import *
 from Product.models import ProductStock, ProductOrderStockReport
 from Client.serializers import SaleInvoiceSerializer
+from Finance.models import RefundCoupon
+from Finance.serializers import RefundCouponSerializer
 
-from SaleRecords.models import *
 from Invoices.models import SaleInvoice
 from Client.helpers import calculate_validity
 from Employee.models import *
 from TragetControl.models import *
+from Finance.models import *
+from Finance.serializers import *
 
 
 class ClientSerializer(serializers.ModelSerializer):
@@ -29,30 +33,48 @@ class SaleRecordsAppointmentServicesSerializer(serializers.ModelSerializer):
     client_data = serializers.SerializerMethodField(read_only=True)
 
     def get_client_data(self, obj):
-        if obj.client:
-            client = Client.objects.get(id=obj.client.id)
-            return ClientSerializer(client).data
-        return None
-
+        try:
+            if obj.client:
+                client = Client.objects.get(id=obj.client.id)
+                return ClientSerializer(client).data
+            return None
+        except Exception as e:
+            raise ValidationError(
+                f'Error Occured while getting the client data appointment services {str(e)}')
+            
     def get_service_names(self, obj):
-        from Invoices.models import InvoiceTranslation
-
-        secondary_invoice_traslation = InvoiceTranslation.objects.filter(
-            id=obj.sale_record.location.secondary_translation.id).first()
-        translation = obj.service.servicetranlations_set.filter(
-            language__id=secondary_invoice_traslation.language.id).first()
-        if translation:
-            return {
-                'name': f"{obj.service.name}",
-                'arabic_name': f"{obj.service.arabic_name}",
-                'secondary_name': f"{translation.service_name}"
-            }
-        else:
-            return {
-                'name': f"{obj.service.name}",
-                'arabic_name': f"{obj.service.arabic_name}",
-                'secondary_name': f""
-            }
+        try:
+            from Invoices.models import InvoiceTranslation
+            try:
+                secondary_invoice_traslation = InvoiceTranslation.objects.filter(
+                    id=obj.sale_record.location.secondary_translation.id).first()
+            except:
+                secondary_invoice_traslation = None
+                
+            if secondary_invoice_traslation:
+                translation = obj.service.servicetranlations_set.filter(
+                    language__id=secondary_invoice_traslation.language.id).first()
+            else:
+                return {
+                    'name': f"{obj.service.name}"if obj.service.name else "",
+                    'arabic_name': f"{obj.service.arabic_name}"if obj.service.arabic_name else "",
+                    'secondary_name': f""
+                }
+            if translation:
+                return {
+                    'name': f"{obj.service.name}",
+                    'arabic_name': f"{obj.service.arabic_name}",
+                    'secondary_name': f"{translation.service_name}"
+                }
+            else:
+                return {
+                    'name': f"{obj.service.name}",
+                    'arabic_name': f"{obj.service.arabic_name}",
+                    'secondary_name': f""
+                }
+        except Exception as e:
+            raise ValidationError(
+                f'Error Occured while getting the service names appointment services {str(e)}')
 
     class Meta:
         model = SaleRecordsAppointmentServices
@@ -64,25 +86,39 @@ class SaleRecordProductsSerializer(serializers.ModelSerializer):
     product_names = serializers.SerializerMethodField(read_only=True)
 
     def get_product_names(self, obj):
-        from Invoices.models import InvoiceTranslation
+        try:
+            from Invoices.models import InvoiceTranslation
+            try:
+                secondary_invoice_traslation = InvoiceTranslation.objects.filter(
+                    id=obj.sale_record.location.secondary_translation.id).first()
+            except:
+                secondary_invoice_traslation = None
+            
+            if secondary_invoice_traslation:
+                translation = obj.product.producttranslations_set.filter(
+                language__id=secondary_invoice_traslation.language.id).first()
+            else:
+                return {
+                    'name': f"{obj.product.name}" if obj.product.name else "",
+                    'arabic_name': f"{obj.product.arabic_name}" if obj.product.arabic_name else "",
+                    'secondary_name': f""
+                }
 
-        secondary_invoice_traslation = InvoiceTranslation.objects.filter(
-            id=obj.sale_record.location.secondary_translation.id).first()
-        translation = obj.product.producttranslations_set.filter(
-            language__id=secondary_invoice_traslation.language.id).first()
-
-        if translation:
-            return {
-                'name': f"{obj.product.name}",
-                'arabic_name': f"{obj.product.arabic_name}",
-                'secondary_name': f"{translation.product_name}"
-            }
-        else:
-            return {
-                'name': f"{obj.product.name}",
-                'arabic_name': f"{obj.product.arabic_name}",
-                'secondary_name': f""
-            }
+            if translation:
+                return {
+                    'name': f"{obj.product.name}",
+                    'arabic_name': f"{obj.product.arabic_name}",
+                    'secondary_name': f"{translation.product_name}"
+                }
+            else:
+                return {
+                    'name': f"{obj.product.name}",
+                    'arabic_name': f"{obj.product.arabic_name}",
+                    'secondary_name': f""
+                }
+        except Exception as e:
+            raise ValidationError(
+                f'Error Occured while getting the product names {str(e)}')
 
     class Meta:
         model = SaleRecordsProducts
@@ -97,24 +133,41 @@ class SaleRecordServicesSerializer(serializers.ModelSerializer):
     # secondary_name = serializers.SerializerMethodField(read_only = True)
 
     def get_service_names(self, obj):
-        from Invoices.models import InvoiceTranslation
-
-        secondary_invoice_traslation = InvoiceTranslation.objects.filter(
-            id=obj.sale_record.location.secondary_translation.id).first()
-        translation = obj.service.servicetranlations_set.filter(
-            language__id=secondary_invoice_traslation.language.id).first()
-        if translation:
-            return {
-                'name': f"{obj.service.name}",
-                'arabic_name': f"{obj.service.arabic_name}",
-                'secondary_name': f"{translation.service_name}"
-            }
-        else:
-            return {
-                'name': f"{obj.service.name}",
-                'arabic_name': f"{obj.service.arabic_name}",
-                'secondary_name': f""
-            }
+        try:
+            from Invoices.models import InvoiceTranslation
+            try:
+                secondary_invoice_traslation = InvoiceTranslation.objects.filter(
+                    id=obj.sale_record.location.secondary_translation.id).first()
+            
+            except:
+                secondary_invoice_traslation = None
+            #     raise ValidationError(f"error getting the secondary translation in service{e}")
+            
+            
+            if secondary_invoice_traslation:
+                translation = obj.service.servicetranlations_set.filter(
+                    language__id=secondary_invoice_traslation.language.id).first()
+            else:
+                return {
+                    'name': f'{obj.service.name}' if obj.service.name else "",
+                    'arabic_name': f'{obj.service.arabic_name}' if obj.service.arabic_name else "",
+                    'secondary_name': f""
+                }
+            if translation:
+                return {
+                    'name': f"{obj.service.name}" if obj.service.name else "",
+                    'arabic_name': f"{obj.service.arabic_name}" if obj.service.arabic_name else "",
+                    'secondary_name': f"{translation.service_name} " if translation.service_name else "",
+                }
+            else:
+                return {
+                    'name': f"{obj.service.name}"  if obj.service.name else "",
+                    'arabic_name': f"{obj.service.arabic_name}"  if obj.service.arabic_name else "",
+                    'secondary_name': f""
+                }
+        except Exception as e:
+            raise ValidationError(
+                f'Error Occured while getting the service names {str(e)}')
 
     class Meta:
         model = SaleRecordServices
@@ -127,10 +180,14 @@ class SaleRecordVouchersSerializer(serializers.ModelSerializer):
     voucher_names = serializers.SerializerMethodField(read_only=True)
 
     def get_voucher_names(self, obj):
-        return {
-            'name': f"{obj.voucher.name}",
-            'arabic_name': f"{obj.voucher.arabic_name}",
-        }
+        try:
+            return {
+                'name': f"{obj.voucher.name}",
+                'arabic_name': f"{obj.voucher.arabic_name}",
+            }
+        except Exception as e:
+            raise ValidationError(
+                f'Error Occured while getting the voucher names {str(e)}')
 
     class Meta:
         model = SaleRecordVouchers
@@ -143,14 +200,17 @@ class PurchasedGiftCardsSerializer(serializers.ModelSerializer):
     valid_till = serializers.CharField(write_only=True, required=True)
 
     def get_gift_card_detail(self, obj):
-        if obj.gift_card:
+        try:
+            if obj.gift_card:
 
-            return {'title': f"{obj.gift_card.title}",
-                    'code': f"{obj.gift_card.code}",
-                    'spend_amount': f"{obj.spend_amount}",
-                    'price': f"{obj.price}",
-                    }
-
+                return {'title': f"{obj.gift_card.title}",
+                        'code': f"{obj.gift_card.code}",
+                        'spend_amount': f"{obj.spend_amount}",
+                        'price': f"{obj.price}",
+                        }
+        except Exception as e:
+            raise ValidationError(
+                f'Error Occured while getting the gift card detail {str(e)}')
     class Meta:
         model = PurchasedGiftCards
         fields = "__all__"
@@ -162,11 +222,14 @@ class SaleRecordMembershipSerializer(serializers.ModelSerializer):
     membership_names = serializers.SerializerMethodField(read_only=True)
 
     def get_membership_names(self, obj):
-        return {
-            'name': f"{obj.membership.name}",
-            'arabic_name': f"{obj.membership.arabic_name}",
-        }
-
+        try:
+            return {
+                'name': f"{obj.membership.name}",
+                'arabic_name': f"{obj.membership.arabic_name}",
+            }
+        except Exception as e:
+            raise ValidationError(
+                f'Error Occured while getting the membership names {str(e)}')
     class Meta:
         model = SaleRecordMembership
         fields = "__all__"
@@ -200,10 +263,14 @@ class SaleRecordAppliedCouponsSerializer(serializers.ModelSerializer):
     client_data = serializers.SerializerMethodField(read_only=True)
 
     def get_client_data(self, obj):
-        if obj.client:
-            client = Client.objects.get(id=obj.client.id)
-            return ClientSerializer(client).data
-        return None
+        try:
+            if obj.client:
+                client = Client.objects.get(id=obj.client.id)
+                return ClientSerializer(client).data
+            return None
+        except Exception as e:
+            raise ValidationError(
+                f'Error Occured while getting the client data coupons {str(e)}')
 
     class Meta:
         model = SaleRecordAppliedCoupons
@@ -215,10 +282,14 @@ class AppliedMembershipsSerializer(serializers.ModelSerializer):
     client_data = serializers.SerializerMethodField(read_only=True)
 
     def get_client_data(self, obj):
-        if obj.client:
-            client = Client.objects.get(id=obj.client.id)
-            return ClientSerializer(client).data
-        return None
+        try:
+            if obj.client:
+                client = Client.objects.get(id=obj.client.id)
+                return ClientSerializer(client).data
+            return None
+        except Exception as e:
+            raise ValidationError(
+                f'Error Occured while getting the client data memberships {str(e)}')
 
     class Meta:
         model = AppliedMemberships
@@ -230,11 +301,14 @@ class AppliedVouchersSerializer(serializers.ModelSerializer):
     client_data = serializers.SerializerMethodField(read_only=True)
 
     def get_client_data(self, obj):
-        if obj.client:
-            client = Client.objects.get(id=obj.client.id)
-            return ClientSerializer(client).data
-        return None
-
+        try:
+            if obj.client:
+                client = Client.objects.get(id=obj.client.id)
+                return ClientSerializer(client).data
+            return None
+        except Exception as e:
+            raise ValidationError(
+                f'Error Occured while getting the client data vouchers {str(e)}')
     class Meta:
         model = AppliedVouchers
         fields = "__all__"
@@ -260,16 +334,26 @@ class RedeemedLoyaltyPointsSerializer(serializers.ModelSerializer):
     client_data = serializers.SerializerMethodField(read_only=True)
 
     def get_client_data(self, obj):
-        if obj.client:
-            client = Client.objects.get(id=obj.client.id)
-            return ClientSerializer(client).data
-        return None
+        try:
+            if obj.client:
+                client = Client.objects.get(id=obj.client.id)
+                return ClientSerializer(client).data
+            return None
+        except Exception as e:
+            raise ValidationError(
+                f'Error Occured while getting the client data lolity points {str(e)}')
 
     class Meta:
         model = RedeemedLoyaltyPoints
         fields = "__all__"
         read_only_fields = ['sale_record']
         # read_only_fields = ['sale_record']
+
+class MembershipInstallmentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MembershipInstallments
+        fields = "__all__"
+        read_only_fields = ['membership']
 
 
 class SaleRecordSerializer(serializers.ModelSerializer):
@@ -293,8 +377,18 @@ class SaleRecordSerializer(serializers.ModelSerializer):
     applied_loyalty_points_records = RedeemedLoyaltyPointsSerializer(many=True)
 
     invoice = serializers.SerializerMethodField(read_only=True)
-
     client_data = serializers.SerializerMethodField(read_only=True)
+    refund_coupons = serializers.SerializerMethodField(read_only = True)
+    
+    
+    def get_refund_coupons(self, obj):
+        try:
+            coupon = RefundCoupon.objects.get(checkout_id = obj.id)
+            return RefundCouponSerializer(coupon).data
+        except:
+            return None
+        
+        
 
     def get_invoice(self, obj):
         try:
@@ -307,11 +401,15 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                 f'Error Occured while getting the invoice in the serializer {str(e)}')
 
     def get_client_data(self, obj):
-        if obj.client:
-            client = Client.objects.get(id=obj.client.id)
-            return ClientSerializer(client).data
-        return None
-
+        try:
+            if obj.client:
+                client = Client.objects.get(id=obj.client.id)
+                return ClientSerializer(client).data
+            return None
+        except Exception as e:
+            raise ValidationError(
+                f'Error Occured while getting the client data in the serializer {str(e)}')
+    
     def validate(self, data):
         # Validate that there is at least one record in appointment_services, services_records, and products_records
 
@@ -407,6 +505,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     membership=data['membership'],
                     price=float(data['price'] * data['quantity']),
                     quantity=data['quantity'],
+                    installment_months = data['installment_months'],
                     expiry=calculate_validity(data['valid_till']),
                 ) for data in membership_records
             ])
@@ -586,7 +685,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
         else:
             pass
 
-    def employee_commission_calculation(self, location=None, user=None,  sub_total=None, checkout_id=None, products_list=None, vouchers_list=None, service_list=None):
+    def employee_commission_calculation(self, location=None, user=None,  sub_total=None, checkout_id=None, products_list=None, vouchers_list=None, service_list=None, appintment_services_list = None):
         try:
             if products_list:
                 for item in products_list:
@@ -695,6 +794,41 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                             quantity=item.get('quantity'),
                             tip=0
                         )
+            if appintment_services_list:
+                for item in appintment_services_list:
+                    
+                    sale_commission = CategoryCommission.objects.filter(
+                        commission__employee=item.get('employee'),
+                        from_value__lte=float(item.get("price")),
+                        category_comission__iexact='Service'
+                    ).order_by('-from_value').first()
+                    service = Service.objects.get(id=f'{item.get("service")}')
+                    if sale_commission:
+                        calculated_commission = sale_commission.calculated_commission(
+                            item.get('price'))
+                        EmployeeCommission.objects.create(
+
+                            user_id=user,
+                            business=checkout_id.location.business,
+                            location_id=location,
+                            employee=item.get('employee'),
+                            commission=sale_commission.commission,
+                            category_commission=sale_commission,
+                            commission_category=sale_commission.category_comission,
+                            commission_type=sale_commission.comission_choice,
+                            sale_value=float(item.get('price')),
+                            commission_rate=float(
+                                sale_commission.commission_percentage),
+                            commission_amount=float(calculated_commission),
+                            symbol=sale_commission.symbol,
+                            sale_id=checkout_id.id,
+
+                            item_name=service.name,
+                            item_id=item.get('service'),
+                            quantity=item.get('quantity'),
+                            tip=0
+                        )
+                    
 
         except Exception as e:
             raise ValidationError(

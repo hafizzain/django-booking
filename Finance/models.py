@@ -17,6 +17,7 @@ from Utility.models import CommonField
 class Refund(CommonField):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name = 'User id') 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, verbose_name = 'Client id', blank=True, null=True)
+    client_type = models.CharField(max_length = 100 , blank=True, null=True)
     business = models.ForeignKey(Business, on_delete=models.CASCADE, verbose_name ='Business id')
     location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, verbose_name = 'location id')
     refund_invoice_id = models.ForeignKey(SaleInvoice, on_delete=models.CASCADE, verbose_name = 'Invoice id')
@@ -50,8 +51,10 @@ class RefundCoupon(CommonField):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, blank= True, null= True)  
     
     refund_coupon_code = models.CharField(max_length=50, unique=True)
+    checkout_id = models.CharField(blank=True, max_length=255, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     expiry_date = models.DateField()
+    coupon_type = models.CharField(max_length = 20, default = 'refund')
     is_used = models.BooleanField(default=False)
     
     related_refund = models.ForeignKey(Refund, on_delete=models.CASCADE, null=True,  related_name='related_refund_coupon')

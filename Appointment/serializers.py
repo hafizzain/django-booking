@@ -30,7 +30,7 @@ from . import choices
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Utility.models import ExceptionRecord
 from Service.models import Service
-from Appointment.models import Comment
+from Appointment.models import *
 from Client.serializers import UserSerializerResponse
 
 
@@ -1646,12 +1646,9 @@ class SingleNoteSerializer(serializers.ModelSerializer):
         if obj.client != None:
             appointment_checkout_all = AppointmentService.objects \
                 .filter(
-                appointment__client=obj.client,
-                appointment_status__in=['Done', 'Paid']
-            ) \
-                .select_related('member', 'user', 'service') \
-                .order_by('-created_at')
-            # client_all_appointment = appointment_checkout_all.aggregate(total_sale=Sum('price')).get('total_sale', 0)
+                appointment__client_id=obj.client,
+                appointment__status__in=['Done', 'Paid']
+                ).order_by('-created_at')
             return appointment_checkout_all.count()
         else:
             return 0
@@ -1672,7 +1669,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Appointment
-        fields = ['id','selected_promotion_id','discount_price','discount_percentage','check_in_time', 'client','user_id','client_name', 'client_email', 'client_phone', 'client_all_appointment',
+        fields = ['id','selected_promotion_id','selected_promotion_type','discount_price','discount_percentage','check_in_time', 'client','user_id','client_name', 'client_email', 'client_phone', 'client_all_appointment',
                   'client_all_sales', 'appointment_tips', 'notes', 'business_address',
                   'client_type','client_image','appointmnet_service', 'customer_note', 'status']
 
@@ -1885,7 +1882,10 @@ class MissedOpportunityBasicSerializer(serializers.ModelSerializer):
         fields = ['id', 'client_name', 'client_type', 'note', 'date_time', 'services', 'dependency']
 
 
-
+class EmployeeCommentResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = ['id', 'full_name']
 class ClientImagesSerializerResponse(serializers.ModelSerializer):
     class Meta:
         model = ClientImages
@@ -1893,6 +1893,7 @@ class ClientImagesSerializerResponse(serializers.ModelSerializer):
         
 class CommentSerializer(serializers.ModelSerializer):
     user = UserSerializerResponse()
+    employee = EmployeeCommentResponseSerializer()
     class Meta:
         model = Comment
         fields = '__all__'
@@ -1917,3 +1918,8 @@ class GroupCheckInSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentGroup
         fields = "__all__"
+        
+# class EmployeeUpAndDownSaleSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = EmployeeUpAndDownSale
+#         fields = "__all__"

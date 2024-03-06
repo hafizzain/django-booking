@@ -3,15 +3,22 @@ from uuid import uuid4
 from Authentication.models import User
 from Utility.models import CommonField
 from SaleRecords.choices import *
+from dateutil.relativedelta import relativedelta
+from django.db.models.signals import pre_save, post_save
+from django.dispatch import receiver
+# from datetime import datetime
 
+from Appointment.models import  Appointment, AppointmentGroup
 from Business.models import BusinessAddress,  BusinessTax
 from Promotions.models import Coupon
 from Product.models import Product
 from Service.models import Service
 from Employee.models import Employee, GiftCards
 from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs, LoyaltyPoints, ClientLoyaltyPoint
-from Finance.models import Refund
-from Appointment.models import  Appointment, AppointmentGroup
+from Finance.models import Refund, RefundCoupon
+from Client.helpers import calculate_validity
+from Client.models import CurrencyPriceMembership
+
 # from Invoices.models import SaleInvoice
 
 # from Business.models import
@@ -28,6 +35,7 @@ class SaleRecords(CommonField):
     # refunds_data = models.ForeignKey(Refund, on_delete = models.SET_NULL, null = True, blank=True, related_name = 'sale_record_refunds') 
     
     checkout_type = models.CharField(choices = CheckoutType.choices, max_length = 50) 
+    is_refund = models.BooleanField(default = False)
     
     
     # Client info
@@ -113,10 +121,44 @@ class SaleRecordMembership(CommonField):
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
     expiry = models.DateTimeField(blank=True, null=True)
+    installment_months = models.SmallIntegerField(blank=True, null=True)
+    remaining_installments = models.SmallIntegerField(blank=True, null=True)
+    payable_amount = models.FloatField(blank=True, null=True)
+    next_installment_date =  models.DateTimeField(blank=True, null=True)
+    
     # employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_membership_employee')
     
     price = models.FloatField(blank=True, null=True) 
     quantity = models.PositiveSmallIntegerField(blank=True, null=True) 
+    
+@receiver(post_save, sender = SaleRecordMembership)
+def installment_instance_create(sender, instance, created, **kwargs):
+    if created and instance.installment_months:
+        MembershipInstallments.objects.create(
+            membership=instance,
+            paid_installment=instance.price
+        )
+    
+class MembershipInstallments(CommonField):
+    memberhsip = models.ForeignKey(SaleRecordMembership, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'installment_memberships')
+    paid_installment = models.FloatField(blank=True, null=True)
+
+@receiver(post_save, sender=MembershipInstallments)
+def next_installment_expiry(sender, instance, created, **kwargs):
+    if created:  # Check if the instance is newly created
+        membership = instance.membership  # Assuming membership is the ForeignKey field in MembershipInstallments
+        if membership.installment_months:
+            # Assuming calculate_validity function is defined elsewhere and correctly calculates the next installment date
+            next_membership_expiry = relativedelta(instance.membership.created_at, instance.created_at).months + 1 
+            membership.next_installment_date = calculate_validity(str(next_membership_expiry)+ ' months')
+            total_paid_installments = MembershipInstallments.objects.filter(membership = instance.membership).count()
+            membership.remaining_installments = membership.installment_months - total_paid_installments
+            memberhsip_instance = CurrencyPriceMembership.objects.get(membership__id = membership.id)
+            membership.payable_amount = memberhsip_instance.price - instance.paid_installment
+            
+            membership.save()
+
+    
     
 class PurchasedGiftCards(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.SET_NULL, null = True, related_name = 'gift_cards_records')
@@ -160,6 +202,7 @@ class SaleRecordTip(CommonField):
 class SaleRecordAppliedCoupons(CommonField):
     sale_record = models.ForeignKey(SaleRecords, on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_coupons_records')
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL,null = True)
+    refund_coupon = models.ForeignKey(RefundCoupon, on_delete=models.SET_NULL,null = True)
     client = models.ForeignKey(Client, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'applied_coupons_client')
     
     coupon_type = models.CharField(max_length = 100, default = '', blank=False, null=False)

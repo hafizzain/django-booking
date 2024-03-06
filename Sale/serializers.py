@@ -673,7 +673,10 @@ class POSerializerForClientSale(serializers.ModelSerializer):
         return obj.product.name
 
     def get_member(self, obj):
-        return obj.employee.full_name
+        try:
+            return obj.member.full_name
+        except:
+            return obj.employee.full_name
 
     class Meta:
         model = ProductOrder

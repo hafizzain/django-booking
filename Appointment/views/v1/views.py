@@ -313,16 +313,15 @@ def get_appointments_service(request):
     # Client All Appointment Orders ------------------------------
     appointment_checkout_all = AppointmentService.objects \
         .filter(
-        appointment__client=client,
-        appointment_status__in=['Done', 'Paid']
-        ) \
-        .select_related('member', 'user', 'service') \
-        .order_by('-created_at')
+        appointment__client_id=client,
+        appointment__status__in=['Done', 'Paid']
+        ).order_by('-created_at')
     
     #Now Calculate Total Sale    
     appointment_total = appointment_checkout_all.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += appointment_total if appointment_total else 0
     product = POSerializerForClientSale(product_order, many=True, context={'request': request, })
+    # appointment = ServiceClientSaleSerializer(appointment_checkout_all, many=True)
     
     price_values = sum(item.get('price', 0) for item in product.data)
     voucher_total_price = sum(item.get('price', 0) for item in voucher.data)
@@ -559,7 +558,7 @@ def get_today_appointments(request):
 
     today = date.today()
     include_query = Q(is_blocked=False, appointment_date__icontains=today, )
-    exclude_query = Q(appointment_status__in=['Cancel', 'Done', 'Paid']) | \
+    exclude_query = Q(appointment__status__in=['Cancel', 'Done', 'Paid']) | \
                     Q(appointment__status=choices.AppointmentStatus.CANCELLED)
 
     if location_id:
@@ -2428,6 +2427,14 @@ def update_appointment_service(request):
             except Exception as err:
                 errors.append(str(err))
 
+            # up_and_down_sale = EmployeeUpAndDownSale.objects.create(
+            #     employee = member_id,
+            #     service = service_id,
+            #     new_price=price,
+            # )
+            # up_and_down_sale.save()
+            # old_price = 0
+            
             try:
                 # below is just a workaround
                 if id:
@@ -2442,7 +2449,10 @@ def update_appointment_service(request):
                     service_appointment.business = appointment.business
                     service_appointment.business_address = appointment.business_address
                     service_appointment.status = choices.AppointmentServiceStatus.BOOKED
-
+                
+                # old_price = service_appointment.price
+                # up_and_down_sale.old_price = old_price
+                
                 service_appointment.appointment_date = appointment_date
                 service_appointment.appointment_time = date_time
                 service_appointment.service = service_id
@@ -2454,6 +2464,17 @@ def update_appointment_service(request):
                 service_appointment.is_favourite = is_favourite
                 service_appointment.save()
 
+                # final_price = old_price - price
+                # if final_price > 0:
+                #     up_and_down_sale.price = final_price
+                #     up_and_down_sale.status = 'UpSale'
+                #     up_and_down_sale.save()
+                # if final_price < 0:
+                #     final_price = abs(final_price)
+                #     up_and_down_sale.price = final_price
+                #     up_and_down_sale.status = 'DownSale'
+                #     up_and_down_sale.save()
+                    
                 # If a new service is added change the status of 
                 # appointment to started
                 appointment.status = choices.AppointmentStatus.BOOKED
@@ -3676,11 +3697,11 @@ def get_client_sale(request):
     voucher_order = SaleRecordVouchers.objects \
                         .filter(sale_record__client__id=client) \
                         .select_related('sale_record', 'employee', 'voucher') \
-                        .order_by('-created_at')[:5]
+                        .order_by('-created_at')
     membership_order = SaleRecordMembership.objects \
                         .filter(sale_record__client__id=client) \
                         .select_related('sale_record') \
-                        .order_by('-created_at')[:5]
+                        .order_by('-created_at')
     voucher_total = voucher_order.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += voucher_total if voucher_total else 0
     if voucher_order.count() > 5:
@@ -5045,3 +5066,46 @@ def appointment_time_report(request):
                 }
             }
         return Response(data, status=status.HTTP_200_OK)
+
+# @api_view(['GET'])
+# @permission_classes([AllowAny])
+# def get_EmployeeUpAndDownSale(request):
+#     location = request.GET.get('location', None)
+#     employee = request.GET.get('employee', None)
+#     date = request.GET.get('date', None)
+    
+#     query = Q()
+#     if location:
+#         query &= Q(location_id=location)
+        
+#     if employee:
+#         query &= Q(employee_id=employee)
+    
+#     if date:
+#         query &= Q(created_at=date)
+        
+#     employee_sales = EmployeeUpAndDownSale.objects.filter(query) \
+#                                 .select_related('location', 'employee','service')
+
+#     paginator = AppointmentsPagination()
+#     paginator.page_size = 10
+#     page_result = paginator.paginate_queryset(employee_sales, request)
+    
+#     serialized = EmployeeUpAndDownSaleSerializer(page_result, many=True)
+#     data = {
+#                 'status': True,
+#                 'status_code': 200,
+#                 'status_code_text': '200',
+#                 "response": {
+#                     "message": "Get Up & Down Sale Successfully",
+#                     "error_message": None,
+#                     "data": serialized.data,
+#                     'count': paginator.page.paginator.count,
+#                     'next': paginator.get_next_link(),
+#                     'previous': paginator.get_previous_link(),
+#                     'current_page': paginator.page.number,
+#                     'per_page': paginator.page_size,
+#                     'total_pages': paginator.page.paginator.num_pages,
+#                 }
+#             }
+#     return Response(data, status=status.HTTP_200_OK)

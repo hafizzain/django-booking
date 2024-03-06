@@ -26,7 +26,7 @@ class SaleRecordsProductsAdmin(admin.ModelAdmin):
 
 @admin.register(SaleRecordMembership)
 class SaleRecordMembershipAdmin(admin.ModelAdmin):
-    list_display = ['id']
+    list_display = ['id','membership','expiry','installment_months','remaining_installments','payable_amount','next_installment_date','created_at']
     ordering = ['-created_at']
 
 @admin.register(SaleRecordVouchers)
@@ -79,3 +79,7 @@ class AppliedPromotionAdmin(admin.ModelAdmin):
 class RedeemedLoyaltyPointsAdmn(admin.ModelAdmin):
     list_display = ['id', 'client_loyalty_point']
     ordering = ['-created_at']
+
+@admin.register(MembershipInstallments)
+class MembershipInstallmentAdmin(admin.ModelAdmin):
+    list_display = ['paid_installment']

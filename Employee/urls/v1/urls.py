@@ -2,6 +2,7 @@ from django.urls import path, include
 
 from Employee.views.v1 import views
 from rest_framework.routers import DefaultRouter
+from Employee.views.v1.views import *
 
 router = DefaultRouter()
 router.register('giftcards', views.GiftCardViewSet, basename='giftcard')
@@ -118,4 +119,15 @@ urlpatterns = [
     # Set_passeord
     path('set_password/', views.set_password),
     path('check_employee_existance/', views.check_employee_existance),
+    
+    # Employee Comments
+    path('get-employee-comment-list/', get_employee_comment),
+    path('create-employee-comment/', create_employee_comment),
+    
+    # Employee Brake Time
+    path('get-employee-brake-time/', BrakeTimeView.as_view()),
+    path('get-employee-brake-time/<str:pk>/', BrakeTimeView.as_view()),
+    path('create-employee-brake-time/', BrakeTimeView.as_view()),
+    path('update-employee-brake-time/', BrakeTimeView.as_view()),
+    path('delete-employee-brake-time/', BrakeTimeView.as_view()),
 ]

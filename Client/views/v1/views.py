@@ -16,15 +16,14 @@ from django.db.models import Q, F, IntegerField
 from Client.helpers import calculate_validity
 from Service.models import Service
 from Business.models import Business, BusinessAddress
-from SaleRecords.models import SaleRecordMembership , SaleRecordVouchers
 from Product.models import Product
 from Utility.models import Country, Currency, ExceptionRecord, Language, State, City
 from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, \
     DiscountMembership, LoyaltyPoints, Subscription, Rewards, Promotion, Membership, Vouchers, ClientLoyaltyPoint, \
     LoyaltyPointLogs, VoucherCurrencyPrice, ClientImages
     
-from SaleRecords.models import PurchasedGiftCards
-from SaleRecords.serializers import PurchasedGiftCardsSerializer
+from SaleRecords.models import PurchasedGiftCards, SaleRecordMembership, SaleRecordVouchers
+from SaleRecords.serializers import PurchasedGiftCardsSerializer, SaleRecordMembershipSerializer
 from Client.serializers import (SingleClientSerializer, ClientSerializer, ClientGroupSerializer,
                                 LoyaltyPointsSerializer,
                                 SubscriptionSerializer, RewardSerializer, PromotionSerializer, MembershipSerializer,
@@ -681,7 +680,8 @@ def update_client(request):
     if serialized.is_valid():
         serialized.save()
     if images is not None:
-        ids = json.loads(images)
+        # ids = json.loads(images)
+        ids = [id for id in images if isinstance(id, int)]  # Extract and convert to integers
         # Get all existing images for the client
         existing_images = ClientImages.objects.filter(client_id=client.id)
 
@@ -1928,6 +1928,7 @@ def create_memberships(request):
     price = request.data.get('price', None)
     tax_rate = request.data.get('tax_rate', None)
     discount = request.data.get('discount', None)
+    is_installment = request.data.get('is_installment',None)
     currency_membership_price = request.data.get('currency_membership_price', None)  # CurrencyPriceMembership
 
     if not all([business, name, valid_for, ]):
@@ -1978,6 +1979,7 @@ def create_memberships(request):
 
         # New Require
         description=description,
+        is_installment = is_installment,
         # color = color,
         term_condition=terms_condition,
 
@@ -2204,6 +2206,7 @@ def update_memberships(request):
     services = request.data.get('services', None)
     product = request.data.get('product', None)
     products = request.data.get('products', None)
+    is_installment = request.data.get('is_installment',None)
     membership_type = request.data.get('membership_type', None)
     currency_membership = request.data.get('currency_membership', None)
     check = True
@@ -2240,6 +2243,9 @@ def update_memberships(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    if is_installment:
+        membership.is_installment = is_installment
+        membership.save()
     if membership_type == 'Product':
         try:
             product_id = Product.objects.get(id=product)
@@ -3000,19 +3006,31 @@ def get_client_all_vouchers(request):
 def get_client_all_memberships(request):
     location_id = request.GET.get('location_id', None)
     client_id = request.GET.get('client_id', None)
+    installment = request.GET.get('installment', None)
+    
 
     today_date = datetime.now()
     today_date = today_date.strftime('%Y-%m-%d')
-    client_membership = SaleRecordMembership.objects.filter(
-        sale_record__location__id=location_id,
-        expiry__gte=timezone.now(),
-        # created_at__lt = F('end_date'),
-        # end_date__gte = today_date,
-        sale_record__client__id=client_id,
-    )
+    if installment:
+        client_membership = SaleRecordMembership.objects.filter(
+            sale_record__location__id=location_id,
+            expiry__gte=timezone.now(),
+            # created_at__lt = F('end_date'),
+            # end_date__gte = today_date,
+            sale_record__client__id=client_id,
+            membership__is_installment = installment
+        )
+    else:
+        client_membership = SaleRecordMembership.objects.filter(
+                sale_record__location__id=location_id,
+                expiry__gte=timezone.now(),
+                # created_at__lt = F('end_date'),
+                # end_date__gte = today_date,
+                sale_record__client__id=client_id,
+            )
 
     # return JsonResponse({'data': client_membership})
-    serializer = ClientMembershipsSerializer(client_membership, many=True)
+    serializer = ClientMembershipsSerializer(client_membership, many=True, context = {'request': request})
 
     return Response(
         {

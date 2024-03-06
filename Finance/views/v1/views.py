@@ -1,17 +1,19 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import api_view, permission_classes
 from django.db.models import Q
 from Utility.Campaign import send_refund_email
 
 from Finance.models import Refund, RefundCoupon, AllowRefunds,AllowRefundPermissionsEmployees, RefundProduct, RefundServices
-from Finance.serializers import RefundSerializer, CouponSerializer, AllowRefundsSerializer
+from Finance.serializers import RefundSerializer, RefundCouponSerializer, AllowRefundsSerializer, RefundProductSerializer , RefundServiceSerializer
 from Finance.helpers import short_uuid, check_permission, check_days
 from SaleRecords.models import SaleRecordsAppointmentServices, SaleRecordsProducts, SaleRecordServices
 from Invoices.models import SaleInvoice
 from Client.serializers import SaleInvoiceSerializer
 from Client.models import Client
+from Service.models import ServiceGroup
 
 
 from Appointment.models import AppointmentCheckout, AppointmentService
@@ -64,37 +66,105 @@ def check_permission_view(request):
         return Response({'erorr': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 class RefundAPIView(APIView):
-
+    pagination_class = PageNumberPagination
+    page_size = 10
     def get(self, request, *args, **kwargs):
-        refunds = Refund.objects.select_related(
-            'client', 'business', 'location', 'refund_invoice_id', 'user') \
-            .prefetch_related('refunded_products', 'refunded_services', 'related_refund_coupon').all()
-        refund_serializer = RefundSerializer(refunds, many=True)
-        if not refunds:
+        location_id = request.GET.get('location_id', None)
+        search_txt = request.GET.get('search_text', None)
+        service_group = request.GET.get('service_group', None)
+        brand_id = request.GET.get('brand_id', None)
+        
+        query = Q()
+        if location_id:
+            query &= Q(refund__location=location_id)
+            
+        if search_txt:
+            query &= Q(refund__client__full_name__icontains=search_txt) | Q(product__name__icontains=search_txt)
+            
+        if brand_id:
+            query &= Q(product__brand_id=brand_id)
+            
+        if request.GET.get('type') == 'Product':
+            refunds = RefundProduct.objects.filter(query).order_by('-created_at')
+            
+            paginator = self.pagination_class()
+            result_page = paginator.paginate_queryset(refunds, request)
+            refund_serializer = RefundProductSerializer(result_page, many=True)
+            if not refunds:
+                response_data = {
+                    'success': False,
+                    'status_code': 400,
+                    'response': {
+                        'message': 'No Records found',
+                        'error_message': None,
+                        'data': None
+                    }
+                }
+                return Response(response_data, status=status.HTTP_200_OK)
             response_data = {
-                'success': False,
-                'status_code': 400,
+                'count': paginator.page.paginator.count,
+                'next': paginator.get_next_link(),
+                'previous': paginator.get_previous_link(),
+                'current_page': paginator.page.number,
+                'per_page': self.page_size,
+                'total_pages': paginator.page.paginator.num_pages,
+                'success': True,
+                'status_code': 200,
                 'response': {
-                    'message': 'No Records found',
-                    'error_message': refund_serializer.errors,
-                    'data': None
+                    'message': 'Record fetched successfully',
+                    'error_message': None,
+                    'data': {
+                        'refund_data': refund_serializer.data,
+                    }
                 }
             }
-            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
-        response_data = {
-            'success': True,
-            'status_code': 200,
-            'response': {
-                'message': 'Record created successfully',
-                'error_message': None,
-                'data': {
-                    'refunds': refund_serializer.data,
+            return Response(response_data, status=status.HTTP_200_OK)
+        query = Q()
+        if service_group:
+            services =ServiceGroup.objects.get(id=service_group).services.all()
+            services_list = list(services.values_list('id', flat=True))
+            query &= Q(service__in=services_list)
+            
+        if request.GET.get('type') == 'Service':
+            refunds = RefundServices.objects.filter(query).order_by('-created_at')
+            
+            paginator = self.pagination_class()
+            result_page = paginator.paginate_queryset(refunds, request)
+            refund_serializer = RefundServiceSerializer(result_page, many=True)
+            if not refunds:
+                response_data = {
+                    'success': False,
+                    'status_code': 400,
+                    'response': {
+                        'message': 'No Records found',
+                        'error_message': None,
+                        'data': None
+                    }
+                }
+                return Response(response_data, status=status.HTTP_200_OK)
+            response_data = {
+                'count': paginator.page.paginator.count,
+                'next': paginator.get_next_link(),
+                'previous': paginator.get_previous_link(),
+                'current_page': paginator.page.number,
+                'per_page': self.page_size,
+                'total_pages': paginator.page.paginator.num_pages,
+                'success': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Record fetched successfully',
+                    'error_message': None,
+                    'data': {
+                        'refund_data': refund_serializer.data,
+                    }
                 }
             }
-        }
-        return Response(response_data, status=status.HTTP_200_OK)
+            return Response(response_data, status=status.HTTP_200_OK)
+            
 
-    '''
+
+    def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
+        '''
     POST REQUEST FOR THE REFUND
     Payload formate:
             {
@@ -136,8 +206,8 @@ class RefundAPIView(APIView):
 
 
             '''
-
-    def post(self, request, *args, **kwargs):  # sourcery skip: extract-method
+            
+            
         refund_invoice_id = request.data.get('refund_invoice_id')
         refund_price = request.data.get('total_refund_amount')
         payment_type = request.data.get('payment_type')
@@ -166,24 +236,27 @@ class RefundAPIView(APIView):
                 try:    
                     invoice = SaleInvoice.objects.get(id=refund_invoice_id) 
                     checkout_instance = invoice.checkout_instance 
-                    # checkout_instance.is_refund = True
+                    checkout_instance.is_refund = True
                     checkout_instance.save() 
                     newCheckoutInstance = checkout_instance  
                     newCheckoutInstance.pk = None 
-                    # newCheckoutInstance.is_refund = True
+                    newCheckoutInstance.is_refund = True
                     newCheckoutInstance.save()
                     newCheckoutInstance.checkout_type = 'Refund'
+                    newCheckoutInstance.is_refund = True
                     newCheckoutInstance.sub_total = float(-refund_price)
                     newCheckoutInstance.total_price = float(-refund_price)
                     newCheckoutInstance.save()
 
                     if checkout_type == 'Appointment': 
                         print('coming here')
-                        newAppointment = checkout_instance.appointment_services.appointment
+                        appointment_services  = SaleRecordsAppointmentServices.objects.get(sale_record = checkout_instance)
+                        # raise ValueError(f'Coming here {appointment_services.count()}')
+                        newAppointment = appointment_services.appointment
                         newAppointment.pk = None 
                         newAppointment.save() 
                         
-                        order_items = SaleRecordsAppointmentServices.objects.filter(appointment = invoice.checkout_instance.appointment_services.appointment, service__id__in = refunded_services_ids) 
+                        order_items = SaleRecordsAppointmentServices.objects.filter(appointment = appointment_services.appointment, service__id__in = refunded_services_ids) 
                         # return Response({'Appointment order count ': order_items.count() })
                         # for order in order_items:
                         #     order.pk = None
@@ -197,7 +270,8 @@ class RefundAPIView(APIView):
                         
                         
                         for order in order_items:
-                            refunded_services = RefundServices.objects.get(checkouts = invoice.checkout_instance,service__id = order.service.id)
+                            refunded_services = RefundServices.objects.get(checkouts = invoice.checkout_instance.id,service = order.service)
+                            
                             SaleRecordsAppointmentServices.objects.create(
                                 sale_record = newCheckoutInstance,
                                 appointment = newAppointment,
@@ -206,7 +280,7 @@ class RefundAPIView(APIView):
                                 service_start_time = order.service_start_time,
                                 service_end_time = order.service_end_time,
                                 quantity = 1,
-                                price = float(-refunded_services.price)
+                                price = float(-refunded_services.refunded_amount)
                             )
                     
                         # or you can do it in loop
@@ -216,24 +290,9 @@ class RefundAPIView(APIView):
 
                         for order in product_orders:
                                 # raise ValueError('comming here')
-                                refund_product = RefundProduct.objects.get(checkouts = invoice.checkout_instance.id,product=order.product)
+                                refund_product = RefundProduct.objects.get(checkouts = invoice.checkout_instance.id,product__id=order.product.id)
                                 # raise ValueError('comign here')
                                 
-                                # raise ValueError(f'comitn here refund p :{refund_product.id} actual p: {order.product.id}')
-                                # newOrder = order
-                                # newOrder.pk = None
-                                # newOrder.sale_record = newCheckoutInstance
-                                # newOrder.save()
-                                # newOrder.quantity = refund_product.refunded_quantity
-                                # newOrder.price = float(-refund_product.refunded_amount)
-                                # newOrder.save()
-                                
-                                # order.sale_record = newCheckoutInstance
-                                
-                                # return Response({'new checkout instance id': newCheckoutInstance.id})
-                                # raise ValueError('Coming here')
-                                # return Response({'product orders count': refund_product.count()})
-                                # Create a new SaleRecordsProducts instance for the refund
                                 
                                 SaleRecordsProducts.objects.create(
                                     sale_record= newCheckoutInstance,
@@ -245,35 +304,49 @@ class RefundAPIView(APIView):
                                 
                             
                             
-                        # service_orders = SaleRecordServices.objects.filter(sale_record=invoice.checkout_instance, service__id__in = refunded_services_ids) 
-                        # # service_orders.update(pk = None, checkout=newCheckoutInstance) 
-                        # for order in service_orders:
-                        #     try :
-                        #         refunded_services = RefundServices.objects.get(checkouts = invoice.checkout_instance,service__id = order.service.id)
-                        #         SaleRecordServices.objects.create(
-                        #             sale_record = newCheckoutInstance,
-                        #             employee = order.employee,
-                        #             service = order.service,
-                        #             quantity = 1,
-                        #             price = float(-refunded_services.price)
-                        #         )
-                        #     except ObjectDoesNotExist:
-                        #         print(f"No RefundProduct found for product ID {order.product.id}")
+                        service_orders = SaleRecordServices.objects.filter(sale_record=invoice.checkout_instance, service__id__in = refunded_services_ids) 
+                        # service_orders.update(pk = None, checkout=newCheckoutInstance) 
+                        for order in service_orders:
+                            
+                                refunded_services = RefundServices.objects.get(checkouts = invoice.checkout_instance.id,service__id = order.service.id)
+                                SaleRecordServices.objects.create(
+                                    sale_record = newCheckoutInstance,
+                                    employee = order.employee,
+                                    service = order.service,
+                                    quantity = 1,
+                                    price = float(-refunded_services.refunded_amount)
+                                )
+                            
                             
                         
-                    newInvoice = invoice 
-                    newInvoice.pk = None 
-                    newInvoice.invoice_type = 'refund'
-                    newInvoice.payment_type = 'Cash'
-                    newInvoice.client_type = 'Walk_in'
-                    newInvoice.sub_total = float(-refund_price)
-                    newInvoice.total_amount = float(-refund_price)
-                    newInvoice.checkout = str(newCheckoutInstance.id) 
-                    newInvoice.total_tax = 0
-                    newInvoice.total_tip = 0
-                    # newInvoice.checkout_type = 'refund'
-                    newInvoice.payment_type = payment_type
-                    newInvoice.save() 
+                    # newInvoice = invoice 
+                    # newInvoice.pk = None 
+                    # newInvoice.invoice_type = 'refund'
+                    # newInvoice.payment_type = 'Cash'
+                    # newInvoice.client_type = 'Walk_in'
+                    # newInvoice.sub_total = float(-refund_price)
+                    # newInvoice.total_amount = float(-refund_price)
+                    # newInvoice.checkout = str(newCheckoutInstance.id) 
+                    # newInvoice.total_tax = 0
+                    # newInvoice.total_tip = 0
+                    # # newInvoice.checkout_type = 'refund'
+                    # newInvoice.payment_type = payment_type
+                    # newInvoice.save() 
+                    invoice = SaleInvoice.objects.create(
+                        user=user,
+                        client=invoice.client,
+                        location=invoice.location,
+                        payment_type=payment_type,
+                        invoice_type='refund',
+                        change=0,
+                        checkout_type='refund',
+                        sub_total=float(-refund_price),
+                        total_amount=float(-refund_price),
+                        total_tax=0,
+                        total_tip=0,
+                        checkout=newCheckoutInstance.id,
+                    )
+                    invoice.save()
 
                     try:
                         client_instance = Client.objects.get(id=client)
@@ -291,13 +364,15 @@ class RefundAPIView(APIView):
                     coupon_data = {
                         'user': request.user.id,
                         'client': client,
-                        'refund_coupon_code': f"REFUND_{short_uuid(refund_instance.id)}",
+                        'coupon_type': 'refund',
+                        'checkout_id': str(newCheckoutInstance.id),
+                        'refund_coupon_code': f"{short_uuid(refund_instance.id)}",
                         'amount': refund_instance.total_refund_amount,
                         'expiry_date': expiry_date,
                         'related_refund': refund_instance.id,
                     }
                     try:
-                        coupon_serializer = CouponSerializer(data=coupon_data)
+                        coupon_serializer = RefundCouponSerializer(data=coupon_data)
                         coupon_serializer.is_valid(raise_exception=True)
                         coupon_serializer.save()
                     except Exception as e:
@@ -311,7 +386,7 @@ class RefundAPIView(APIView):
                             'data': {
                                 'refund': RefundSerializer(serializer.instance).data,
                                 # 'coupon': CouponSerializer(coupon_serializer.instance).data,
-                                'invoice': SaleInvoiceSerializer(newInvoice).data
+                                'invoice': SaleInvoiceSerializer(invoice).data
                             }
                         }
                     }
@@ -325,7 +400,7 @@ class RefundAPIView(APIView):
                             'error_message': None,
                             'data': {
                                 'refund': RefundSerializer(serializer.instance).data,
-                                'invoice': SaleInvoiceSerializer(newInvoice).data, 
+                                'invoice': SaleInvoiceSerializer(invoice).data, 
                             }
                         }
                     }
@@ -350,7 +425,7 @@ class RefundedCoupons(APIView):
     def get(self, request, *args, **kwargs):
         coupons = RefundCoupon.objects.select_related(
             'related_refund__business', 'related_refund__location').all()
-        serializer = CouponSerializer(coupons, many=True)
+        serializer = RefundCouponSerializer(coupons, many=True)
         if not coupons:
             response_data = {
                 'success': False,

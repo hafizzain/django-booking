@@ -31,6 +31,7 @@ from Authentication.models import AccountType, User
 from django_tenants.utils import tenant_context
 from Business.models import BusinessAddress
 from Product.models import CurrencyRetailPrice
+from Employee.models import *
 
 class VacationDetailsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -1018,6 +1019,7 @@ class VacationSerializerResponse(serializers.ModelSerializer):
 class ScheduleSerializerOP(serializers.ModelSerializer):
     is_holidays = serializers.SerializerMethodField(read_only=True)
     vacation = VacationSerializerResponse()
+    break_time = serializers.SerializerMethodField(read_only=True)
 
     def get_is_holidays(self, obj):
         pass
@@ -1131,10 +1133,20 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
         # except Exception as ex:
         #     return str(ex)
 
+    def get_break_time(self, obj):
+        try:
+            employee_obj = self.context.get('obj')
+            location = self.context.get('location_id', None)
+            break_time = BrakeTime.objects.filter(employee=employee_obj.id, date=obj.date, location=location) \
+                                            .select_related('employee', 'location')
+            return BrakeTimeSerializer(break_time, many=True).data
+        except:
+            return None
     class Meta:
         model = EmployeDailySchedule
         fields = ['id', 'vacation', 'is_leo_day', 'is_holidays', 'is_holiday', 'date', 'is_vacation', 'is_leave',
                   'from_date',
+                  'break_time',
                   'is_working_schedule',
                   'day', 'end_time_shift', 'end_time', 'is_weekend', 'vacation_status', 'note',
                   'start_time']
@@ -1150,18 +1162,6 @@ class ScheduleSerializerResponse(serializers.ModelSerializer):
     employee = EmployeeSerializerResponse()
     # grouped_data = serializers.SerializerMethodField(read_only=True)
     date = serializers.DateTimeField(format="%Y-%m-%d", input_formats=['iso-8601', 'date'])
-
-    # def get_grouped_data(self, obj):
-    #     employee_list = []
-    #     # Retrieve all records with the same title and date
-    #     matching_records = EmployeDailySchedule.objects.filter(title=obj.title, date=obj.date)
-    #
-    #     # Populate checker_list with the IDs of the matching records
-    #     for record in matching_records:
-    #         employee_list.append(str(record.employee_id))
-    #     qs = Employee.objects.filter(id__in=employee_list)
-    #     response = EmployeeSerializerResponse(qs , many=True).data
-    #     return response
 
     class Meta:
         model = EmployeDailySchedule
@@ -1273,7 +1273,6 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     schedule = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     leave_data = serializers.SerializerMethodField(read_only=True)
-
     # false_scedule =  serializers.SerializerMethodField(read_only=True)
 
     def get_leave_data(self, obj):
@@ -1286,7 +1285,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
             return leave_data
         except Exception as ex:
             return None
-
+        
     def get_schedule(self, obj):
         start_date = self.context.get('start_date', None)
         end_date = self.context.get('end_date', None)
@@ -1352,8 +1351,9 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         #         default=Value(False),
         #         output_field=BooleanField()
         #     )
-        # ).filter(is_vacation_accepted=True)
-        return ScheduleSerializerOP(qs, many=True, context=self.context).data
+        # ).filter(is_vacation_accepted=True) context=self.context).data
+        location = self.context.get('location_id', None)
+        return ScheduleSerializerOP(qs, many=True, context={'obj': obj, 'location_id': location}).data
 
     # def get_false_scedule(self, obj):
     #     qs = EmployeDailySchedule.objects.filter(employee=obj, is_weekend=False)
@@ -1371,7 +1371,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['id', 'leave_data', 'full_name', 'image', 'schedule', 'created_at', 'is_active', 'is_deleted',
+        fields = ['id', 'leave_data', 'full_name',  'image', 'schedule', 'created_at', 'is_active', 'is_deleted',
                   'is_blocked']
 
 
@@ -2118,3 +2118,7 @@ class GiftCardRetailPriceSerializer(serializers.ModelSerializer):
         model = GiftDetail
         fields = ['currency_code','spend_amount','currency','price']
         
+class BrakeTimeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BrakeTime
+        fields = "__all__"        

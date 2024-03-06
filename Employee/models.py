@@ -447,7 +447,15 @@ class VacationDetails(models.Model):
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)
 
-
+class BrakeTime(CommonField):
+    location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='location_brake_time')
+    employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True, related_name='employee_brake_time')
+    
+    start_time = models.TimeField(null=True, blank=True)
+    end_time = models.TimeField(null=True, blank=True)
+    date = models.DateField(null=True, blank=True)
+    is_brake_time = models.BooleanField(default=False)
+    
 class EmployeDailySchedule(models.Model):
     DAYS_CHOICE = [
         ('Monday', 'Monday'),
@@ -491,6 +499,7 @@ class EmployeDailySchedule(models.Model):
     is_leo_day = models.BooleanField(default=False)
     is_holiday = models.BooleanField(default=False)
     is_schedule = models.BooleanField(default=False)
+    is_brake_time = models.BooleanField(default=False)
     is_working_schedule = models.BooleanField(default=False)
     is_holiday_due_to_update = models.BooleanField(default=False)
     last_state_of_schedule = models.TextField(null=True)
@@ -710,7 +719,7 @@ class GiftCards(models.Model):
     # name = models.TextField(null=True, blank=True)
     title = models.TextField(null=True, blank=True)
     gift_card_value = models.FloatField(default=0, null=True)
-    # retail_price = models.FloatField(default=0, null=True, blank = True)
+    retail_price = models.FloatField(default=0, null=True, blank = True)
     expire_date = models.DateField(auto_now_add=now, null=True)
     start_date = models.DateField(null=True)
     end_date = models.DateField(null=True)
@@ -726,6 +735,8 @@ class GiftCards(models.Model):
     updated_at = models.DateTimeField(null=True, blank=True)
     custom_card = models.TextField(null=True)
     is_custom_card = models.BooleanField(default=False)
+    price = models.FloatField(default=0, null=True, blank=True)
+    location_is = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True,)
     
     # Common Fields
     is_active = models.BooleanField(default=True)
