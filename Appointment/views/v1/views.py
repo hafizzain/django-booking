@@ -3765,6 +3765,7 @@ def get_client_sale(request):
                 'service': services_data.data,
                 'voucher': voucher_membership,
                 'appointment': appointment.data,
+                'membership' : membership,
                 'appointments_count': appointment_checkout_all.count(),
                 'total_sales': total_sale,
                 'quick_sale_count': quick_sale_count,
