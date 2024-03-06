@@ -646,7 +646,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             selected_data = []
             
             brake_time_data = self.get_brake_time(obj,location_id,selected_date)
-            selected_data.append(brake_time_data)
+            selected_data.append({'brake_time': brake_time_data})
             
             for appointment in sorted_appointments:
                 app_id = appointment.id
