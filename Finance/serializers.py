@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from django.db.models import F, Q
+from django.db.models import F, Q, ExpressionWrapper, IntegerField, FloatField
 from django.db import transaction
 
 from Product.models import ProductStock
@@ -9,74 +9,121 @@ from Finance.models import Refund, RefundProduct, RefundServices, RefundCoupon, 
 
 
 class RefundProductSerializer(serializers.ModelSerializer):
-    class Meta:
+    refund_data  = serializers.SerializerMethodField(read_only = True)
+    product_data = serializers.SerializerMethodField(read_only = True)
+    
+    
+    def get_refund_data(self, obj):
+        return {
+            'refund_type':obj.refund.refund_type,
+            'client': obj.refund.client.full_name if obj.refund.client else None,
+            'location': obj.refund.location.address_name
+        }
+        
+    def get_product_data(self, obj):
+        return{
+            'product_name': obj.product.name,
+            'brand': obj.product.brand.name
+            
+        }
+        
+    class Meta: 
         model = RefundProduct
         fields = '__all__'
-        read_only_fields = ['refund']
+        read_only_fields = ['refund', 'refund_data', 'product_data']
 
 
 class RefundServiceSerializer(serializers.ModelSerializer):
+    refund_data  = serializers.SerializerMethodField(read_only = True)
+    service_data = serializers.SerializerMethodField(read_only = True)
+    
+    
+    def get_refund_data(self, obj):
+        return {
+            'refund_type':obj.refund.refund_type,
+            'client': obj.refund.client.full_name if obj.refund.client else None,
+            'location': obj.refund.location.address_name
+        }
+        
+    def get_service_data(self, obj):
+        return{
+            'service_name': obj.service.name,
+            'service group': obj.service.servicegroup_services.name
+        }
+        
     class Meta:
         model = RefundServices
         fields = '__all__'
-        read_only_fields = ['refund']
+        read_only_fields = ['refund','refund_data','service_data']
 
+class RefundCouponSerializer(serializers.ModelSerializer):
+    # related_refund = RefundSerializer(read_only=True)
+
+    class Meta:
+        model = RefundCoupon
+        fields = '__all__'
 
 class RefundSerializer(serializers.ModelSerializer):
     refunded_products = RefundProductSerializer(many=True)
     refunded_services = RefundServiceSerializer(many=True)
+    related_refund_coupon = RefundCouponSerializer(many=True, read_only=True)
 
     class Meta:
         model = Refund
         fields = '__all__'
 
-    def product_stock_update(self, location, refunded_products_data):
+    def __product_stock_update(self, location, refunded_products_data):
         '''
         This fundtion is updating the stock if the product has the in_stock key. 
         Only thoes product record will be update in the ProductStock but the refund_quantity 
         will be update for all the products!
         '''
         try:
-            [ProductStock.objects.filter(product_id=product_data["product"], location_id = location).update(refunded_quantity=F('refunded_quantity') + product_data["refunded_quantity"])
-                                for product_data in refunded_products_data]
-            [ProductStock.objects.filter(product_id=product_data["product"], location_id=location).update(sold_quantity=F('sold_quantity') - product_data["refunded_quantity"], 
-                                                                                                        available_quantity=F('available_quantity') + product_data['refunded_quantity'], 
-                                                                                                        is_refunded=True)
-            for product_data in refunded_products_data if product_data['in_stock'] == True]
+            # [ProductStock.objects.filter(product=product_data["product"], location = location).update(refunded_quantity=ExpressionWrapper(F('refunded_quantity') + product_data["refunded_quantity"], output_field=IntegerField()))
+            #                     for product_data in refunded_products_data]
+            # [ProductStock.objects.filter(product=product_data["product"], location=location).update(sold_quantity= ExpressionWrapper(F('sold_quantity') - product_data["refunded_quantity"], output_field=IntegerField()), 
+            #                                                                                             available_quantity=ExpressionWrapper(F('available_quantity') + product_data['refunded_quantity'], output_field=IntegerField()), 
+            #                                                                                             is_refunded=True)
+            # for product_data in refunded_products_data if product_data['in_stock'] == True]
+            
+            for product_data in refunded_products_data:
+                if product_data['in_stock'] == True:
+                    ProductStock.objects.filter(product = product_data['product'], location = location)\
+                        .update(sold_quantity = ExpressionWrapper(F('sold_quantity') + product_data['refunded_quantity'],output_field=IntegerField()),
+                                available_quantity = ExpressionWrapper(F('available_quantity')+ product_data['refunded_quantity'], output_field=IntegerField()),
+                                is_refunded = True)
+                ProductStock.objects.filter(product = product_data["product"] , location = location).update(refunded_quantity =F('refunded_quantity') + product_data["refunded_quantity"])
         except Exception as e:
             return ({'error': str(e)})
-        return True
+        
 
     def create(self, validated_data):  # sourcery skip: extract-method
         request = self.context.get('request')
         location = request.data.get('location')
-        refunded_products_data = validated_data.pop('refunded_products', [])
-        refunded_services_data = validated_data.pop('refunded_services', [])
+        refunded_products = validated_data.pop('refunded_products', [])
+        refunded_services = validated_data.pop('refunded_services', [])
+        
+        # refunded_products = validated_data.get('refunded_products', [])
+        # refunded_services = validated_data.get('refunded_services', [])
         with transaction.atomic():
             refund = Refund.objects.create(**validated_data)
             refunded_products_instances = [
                 RefundProduct(refund=refund, **product_data)
-                for product_data in refunded_products_data
+                for product_data in refunded_products
             ]
             #  Creating RefundedProduct 
             RefundProduct.objects.bulk_create(refunded_products_instances)
-            self.product_stock_update(location,refunded_products_data)
+            self.__product_stock_update(location,refunded_products)
             # Create refunded services
             refunded_services_instances = [
                 RefundServices(refund=refund, **service_data)
-                for service_data in refunded_services_data
+                for service_data in refunded_services
             ]
             RefundServices.objects.bulk_create(refunded_services_instances)
 
         return refund
 
 
-class CouponSerializer(serializers.ModelSerializer):
-    related_refund = RefundSerializer(read_only=True)
-
-    class Meta:
-        model = RefundCoupon
-        fields = '__all__'
 
 class AllowRefundPermissionsEmployeesSerializer(serializers.ModelSerializer):
     employee_data = EmployeeInfoSerializer(source = 'employee', read_only = True)
@@ -116,8 +163,9 @@ class AllowRefundsSerializer(serializers.ModelSerializer):
         instance.number_of_days = validated_data.get('number_of_days', instance.number_of_days)
         instance.save()
         allowed_employees_data = validated_data.get('allowed_refund', [])
+        
         provided_employee_ids = {str(data['employee']) for data in allowed_employees_data}
-        print(provided_employee_ids)
+        # print(provided_employee_ids)
         instance.allowed_refund.filter(~Q(employee_id__in=provided_employee_ids)).delete()
 
         for employee_data in allowed_employees_data:

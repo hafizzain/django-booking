@@ -4,7 +4,9 @@ from Appointment.views.v1 import views
 urlpatterns = [
     # Appointment
     path('create_appointment/', views.create_appointment),
+    path('create_group_appointment/', views.create_group_appointment),
     path('get_calendar_appointment/', views.get_calendar_appointment),
+    path('create_reversal/', views.create_reversal),
     # path('get_all_appointments/',views.get_all_appointments),
     path('get_all_appointments/',views.get_available_appointments),
     path('get_recent_ten_appointments/', views.get_recent_ten_appointments),
@@ -12,6 +14,7 @@ urlpatterns = [
     path('get_today_appointments/', views.get_today_appointments),
     path('get_single_appointments/', views.get_single_appointments),
     path('get_appointments_service/', views.get_appointments_service),
+    path('get_appointments_group_services/', views.get_appointments_group_services),
 
     # new apis for latest requirements
     path('appointment_service_status_update/', views.appointment_service_status_update),
@@ -40,14 +43,15 @@ urlpatterns = [
     
     #delete tip
     path('delete_appointment_employee_tip/', views.delete_appointment_employee_tip),
-    
+
+
     #Service Employee
     path('get_service_employee/', views.get_service_employee),
     path('get_employees_for_selected_service/', views.get_employees_for_selected_service),
     
     #Search by client 
     path('get_client_sale/', views.get_client_sale),
-    
+
     #Create Client Book Appointment
     path('create_appointment_client/', views.create_appointment_client),
     
@@ -58,6 +62,7 @@ urlpatterns = [
 
     #Appointment Logs
     path('get_appointment_logs/', views.get_appointment_logs),
+    path('get_reversal_logs/', views.get_reversal),
 
     # Employee Inshights
     path('get_employee_insights/', views.get_employee_appointment_insights),
@@ -68,6 +73,11 @@ urlpatterns = [
     # missed opportunities
     path('create_missed_opportunity/', views.create_missed_opportunity),
     path('missed_opportunities/', views.MissedOpportunityListCreate.as_view(), name='list-create-missed-opportunities'),
-    path('missed_opportunities/<uuid:id>/', views.MissedOpportunityListCreate.as_view(), name='missed-opportunities-delete')
+    path('missed_opportunities/<uuid:id>/', views.MissedOpportunityListCreate.as_view(), name='missed-opportunities-delete'),
 
+    path('update_reversal/', views.update_reversals),
+    path('appointment_check_in/', views.update_appointment_check_in),
+    path('group_appointment_check_in/', views.update_group_appointment_check_in),
+    path('appointment_time_report/', views.appointment_time_report),
+    
 ]

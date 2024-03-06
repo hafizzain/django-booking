@@ -162,6 +162,7 @@ def add_invoiceTranslation(request):
         tips = request.POST.get('tips')
         taxes = request.POST.get('taxes')
         total = request.POST.get('total')
+        change =  request.POST.get('change')
         payment_method = request.POST.get('payment_method')
         statuss = request.POST.get('status')
 
@@ -174,6 +175,7 @@ def add_invoiceTranslation(request):
             taxes = taxes,
             total = total,
             payment_method = payment_method,
+            change = change,
             status = statuss
         )
         invoiceTranslation.user = request.user
@@ -265,6 +267,7 @@ def update_invoiceTranslation(request):
     tips = request.POST.get('tips')
     taxes = request.POST.get('taxes')
     total = request.POST.get('total')
+    change =  request.POST.get('change')
     payment_method = request.POST.get('payment_method')
     statuss = request.POST.get('status')
 
@@ -295,6 +298,7 @@ def update_invoiceTranslation(request):
         invoice_data.tips = tips
         invoice_data.taxes = taxes
         invoice_data.total = total
+        invoice_data.change = change
         invoice_data.payment_method = payment_method
         invoice_data.status = statuss
 

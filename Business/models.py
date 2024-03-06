@@ -215,7 +215,7 @@ class BusinessTheme(models.Model):
     primary_color = models.CharField(max_length=20, default='')
     secondary_color = models.CharField(max_length=20, default='')
 
-    menu_option = models.CharField(max_length=300, default='', null=True)
+    menu_option = models.CharField(max_length=300, default='', null=True, blank=True)
     calendar_option = models.CharField(max_length=50, default='HorizontalView', choices=CALENDAR_CHOICES)
 
     is_deleted = models.BooleanField(default=False)
@@ -533,7 +533,3 @@ class BusinessPolicy(models.Model):
 
     def __str__(self) -> str:
         return self.title
-
-class RefundSetting(CommonField):
-    location = models.OneToOneField(BusinessAddress, on_delete=models.CASCADE,related_name='refund_location')
-    number_of_days = models.IntegerField(default=30)

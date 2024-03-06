@@ -2,6 +2,7 @@ from django.urls import path, include
 
 from Employee.views.v1 import views
 from rest_framework.routers import DefaultRouter
+from Employee.views.v1.views import *
 
 router = DefaultRouter()
 router.register('giftcards', views.GiftCardViewSet, basename='giftcard')
@@ -12,9 +13,10 @@ urlpatterns = [
     path('get_single_employee/', views.get_single_employee),
     path('get_employees_mainpage/', views.get_employees_mainpage),
     path('get_employees/', views.get_Employees),
+    path('get_gift_card/',views.get_gift_card),
     path('get_employees_dropdown/', views.get_Employees_dropdown),
     path('get_employees_dashboard/', views.get_employees_dashboard),
-
+    path('update_gift_card/', views.update_gift_card),
     path('create_employee/', views.create_employee),
     path('delete_employee/', views.delete_employee),
     path('update_employee/', views.update_employee),
@@ -72,6 +74,7 @@ urlpatterns = [
 
     # Generate ID
     path('generate_id/', views.generate_id),
+    path('get_detail_from_code/',views.get_detail_from_code),
 
     # Vacations For Employee
     # path('create_vacation/', views.create_vacation),
@@ -97,6 +100,7 @@ urlpatterns = [
     path('delete_all_data/', views.get_workingschedule),
     path('del_all_avaliable',views.del_all_avaliable),
     path('delete_workingschedule/', views.delete_workingschedule),
+    path('delete_lieu_day/', views.delete_leo_day),
     path('update_workingschedule/', views.update_workingschedule),
     path('delete_all__workingschedule/', views.delete_all__workingschedule),
 
@@ -115,4 +119,15 @@ urlpatterns = [
     # Set_passeord
     path('set_password/', views.set_password),
     path('check_employee_existance/', views.check_employee_existance),
+    
+    # Employee Comments
+    path('get-employee-comment-list/', get_employee_comment),
+    path('create-employee-comment/', create_employee_comment),
+    
+    # Employee Brake Time
+    path('get-employee-brake-time/', BrakeTimeView.as_view()),
+    path('get-employee-brake-time/<str:pk>/', BrakeTimeView.as_view()),
+    path('create-employee-brake-time/', BrakeTimeView.as_view()),
+    path('update-employee-brake-time/', BrakeTimeView.as_view()),
+    path('delete-employee-brake-time/', BrakeTimeView.as_view()),
 ]

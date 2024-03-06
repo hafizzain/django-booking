@@ -21,6 +21,7 @@ from Utility.models import Country, Currency, ExceptionRecord, State, City
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
+from Product.Constants.index import tenant_media_base_url
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -697,9 +698,21 @@ def update_service(request):
         )
 
     error = []
-    if image is not None:
-        service_id.image = image
-        service_id.save()
+    if image is not None :
+        def get_image(request, image):   # get client image url from AWS 
+            if image:
+                try:
+                    # request = self.request
+                    url = tenant_media_base_url(request, is_s3_url=service_id.is_image_uploaded_s3)
+                    return f'{url}{service_id.image}'
+                except:
+                    return f'{service_id.image}'
+            return None
+        
+        image_url = get_image(request, image)
+        if image_url != request.data.get('image'):
+            service_id.image = image
+            service_id.save()
         
     if location is not None:
         if type(location) == str:
@@ -712,7 +725,7 @@ def update_service(request):
                 loca = BusinessAddress.objects.get(id=loc)
                 service_id.location.add(loca)
             except Exception as err:
-                error.append(str(err))
+                error.append(f"error in locatoin update{str(err)}")
 
     if service is not None:
         if type(service) == str:
@@ -725,7 +738,7 @@ def update_service(request):
                 service = Service.objects.get(id=usr)
                 service_id.parrent_service.add(service)
             except Exception as err:
-                error.append(str(err))
+                error.append(f"error usr service {str(err)}")
 
     if employeeslist is not None:
         if type(employeeslist) == str:
@@ -747,7 +760,7 @@ def update_service(request):
 
                 # service_id.employee.add(employe)
             except Exception as err:
-                error.append(str(err))
+                error.append(f"error in employeelist loop {str(err)}")
     try:
         print(staffgroup_id)
         all_prev_ser_grops = ServiceGroup.objects.filter(services=service_id, is_deleted=False)
@@ -760,7 +773,7 @@ def update_service(request):
         service_group.save()
 
     except Exception as err:
-        error.append(str(err))
+        error.append(f"error in service group{str(err)}")
 
     if priceservice is not None:
         if check == True:
@@ -778,6 +791,7 @@ def update_service(request):
             priceservice = json.loads(priceservice)
         else:
             pass
+        
         sum = 0
         for ser in priceservice:
             sum = sum + 1
@@ -839,7 +853,6 @@ def update_service(request):
                     'error': error,
                     'service': serializer.data,
                     'sum': sum,
-
                 }
             },
             status=status.HTTP_200_OK
@@ -2200,9 +2213,10 @@ def create_sale_order(request):
 @transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+
 def new_create_sale_order(request):
     user = request.user
-
+    
     sale_type = request.data.get('selection_type', None)
     client_id = request.data.get('client', None)
     tax_amount = request.data.get('tax_amount', 0)
@@ -2747,7 +2761,7 @@ def new_create_sale_order(request):
                     tip=float(checkout_tip),
                     business_address=business_address,
                 )
-
+# ======================================================= Loyalty point calculations ===========================
     if checkout.client:
         these_orders = Order.objects.filter(
             checkout=checkout
@@ -2763,10 +2777,13 @@ def new_create_sale_order(request):
             else:
                 sale_order_price = sale_order.total_price
 
-            total_price += float(sale_order_price * sale_order.quantity)
+            total_price += float(sale_order_price * sale_order.quantity) # total Price  of the orders 
 
         logs_points_redeemed = 0
         logs_total_redeened_value = 0
+        
+        # ========================================= Updating the loyalty point ===================================
+        
         if all([is_loyalty_points_redeemed, loyalty_points_redeemed_id, loyalty_points_redeemed]):
             try:
                 client_points = ClientLoyaltyPoint.objects.get(id=loyalty_points_redeemed_id)
@@ -2774,6 +2791,7 @@ def new_create_sale_order(request):
                 ExceptionRecord.objects.create(text=f'LOYALTY : {err}')
                 pass
             else:
+                # updating the already present loyalty_points for the client
                 client_points.points_redeemed = float(client_points.points_redeemed) + float(loyalty_points_redeemed)
                 client_points.save()
 
@@ -2796,7 +2814,7 @@ def new_create_sale_order(request):
             client_points, created = ClientLoyaltyPoint.objects.get_or_create(
                 location=business_address,
                 client=checkout.client,
-                loyalty_points=point,
+                loyalty_points=point, # loyalty Foreignkey
             )
 
             loyalty_spend_amount = point.amount_spend

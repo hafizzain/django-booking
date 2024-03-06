@@ -87,12 +87,12 @@ class ServiceManager(models.QuerySet):
         service_orders_filter = Q()
         appointment_service_filter = Q(serivce_appointments__status=choices.AppointmentServiceStatus.FINISHED)
         if location:
-            service_orders_filter &= Q(service_orders__location=location)
+            service_orders_filter &= Q(service_sale_record__sale_record__location=location)
             appointment_service_filter &= Q(serivce_appointments__business_address=location)
         if duration:
             today = datetime.today()
             date = today - timedelta(days=duration)
-            service_orders_filter &= Q(service_orders__created_at__gte=date)
+            service_orders_filter &= Q(service_sale_record__sale_record__created_at__gte=date)
             appointment_service_filter &= Q(serivce_appointments__created_at__gte=date)
 
 
@@ -103,7 +103,7 @@ class ServiceManager(models.QuerySet):
                 output_field=IntegerField()
             ),
             total_orders_quantity = Coalesce(
-                Sum('service_orders__quantity', filter=service_orders_filter, distinct=True),
+                Sum('service_sale_record__quantity', filter=service_orders_filter, distinct=True),
                 0,
                 output_field=IntegerField()
             )
@@ -167,11 +167,11 @@ class Service(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_services_or_packages')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_services_or_packages', null=True, blank=True)
 
-    name = models.CharField(max_length=100, default='')
+    name = models.CharField(max_length=255, default='')
     arabic_name = models.CharField(max_length=999, default='')
 
     #service_type = models.CharField(choices=TREATMENT_TYPES, max_length=50, null=True, blank=True)
-    service_availible = models.CharField(choices=SERVICE_CHOICE, max_length=50, default ='Everyone'  ,null=True, blank=True)
+    service_availible = models.CharField(choices=SERVICE_CHOICE, max_length=255, default ='Everyone'  ,null=True, blank=True)
     
     #servicegroup = models.ForeignKey("ServiceGroup", on_delete=models.SET_NULL, related_name='service_servicegroup', null=True, blank=True)
     parrent_service = models.ManyToManyField('Service', null=True, blank=True, related_name='parent_package_services')
@@ -185,10 +185,10 @@ class Service(models.Model):
     enable_vouchers = models.BooleanField(default=False, null=True, blank=True)
     
     #New Fields added 
-    controls_time_slot = models.CharField(choices=TIME_SLOT_INTERVAL_CHOICES, blank= True, null=True,  max_length=100, default='30_Mins')
+    controls_time_slot = models.CharField(choices=TIME_SLOT_INTERVAL_CHOICES, blank= True, null=True,  max_length=255, default='30_Mins')
     initial_deposit =models.FloatField(default=0, blank= True, null=True,)
-    client_can_book = models.CharField(choices=CLIENT_CAN_BOOK_CHOICES, blank= True, null=True, max_length=100, default='Anytime')
-    slot_availible_for_online = models.CharField(choices=CONTROLS_TIME_SLOT_CHOICES, blank= True, null=True, max_length=100, default='Anytime_In_The_Future')
+    client_can_book = models.CharField(choices=CLIENT_CAN_BOOK_CHOICES, blank= True, null=True, max_length=255, default='Anytime')
+    slot_availible_for_online = models.CharField(choices=CONTROLS_TIME_SLOT_CHOICES, blank= True, null=True, max_length=255, default='Anytime_In_The_Future')
 
     price = models.FloatField(default=0)
     
@@ -229,7 +229,7 @@ class ServiceGroup(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_servicesgroup')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_servicesgroup', null=True, blank=True)
     
-    name = models.CharField(max_length=100, default='')
+    name = models.CharField(max_length=255, default='')
     services = models.ManyToManyField(Service, null=True, blank=True, related_name='servicegroup_services')
     
     allow_client_to_select_team_member = models.BooleanField(default=False)

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from Appointment.models import Appointment, AppointmentService, AppointmentNotes, AppointmentCheckout, AppointmentLogs, LogDetails
+from Appointment.models import Appointment, AppointmentGroup, AppointmentService, AppointmentNotes, AppointmentCheckout, AppointmentLogs, LogDetails
 from Service.models import ServiceGroup
 
 
@@ -50,6 +50,7 @@ class AppointmentServiceAdmin(admin.ModelAdmin):
         'service_group_name',
         'appointment_status',
         'appointment_date',
+        'appointment',
         'appointment_time',
         'end_time',
         'total_price',
@@ -69,3 +70,14 @@ class AppointmentServiceAdmin(admin.ModelAdmin):
         )
         if len(groups) > 0:
             return groups[0].name
+
+
+@admin.register(AppointmentGroup)
+class AppointmentGroupAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'total_appointments'
+    ]
+
+    def total_appointments(self, obj):
+        return obj.appointment.all().count()

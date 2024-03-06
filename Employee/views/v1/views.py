@@ -1,16 +1,23 @@
 import threading
-from datetime import datetime, timedelta, timezone
+from rest_framework.decorators import action
+from django.db.models import Count, IntegerField, Sum, FloatField, Q, Subquery, OuterRef, Case, When, F, Value, \
+    CharField
+from django.utils import timezone
+from django.db import models
+from datetime import datetime, timedelta
 import random
 import string
 from rest_framework import viewsets
 from time import strptime
 from django.shortcuts import render
+
+from Appointment.models import AppointmentService
 from Employee.models import (CategoryCommission, EmployeDailySchedule, Employee, EmployeeProfessionalInfo,
                              EmployeePermissionSetting, EmployeeModulePermission
 , EmployeeMarketingPermission, EmployeeSelectedService, SallarySlipPayrol, StaffGroup
 , StaffGroupModulePermission, Attendance
 , Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation, LeaveManagements, WeekManagement,
-                             VacationDetails, GiftCard, GiftCards, GiftDetails, GiftDetail
+                             VacationDetails, GiftCard, GiftCards,
                              )
 from Employee.services import annual_vacation_check, check_available_vacation_type
 from HRM.models import Holiday
@@ -20,6 +27,9 @@ from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSION
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
+from rest_framework.pagination import PageNumberPagination
 from Employee.serializers import (EmployeSerializer, EmployeInformationsSerializer,
                                   Payroll_Working_device_attendence_ScheduleSerializer,
                                   Payroll_Working_deviceScheduleSerializer, Payroll_WorkingScheduleSerializer,
@@ -32,8 +42,9 @@ from Employee.serializers import (EmployeSerializer, EmployeInformationsSerializ
                                   NewVacationSerializer,
                                   NewAbsenceSerializer, singleEmployeeSerializerOP, Payroll_WorkingScheduleSerializerOP,
                                   WeekendManagementSerializer, LeaveManagementSerializer, ScheduleSerializerOP,
-                                  ScheduleSerializerResponse, GiftCardSerializer, GiftCardSerializerResponse,
-                                  EmployeDailyScheduleResponse
+                                  ScheduleSerializerResponse, GiftCardSerializer, GiftCardSerializerResponse,GiftDetail,
+                                  EmployeDailyScheduleResponse, VacationDetailsSerializer,
+                                  VacationDetailsResponseSerializer, Allscedulae
                                   )
 from Employee.optimized_serializers import OptimizedEmployeeSerializerDashboard
 from django.db import connection, transaction
@@ -67,7 +78,10 @@ from Notification.notification_processor import NotificationProcessor
 
 from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
 from Sale.Constants.Custom_pag import CustomPagination
-
+from Employee.serializers import *
+from SaleRecords.models import *
+from Appointment.serializers import *
+from Sale.Constants.Custom_pag import CustomPagination, AppointmentsPagination
 
 @transaction.atomic
 @api_view(['POST'])
@@ -695,8 +709,9 @@ def get_workingschedule(request):
     start_date = request.query_params.get('start_date', None)
     end_date = request.query_params.get('end_date', None)
     location_id = request.query_params.get('location_id', None)
+    month = request.query_params.get('month', None)
+    year = request.query_params.get('year', None)
     # is_vacation = request.query_params.get('is_vacation',None)
-
     if is_weekend is None:
         query = {}
         if location_id:
@@ -706,14 +721,46 @@ def get_workingschedule(request):
         # if end_date:
         #     query['employee_employedailyschedule__date__date__lte'] = end_date
 
-        all_employee = Employee.objects.filter(is_active=True, is_deleted=False, is_blocked=False, **query).order_by(
-            '-created_at')
+        # all_employee = Employee.objects.filter(is_deleted=False, is_blocked=False, **query).order_by(
+        #     '-created_at')
+        # all_employee = all_employee.filter(
+        #     Q(
+        #         is_active=False ,is_active_date_lte=end_date
+        #     ) | Q(is_active=True)
+        # )
+        all_employee = Employee.objects.filter(is_deleted=False, is_blocked=False, **query).order_by('-created_at')
+        all_employee = all_employee.filter(
+            Q(is_active=False, in_active_date__gte=end_date
+            ) | Q(is_active=True)
+        )
+
+        # all_employee = all_memebers.annotate(
+        #     filtered_in_active_date=Case(
+        #         When(in_active_date__isnull=False,
+        #              then=Case(When(in_active_date__lte=selected_date, then=F('in_active_date')))),
+        #         default=Value(selected_date),
+        #         output_field=models.DateField(),
+        #     )
+        # )
+        # all_employee = all_employee.filter(filtered_in_active_date__lte=selected_date)
+        # all_employee = Employee.objects.filter(query).order_by('-created_at')
+        # all_employee = all_employee.filter(
+        #     Q(is_active=False,in_active_date__lte=end_date)| Q(is_active=True)
+        #
+        # )
+        # all_employee = all_employee.annotate(
+        #     filtered_in_active_date=Case(
+        #         When(in_active_date__isnull=False,
+        #              then=Case(When(in_active_date__lte=end_date, then=F('in_active_date')))),
+        #         default=Value(end_date),
+        #         output_field=models.DateField(),
+        #     )
+        # )
+
         serialized = WorkingScheduleSerializer(all_employee, many=True, context={'request': request,
                                                                                  'start_date': start_date,
                                                                                  'end_date': end_date,
                                                                                  'location_id': location_id})
-        result = EmployeDailySchedule.objects.filter(is_holiday=True)
-        # s = EmployeDailyScheduleResponse(result, many=True).data
         return Response(
             {
                 'start_date': start_date, 'end_date': end_date,
@@ -723,16 +770,16 @@ def get_workingschedule(request):
                 'response': {
                     'message': 'All Employee',
                     'error_message': None,
-                    'employees': serialized.data
+                    'employees': serialized.data,
                 }
             },
             status=status.HTTP_200_OK
         )
     else:
-        employee_ids_in_schedule = EmployeDailySchedule.objects.filter(is_weekend=True)
+        employee_ids_in_schedule = EmployeDailySchedule.objects.filter(is_weekend=True, from_date__year=year,
+                                                                       from_date__month=month, location_id=location_id)
         serialized = ScheduleSerializerResponse(employee_ids_in_schedule, many=True, context={'request': request,
                                                                                               'location_id': location_id})
-
         return Response(
             {
                 'employee_ids_in_schedule': str(employee_ids_in_schedule),
@@ -741,7 +788,7 @@ def get_workingschedule(request):
                 'response': {
                     'message': 'All Employee',
                     'error_message': None,
-                    'employees': serialized.data
+                    'employees': serialized.data,
                 }
             },
             status=status.HTTP_200_OK
@@ -1103,6 +1150,7 @@ def create_employee(request):
         employee.is_active = True
     else:
         employee.is_active = False
+        employee.in_active_date = timezone.now().date()
 
     if email is not None:
         employee.email = email
@@ -1121,12 +1169,12 @@ def create_employee(request):
         leave_data = json.loads(leave_data)
         leave_management = LeaveManagements.objects.create(
             employee_id=employee.id,
-            casual_leave=leave_data.get('casual_leave', 0),
-            annual_leave=leave_data.get('annual_leave', 0),
-            medical_leave=leave_data.get('medical_leave', 0),
-            operational_casual_leave=leave_data.get('casual_leave', 0),
-            operational_annual_leave=leave_data.get('annual_leave', 0),
-            operational_medical_leave=leave_data.get('medical_leave', 0),
+            operational_casual_leave=leave_data.get('operational_casual_leave', 0),
+            operational_annual_leave=leave_data.get('operational_annual_leave', 0),
+            operational_medical_leave=leave_data.get('operational_medical_leave', 0),
+            casual_leave=leave_data.get('operational_casual_leave', 0),
+            annual_leave=leave_data.get('operational_annual_leave', 0),
+            medical_leave=leave_data.get('operational_medical_leave', 0),
             number_of_months=leave_data.get('number_of_months', 0)
         )
         leave_data = LeaveManagementSerializer(leave_management, many=False)
@@ -1382,30 +1430,30 @@ def update_employee(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    if len(leave_data) > 0:
+    if leave_data:
         leave_data = json.loads(leave_data)
         leave_management = LeaveManagements.objects.filter(employee_id=id)
         if leave_management:
             leave_management.update(
-                operational_casual_leave=leave_data.get('casual_leave', 0),
-                operational_annual_leave=leave_data.get('annual_leave', 0),
-                operational_medical_leave=leave_data.get('medical_leave', 0),
+                operational_casual_leave=leave_data.get('operational_casual_leave', 0),
+                operational_annual_leave=leave_data.get('operational_annual_leave', 0),
+                operational_medical_leave=leave_data.get('operational_medical_leave', 0),
                 number_of_months=leave_data.get('number_of_months', 0),
-                casual_leave=leave_data.get('casual_leave', 0),
-                annual_leave=leave_data.get('annual_leave', 0),
-                medical_leave=leave_data.get('medical_leave', 0)
             )
-        else:
-            leave_management = LeaveManagements.objects.create(
-                employee_id=employee.id,
-                casual_leave=leave_data.get('casual_leave', 0),
-                annual_leave=leave_data.get('annual_leave', 0),
-                medical_leave=leave_data.get('medical_leave', 0),
-                number_of_months=leave_data.get('number_of_months', 0),
-                operational_casual_leave=leave_data.get('casual_leave', 0),
-                operational_medical_leave=leave_data.get('medical_leave', 0),
-                operational_annual_leave=leave_data.get('annual_leave', 0)
-            )
+    try:
+        leave_object = LeaveManagements.objects.get(employee_id=id)
+    except:
+        leave_object = LeaveManagements.objects.create(employee_id=id)
+    casual_leave = leave_object.operational_casual_leave - leave_object.used_casual
+    medical_leave = leave_object.operational_medical_leave - leave_object.used_medical
+    annual_leave = leave_object.operational_annual_leave - leave_object.used_annual
+    if 0 > casual_leave or 0 > medical_leave or 0 > annual_leave:
+        pass
+    else:
+        leave_object.casual_leave = leave_object.operational_casual_leave - leave_object.used_casual
+        leave_object.medical_leave = leave_object.operational_medical_leave - leave_object.used_medical
+        leave_object.annual_leave = leave_object.operational_annual_leave - leave_object.used_annual
+        leave_object.save()
 
     try:
         staff = StaffGroup.objects.get(employees=id)
@@ -1457,9 +1505,88 @@ def update_employee(request):
         employee.image = image
 
     if is_active is not None:
+        current_date = timezone.now().date()
+        check_exists = EmployeDailySchedule.objects.filter(
+            employee_id=employee.id,
+            from_date__gte=current_date
+
+        ).exclude(is_holiday=True)
+        if check_exists:
+            return Response(
+                {
+                    'status': True,
+                    'status_code': 402,
+                    'response': {
+                        'message': 'Active schedule1. Adjust or ensure coverage before InActive.',
+                        'error_message': 'Active schedule1. Adjust or ensure coverage before InActive.',
+                    },
+                    'data': Allscedulae(check_exists, many=True).data
+                },
+                status=402
+            )
+        else:
+            pass
+        current_date = timezone.now().date()
+        qs = AppointmentService.objects.filter(member_id=employee, created_at__date__gte=current_date)
+        if qs:
+            return Response(
+                {
+                    'status': True,
+                    'status_code': 402,
+                    'response': {
+                        'message': ' Employee cannot be marked as inactive until all bookings are completed or canceled.',
+                        'error_message': 'Employee cannot be marked as inactive until all bookings are completed or canceled.',
+                    }
+                },
+                status=402
+            )
+
+        else:
+            pass
         employee.is_active = True
+        employee.in_active_date = None
     else:
+        current_date = timezone.now().date()
+        check_exists = EmployeDailySchedule.objects.filter(
+            employee_id=employee.id,
+            from_date__gte=current_date
+        ).exclude(is_holiday=True)
+        if check_exists:
+
+            return Response(
+                {
+                    'status': True,
+                    'status_code': 402,
+                    'response': {
+                        'message': 'Active schedule2. Adjust or ensure coverage before InActive.',
+                        'error_message': 'Active schedule3. Adjust or ensure coverage before InActive.',
+                    }
+                    ,
+                    'data':Allscedulae(check_exists,many=True).data
+                },
+                status=402
+            )
+        else:
+            pass
+        current_date = timezone.now().date()
+        qs = AppointmentService.objects.filter(member_id=employee, created_at__date__gte=current_date)
+        if qs:
+            return Response(
+                {
+                    'status': True,
+                    'status_code': 402,
+                    'response': {
+                        'message': ' Employee cannot be marked as inactive until all bookings are completed or canceled.',
+                        'error_message': 'Employee cannot be marked as inactive until all bookings are completed or canceled.',
+                    }
+                },
+                status=402
+            )
+        else:
+            pass
         employee.is_active = False
+        employee.in_active_date = timezone.now().date()
+
     employee.can_refunds = can_refund
     employee.save()
 
@@ -4157,46 +4284,63 @@ def create_vacation_emp(request):
     is_working_schedule = request.data.get('is_working_schedule', None)
     value = 0
     difference_days = 0
-
     working_sch = None
-    check_leo_day = EmployeDailySchedule.objects.filter(
-        employee=employee,
-        date=from_date,
-        is_leo_day=True
-    )
-    check_weekend = EmployeDailySchedule.objects.filter(
-        employee=employee,
-        date=from_date,
-        is_weekend=True
-    )
-    if check_weekend:
-        return Response(
-            {
-                'status': 400,
-                'status_code': 400,
-                'status_code_text': '400',
-                'response': {
-                    'message': f'Cannot create vacation on weekend.',
-                    'error_message': None,
-                }
-            },
 
-            status=200
-        )
-    if check_leo_day:
-        return Response(
-            {
-                'status': 400,
-                'status_code': 400,
-                'status_code_text': '400',
-                'response': {
-                    'message': f'Cannot create vacation on leo day.',
-                    'error_message': None,
-                }
-            },
-
-            status=200
-        )
+    # check_leo_day = EmployeDailySchedule.objects.filter(
+    #     employee=employee,
+    #     date=from_date,
+    #     is_leo_day=True
+    # )
+    # check_weekend = EmployeDailySchedule.objects.filter(
+    #     employee=employee,
+    #     date=from_date,
+    #     is_weekend=True
+    # )
+    # check_holiday = EmployeDailySchedule.objects.filter(
+    #     employee=employee,
+    #     date=from_date,
+    #     is_holiday=True
+    # )
+    # if check_weekend:
+    #     return Response(
+    #         {
+    #             'status': 400,
+    #             'status_code': 400,
+    #             'status_code_text': '400',
+    #             'response': {
+    #                 'message': f'Cannot create vacation on weekend.',
+    #                 'error_message': None,
+    #             }
+    #         },
+    #         status=200
+    #     )
+    # if check_holiday:
+    #     return Response(
+    #         {
+    #             'status': 400,
+    #             'status_code': 400,
+    #             'status_code_text': '400',
+    #             'response': {
+    #                 'message': f'Cannot create vacation on holiday.',
+    #                 'error_message': None,
+    #             }
+    #         },
+    #         status=200
+    #     )
+    # if check_leo_day:
+    #     return Response(
+    #         {
+    #             'status': 400,
+    #             'status_code': 400,
+    #             'status_code_text': '400',
+    #             'response': {
+    #                 'message': f'Cannot create vacation on leo day.',
+    #                 'error_message': None,
+    #             }
+    #         },
+    # 
+    #         status=200
+    #     )
 
     if not all([business_id, employee]):
         return Response(
@@ -4269,6 +4413,8 @@ def create_vacation_emp(request):
                 },
                 status=status.HTTP_200_OK
             )
+    if vacation_type == 'medical':
+        value = employee_leave_management_obj.medical_leave
     if vacation_type == 'casual':
         value = employee_leave_management_obj.casual_leave
     if vacation_type == 'leo_day':
@@ -4284,6 +4430,7 @@ def create_vacation_emp(request):
     if days > available_value:
         return Response(
             {
+                'days': days,
                 'status': 400,
                 'status_code': '400',
                 'response': {
@@ -4305,6 +4452,24 @@ def create_vacation_emp(request):
     # diff = to_date - from_date
     # working_sch = None
     # days = int(diff.days)
+    is_vacations = Vacation.objects.filter(
+        business=business,
+        employee=employee_id,
+        # from_date=from_date,
+        vacation_status='pending'
+    )
+    if is_vacations:
+        return Response(
+            {
+                'status': 400,
+                'status_code': '400',
+                'response': {
+                    'message': 'Employee vacation is already on pending state',
+                    'error_message': None,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
     is_vacation_exist = Vacation.objects.filter(
         business=business,
         employee=employee_id,
@@ -4333,7 +4498,11 @@ def create_vacation_emp(request):
     )
     try:
         for i in range(days + 1):
-            current_date = from_date + timedelta(days=i)
+            if i == 0:
+                current_date = from_date
+            else:
+                current_date = from_date + timedelta(days=i)
+            # current_date = from_date + timedelta(days=i)
             working_sch = EmployeDailySchedule.objects.filter(employee=employee_id, date=current_date).first()
             if working_sch:
                 working_sch.is_vacation = True
@@ -4343,6 +4512,7 @@ def create_vacation_emp(request):
                 working_sch.save()
             else:
                 working_schedule = EmployeDailySchedule.objects.create(
+                    vacation=empl_vacation,
                     user=user,
                     business=business,
                     employee=employee_id,
@@ -4355,7 +4525,8 @@ def create_vacation_emp(request):
                     from_date=current_date,
                     to_date=to_date,
                     note=note,
-                    vacation_status='pending'
+                    vacation_status='pending',
+                    vacation_type=vacation_type
                 )
 
                 if is_vacation is not None:
@@ -4364,7 +4535,6 @@ def create_vacation_emp(request):
                     working_schedule.vacation = empl_vacation
                 else:
                     working_schedule.is_vacation = False
-
                 working_schedule.is_leave = is_leave if is_leave is not None else False
                 working_schedule.is_off = is_off if is_off is not None else False
                 working_schedule.save()
@@ -4387,6 +4557,7 @@ def create_vacation_emp(request):
         {
             'status': 200,
             'vacation_type': vacation_type,
+            'available_value': available_value,
             'days': days,
             'status_code': '200',
             'response': {
@@ -4404,12 +4575,15 @@ def create_vacation_emp(request):
 @permission_classes([AllowAny])
 def update_vacation_status(request):
     try:
+        type_of_sceduale = request.data.get('type', None)
+        type_of_vacation = request.data.get('type_of_vacation', None)
         business_id = request.data.get('business', None)
         employee = request.data.get('employee', None)
         vacation_id = request.data.get('vacation_id', None)
         vacation_status = request.data.get('vacation_status', None)
         vacation_type = request.data.get('vacation_type', None)
         total_days_to_detect = request.data.get('total_days_to_detect', None)
+        created_from_dashboard = request.data.get('created_from_dashboard', None)
         if total_days_to_detect is not None:
             total_days_to_detect = int(total_days_to_detect)
         if vacation_status == 'accepted':
@@ -4429,6 +4603,7 @@ def update_vacation_status(request):
                         status=status.HTTP_200_OK
                     )
                 leave_managements.casual_leave -= total_days_to_detect
+                leave_managements.used_casual = leave_managements.used_casual + total_days_to_detect
                 leave_managements.save()
             if vacation_type == 'annual':
                 if leave_managements.annual_leave == 0:
@@ -4445,6 +4620,7 @@ def update_vacation_status(request):
                         status=status.HTTP_200_OK
                     )
                 leave_managements.annual_leave -= total_days_to_detect
+                leave_managements.used_annual = leave_managements.used_annual + total_days_to_detect
                 leave_managements.save()
             if vacation_type == 'medical':
                 if leave_managements.medical_leave == 0:
@@ -4461,6 +4637,7 @@ def update_vacation_status(request):
                         status=status.HTTP_200_OK
                     )
                 leave_managements.medical_leave -= total_days_to_detect
+                leave_managements.used_medical = leave_managements.used_medical + total_days_to_detect
                 leave_managements.save()
             if vacation_type == 'leo_day':
                 if leave_managements.leo_leave == 0:
@@ -4685,20 +4862,42 @@ def create_workingschedule(request):
     date = request.data.get('date', None)
     note = request.data.get('note', None)
     max_records = 2
+    check_holiday = None
     is_vacation = request.data.get('is_vacation', None)
+    type_of_sceduale = request.data.get('type', None)
+    type_of_vacation = request.data.get('type_of_vacation', None)
+    id_to_maintain = request.data.get('id_to_maintain', None)
     is_weekend = request.data.get('is_weekend', None)
     is_leave = request.data.get('is_leave', None)
     is_off = request.data.get('is_off', None)
     leo_value = request.data.get('is_leo_day', None)
+    location_for_weekend = request.data.get('location', None)
     is_working_schedule = request.data.get('is_working_schedule', None)
     week_end_employee = request.data.get('week_end_employee', [])
     if is_weekend is not None and leo_value is None and is_working_schedule is None:
+        # check_holiday = EmployeDailySchedule.objects.filter(
+        #     employee=employee,
+        #     from_date=from_date,
+        #     is_holiday=True
+        # )
+        # if check_holiday:
+        #     return Response(
+        #         {
+        #             'status': 400,
+        #             'status_code': 400,
+        #             'status_code_text': '400',
+        #             'response': {
+        #                 'message': f'Cannot create weekend on holiday.',
+        #                 'error_message': None,
+        #             }
+        #         },
+        #         status=200
+        #     )
         week_end_employee = json.loads(week_end_employee)
         schedule_ids = []
         try:
             business = Business.objects.get(id=business_id)
         except Exception as err:
-
             return Response(
                 {
                     'status': False,
@@ -4729,11 +4928,14 @@ def create_workingschedule(request):
             working_sch = EmployeDailySchedule.objects.filter(employee_id=employee, date=date).first()
             if working_sch:
                 working_sch.is_weekend = True
+                working_sch.location_id = location_for_weekend
                 working_sch.save()
+
                 schedule_ids.append(working_sch.id)
 
             else:
                 workings = EmployeDailySchedule.objects.create(
+                    location_id=location_for_weekend,
                     user=user,
                     business=business,
                     employee=employee,
@@ -4757,6 +4959,7 @@ def create_workingschedule(request):
         serializers = ScheduleSerializer(working_schedule, context={'request': request}, many=True)
         return Response(
             {
+                'check_holiday': check_holiday,
                 'status': True,
                 'status_code': 201,
                 'response': {
@@ -4833,34 +5036,59 @@ def create_workingschedule(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        working_schedule, created = EmployeDailySchedule.objects.get_or_create(
-            user=user,
-            business=business,
-            employee=employee_id,
-            date=date,
-        )
+        # EmployeDailySchedule.objects.filter(id=id_to_maintain).update(is_leo_day=True)
+        working_schedule = EmployeDailySchedule.objects.get(id=id_to_maintain)
         working_schedule.day = day
+        working_schedule.is_leo_day=True
+        working_schedule.is_holiday = False # while debugiing we done this False
+        working_schedule.is_weekend=False
+        working_schedule.vacation_status=None
+        working_schedule.is_vacation=False
+        working_schedule.start_time_shift = start_time_shift
+        working_schedule.end_time_shift = end_time_shift
         working_schedule.start_time = start_time
         working_schedule.end_time = end_time
-        working_schedule.start_time_shift = start_time
-        working_schedule.end_time_shift = end_time
-        working_schedule.from_date = date
-        working_schedule.to_date = to_date
-        working_schedule.note = note
-        working_schedule.is_leo_day = True
-        working_schedule.is_vacation = False
-        working_schedule.is_weekend = False
-        working_schedule.vacation_status = None
         working_schedule.save()
-        try:
-            is_leo_day_update = LeaveManagements.objects.get(employee_id=employee_id.id)
-            is_leo_day_update.leo_leave += 1
-            is_leo_day_update.save()
-        except:
-            is_leo_day_created = LeaveManagements.objects.create(employee_id=employee_id.id)
-            is_leo_day_created.leo_leave += 1
-            is_leo_day_created.save()
+        # working_schedule, created = EmployeDailySchedule.objects.get_or_create(
+        #     user=user,
+        #     business=business,
+        #     employee=employee_id,
+        #     date=date,
+        # )
+        # working_schedule.day = day
+        # working_schedule.start_time = start_time
+        # working_schedule.end_time = end_time
+        # working_schedule.start_time_shift = start_time
+        # working_schedule.end_time_shift = end_time
+        # working_schedule.from_date = date
+        # working_schedule.to_date = to_date
+        # working_schedule.note = note
+        # working_schedule.is_leo_day = True
+        # working_schedule.is_vacation = False
+        # working_schedule.is_weekend = False
+        # working_schedule.vacation_status = None
+        # working_schedule.save()
+        if type_of_sceduale == 'vacation':
+            try:
+                leave_object = LeaveManagements.objects.get(employee_id=employee_id.id)
+            except:
+                leave_object = LeaveManagements.objects.create(employee_id=employee_id.id)
+            if type_of_vacation == 'casual':
+                leave_object.casual_leave += 1
+                leave_object.save()
+            if type_of_vacation == 'medical':
+                leave_object.medical_leave += 1
+                leave_object.save()
+            if type_of_vacation == 'annual':
+                leave_object.annual_leave += 1
+                leave_object.save()
+        if type_of_sceduale == 'weekend':
+            try:
+                leave_object = LeaveManagements.objects.get(employee_id=employee_id.id)
+            except:
+                leave_object = LeaveManagements.objects.create(employee_id=employee_id.id)
+            leave_object.leo_leave += 1
+            leave_object.save()
 
         serializers = ScheduleSerializer(working_schedule, context={'request': request})
 
@@ -4869,7 +5097,7 @@ def create_workingschedule(request):
                 'status': True,
                 'status_code': 201,
                 'response': {
-                    'message': 'Working Schedule Created Successfully2!',
+                    'message': 'Working Schedule Created Successfully!',
                     'error_message': None,
                     'schedule': serializers.data,
                     'leo_value': leo_value
@@ -4895,6 +5123,7 @@ def create_workingschedule(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+
         try:
             business = Business.objects.get(id=business_id)
         except Exception as err:
@@ -4918,6 +5147,38 @@ def create_workingschedule(request):
                     'status_code': StatusCodes.INVALID_EMPLOYEE_4025,
                     'response': {
                         'message': 'Employee not found',
+                        'error_message': str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            current_date = timezone.now().date()
+            check_exists = EmployeDailySchedule.objects.filter(
+                employee_id=employee_id,
+                created_at__date__gte=current_date
+            )
+            # if check_exists:
+            #     return Response(
+            #         {
+            #             'status': False,
+            #             'status_code': 404,
+            #             'status_code_text': '404',
+            #             'response': {
+            #                 'message': f'Error',
+            #                 'error_message': None,
+            #             }
+            #         },
+            #         status=status.HTTP_404_NOT_FOUND
+            #     )
+
+        except Exception as err:
+            return Response(
+                {
+                    'status': False,
+                    'status_code': StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response': {
+                        'message': 'Business not found',
                         'error_message': str(err),
                     }
                 },
@@ -4989,7 +5250,7 @@ def create_workingschedule(request):
                 'status': True,
                 'status_code': 201,
                 'response': {
-                    'message': 'Working Schedule Created Successfully!1',
+                    'message': 'Working Schedule Created Successfully!',
                     'error_message': None,
                     'schedule': serializers.data,
                 }
@@ -5224,6 +5485,7 @@ def delete_workingschedule(request):
     schedule_id = request.data.get('id', None)
     is_weekend_true = request.data.get('is_weekend', None)
     ids = request.data.get('ids', [])
+
     if is_weekend_true is None:
         if schedule_id is None:
             return Response(
@@ -5258,11 +5520,9 @@ def delete_workingschedule(request):
             )
         schedule.delete()
         if schedule.vacation:
-
             vacation = schedule.vacation
             remaingin_schedue = EmployeDailySchedule.objects.filter(
                 vacation=vacation,
-
             ).exclude(id=schedule.id)
             if len(remaingin_schedue) == 0:
                 vacation.delete()
@@ -5307,6 +5567,46 @@ def delete_workingschedule(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_leo_day(request):
+    schedule_id = request.query_params.get('id', None)
+    if schedule_id is not None:
+        schedule = EmployeDailySchedule.objects.get(id=schedule_id)
+        schedule.is_leo_day = False
+        schedule.is_vacation = True
+        schedule.vacation_status = 'accepted'
+        schedule.save()
+        schedule = EmployeDailySchedule.objects.get(id=schedule_id)
+        leave_manage = LeaveManagements.objects.get(employee_id=schedule.employee.id)
+        data = LeaveManagementSerializer(leave_manage, many=False).data
+        if str(schedule.vacation_type) == "casual":
+            leave_manage.casual_leave -= 1
+            leave_manage.used_casual = leave_manage.used_casual - 1
+            leave_manage.save()
+        if str(schedule.vacation_type) == "medical":
+            leave_manage.medical_leave -= 1
+            leave_manage.used_medical = leave_manage.used_medical - 1
+            leave_manage.save()
+        if str(schedule.vacation_type) == "annual":
+            leave_manage.annual_leave -= 1
+            leave_manage.used_annual = leave_manage.used_annual - 1
+            leave_manage.save()
+        return Response(
+            {
+                'data': data,
+                'schedule': str(schedule.vacation_type),
+                'status': 200,
+                'status_code': '200',
+                'response': {
+                    'message': 'Schedule deleted successfully',
+                    'error_message': None,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
 
 
 @api_view(['DELETE'])
@@ -5485,6 +5785,8 @@ def update_workingschedule(request):
     start_time = request.data.get('start_time', None)
     end_time = request.data.get('end_time', None)
     schedule_id = request.data.get('schedule_id', None)
+    location_id_weekend = request.data.get('location', None)
+    is_vacation = request.data.get('is_vacation', None)
     # is_working_schedule = request.data.get('is_working_schedule', None)
     if leo_value is not None:
         check_working_schedule = EmployeDailySchedule.objects.get(
@@ -5492,8 +5794,8 @@ def update_workingschedule(request):
         )
         check_working_schedule.start_time = start_time
         check_working_schedule.end_time = end_time
-        check_working_schedule.end_time_shift = end_time
-        check_working_schedule.start_time_shift = start_time
+        check_working_schedule.end_time_shift = None
+        check_working_schedule.start_time_shift = None
         check_working_schedule.is_weekend = False
         check_working_schedule.save()
         # check_working_schedule.update(start_time=start_time,end_time=end_time , is_weekend=False ,is_vacation=False)
@@ -5514,7 +5816,7 @@ def update_workingschedule(request):
             },
             status=200
         )
-    if is_weekend is None:
+    if is_vacation is not None:
         if schedule_id is None:
             return Response(
                 {
@@ -5545,7 +5847,6 @@ def update_workingschedule(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-
         if employee is not None:
             try:
                 emp = Employee.objects.get(id=employee)
@@ -5553,7 +5854,6 @@ def update_workingschedule(request):
                 schedule.leo_value = leo_value
             except Exception as err:
                 pass
-
         schedule.save()
         serializer = ScheduleSerializer(schedule, data=request.data, partial=True, context={'request': request})
         if not serializer.is_valid():
@@ -5581,18 +5881,27 @@ def update_workingschedule(request):
             },
             status=status.HTTP_200_OK
         )
-    else:
+    if is_weekend is not None:
         week_end_employee = json.loads(week_end_employee)
-        qs_to_del = EmployeDailySchedule.objects.filter(date__date=date, is_weekend=True)
-        if qs_to_del:
-            qs_to_del.delete()
         for employee in week_end_employee:
-            EmployeDailySchedule.objects.create(
-                employee_id=employee,
-                is_weekend=True,
-                date=date,
-                from_date=from_date
-            )
+            qs = EmployeDailySchedule.objects.filter(date__date=date, employee_id=employee)
+            if qs:
+                qs = qs.delete()
+                EmployeDailySchedule.objects.create(
+                    employee_id=employee,
+                    is_weekend=True,
+                    date=date,
+                    from_date=from_date,
+                    location_id=location_id_weekend
+                )
+            else:
+                EmployeDailySchedule.objects.create(
+                    employee_id=employee,
+                    is_weekend=True,
+                    date=date,
+                    from_date=from_date,
+                    location_id=location_id_weekend
+                )
         qs = EmployeDailySchedule.objects.filter(
             is_weekend=True,
         )
@@ -6874,26 +7183,74 @@ def create_weekend(request):
 class GiftCardViewSet(viewsets.ModelViewSet):
     queryset = GiftCards.objects.all()
     serializer_class = GiftCardSerializerResponse
+
     # permission_classes = [AllowAny]
     # authentication_classes = []
 
     def create(self, request, *args, **kwargs):
         title = request.data.get('title', None)
-        validity = request.data.get('validity', None)
+        validity = request.data.get('valid_till', None)
         code = request.data.get('code', None)
         currency_gift_card_price = request.data.get('currency_gift_card_price', [])
         description = request.data.get('description', None)
         custom_card = request.data.get('custom_card', None)
-        discount_to_show = request.data.get('discount_to_show',None)
+        discount_to_show = request.data.get('discount_to_show', None)
         price = request.data.get('price', None)
         retail_price = request.data.get('retail_price', None)
-        if custom_card is None:
-            card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,discount_to_show=discount_to_show,
-                                            custom_card=None)
+        term_condition = request.data.get('term_condition', None)
+        location = request.data.get('location_id', None)
+        is_custom_card = request.data.get('is_custom_card',None)
+        
+        if code:
+            
+            code_check = GiftCards.objects.filter(code__contains=code)
+        
+            if code_check:
+                data = {
+                    "success": True,
+                    "status_code": 400,
+                    "response": {
+                        "message": "Code already exists",
+                        "error_message": None,
+                    }
+                }
+                return Response(data, status=status.HTTP_200_OK)
+            
+        if is_custom_card == True:
+            card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,
+                                            discount_to_show=discount_to_show,
+                                            custom_card=None, term_condition=term_condition,
+                                            is_custom_card = is_custom_card,
+                                            location_id = location)
+            
             # currency_gift_card_price = json.loads(currency_gift_card_price)
             if len(currency_gift_card_price) > 0:
                 for data in currency_gift_card_price:
-                    GiftDetail.objects.create(currencies_id = data['currency'],price=data['price'], retail_price=data['retail_price'], gift_card=card)
+                    GiftDetail.objects.create(currencies_id=data['currencies'], price=data['price'],
+                                            spend_amount=data['retail_price'],
+                                            gift_card=card)
+                    
+            serializer_context = {'selected_location': location}
+            serializer = GiftCardSerializerResponse(card,context = serializer_context )
+            data = {
+                "success": True,
+                "status_code": 200,
+                "response": {
+                    "message": "Gift card created Successfully",
+                    "error_message": None,
+                    "data": serializer.data
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,
+                                            custom_card='avaliable',
+                                            # is_custom_card = is_custom_card,
+                                            price=price,
+                                            retail_price=retail_price,
+                                            location_is=location)
+        
+
             data = {
                 "success": True,
                 "status_code": 200,
@@ -6904,54 +7261,16 @@ class GiftCardViewSet(viewsets.ModelViewSet):
                 }
             }
             return Response(data, status=status.HTTP_200_OK)
-        else:
-            card = GiftCards.objects.create(title=title, valid_till=validity, code=code, description=description,
-                                            custom_card='avaliable',
-                                            price=price, retail_price=retail_price)
-            data = {
-                "success": True,
-                "status_code": 200,
-                "response": {
-                    "message": "giftcard get successfully",
-                    "error_message": None,
-                    "data": serializer.data
-                }
-            }
-            return Response(data, status=status.HTTP_200_OK)
-
-
-    def get(self ,request,*args , **kwargs):
-        query_set = GiftCards.objects.all()
-        serializer = GiftCardSerializerResponse(query_set , many=True).data
-        data = {
-            "success": True,
-            "status_code": 200,
-            "response": {
-                "message": "gift card get successfully",
-                "error_message": None,
-                "data": serializer.data
-            }
-        }
-        return Response(data, status=status.HTTP_200_OK)
-
-    def update(self, request, *args, **kwargs):
-        id = self.query_params.get('id', None)
-        if id is not None:
-            instance = GiftCards.objects.get(id=id)
-            serializer = GiftCardSerializer(instance=instance, data=request.data, partial=True)
-            if serializer.is_valid(raise_exception=True):
-                instance = serializer.save()
-                data = GiftCardSerializer(instance, many=False).data
-                return Response({"msg": "Gift card updated successfully"}, status=status.HTTP_200_OK)
-        else:
-            return Response({"msg": "Id is None"}, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, *args, **kwargs):
         id = request.query_params.get('id', None)
         if id is not None:
-            giftcard = GiftCards.objects.filter(id=id)
-            if giftcard.exists():
-                giftcard.delete()
+            giftcard = GiftCards.objects.get(id=id, is_deleted=False)
+            if giftcard :
+                #Soft delete the gift card
+                giftcard.is_deleted = True
+                giftcard.is_active = False
+                giftcard.save()
                 data = {
                     "success": True,
                     "status_code": 200,
@@ -6987,3 +7306,378 @@ class GiftCardViewSet(viewsets.ModelViewSet):
             }
             return Response(data, status=status.HTTP_404_NOT_FOUND)
 
+
+@api_view(['PATCH'])
+@permission_classes([AllowAny])
+def update_gift_card(request):
+    code = request.data.get('code', None)
+    # code_check = GiftCards.objects.filter(code=code)
+    # if code_check:
+    #     data = {
+    #         "success": True,
+    #         "status_code": 400,
+    #         "response": {
+    #             "message": "Code already exists",
+    #             "error_message": None,
+    #         }
+    #     }
+    #     return Response(data, status=status.HTTP_200_OK)
+    id = request.data.get('id', None)
+    currency_gift_card_price = request.data.get('currency_gift_card_price', [])
+    instance = GiftCards.objects.get(id=id)
+    instance.title = request.data.get('title', None)
+    instance.valid_till = request.data.get('valid_till', None)
+    instance.code = request.data.get('code', None)
+    instance.currency_gift_card_price = request.data.get('currency_gift_card_price', [])
+    instance.description = request.data.get('description', None)
+    instance.price = request.data.get('price', None)
+    instance.retail_price = request.data.get('retail_price', None)
+    instance.term_condition = request.data.get('term_condition', None)
+    instance.save()
+    if len(currency_gift_card_price) > 0:
+        gift_details = GiftDetail.objects.filter(gift_card_id=id)
+        gift_details.delete()
+        for data in currency_gift_card_price:
+            GiftDetail.objects.create(currencies_id=data['currencies'], price=data['price'],
+                                    retail_price=data['retail_price'], gift_card_id=id)
+    data = {
+        "success": True,
+        "status_code": 200,
+        "response": {
+            "message": "gift card updated successfully",
+            "error_message": None,
+        }
+    }
+    return Response(data, status=status.HTTP_200_OK)
+    # if id is not None:
+    #     serializer = GiftCardSerializer(instance=instance, data=request.data, partial=True)
+    #     if serializer.is_valid(raise_exception=True):
+    #         instance = serializer.save()
+    #         data = GiftCardSerializer(instance, many=False).data
+    # else:
+    #     return Response({"msg": "Id is None"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_gift_card(request):
+    selected_location = request.query_params.get('selected_location')
+    search_text = request.query_params.get('search_text', None)
+    
+    # GiftCard show on bases of Ceruncy and location
+    if selected_location is not None:
+        ceruncy = BusinessAddress.objects.filter(id=selected_location).values_list('currency', flat=True)
+        gift_detils = list(GiftDetail.objects.filter(currencies__in=ceruncy).values_list('gift_card', flat=True))
+        query_set = GiftCards.objects.filter(id__in=gift_detils, is_deleted=False,  is_custom_card = False)
+        
+        if search_text:
+            query_set = GiftCards.objects.filter(title__icontains=search_text, is_deleted=False, is_custom_card = False)
+            
+        serializer_context = {'selected_location': selected_location}
+        serializer = GiftCardSerializerResponse(query_set, many=True, context=serializer_context).data
+        data = {
+            "success": True,
+            "status_code": 200,
+            "response": {
+                "message": "gift card get successfully",
+                "error_message": None,
+                "results": serializer
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)
+    else:
+        query_set = GiftCards.objects.filter(is_deleted=False)
+        serializer = GiftCardSerializerResponse(query_set, many=True).data
+        data = {
+            "success": True,
+            "status_code": 200,
+            "response": {
+                "message": "All gift card get successfully",
+                "error_message": None,
+                "results": serializer
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_detail_from_code(request):
+    code = request.query_params.get('code', None)
+    location_id = request.query_params.get('location_id', None)
+
+
+    if code is not None and location_id is not None:
+        try:
+            
+            # Filter GiftCards based on the provided code and BusinessAddress
+            gift_card = GiftCards.objects.get(code=code, is_deleted = False)
+            serializer_gift_card = SingleGiftCardDetails(gift_card,
+                                                        context={'location_id':location_id}).data
+            
+            data = {
+                "success": True,
+                "status_code": 200,
+                "response": {
+                    "message": "Gift card details retrieved successfully",
+                    "error_message": None,
+                    "gift_card": serializer_gift_card,
+                }
+            }
+            # Return the response
+            return Response(data, status=status.HTTP_200_OK)
+
+        except GiftCards.DoesNotExist:
+            # If no matching gift card is found
+            data = {
+                "success": False,
+                "status_code": 404,
+                "response": {
+                    "message": "Enter a valid gift card",
+                    "error_message": "No gift card with the provided code and location ID",
+                    "data": None
+                }
+            }
+
+            # Return a 404 Not Found response
+            return Response(data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_employee_comment(request):
+        employee_id = request.GET.get('employee_id', None)
+        location_id = request.GET.get('location_id', None)
+        use_pagination = not request.GET.get('no_pagination', None)
+
+        query = Q()
+        if location_id:
+            query &= Q(location_id=location_id)
+
+        if employee_id:
+            query &= Q(employee_id=employee_id)
+
+        comments = Comment.objects.filter(query, is_deleted=False).filter(employee__isnull=False).order_by('-created_at')
+
+        if use_pagination:
+            paginator = AppointmentsPagination()
+            paginator.page_size = 10
+            comment = paginator.paginate_queryset(comments, request)
+            
+            client_data = CommentSerializer(comment, many=True).data
+            
+            data = {
+                'status': True,
+                'status_code': 200,
+                'status_code_text': '200',
+                "response": {
+                    "message": "Comment get Successfully",
+                    "error_message": None,
+                    "data": client_data,
+                    'count': paginator.page.paginator.count,
+                    'next': paginator.get_next_link(),
+                    'previous': paginator.get_previous_link(),
+                    'current_page': paginator.page.number,
+                    'per_page': paginator.page_size,
+                    'total_pages': paginator.page.paginator.num_pages,
+                }
+            }
+    
+            return Response(data, status=201) 
+        else:
+            client_data = CommentSerializer(comments, many=True).data
+            data = {
+                'status': True,
+                'status_code': 200,
+                'status_code_text': '200',
+                "response": {
+                    "message": "Comment get Successfully",
+                    "error_message": None,
+                    "data": client_data,
+                }
+            }
+
+        return Response(data, status=status.HTTP_200_OK)
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_employee_comment(request):
+    comment = request.data.get('comment', None)
+    employee_id = request.data.get('employee_id', None)
+    location_id = request.data.get('location_id', None)
+    
+    user_id = request.user.id
+    comment = Comment.objects.create(employee_id=employee_id,
+                                    comment=comment,
+                                    user_id=user_id,
+                                    location_id = location_id
+                                    )
+    comment.save()
+    client_data = CommentSerializer(comment, many=False).data  
+    return Response(
+        {
+            'status': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Comment added successfully',
+                'error_message': [],
+                'data': client_data
+            }
+        },
+        status=status.HTTP_201_CREATED
+    )
+
+@permission_classes([IsAuthenticated])
+class BrakeTimeView(APIView):
+    permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination
+    page_size = 10
+    
+    def get(self, request, pk=None):
+        no_pagination = request.GET.get('no_pagination', None)
+        location = request.GET.get('location', None)
+
+        if pk is not None:
+            braketime = get_object_or_404(BrakeTime, id=pk)
+            serialized = BrakeTimeSerializer(braketime)
+            data = {
+                "success": True,
+                "status_code": 200,
+                "response": {
+                    "message": "Break Time Get Successfully",
+                    "error_message": None,
+                    "data": serialized.data
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            query = Q()
+            if location: 
+                query &= Q(location_id=location)
+            braketime = BrakeTime.objects.filter(query).order_by('-created_at')
+            serialized = BrakeTimeSerializer(braketime, many=True)
+            if no_pagination:
+                data = {
+                    "success": True,
+                    "status_code": 200,
+                    "response": {
+                        "message": "Break Time Get Successfully",
+                        "error_message": None,
+                        "data": serialized.data
+                    }
+                }
+                return Response(data, status=status.HTTP_200_OK)
+            else:
+                paginator = self.pagination_class()
+                result_page = paginator.paginate_queryset(braketime, request)
+                serializer = BrakeTimeSerializer(result_page, many=True)
+                data = {
+                    'count': paginator.page.paginator.count,
+                    'next': paginator.get_next_link(),
+                    'previous': paginator.get_previous_link(),
+                    'current_page': paginator.page.number,
+                    'per_page': self.page_size,
+                    'total_pages': paginator.page.paginator.num_pages,
+                    "success": True,
+                    "status_code": 200,
+                    "response": {
+                        "message": "Break Time Get Successfully",
+                        "error_message": None,
+                        "data": serializer.data
+                    }
+                }
+                return Response(data, status=status.HTTP_200_OK)
+
+    @transaction.atomic
+    def post(self, request):
+        
+        serializer = BrakeTimeSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                "success": True,
+                "status_code": 201,
+                "response": {
+                    "message": "Break Time Add successfully",
+                    "error_message": None,
+                    "data": serializer.data
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            data = {
+                "success": False,
+                "status_code": 400,
+                "response": {
+                    "message": "Break Time Not Add",
+                    "error_message": serializer.errors,
+                    "data": None
+                }
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+    @transaction.atomic
+    def put(self, request, pk=None):
+        pk = request.query_params.get('id', None)
+        
+        if pk is None:
+            data = {
+                "success": False,
+                "status_code": 400,
+                "response": {
+                    "message": "Id is missing in the request",
+                    "error_message":'Comment Id missing',
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+            
+        brake_time = get_object_or_404(BrakeTime, id=pk)
+        serializer = BrakeTimeSerializer(brake_time, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                "success": True,
+                "status_code": 201,
+                "response": {
+                    "message": "Break Time updated successfully",
+                    "error_message": None,
+                    "data": serializer.data
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            data = {
+                "success": False,
+                "status_code": 400,
+                "response": {
+                    "message": "Break time not updated",
+                    "error_message": serializer.errors,
+                    "data": None
+                }
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+    @transaction.atomic
+    def delete(self, request, pk=None):
+        pk = request.query_params.get('id', None)
+        
+        if pk is None:
+            data = {
+                "success": False,
+                "status_code": 400,
+                "response": {
+                    "message": "Id is missing in the request",
+                    "error_message": 'Comment Id missing',
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        brake_time = get_object_or_404(BrakeTime, id=pk)
+        brake_time.delete()
+        data = {
+            "success": True,
+            "status_code": 200,
+            "response": {
+                "message": "Break time deleted successfully",
+                "error_message": None,
+                "data": None
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)

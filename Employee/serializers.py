@@ -25,15 +25,22 @@ from .models import (EmployeDailySchedule, Employee, EmployeeProfessionalInfo,
                      StaffGroup, StaffGroupModulePermission, Attendance
 , Payroll, CommissionSchemeSetting, Asset, AssetDocument,
                      EmployeeSelectedService, Vacation, CategoryCommission, LeaveManagements,
-                     WeekManagement, VacationDetails, GiftCards
+                     WeekManagement, VacationDetails, GiftCards, GiftDetail
                      )
 from Authentication.models import AccountType, User
 from django_tenants.utils import tenant_context
-
+from Business.models import BusinessAddress
+from Product.models import CurrencyRetailPrice
+from Employee.models import *
 
 class VacationDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = VacationDetails
+        fields = "__all__"
+
+class VacationDetailsResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vacation
         fields = "__all__"
 
 
@@ -918,7 +925,7 @@ class CommissionSerializer(serializers.ModelSerializer):
         model = CommissionSchemeSetting
         # fields = '__all__'
         exclude = ('sale_price_before_discount', 'created_at', 'from_value', 'to_value', 'percentage', 'user',
-                    'sale_price_including_tax', 'service_price_before_membership_discount')
+                   'sale_price_including_tax', 'service_price_before_membership_discount')
 
 
 class VacationSerializer(serializers.ModelSerializer):
@@ -999,9 +1006,20 @@ class HolidaysSerializer(serializers.ModelSerializer):
         model = Holiday
         fields = "__all__"
 
+class Allscedulae(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeDailySchedule
+        fields = "__all__"
 
+
+class VacationSerializerResponse(serializers.ModelSerializer):
+    class Meta:
+        model = Vacation
+        fields= ['id','vacation_type']
 class ScheduleSerializerOP(serializers.ModelSerializer):
     is_holidays = serializers.SerializerMethodField(read_only=True)
+    vacation = VacationSerializerResponse()
+    break_time = serializers.SerializerMethodField(read_only=True)
 
     def get_is_holidays(self, obj):
         pass
@@ -1036,88 +1054,99 @@ class ScheduleSerializerOP(serializers.ModelSerializer):
         #         # return True
         #     else:
         #         return False
-            # query = Q(location_id=location_id)
-            # if start_date is None and end_date is None:
-            #     start_date=start_date
-            #     # query &= Q(start_date__gte=start_date)
-            # if start_date is not None:
-            #     end_date=end_date
-            #     # query &= (Q(end_date__lte=end_date) | Q(end_date__isnull=True))
-            #     holidays = Holiday.objects.select_related('user', 'business', 'location') \
-            #         .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
-            # holidays = False
-            # holidays = Holiday.objects.select_related('user', 'business', 'location') \
-            #     .filter(
-            #     (Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date)).filter(
-            #     location=location_id)
-            # if holidays:
-            #     return True  # Return True if there is any holiday
-            # else:
-            #     return False
-            # holidays = Holiday.objects.filter(
-            #     Q(end_date__lte=end_date) & Q(start_date__gte=start_date)).filter(
-            #     location=location_id)
-            # if holidays:
-            #     return True  # Return True if there is any holiday
-            # else:
-            #     return Falsedate__date__gte
-            # from HRM.serializers import HolidaySerializer end_date__date__lte=end_date,
-            # holidays = Holiday.objects.filter(
-            #     start_date__date__gte=start_date
-            # )
-            # holidays = Holiday.objects.filter(
-            #     start_date__date__gte=start_date
-            # )
-            # holidays = holidays.first()
-            # end_date = holidays.end_date
-            # if end_date is None
-            # # if end_date is None:
-            #     holiday = Holiday.objects.filter(
-            #         start_date__date__gte=start_date ,end_date=None
-            #     )
-            #     holiday = holiday.start_date = start_date
-            #     if holiday
-            #     if holiday.exists():
-            #         return True
-            #     else:
-            #         return False
-            # holidays = holidays.filter(end_date__date__lte=end_date)
-            # holidays = Holiday.objects.all()
-            # s = HolidaysSerializer(holidays , many=True).data
-            # return  s
-            # else:
-            #     return False
-            # holidays = Holiday.objects.all()
-            # holiday_check = HolidaySerializer(holidays).data
-            # return str(holidays)
-            # if holidays.exists():
-            #     return True
-            # else:
-            #     return False
+        # query = Q(location_id=location_id)
+        # if start_date is None and end_date is None:
+        #     start_date=start_date
+        #     # query &= Q(start_date__gte=start_date)
+        # if start_date is not None:
+        #     end_date=end_date
+        #     # query &= (Q(end_date__lte=end_date) | Q(end_date__isnull=True))
+        #     holidays = Holiday.objects.select_related('user', 'business', 'location') \
+        #         .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
+        # holidays = False
+        # holidays = Holiday.objects.select_related('user', 'business', 'location') \
+        #     .filter(
+        #     (Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date)).filter(
+        #     location=location_id)
+        # if holidays:
+        #     return True  # Return True if there is any holiday
+        # else:
+        #     return False
+        # holidays = Holiday.objects.filter(
+        #     Q(end_date__lte=end_date) & Q(start_date__gte=start_date)).filter(
+        #     location=location_id)
+        # if holidays:
+        #     return True  # Return True if there is any holiday
+        # else:
+        #     return Falsedate__date__gte
+        # from HRM.serializers import HolidaySerializer end_date__date__lte=end_date,
+        # holidays = Holiday.objects.filter(
+        #     start_date__date__gte=start_date
+        # )
+        # holidays = Holiday.objects.filter(
+        #     start_date__date__gte=start_date
+        # )
+        # holidays = holidays.first()
+        # end_date = holidays.end_date
+        # if end_date is None
+        # # if end_date is None:
+        #     holiday = Holiday.objects.filter(
+        #         start_date__date__gte=start_date ,end_date=None
+        #     )
+        #     holiday = holiday.start_date = start_date
+        #     if holiday
+        #     if holiday.exists():
+        #         return True
+        #     else:
+        #         return False
+        # holidays = holidays.filter(end_date__date__lte=end_date)
+        # holidays = Holiday.objects.all()
+        # s = HolidaysSerializer(holidays , many=True).data
+        # return  s
+        # else:
+        #     return False
+        # holidays = Holiday.objects.all()
+        # holiday_check = HolidaySerializer(holidays).data
+        # return str(holidays)
+        # if holidays.exists():
+        #     return True
+        # else:
+        #     return False
 
-            # # query = Q(location_id=location_id)
-            # if start_date is None and end_date is None:
-            #     start_date=start_date
-            #     # query &= Q(start_date__gte=start_date)
-            # if start_date is not None:
-            #     end_date=end_date
-            #     # query &= (Q(end_date__lte=end_date) | Q(end_date__isnull=True))
-            #     holidays = Holiday.objects.select_related('user', 'business', 'location') \
-            #         .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
-            # holidays = False
-            # holidays = Holiday.objects.select_related('user', 'business', 'location') \
-            #     .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
-            # start_date = datetime.strptime(start_date, "%Y-%m-%d")
-            # end_date = datetime.strptime(end_date, "%Y-%m-%d")
+        # # query = Q(location_id=location_id)
+        # if start_date is None and end_date is None:
+        #     start_date=start_date
+        #     # query &= Q(start_date__gte=start_date)
+        # if start_date is not None:
+        #     end_date=end_date
+        #     # query &= (Q(end_date__lte=end_date) | Q(end_date__isnull=True))
+        #     holidays = Holiday.objects.select_related('user', 'business', 'location') \
+        #         .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
+        # holidays = False
+        # holidays = Holiday.objects.select_related('user', 'business', 'location') \
+        #     .filter((Q(end_date__lte=end_date) | Q(end_date__isnull=True)) & Q(start_date__gte=start_date))
+        # start_date = datetime.strptime(start_date, "%Y-%m-%d")
+        # end_date = datetime.strptime(end_date, "%Y-%m-%d")
 
-            #
-            # Return True if there is any holiday
+        #
+        # Return True if there is any holiday
         # except Exception as ex:
         #     return str(ex)
 
+    def get_break_time(self, obj):
+        try:
+            employee_obj = self.context.get('obj')
+            location = self.context.get('location_id', None)
+            break_time = BrakeTime.objects.filter(employee=employee_obj.id, date=obj.date, location=location) \
+                                            .select_related('employee', 'location')
+            return BrakeTimeSerializer(break_time, many=True).data
+        except:
+            return None
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'is_leo_day','is_holidays', 'is_holiday', 'date', 'is_vacation', 'is_leave', 'from_date',
+        fields = ['id', 'vacation', 'is_leo_day', 'is_holidays', 'is_holiday', 'date', 'is_vacation', 'is_leave',
+                  'from_date',
+                  'break_time',
                   'is_working_schedule',
                   'day', 'end_time_shift', 'end_time', 'is_weekend', 'vacation_status', 'note',
                   'start_time']
@@ -1134,21 +1163,9 @@ class ScheduleSerializerResponse(serializers.ModelSerializer):
     # grouped_data = serializers.SerializerMethodField(read_only=True)
     date = serializers.DateTimeField(format="%Y-%m-%d", input_formats=['iso-8601', 'date'])
 
-    # def get_grouped_data(self, obj):
-    #     employee_list = []
-    #     # Retrieve all records with the same title and date
-    #     matching_records = EmployeDailySchedule.objects.filter(title=obj.title, date=obj.date)
-    #
-    #     # Populate checker_list with the IDs of the matching records
-    #     for record in matching_records:
-    #         employee_list.append(str(record.employee_id))
-    #     qs = Employee.objects.filter(id__in=employee_list)
-    #     response = EmployeeSerializerResponse(qs , many=True).data
-    #     return response
-
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'title', 'date', 'employee']
+        fields = ['id', 'title', 'date', 'employee', 'is_weekend', 'vacation', 'from_date']
 
 
 class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
@@ -1169,8 +1186,44 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
         return obj.total_hours
 
     def get_total_hours(self, obj):
-
         income_type = self.context.get('income_type', None)
+        # return str(obj)
+        # try:
+        #     if income_type == 'Hourly_Rate':
+        #         if obj.is_vacation:
+        #             return 8.0
+        #         elif obj.is_leave:
+        #             return 0.0
+        #         else:
+        #             pass
+        #
+        #     if obj.start_time is None or obj.end_time is None:
+        #         return 0.0  # Return 0.0 if any of the time values is None
+        #
+        #     shift1_start = datetime.strptime(obj.start_time.strftime("%H:%M:%S"), "%H:%M:%S")
+        #     shift1_end = datetime.strptime(obj.end_time.strftime("%H:%M:%S"), "%H:%M:%S")
+        #
+        #     if shift1_end < shift1_start:
+        #         shift1_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
+        #
+        #     total_hours = (shift1_end - shift1_start).total_seconds() / 3600  # calculate the time difference in hours
+        #
+        #     if obj.start_time_shift and obj.end_time_shift:
+        #         shift2_start = datetime.strptime(obj.start_time_shift.strftime("%H:%M:%S"), "%H:%M:%S")
+        #         shift2_end = datetime.strptime(obj.end_time_shift.strftime("%H:%M:%S"), "%H:%M:%S")
+        #
+        #         if shift2_end < shift2_start:
+        #             shift2_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
+        #
+        #         shift2_hours = (
+        #                                    shift2_end - shift2_start).total_seconds() / 3600  # calculate the time difference in hours
+        #         total_hours += shift2_hours
+        #
+        #     total_hours = float(total_hours)  # convert to float (if it's not already)
+        #     return total_hours
+        #
+        # except Exception as err:
+        #     return str(err)
 
         try:
             if income_type == 'Hourly_Rate':
@@ -1180,7 +1233,6 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
                     return '0'
                 else:
                     pass
-
             if obj.start_time is None or obj.end_time is None:
                 return '0'  # Return '0' if any of the time values is None
 
@@ -1191,20 +1243,20 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
                 shift1_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
 
             total_hours = (shift1_end - shift1_start).total_seconds() / 3600  # calculate the time difference in hours
-
-            if obj.start_time_shift and obj.end_time_shift:
-                shift2_start = datetime.strptime(obj.start_time_shift.strftime("%H:%M:%S"), "%H:%M:%S")
-                shift2_end = datetime.strptime(obj.end_time_shift.strftime("%H:%M:%S"), "%H:%M:%S")
-
-                if shift2_end < shift2_start:
-                    shift2_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
-
-                shift2_hours = (
-                                       shift2_end - shift2_start).total_seconds() / 3600  # calculate the time difference in hours
-                total_hours += shift2_hours
-
-            total_hours = float(total_hours)  # convert to integer
-            return float(total_hours)
+            #
+            # if obj.start_time_shift and obj.end_time_shift:
+            #     shift2_start = datetime.strptime(obj.start_time_shift.strftime("%H:%M:%S"), "%H:%M:%S")
+            #     shift2_end = datetime.strptime(obj.end_time_shift.strftime("%H:%M:%S"), "%H:%M:%S")
+            #
+            #     if shift2_end < shift2_start:
+            #         shift2_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
+            #
+            #     shift2_hours = (
+            #                            shift2_end - shift2_start).total_seconds() / 3600  # calculate the time difference in hours
+            #     total_hours += shift2_hours
+            #
+            # total_hours = float(total_hours)  # convert to integer
+            return total_hours
 
         except Exception as err:
             return str(err)
@@ -1214,14 +1266,13 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'business', 'employee', 'day', 'vacation', 'start_time', 'end_time',
                   'start_time_shift', 'end_time_shift', 'from_date', 'to_date', 'total_hours', 'note',
                   'date', 'is_leave', 'is_off', 'is_vacation', 'is_active', 'created_at', 'updated_at',
-                  'total_hours_dummy', 'is_leo_day','is_holiday','is_working_schedule','is_weekend']
+                  'total_hours_dummy', 'is_leo_day', 'is_holiday', 'is_working_schedule', 'is_weekend','vacation_status']
 
 
 class WorkingScheduleSerializer(serializers.ModelSerializer):
     schedule = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     leave_data = serializers.SerializerMethodField(read_only=True)
-
     # false_scedule =  serializers.SerializerMethodField(read_only=True)
 
     def get_leave_data(self, obj):
@@ -1234,7 +1285,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
             return leave_data
         except Exception as ex:
             return None
-
+        
     def get_schedule(self, obj):
         start_date = self.context.get('start_date', None)
         end_date = self.context.get('end_date', None)
@@ -1291,6 +1342,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         #     Q(is_vacation=True, vacation_status='accepted'),
         #     **query
         # )
+        # qs = EmployeDailySchedule.objects.filter(employee=obj, **query)
         qs = EmployeDailySchedule.objects.filter(employee=obj)
         qs = qs.exclude(vacation_status='pending')
         # qs = qs.annotate(
@@ -1299,8 +1351,9 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         #         default=Value(False),
         #         output_field=BooleanField()
         #     )
-        # ).filter(is_vacation_accepted=True)
-        return ScheduleSerializerOP(qs, many=True, context=self.context).data
+        # ).filter(is_vacation_accepted=True) context=self.context).data
+        location = self.context.get('location_id', None)
+        return ScheduleSerializerOP(qs, many=True, context={'obj': obj, 'location_id': location}).data
 
     # def get_false_scedule(self, obj):
     #     qs = EmployeDailySchedule.objects.filter(employee=obj, is_weekend=False)
@@ -1318,7 +1371,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['id', 'leave_data', 'full_name', 'image', 'schedule', 'created_at', 'is_active', 'is_deleted',
+        fields = ['id', 'leave_data', 'full_name',  'image', 'schedule', 'created_at', 'is_active', 'is_deleted',
                   'is_blocked']
 
 
@@ -1418,25 +1471,22 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         if leo_day is None:
             employee_schedules = EmployeDailySchedule.objects.filter(
                 employee=obj,
-                # is_leave=False,
+                is_leo_day=False,
                 date__range=(month_start_date, month_end_date)
             ).order_by('-date')
             hours = 0
             for schedule in employee_schedules:
                 hours += schedule.total_hours
-
             return hours
         else:
             employee_schedules = EmployeDailySchedule.objects.filter(
                 employee=obj,
-                # is_leave=False,
                 is_leo_day=True,
                 date__range=(month_start_date, month_end_date)
             ).order_by('-date')
             hours = 0
             for schedule in employee_schedules:
                 hours += schedule.total_hours
-
             return hours
 
     def get_total_earning(self, obj):
@@ -1453,39 +1503,65 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         month_end_date = end_date or f'{now_date.year}-{now_date.month}-{total_days}'
         if leo_day is not None:
             employee_schedules = EmployeDailySchedule.objects.filter(
+                is_holiday=False,
+                is_working_schedule=False,
+                is_weekend=False,
+                is_vacation=False,
                 is_leo_day=True,
                 employee=obj,
                 date__range=(month_start_date, month_end_date)
             ).order_by('-date')
+            try:
+                income_type_info = EmployeeProfessionalInfo.objects.get(employee=obj)
+            except:
+                income_type = None
+            else:
+                total_earning = 0
+                salary = income_type_info.salary  # 300
+                income_type = income_type_info.income_type
+                if income_type == 'Monthly_Salary':
+                    per_day_salary = salary / total_days  # 10
+                    total_earning += (employee_schedules.count() * per_day_salary)
+
+                elif income_type == 'Daily_Income':
+                    total_earning += (employee_schedules.count() * salary)
+                    pass
+                elif income_type == 'Hourly_Rate':
+                    total_hours = 0
+                    for schedule in employee_schedules:
+                        total_hours += schedule.total_hours
+                    total_earning += (total_hours * salary)
+
+                return total_earning
         else:
             employee_schedules = EmployeDailySchedule.objects.filter(
-                # is_leave=False,
+                is_leo_day=False,
                 employee=obj,
                 date__range=(month_start_date, month_end_date)
             ).order_by('-date')
-        try:
-            income_type_info = EmployeeProfessionalInfo.objects.get(employee=obj)
-        except:
-            income_type = None
-        else:
-            total_earning = 0
-            salary = income_type_info.salary  # 300
-            income_type = income_type_info.income_type
+            try:
+                income_type_info = EmployeeProfessionalInfo.objects.get(employee=obj)
+            except:
+                income_type = None
+            else:
+                total_earning = 0
+                salary = income_type_info.salary  # 300
+                income_type = income_type_info.income_type
 
-            if income_type == 'Monthly_Salary':
-                per_day_salary = salary / total_days  # 10
-                total_earning += (employee_schedules.count() * per_day_salary)
+                if income_type == 'Monthly_Salary':
+                    per_day_salary = salary / total_days  # 10
+                    total_earning += (employee_schedules.count() * per_day_salary)
 
-            elif income_type == 'Daily_Income':
-                total_earning += (employee_schedules.count() * salary)
-                pass
-            elif income_type == 'Hourly_Rate':
-                total_hours = 0
-                for schedule in employee_schedules:
-                    total_hours += schedule.total_hours
-                total_earning += (total_hours * salary)
+                elif income_type == 'Daily_Income':
+                    total_earning += (employee_schedules.count() * salary)
+                    pass
+                elif income_type == 'Hourly_Rate':
+                    total_hours = 0
+                    for schedule in employee_schedules:
+                        total_hours += schedule.total_hours
+                    total_earning += (total_hours * salary)
 
-            return total_earning
+                return total_earning
 
     def get_salary(self, obj):
         try:
@@ -1513,16 +1589,24 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
         month_end_date = end_date or f'{now_date.year}-{now_date.month}-{total_days}'
         if leo_day is None:
+            # schedule = EmployeDailySchedule.objects.filter(
+            #     employee=obj,
+            #     date__range=(month_start_date, month_end_date)
+            # ).order_by('-date')
             schedule = EmployeDailySchedule.objects.filter(
-                employee=obj,
-                date__range=(month_start_date, month_end_date)
-            ).exclude(is_leave=True).order_by('-date')
+                Q(employee=obj) &
+                Q(date__range=(month_start_date, month_end_date))
+            ).exclude(~Q(vacation_status='accepted') & Q(is_vacation=True)).order_by('-date')
         else:
             schedule = EmployeDailySchedule.objects.filter(
                 is_leo_day=True,
+                is_holiday=False,
+                is_working_schedule=False,
+                is_weekend=False,
+                is_vacation=False,
                 employee=obj,
                 date__range=(month_start_date, month_end_date)
-            ).exclude(is_leave=True).order_by('-date')
+            ).order_by('-date')
         # ).order_by('employee__employee_employedailyschedule__date')            
         context = self.context
         try:
@@ -1938,7 +2022,8 @@ class EmployeeInfoSerializer(serializers.ModelSerializer):
 class GiftCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = GiftCards
-        fields = ['name', 'gift_card_value', 'retail_price', 'expire_date', 'discount_to_show','start_date','end_date']
+        fields = ['name', 'gift_card_value', 'retail_price', 'expire_date', 'discount_to_show', 'start_date',
+                  'end_date']
 
     def create(self, validated_data):
         return GiftCards.objects.create(**validated_data)
@@ -1955,19 +2040,85 @@ class GiftCardSerializer(serializers.ModelSerializer):
 
         return instance
 
+
 class Currencyresponse(serializers.ModelSerializer):
     class Meta:
         model = Currency
+        fields = ['id','code']
+
+
+class GiftCardDetails(serializers.ModelSerializer):
+    # currencies = Currencyresponse()
+    class Meta:
+        model = GiftDetail
         fields = "__all__"
 
+class CurrencySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Currency
+        fields = ['id', 'code']
+
 class GiftCardSerializerResponse(serializers.ModelSerializer):
-    currency = Currencyresponse()
+    gift_card_details = GiftCardDetails(many=True)
+    currency = serializers.SerializerMethodField(read_only=True)
+    # retails_price = serializers.SerializerMethodField(read_only=True)
+    
+    def get_currency(self, obj):
+        selected_location = self.context.get('selected_location')
+        
+        if selected_location:
+            business_address = BusinessAddress.objects.get(id=selected_location)
+            currency = business_address.currency
+
+            if currency:
+                currency_data = CurrencySerializer(currency).data
+            
+                return currency_data
+            else:
+                return None
+        else:
+            currency = Currency.objects.all()
+
+            currency_data = CurrencySerializer(currency, many=True).data
+            
+            return currency_data
+        
     class Meta:
         model = GiftCards
         fields = "__all__"
-
-
+        
 class EmployeDailyScheduleResponse(serializers.ModelSerializer):
     class Meta:
         model = EmployeDailySchedule
         fields = "__all__"
+
+class SingleGiftCardDetails(serializers.ModelSerializer):
+    gift_card_details = serializers.SerializerMethodField(read_only=True)
+    class Meta:
+        model = GiftCards
+        fields = "__all__"
+        
+    def get_gift_card_details(self, obj):
+        location_id = self.context.get('location_id')
+        # Retrieve the BusinessAddress based on the provided location_id
+        business_address = BusinessAddress.objects.get(id=location_id)
+        currency=business_address.currency
+
+        #Filter the GiftDetail based on the provided currency
+        query = GiftDetail.objects.filter(currencies=currency) \
+                                    .filter(gift_card=obj)
+        
+        #Serialize the GiftDetail
+        return GiftCardRetailPriceSerializer(query, many= True).data
+class GiftCardRetailPriceSerializer(serializers.ModelSerializer):
+    currency_code = serializers.CharField(source='currencies.code')
+    currency = serializers.CharField(source='currencies.id')
+    spend_amount = serializers.CharField(read_only=True)
+    class Meta:
+        model = GiftDetail
+        fields = ['currency_code','spend_amount','currency','price']
+        
+class BrakeTimeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BrakeTime
+        fields = "__all__"        

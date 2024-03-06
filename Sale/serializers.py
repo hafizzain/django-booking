@@ -535,8 +535,12 @@ class ServiceSerializerMainpage(serializers.ModelSerializer):
     price = serializers.SerializerMethodField(read_only=True)
 
     def get_price(self, obj):
+    
         ser = obj.service_priceservice.order_by('-created_at').first()
-        return ser.price
+        if ser:
+            return ser.price
+        else:
+            return None
 
     def get_service_group(self, obj):
         group = obj.servicegroup_services.filter(is_deleted=False)
@@ -657,7 +661,7 @@ class POSerializerForClientSale(serializers.ModelSerializer):
         return obj.product.name if obj.product.name else None
 
     def get_price(self, obj):
-        return obj.current_price
+        return obj.product.cost_price
 
     def get_product_details(self, obj):
         return obj.product.description if obj.product.description else None
@@ -669,11 +673,14 @@ class POSerializerForClientSale(serializers.ModelSerializer):
         return obj.product.name
 
     def get_member(self, obj):
-        return obj.member.full_name
+        try:
+            return obj.member.full_name
+        except:
+            return obj.employee.full_name
 
     class Meta:
         model = ProductOrder
-        fields = ['quantity', 'status', 'created_at', 'member', 'tip', 'payment_type', 'price',
+        fields = ['quantity', 'status', 'member', 'created_at', 'tip', 'payment_type', 'price',
                   'name', 'product_name', 'gst', 'order_type', 'product_details']
 
 
@@ -847,13 +854,16 @@ class SOSerializerForClientSale(serializers.ModelSerializer):
         return obj.service.name
 
     def get_member(self, obj):
-        return obj.member.full_name
+        # return obj.member.full_name
+        return obj.employee.full_name
 
     def get_user(self, obj):
-        return obj.user.full_name
+        # return obj.user.full_name
+        return obj.sale_record.user.full_name
 
     def get_price(self, obj):
-        return obj.current_price
+        # return obj.current_price
+        return obj.price
 
     class Meta:
         model = ServiceOrder
@@ -873,14 +883,18 @@ class MOrderSerializerForSale(serializers.ModelSerializer):
         return 'Membership'
 
     def get_member(self, obj):
-        return obj.member.full_name
-
+        try:
+            return obj.member.full_name
+        except:
+            return None
     def get_membership(self, obj):
         return obj.membership.name
 
     def get_price(self, obj):
-        return obj.current_price
-
+        try:
+            return obj.current_price
+        except:
+            return obj.price
     class Meta:
         model = MemberShipOrder
         fields = ['membership', 'order_type', 'member', 'quantity', 'price', 'created_at']
@@ -1045,13 +1059,51 @@ class VOSerializerForClientSale(serializers.ModelSerializer):
         return 'Voucher'
 
     def get_member(self, obj):
-        return obj.member.full_name
+        # return obj.member.full_name
+        try:
+            return obj.member.full_name
+        except:
+            return None
 
     def get_voucher(self, obj):
-        return obj.voucher.name
+        try:
+            return obj.voucher.name
+        except:
+            return None
 
     def get_price(self, obj):
-        return obj.current_price
+        # return obj.current_price
+        return obj.price
+
+    class Meta:
+        model = VoucherOrder
+        fields = ['voucher', 'member', 'quantity', 'order_type', 'price', 'created_at', ]
+        
+class VoucherSerializerForClientSale(serializers.ModelSerializer):
+    # client = serializers.SerializerMethodField(read_only=True)
+    member = serializers.SerializerMethodField(read_only=True)
+    voucher = serializers.SerializerMethodField(read_only=True)
+    order_type = serializers.SerializerMethodField(read_only=True)
+    price = serializers.SerializerMethodField(read_only=True)
+
+    def get_order_type(self, obj):
+        return 'Voucher'
+
+    def get_member(self, obj):
+        try:
+            return obj.employee.full_name
+        except:
+            return None
+
+    def get_voucher(self, obj):
+        try:
+            return obj.voucher.name
+        except:
+            return None
+
+    def get_price(self, obj):
+        # return obj.current_price
+        return obj.price
 
     class Meta:
         model = VoucherOrder
@@ -2288,7 +2340,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             'service_commission_type', 'product_commission_type', 'voucher_commission_type', 'ids',
             'membership_product',
             'membership_service', 'membership_type', 'invoice', 'tax_name', 'tax_name1', 'total_discount',
-            'voucher_redeem_percentage', 'redeem_option', 'total_tip', 'client_loyalty_points'
+            'voucher_redeem_percentage', 'redeem_option', 'total_tip', 'client_loyalty_points','is_refund'
         ]
 
         # Remove Member from get all sale orders
@@ -2354,7 +2406,7 @@ class SaleOrders_CheckoutSerializerOP(serializers.ModelSerializer):
     class Meta:
         model = Checkout
         fields = ['id', 'payment_type', 'client', 'invoice', 'created_at',
-                  'subtotal', 'total_tax', 'total_tip']
+                  'subtotal', 'total_tax', 'total_tip','is_refund']
 
 
 class SaleInvoiceSerializer(serializers.ModelSerializer):
@@ -2483,7 +2535,7 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
                   'membership', 'rewards', 'tip', 'gst', 'gst1', 'gst_price', 'gst_price1', 'service_price',
                   'total_price', 'service_commission', 'service_commission_type', 'voucher_discount_percentage',
                   'created_at', 'order_type', 'client', 'location', 'price', 'promotion_name', 'invoice',
-                  'tax_name', 'tax_name1', 'total_tip', 'client_loyalty_points']
+                  'tax_name', 'tax_name1', 'total_tip', 'client_loyalty_points','is_refund']
 
 
 class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
@@ -2518,14 +2570,19 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
         except Exception as e:
             return str(e)
 
-    # Need to work on this to do cater subtotal to show on the frontend this is not showing for this.
+    # Resolved the Subtotal Error
     def get_subtotal(self, obj):
         try:
             if obj.coupon:
                 total = float(obj.subtotal) - float(obj.coupon_discounted_price)
                 return total
-        except:
-            return 0
+            else:
+                service_subtotal=AppointmentService.objects.filter(appointment=obj.appointment).with_appointment_subtotal()\
+                    .aggregate(final_subtotal=Coalesce(Sum('subtotal'), 0.0))['final_subtotal']
+                return service_subtotal
+        except Exception as e:
+            return {'error': str(e)}
+            
 
         #     total = obj.subtotal
         #     if obj.coupon:
@@ -2538,5 +2595,5 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
 
     class Meta:
         model = AppointmentCheckout
-        fields = ['id', 'payment_method', 'order_type', 'client',
-                  'invoice', 'created_at', 'subtotal', 'total_tax', 'total_tip']
+        fields = ['id', 'payment_method','order_type', 'client',
+                  'invoice', 'created_at', 'subtotal', 'total_tax', 'total_tip','is_refund']

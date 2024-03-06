@@ -134,6 +134,7 @@ class Employee(models.Model):
 
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
+    in_active_date = models.DateField(null=True)
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(null=True, blank=True)
@@ -186,7 +187,7 @@ class EmployeeSelectedService(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='employee_service')
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_selected_service')
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-    level = models.CharField(max_length=100, choices=LEVEL_CHOICE, default='Average',
+    level = models.CharField(max_length=255, choices=LEVEL_CHOICE, default='Average',
                              verbose_name='Employee Service Level')
 
     def __str__(self):
@@ -446,7 +447,15 @@ class VacationDetails(models.Model):
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)
 
-
+class BrakeTime(CommonField):
+    location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='location_brake_time')
+    employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True, related_name='employee_brake_time')
+    
+    start_time = models.TimeField(null=True, blank=True)
+    end_time = models.TimeField(null=True, blank=True)
+    date = models.DateField(null=True, blank=True)
+    is_brake_time = models.BooleanField(default=False)
+    
 class EmployeDailySchedule(models.Model):
     DAYS_CHOICE = [
         ('Monday', 'Monday'),
@@ -457,19 +466,19 @@ class EmployeDailySchedule(models.Model):
         ('Saturday', 'Saturday'),
         ('Sunday', 'Sunday'),
     ]
-
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    created_from_dashboard = models.TextField(null=True)
     title = models.TextField(default='Weekend', null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='user_employedailyschedule')
-    business = models.ForeignKey(Business, on_delete=models.CASCADE, null=True,
-                                 related_name='business_employedailyschedule')
-
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, null=True,related_name='business_employedailyschedule')
+    location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, null=True,related_name='location_weekend_sceduale')
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_employedailyschedule')
     day = models.CharField(choices=DAYS_CHOICE, default='Monday', max_length=50, null=True, blank=True)
     vacation = models.ForeignKey(Vacation, on_delete=models.SET_NULL, null=True, blank=True,
                                  related_name='vacation_employedailyschedules')
     start_time = models.TimeField(null=True, blank=True)
     end_time = models.TimeField(null=True, blank=True)
+
 
     is_display = models.BooleanField(default=False)
     vacation_status = models.TextField(null=True)
@@ -490,9 +499,11 @@ class EmployeDailySchedule(models.Model):
     is_leo_day = models.BooleanField(default=False)
     is_holiday = models.BooleanField(default=False)
     is_schedule = models.BooleanField(default=False)
+    is_brake_time = models.BooleanField(default=False)
     is_working_schedule = models.BooleanField(default=False)
     is_holiday_due_to_update = models.BooleanField(default=False)
-
+    last_state_of_schedule = models.TextField(null=True)
+    vacation_type = models.TextField(null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(auto_now_add=now)
@@ -640,8 +651,11 @@ class LeaveManagements(CommonField):
     # id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, related_name='employee_leaves')
     casual_leave = models.IntegerField(null=True, default=0, help_text='Number of casual leaves allowed')
+    used_casual =  models.IntegerField(null=True, default=0, help_text='Number of casual leaves allowed')
     annual_leave = models.IntegerField(null=True, default=0, help_text='Number of annual leaves allowed')
+    used_annual = models.IntegerField(null=True, default=0, help_text='Number of casual leaves allowed')
     medical_leave = models.IntegerField(null=True, default=0, help_text='Number of medical leaves allowed')
+    used_medical = models.IntegerField(null=True, default=0, help_text='Number of casual leaves allowed')
     leo_leave = models.IntegerField(null=True, default=0, help_text='Number of medical leaves allowed')
     operational_casual_leave = models.IntegerField(null=True, default=0, help_text='Number of casual leaves allowed')
     operational_annual_leave = models.IntegerField(null=True, default=0, help_text='Number of annual leaves allowed')
@@ -684,6 +698,7 @@ class GiftCard(models.Model):
     discount_to_show = models.TextField(null=True)
 
 
+# this model is being used in the checkout
 class GiftCards(models.Model):
     VALIDITY_DAY = [
         ('7 Days', '7 Days'),
@@ -699,11 +714,12 @@ class GiftCards(models.Model):
         ('2 Years', '2 Years'),
         ('5 Years', '5 Years'),
     ]
+    term_condition = models.TextField(null=True)
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-    name = models.TextField(null=True, blank=True)
+    # name = models.TextField(null=True, blank=True)
     title = models.TextField(null=True, blank=True)
     gift_card_value = models.FloatField(default=0, null=True)
-    retail_price = models.FloatField(default=0, null=True)
+    retail_price = models.FloatField(default=0, null=True, blank = True)
     expire_date = models.DateField(auto_now_add=now, null=True)
     start_date = models.DateField(null=True)
     end_date = models.DateField(null=True)
@@ -718,24 +734,28 @@ class GiftCards(models.Model):
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)
     custom_card = models.TextField(null=True)
-    price = models.FloatField(default=0, null=True)
-    retail_price = models.FloatField(default=0, null=True)
+    is_custom_card = models.BooleanField(default=False)
+    price = models.FloatField(default=0, null=True, blank=True)
+    location_is = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True,)
+    
+    # Common Fields
+    is_active = models.BooleanField(default=True)
+    is_blocked = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
 
 
 class GiftDetail(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-    gift_card = models.ForeignKey(GiftCards, on_delete=models.CASCADE, null=True)
+    gift_card = models.ForeignKey(GiftCards, on_delete=models.CASCADE, null=True,related_name='gift_card_details')
     price = models.FloatField(default=0, null=True)
-    retail_price = models.FloatField(default=0, null=True)
+    spend_amount = models.FloatField(default=0, null=True)
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(null=True, blank=True)
     currency = models.TextField(null=True)
-    currencies = models.ForeignKey(Currency , on_delete=models.CASCADE , null=True)
+    currencies = models.ForeignKey(Currency , on_delete=models.CASCADE , null=True,related_name='gift_detail_currencies')
+    retail_price = models.FloatField(default=0, null=True, blank=True)  # Add this line for retail_price
 
-
-class GiftDetails(models.Model):
-    gift_card = models.ForeignKey(GiftCards, on_delete=models.CASCADE, null=True)
-    price = models.FloatField(default=0, null=True)
-    retail_price = models.FloatField(default=0, null=True)
-    created_at = models.DateTimeField(auto_now_add=now, null=True)
-    updated_at = models.DateTimeField(null=True, blank=True)
+    # Common Fields
+    is_active = models.BooleanField(default=True)
+    is_blocked = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
