@@ -304,6 +304,9 @@ def get_appointments_service(request):
     voucher_total = voucher_order.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += voucher_total if voucher_total else 0
     
+    membership_total = membership_order.aggregate(total_sale=Sum('price'))['total_sale']
+    total_sale += membership_total if membership_total else 0
+    
     voucher = VOSerializerForClientSale(voucher_order, many=True, context={'request': request, })
     membership = MOrderSerializerForSale(membership_order[:5], many=True, context={'request': request, })
 
@@ -324,6 +327,7 @@ def get_appointments_service(request):
     # appointment = ServiceClientSaleSerializer(appointment_checkout_all, many=True)
     
     price_values = sum(item.get('price', 0) for item in product.data)
+    voucher_total_price = 0
     voucher_total_price = sum(item.get('price', 0) for item in voucher.data)
     total_sale = total_sale + price_values + voucher_total_price
     
