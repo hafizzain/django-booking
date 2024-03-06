@@ -430,8 +430,8 @@ def get_sales_analytics(request):
         gift_card = PurchasedGiftCards.objects.filter(query).aggregate(total_gift_card_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
         appointment = SaleRecordsAppointmentServices.objects.filter(query).aggregate(total_appointment_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
         
-        appointment_average = SaleRecordsAppointmentServices.objects.filter(query) \
-                                .aggregate(avg_appointment=Coalesce(Avg('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        # appointment_average = SaleRecordsAppointmentServices.objects.filter(query) \
+        #                         .aggregate(avg_appointment=Coalesce(Avg('price', output_field=FloatField()), Value(0, output_field=FloatField())))
         
         # Appointment Count
         cancel_appointment = Appointment.objects.filter(business, query, status='Cancelled').count()
@@ -499,7 +499,7 @@ def get_sales_analytics(request):
             'data': {
                 'sales_cards':{
                     'avg_sale': avg_sale,
-                    'appointment_average': appointment_average['avg_appointment'],
+                    'appointment_average': appointment['total_appointment_sale'],
                 },
                 'sales_progress': {
                     'service': {
