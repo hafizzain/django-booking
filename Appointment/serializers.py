@@ -1934,7 +1934,7 @@ class GroupCheckInSerializer(serializers.ModelSerializer):
         model = AppointmentGroup
         fields = "__all__"
         
-# class EmployeeUpAndDownSaleSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = EmployeeUpAndDownSale
-#         fields = "__all__"
+class EmployeeUpAndDownSaleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeeUpAndDownSale
+        fields = "__all__"

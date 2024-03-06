@@ -5115,45 +5115,45 @@ def appointment_time_report(request):
             }
         return Response(data, status=status.HTTP_200_OK)
 
-# @api_view(['GET'])
-# @permission_classes([AllowAny])
-# def get_EmployeeUpAndDownSale(request):
-#     location = request.GET.get('location', None)
-#     employee = request.GET.get('employee', None)
-#     date = request.GET.get('date', None)
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_EmployeeUpAndDownSale(request):
+    location = request.GET.get('location', None)
+    employee = request.GET.get('employee', None)
+    date = request.GET.get('date', None)
     
-#     query = Q()
-#     if location:
-#         query &= Q(location_id=location)
+    query = Q()
+    if location:
+        query &= Q(location_id=location)
         
-#     if employee:
-#         query &= Q(employee_id=employee)
+    if employee:
+        query &= Q(employee_id=employee)
     
-#     if date:
-#         query &= Q(created_at=date)
+    if date:
+        query &= Q(created_at=date)
         
-#     employee_sales = EmployeeUpAndDownSale.objects.filter(query) \
-#                                 .select_related('location', 'employee','service')
+    employee_sales = EmployeeUpAndDownSale.objects.filter(query) \
+                                .select_related('location', 'employee','service')
 
-#     paginator = AppointmentsPagination()
-#     paginator.page_size = 10
-#     page_result = paginator.paginate_queryset(employee_sales, request)
+    paginator = AppointmentsPagination()
+    paginator.page_size = 10
+    page_result = paginator.paginate_queryset(employee_sales, request)
     
-#     serialized = EmployeeUpAndDownSaleSerializer(page_result, many=True)
-#     data = {
-#                 'status': True,
-#                 'status_code': 200,
-#                 'status_code_text': '200',
-#                 "response": {
-#                     "message": "Get Up & Down Sale Successfully",
-#                     "error_message": None,
-#                     "data": serialized.data,
-#                     'count': paginator.page.paginator.count,
-#                     'next': paginator.get_next_link(),
-#                     'previous': paginator.get_previous_link(),
-#                     'current_page': paginator.page.number,
-#                     'per_page': paginator.page_size,
-#                     'total_pages': paginator.page.paginator.num_pages,
-#                 }
-#             }
-#     return Response(data, status=status.HTTP_200_OK)
+    serialized = EmployeeUpAndDownSaleSerializer(page_result, many=True)
+    data = {
+                'status': True,
+                'status_code': 200,
+                'status_code_text': '200',
+                "response": {
+                    "message": "Get Up & Down Sale Successfully",
+                    "error_message": None,
+                    "data": serialized.data,
+                    'count': paginator.page.paginator.count,
+                    'next': paginator.get_next_link(),
+                    'previous': paginator.get_previous_link(),
+                    'current_page': paginator.page.number,
+                    'per_page': paginator.page_size,
+                    'total_pages': paginator.page.paginator.num_pages,
+                }
+            }
+    return Response(data, status=status.HTTP_200_OK)
