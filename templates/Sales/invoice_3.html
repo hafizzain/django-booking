@@ -884,7 +884,7 @@
                           {% if checkout_data.applied_coupons_records.all %}
                                                 
                             {% for coupon in checkout_data.applied_coupons_records.all %}
-                              {% if coupon.client.id == checkout_data.client.id %}
+                              
                               
                               
                               <div class="flex items-center justify-between text-primary text-sm font-semibold">
@@ -899,7 +899,7 @@
                                 </p>
                               </div>
                           
-                              {% endif %}
+                              
                             {% endfor %}
                               
                         
@@ -985,7 +985,7 @@
                         {% if checkout_data.applied_gift_cards_records.all %}
                             
                             {% for g in checkout_data.applied_gift_cards_records.all %}
-                              {% if g.client.id == checkout_data.client.id %}
+                              
                               
                               
                               <div class="flex items-center justify-between text-primary text-sm font-semibold">
@@ -1002,7 +1002,7 @@
                               
                               
                               
-                              {% endif %}
+                              
                             {% endfor %}
                               
                         
