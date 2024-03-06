@@ -85,6 +85,7 @@ from Appointment.serializers import *
 from rest_framework.views import APIView
 from SaleRecords.models import *
 from Sale.serializers import *
+from SaleRecords.serializers import *
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -3708,15 +3709,24 @@ def get_client_sale(request):
         service_orders = service_orders[:5]
     services_data = SOSerializerForClientSale(service_orders, many=True, context={'request': request, })
 
-    # Voucher & Membership Orders -----------------------
+    # Voucher Orders -----------------------
     voucher_order = SaleRecordVouchers.objects \
                         .filter(sale_record__client__id=client) \
                         .select_related('sale_record', 'employee', 'voucher') \
                         .order_by('-created_at')
+                        
+    # Gift Card Orders -----------------------
+    purchased_gift_cards =PurchasedGiftCards.objects \
+                        .filter(sale_record__client__id=client) \
+                        .select_related('sale_record', 'gift_card') \
+                        .order_by('-created_at')                  
+        
+    # Membership Orders -----------------------                    
     membership_order = SaleRecordMembership.objects \
                         .filter(sale_record__client__id=client) \
                         .select_related('sale_record') \
                         .order_by('-created_at')
+                        
     voucher_total = voucher_order.aggregate(total_sale=Sum('price'))['total_sale']
     total_sale += voucher_total if voucher_total else 0
     if voucher_order.count() > 5:
@@ -3727,8 +3737,14 @@ def get_client_sale(request):
     if membership_order.count() > 5:
         membership_order = membership_order[:5]
 
+    gift_cards_total = purchased_gift_cards.aggregate(total_sale=Sum('price'))['total_sale']
+    total_sale += gift_cards_total if gift_cards_total else 0
+    if purchased_gift_cards.count() > 5:
+        purchased_gift_cards = purchased_gift_cards[:5]
+        
     voucher = VoucherSerializerForClientSale(voucher_order, many=True, context={'request': request, })
     membership = MOrderSerializerForSale(membership_order[:5], many=True, context={'request': request, })
+    gift_cards = PurchasedGiftCardsSerializer(purchased_gift_cards, many=True, context={'request': request, })
 
     voucher_membership.extend(voucher.data)
     voucher_membership.extend(membership.data)
