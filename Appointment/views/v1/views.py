@@ -5141,8 +5141,9 @@ def get_EmployeeUpAndDownSale(request):
         query &= Q(created_at__range=(start_date,end_date))
         
     employee_sales = EmployeeUpAndDownSale.objects.filter(query) \
-                                .select_related('location', 'employee','service')
-
+                                .select_related('location', 'employee','service') \
+                                .exclude(status="")
+                                
     paginator = AppointmentsPagination()
     paginator.page_size = 10
     page_result = paginator.paginate_queryset(employee_sales, request)
