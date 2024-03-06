@@ -32,6 +32,8 @@ from Utility.models import ExceptionRecord
 from Service.models import Service
 from Appointment.models import *
 from Client.serializers import UserSerializerResponse
+from Employee.models import *
+from Employee.serializers import *
 
 
 class SerializerResponse(serializers.ModelSerializer):
@@ -402,6 +404,7 @@ class CalanderserializerResponse(serializers.ModelSerializer):
     client_types = serializers.CharField(source='appointment.client_type', read_only=True)
     appointment_id = serializers.CharField(source='appointment.id', read_only=True)
     appointment_status = serializers.CharField(source='appointment.status', read_only=True)
+    break_time = serializers.SerializerMethodField(read_only=True)
 
     appointment_group_id = serializers.SerializerMethodField(read_only=True)
 
@@ -409,6 +412,17 @@ class CalanderserializerResponse(serializers.ModelSerializer):
         try:
             return str(AppointmentGroup.objects.get(appointment = app_service_instance.appointment).id)
         except Exception as err:
+            return None
+        
+    def get_break_time(self, obj):
+        try:
+            employee_obj = self.context.get('obj')
+            location = self.context.get('location_id', None)
+            date = self.context.get('date', None)
+            break_time = BrakeTime.objects.filter(employee=employee_obj.id, date=date, location=location) \
+                                            .select_related('employee', 'location')
+            return BrakeTimeSerializer(break_time, many=True).data
+        except:
             return None
 
     class Meta:
@@ -614,6 +628,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
 
     def get_appointments(self, obj):
         selected_date = self.context.get('selected_date', None)
+        location_id = self.context.get('location_id', None)
         if not selected_date:
             return []
         appoint_services = AppointmentService.objects.filter(
@@ -667,7 +682,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 loop_return = []
                 for id in data['ids']:
                     app_service = AppointmentService.objects.get(id=id)
-                    serialized_service = CalanderserializerResponse(app_service,many=False)
+                    serialized_service = CalanderserializerResponse(app_service,many=False, context={'obj': obj, 'location_id': location_id, 'date': selected_date})
                     # serialized_service = AppointmentServiceSerializer(app_service , many=False)
                     loop_return.append(serialized_service.data)
                 returned_list.append(loop_return)
