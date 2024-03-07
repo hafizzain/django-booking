@@ -72,10 +72,10 @@ class User(AbstractBaseUser):
     is_deleted = models.BooleanField(default=False)
 
     # Add new fields
-    address = models.CharField(max_length=255, null=True, blank=True)
-    city = models.CharField(max_length=255, null=True, blank=True)
-    country = models.CharField(max_length=255, null=True, blank=True)
-    zip_code = models.CharField(max_length=255, null=True, blank=True)
+    # address = models.CharField(max_length=255, null=True, blank=True)
+    # city = models.CharField(max_length=255, null=True, blank=True)
+    # country = models.CharField(max_length=255, null=True, blank=True)
+    # zip_code = models.CharField(max_length=255, null=True, blank=True)
     
     mobile_number = models.CharField(max_length=20, null=True, blank=True)
     is_mobile_verified = models.BooleanField(default=False)
