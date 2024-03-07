@@ -40,6 +40,6 @@ class MissedOpportunityReason(models.TextChoices):
     OUT_OF_STOCK = 'Out of stock', 'Out of stock'
 
 class EmployeeUpAndDownSaleChoices(models.TextChoices):
-        UPSALE = 'UpSale', 'UpSale'
-        DOWNSALE = 'DownSale', 'DownSale'
+        UPSALE = 'Up-Sell', 'Up-Sell'
+        DOWNSALE = 'Down-Sell', 'Down-Sell'
         

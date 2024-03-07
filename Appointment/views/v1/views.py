@@ -2506,12 +2506,12 @@ def update_appointment_service(request):
                         if old_price != price:
                             if old_price > price:
                                 up_and_down_sale.price_difference = final_price
-                                up_and_down_sale.status = 'DownSale'
+                                up_and_down_sale.status = 'Down-Sell'
                                 
                             if old_price < price:
                                 final_price = abs(final_price)
                                 up_and_down_sale.price_difference = final_price
-                                up_and_down_sale.status = 'UpSale'
+                                up_and_down_sale.status = 'Up-Sell'
                             
                     up_and_down_sale.save()    
                     
