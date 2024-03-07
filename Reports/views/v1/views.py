@@ -564,7 +564,12 @@ def get_search_result_analytic(request):
         query &= Q(created_at__range=(start_date, end_date))
         
     product = SaleRecordsProducts.objects.filter(query).distinct('product')
-    product_records = ProductsReportSerializer(product, many=True, context={'location_id': location_id})
+    
+    paginator = AppointmentsPagination()
+    paginator.page_size = 10
+    page_result = paginator.paginate_queryset(product, request)
+    
+    product_records = ProductsReportSerializer(page_result, many=True,)
     
     data = {
         'success': True,
@@ -572,7 +577,13 @@ def get_search_result_analytic(request):
         'message': 'Product fetched successfully',
         'error_message': None,
         'data': {
-            'product_records': product_records.data
+            'product_records': product_records.data,
+            'count': paginator.page.paginator.count,
+            'next': paginator.get_next_link(),
+            'previous': paginator.get_previous_link(),
+            'current_page': paginator.page.number,
+            'per_page': paginator.page_size,
+            'total_pages': paginator.page.paginator.num_pages,
         }
     }
     return Response(data, status=status.HTTP_200_OK)
