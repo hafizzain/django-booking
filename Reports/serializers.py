@@ -1137,7 +1137,7 @@ class ProductsReportSerializer(serializers.ModelSerializer):
         return "POS"
     
     def get_quantity(self, obj):
-        location= self.context.get["location_id"]
+        location = self.context.get("location_id")
         product_list = Product.objects.filter(location_id = location).values_list('id', flat=True)
 
         for product in product_list:
