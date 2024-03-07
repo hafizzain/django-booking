@@ -1131,10 +1131,18 @@ class AppointmentService_DiscountReportSerializer(serializers.ModelSerializer):
 class ProductsReportSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(source='product.name')
     channel = serializers.SerializerMethodField(read_only=True)
-    
+    quantity = serializers.SerializerMethodField(read_only=True)
     
     def get_channel(self, obj):
         return "POS"
+    
+    def get_quantity(self, obj):
+        location= self.context.get["location_id"]
+        product_list = Product.objects.filter(location_id = location).values_list('id', flat=True)
+
+        for product in product_list:
+            return SaleRecordsProducts.objects.filter(product_id = product).count()
+        
     class Meta:
         model = SaleRecordsProducts
         fields = ['product', 'product_name', 'channel', 'quantity', 'created_at']

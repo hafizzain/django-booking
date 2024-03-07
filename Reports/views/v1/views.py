@@ -563,8 +563,8 @@ def get_search_result_analytic(request):
     if start_date and end_date:
         query &= Q(created_at__range=(start_date, end_date))
         
-    product = SaleRecordsProducts.objects.filter(query)
-    product_records = ProductsReportSerializer(product, many=True)
+    product = SaleRecordsProducts.objects.filter(query).distinct('product')
+    product_records = ProductsReportSerializer(product, many=True, context={'location_id': location_id})
     
     data = {
         'success': True,

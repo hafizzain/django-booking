@@ -1936,6 +1936,7 @@ class GroupCheckInSerializer(serializers.ModelSerializer):
         
 class EmployeeUpAndDownSaleSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.full_name')
+    service_name = serializers.CharField(source='service.name')
     class Meta:
         model = EmployeeUpAndDownSale
         fields = "__all__"
