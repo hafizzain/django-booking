@@ -2473,6 +2473,7 @@ def update_appointment_service(request):
                 if id:
                     service_appointment = AppointmentService.objects.get(id=str(id))
                     up_and_down_sale.location = service_appointment.business_address
+                    up_and_down_sale.old_price = service_appointment.price
                     up_and_down_sale.save()
 
                     if is_deleted == True:
@@ -2485,8 +2486,6 @@ def update_appointment_service(request):
                     service_appointment.business = appointment.business
                     service_appointment.business_address = appointment.business_address
                     service_appointment.status = choices.AppointmentServiceStatus.BOOKED
-                
-                up_and_down_sale.old_price = old_price
                 
                 service_appointment.appointment_date = appointment_date
                 service_appointment.appointment_time = date_time
@@ -2511,7 +2510,6 @@ def update_appointment_service(request):
                         up_and_down_sale.price_difference = final_price
                         up_and_down_sale.status = 'DownSale'
                         
-                
                 up_and_down_sale.save()    
                     
                 # If a new service is added change the status of 
