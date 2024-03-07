@@ -3648,6 +3648,7 @@ def get_service_employee(request):
 @permission_classes([AllowAny])
 def get_employees_for_selected_service(request):
     service = request.GET.get('service', None)
+    location_id = request.GET.get('location_id', None)
     if service is None:
         return Response(
             {
@@ -3665,7 +3666,7 @@ def get_employees_for_selected_service(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    Employee = EmployeeSelectedService.objects.filter(service=service)
+    Employee = EmployeeSelectedService.objects.filter(service=service, employee__location_id=location_id)
     serializer = ServiceEmployeeSerializer(Employee, many=True)
 
     # test = data['employee']
