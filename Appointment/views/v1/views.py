@@ -3665,8 +3665,15 @@ def get_employees_for_selected_service(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+        
+        query = Q()
+    if location_id :
+        query &= Q(employee__location=location_id)
+    
+    if service:
+        query &= Q(service=service)
 
-    Employee = EmployeeSelectedService.objects.filter(service=service, employee__location_id=location_id)
+    Employee = EmployeeSelectedService.objects.filter(query)
     serializer = ServiceEmployeeSerializer(Employee, many=True)
 
     # test = data['employee']
