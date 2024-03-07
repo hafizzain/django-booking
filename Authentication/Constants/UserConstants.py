@@ -44,10 +44,10 @@ def complete_user_account(request, user=None, data=None):
     last_name = data['last_name']
     mobile_number = data['mobile_number']
     social_account = data.get('social_account', None)
-    address = data.get('address', None)
-    city = data.get('city', None)
-    country = data.get('country', None)
-    zip_code = data.get('zip_code', None)
+    # address = data.get('address', None)
+    # city = data.get('city', None)
+    # country = data.get('country', None)
+    # zip_code = data.get('zip_code', None)
 
 
     user.first_name = first_name
@@ -56,10 +56,10 @@ def complete_user_account(request, user=None, data=None):
     user.full_name=f'{first_name} {last_name}'
     user.mobile_number=mobile_number
 
-    user.address = address
-    user.city = city
-    user.country = country
-    user.zip_code = zip_code
+    # user.address = address
+    # user.city = city
+    # user.country = country
+    # user.zip_code = zip_code
     
     if social_account is not None:
         user.is_email_verified = True

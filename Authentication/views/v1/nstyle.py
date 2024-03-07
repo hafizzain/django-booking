@@ -554,185 +554,189 @@ def login(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-
-    connection.set_schema_to_public()
     try:
-        user = User.objects.get(
-            email=email,
-            is_deleted=False,
-            user_account_type__account_type='Employee'
-        )
-        employee = True
-    except Exception as err:
-        user = None
-
-    if user == None:
+        
+        connection.set_schema_to_public()
+    except Exception as e:
+        return str(e)
+    else:
         try:
-            user = User.objects.filter(
-                email=email,
-                is_deleted=False
-            ).exclude(user_account_type__account_type='Everyone')
-            if len(user) > 0:
-                user = user[0]
-            else:
-                raise Exception('User Does not exists with this Email')
-
-        except Exception as err:
-            return Response(
-                {
-                    'status': False,
-                    'status_code': StatusCodes.INVALID_CREDENTIALS_4013,
-                    'status_code_text': 'INVALID_CREDENTIALS_4013',
-                    'response': {
-                        'message': 'User does not exist with this email',
-                        'error_message': str(err),
-                        'fields': ['email']
-                    }
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-    if not social_account:
-        if not user.check_password(password):
-            return Response(
-                {
-                    'status': False,
-                    'status_code': StatusCodes.INVALID_CREDENTIALS_4013,
-                    'status_code_text': 'INVALID_CREDENTIALS_4013',
-                    'response': {
-                        'message': 'Incorrect Password',
-                        'fields': ['password']
-                    }
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-    if not social_account and not user.is_active:
-        return Response(
-            {
-                'status': False,
-                'status_code': StatusCodes.USER_ACCOUNT_INACTIVE_4009,
-                'status_code_text': 'USER_ACCOUNT_INACTIVE_4009',
-                'response': {
-                    'message': 'This account is inactive! Please verify.',
-                    'error_message': 'Account is not active'
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
-
-    if user.social_account and not social_account:
-        return Response(
-            {
-                'status': False,
-                'status_code': StatusCodes.ACCOUNT_ASSOCIATED_WITH_SOCIAL,
-                'status_code_text': 'ACCOUNT_ASSOCIATED_WITH_SOCIAL',
-                'response': {
-                    'message': f'This Account associated with {user.social_platform}, Please signin with {user.social_platform}',
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
-
-    if not social_account and not user.is_email_verified:
-        return Response(
-            {
-                'status': False,
-                'status_code': StatusCodes.USER_EMAIL_NOT_VERIFIED_4010,
-                'status_code_text': 'USER_EMAIL_NOT_VERIFIED_4010',
-                'response': {
-                    'message': 'Your Email is not verified.',
-                    'error_message': 'User Email is not verified yet'
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
-
-    elif user.is_blocked:
-        return Response(
-            {
-                'status': False,
-                'status_code': StatusCodes.USER_ACCOUNT_IS_BLOCKED_4012,
-                'status_code_text': 'USER_ACCOUNT_IS_BLOCKED_4012',
-                'response': {
-                    'message': 'Your Account is blocked! Contact our support',
-                    'error_message': 'Users"s Account is blocked, Can"t access this account'
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
-    if employee:
-        # s_data['id'] = None
-        employe_user = EmployeeTenantDetail.objects.get(user=user)
-        employee_location_id = None
-        with tenant_context(employe_user.tenant):
             user = User.objects.get(
                 email=email,
                 is_deleted=False,
                 user_account_type__account_type='Employee'
             )
+            employee = True
+        except Exception as err:
+            user = None
+
+        if user == None:
             try:
-                emp = Employee.objects.get(email=str(user.email))
+                user = User.objects.filter(
+                    email=email,
+                    is_deleted=False
+                ).exclude(user_account_type__account_type='Everyone')
+                if len(user) > 0:
+                    user = user[0]
+                else:
+                    raise Exception(f'User Does not exists with this Email {user.id} ')
+
+            except Exception as err:
+                return Response(
+                    {
+                        'status': False,
+                        'status_code': StatusCodes.INVALID_CREDENTIALS_4013,
+                        'status_code_text': 'INVALID_CREDENTIALS_4013',
+                        'response': {
+                            'message': 'User does not exist with this email getting error in except part',
+                            'error_message': str(err),
+                            'fields': ['email']
+                        }
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+        if not social_account:
+            if not user.check_password(password):
+                return Response(
+                    {
+                        'status': False,
+                        'status_code': StatusCodes.INVALID_CREDENTIALS_4013,
+                        'status_code_text': 'INVALID_CREDENTIALS_4013',
+                        'response': {
+                            'message': 'Incorrect Password',
+                            'fields': ['password']
+                        }
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+        if not social_account and not user.is_active:
+            return Response(
+                {
+                    'status': False,
+                    'status_code': StatusCodes.USER_ACCOUNT_INACTIVE_4009,
+                    'status_code_text': 'USER_ACCOUNT_INACTIVE_4009',
+                    'response': {
+                        'message': 'This account is inactive! Please verify.',
+                        'error_message': 'Account is not active'
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if user.social_account and not social_account:
+            return Response(
+                {
+                    'status': False,
+                    'status_code': StatusCodes.ACCOUNT_ASSOCIATED_WITH_SOCIAL,
+                    'status_code_text': 'ACCOUNT_ASSOCIATED_WITH_SOCIAL',
+                    'response': {
+                        'message': f'This Account associated with {user.social_platform}, Please signin with {user.social_platform}',
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not social_account and not user.is_email_verified:
+            return Response(
+                {
+                    'status': False,
+                    'status_code': StatusCodes.USER_EMAIL_NOT_VERIFIED_4010,
+                    'status_code_text': 'USER_EMAIL_NOT_VERIFIED_4010',
+                    'response': {
+                        'message': 'Your Email is not verified.',
+                        'error_message': 'User Email is not verified yet'
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        elif user.is_blocked:
+            return Response(
+                {
+                    'status': False,
+                    'status_code': StatusCodes.USER_ACCOUNT_IS_BLOCKED_4012,
+                    'status_code_text': 'USER_ACCOUNT_IS_BLOCKED_4012',
+                    'response': {
+                        'message': 'Your Account is blocked! Contact our support',
+                        'error_message': 'Users"s Account is blocked, Can"t access this account'
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        if employee:
+            # s_data['id'] = None
+            employe_user = EmployeeTenantDetail.objects.get(user=user)
+            employee_location_id = None
+            with tenant_context(employe_user.tenant):
+                user = User.objects.get(
+                    email=email,
+                    is_deleted=False,
+                    user_account_type__account_type='Employee'
+                )
+                try:
+                    emp = Employee.objects.get(email=str(user.email))
+                except:
+                    pass
+                else:
+                    employee_locations = emp.location.all()
+                    if len(employee_locations) > 0:
+                        employee_location_id = employee_locations[0].id
+                        
+                    if not emp.is_active:
+                        return Response(
+                            {
+                                'status': False,
+                                'status_code': 403,
+                                'status_code_text': 'EMPLOYEE_INACTIVE',
+                                'response': {
+                                    'message': 'Your employee is inactive',
+                                    'error_message': 'User Employee is not active, Please enable is_active flag'
+                                }
+                            },
+                            status=status.HTTP_403_FORBIDDEN
+                        )
+                try:
+                    token = Token.objects.get(user=user)
+                except Token.DoesNotExist:
+                    token = Token.objects.create(user=user)
+                domain_name = str(employe_user.tenant.domain).split('.')[0]
+                serialized = UserLoginSerializer(user, context={'employee': True,
+                                                                'request': request,
+                                                                'token': token.key,
+                                                                'tenant': domain_name
+                                                                })
+                s_data = dict(serialized.data)
+                if employee_location_id:
+                    s_data['selected_location'] = employee_location_id
+
+        else:
+            serialized = UserLoginSerializer(user, context={'employee': False,
+                                                            'tenant': None})
+            s_data = dict(serialized.data)
+            s_data['id'] = None
+            s_data['access_token'] = None
+            try:
+                with tenant_context(Tenant.objects.get(user=user)):
+                    tnt_token = Token.objects.get(user__username=user.username)
+                    s_data['id'] = str(tnt_token.user.id)
+                    s_data['access_token'] = str(tnt_token.key)
             except:
                 pass
-            else:
-                employee_locations = emp.location.all()
-                if len(employee_locations) > 0:
-                    employee_location_id = employee_locations[0].id
-                    
-                if not emp.is_active:
-                    return Response(
-                        {
-                            'status': False,
-                            'status_code': 403,
-                            'status_code_text': 'EMPLOYEE_INACTIVE',
-                            'response': {
-                                'message': 'Your employee is inactive',
-                                'error_message': 'User Employee is not active, Please enable is_active flag'
-                            }
-                        },
-                        status=status.HTTP_403_FORBIDDEN
-                    )
-            try:
-                token = Token.objects.get(user=user)
-            except Token.DoesNotExist:
-                token = Token.objects.create(user=user)
-            domain_name = str(employe_user.tenant.domain).split('.')[0]
-            serialized = UserLoginSerializer(user, context={'employee': True,
-                                                            'request': request,
-                                                            'token': token.key,
-                                                            'tenant': domain_name
-                                                            })
-            s_data = dict(serialized.data)
-            if employee_location_id:
-                s_data['selected_location'] = employee_location_id
 
-    else:
-        serialized = UserLoginSerializer(user, context={'employee': False,
-                                                        'tenant': None})
-        s_data = dict(serialized.data)
-        s_data['id'] = None
-        s_data['access_token'] = None
-        try:
-            with tenant_context(Tenant.objects.get(user=user)):
-                tnt_token = Token.objects.get(user__username=user.username)
-                s_data['id'] = str(tnt_token.user.id)
-                s_data['access_token'] = str(tnt_token.key)
-        except:
-            pass
-
-    return Response(
-        {
-            'status': False,
-            'status_code': 200,
-            'response': {
-                'message': 'Authenticated',
-                # 'data' : employee
-                'data': s_data,
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+        return Response(
+            {
+                'status': False,
+                'status_code': 200,
+                'response': {
+                    'message': 'Authenticated',
+                    # 'data' : employee
+                    'data': s_data,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
 
 
 @api_view(['POST'])
@@ -792,7 +796,7 @@ def login_flagged(request):
                     'status_code': StatusCodes.INVALID_CREDENTIALS_4013,
                     'status_code_text': 'INVALID_CREDENTIALS_4013',
                     'response': {
-                        'message': 'User does not exist with this email',
+                        'message': 'User does not exist with this email login flag issue',
                         'error_message': str(err),
                         'fields': ['email']
                     }
@@ -908,7 +912,7 @@ def change_password(request):
                 'status_code': StatusCodes.INVALID_CREDENTIALS_4013,
                 'status_code_text': 'INVALID_CREDENTIALS_4013',
                 'response': {
-                    'message': 'User does not exist with this email',
+                    'message': 'User does not exist with this email change password',
                     'error_message': str(err),
                     'fields': ['email']
                 }
