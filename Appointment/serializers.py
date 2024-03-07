@@ -404,7 +404,7 @@ class CalanderserializerResponse(serializers.ModelSerializer):
     client_types = serializers.CharField(source='appointment.client_type', read_only=True)
     appointment_id = serializers.CharField(source='appointment.id', read_only=True)
     appointment_status = serializers.CharField(source='appointment.status', read_only=True)
-    # break_time = serializers.SerializerMethodField(read_only=True)
+    break_time = serializers.SerializerMethodField(read_only=True)
 
     appointment_group_id = serializers.SerializerMethodField(read_only=True)
 
@@ -414,16 +414,16 @@ class CalanderserializerResponse(serializers.ModelSerializer):
         except Exception as err:
             return None
         
-    # def get_break_time(self, obj):
-    #     try:
-    #         employee_obj = self.context.get('obj')
-    #         location = self.context.get('location_id', None)
-    #         date = self.context.get('date', None)
-    #         break_time = BrakeTime.objects.filter(employee=employee_obj.id, date=date, location=location) \
-    #                                         .select_related('employee', 'location')
-    #         return BrakeTimeSerializer(break_time, many=True).data
-    #     except:
-    #         return None
+    def get_break_time(self, obj):
+        try:
+            employee_obj = self.context.get('obj')
+            location = self.context.get('location_id', None)
+            date = self.context.get('date', None)
+            break_time = BrakeTime.objects.filter(employee=employee_obj.id, date=date, location=location) \
+                                            .select_related('employee', 'location')
+            return BrakeTimeSerializer(break_time, many=True).data
+        except:
+            return None
 
     class Meta:
         model = AppointmentService
