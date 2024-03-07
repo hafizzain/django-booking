@@ -5137,7 +5137,7 @@ def get_EmployeeUpAndDownSale(request):
         query &= Q(employee_id=employee)
         
     if start_date and end_date:
-        query &= Q(created_at__range=(start_date,end_date))
+        query &= Q(created_at__gte=start_date, created_at__lte=end_date)
         
     employee_sales = EmployeeUpAndDownSale.objects.filter(query) \
                                 .select_related('location', 'employee','service') \
