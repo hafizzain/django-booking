@@ -1137,11 +1137,9 @@ class ProductsReportSerializer(serializers.ModelSerializer):
         return "POS"
     
     def get_quantity(self, obj):
-        location = self.context.get("location_id")
-        product_list = Product.objects.filter(location_id = location).values_list('id', flat=True)
-
-        for product in product_list:
-            return SaleRecordsProducts.objects.filter(product_id = product).count()
+        total_quantity_queryset = SaleRecordsProducts.objects.filter(product=obj.product).aggregate(total_quantity=Sum('quantity'))
+        total_quantity = total_quantity_queryset.get('total_quantity', 0)
+        return int(total_quantity)
         
     class Meta:
         model = SaleRecordsProducts
