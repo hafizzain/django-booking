@@ -231,7 +231,7 @@ class AppliedVouchers(CommonField):
 class RedeemedLoyaltyPoints(CommonField):
     sale_record = models.ForeignKey(SaleRecords,  on_delete = models.CASCADE, null = True, blank = True, related_name = 'applied_loyalty_points_records')
     client_loyalty_point = models.ForeignKey(ClientLoyaltyPoint, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'loyalty_points_records')
-    redeemed_points = models.PositiveSmallIntegerField(default = 0 , blank=True, null=True)
+    redeemed_points = models.FloatField(default = 0.0 , blank=True, null=True)
     client = models.ForeignKey(Client, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'applied_loyalty_points_client')
     
 class AppliedGiftCards(CommonField):
