@@ -274,7 +274,7 @@ def get_appointments_service(request):
     # Calculate Total Sale of Client---------------------
     client = appointment.client
     
-     # Product Order---------------------
+    # Product Order---------------------
     product_order = SaleRecordsProducts.objects \
         .filter(sale_record__client_id=client) \
         .select_related('sale_record', 'employee', 'product') \
