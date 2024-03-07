@@ -2458,22 +2458,18 @@ def update_appointment_service(request):
             except Exception as err:
                 errors.append(str(err))
 
-            # Create UP and Down sale -----------------------------------
-            up_and_down_sale = EmployeeUpAndDownSale.objects.create(
-                employee = member_id,
-                service = service_id,
-                new_price=price,
-            )
-            up_and_down_sale.save()
             old_price = 0
+            location = ""
+            status = ""
+            price_difference = 0
             
             try:
                 # below is just a workaround
                 if id:
                     service_appointment = AppointmentService.objects.get(id=str(id))
                     old_price = service_appointment.price
-                    up_and_down_sale.location = service_appointment.business_address
-                    up_and_down_sale.save()
+                    location = service_appointment.business_address
+
                     if is_deleted == True:
                         service_appointment.delete()
                         continue
@@ -2484,9 +2480,6 @@ def update_appointment_service(request):
                     service_appointment.business = appointment.business
                     service_appointment.business_address = appointment.business_address
                     service_appointment.status = choices.AppointmentServiceStatus.BOOKED
-                
-                
-                up_and_down_sale.old_price = old_price
                 
                 service_appointment.appointment_date = appointment_date
                 service_appointment.appointment_time = date_time
@@ -2500,18 +2493,26 @@ def update_appointment_service(request):
                 service_appointment.save()
 
                 # Up and down Sale Logic ------------------------------
-                final_price = old_price - price
                 if old_price != price:
+                    final_price = old_price - price
                     if old_price > price:
-                        up_and_down_sale.price_difference = final_price
-                        up_and_down_sale.status = 'UpSale'
+                        status = 'UpSale'
                         
                     if old_price < price:
                         final_price = abs(final_price)
-                        up_and_down_sale.price_difference = final_price
-                        up_and_down_sale.status = 'DownSale'
+                        status = 'DownSale'
                         
-                up_and_down_sale.save()    
+                    # Create UP and Down sale -----------------------------------
+                    up_and_down_sale = EmployeeUpAndDownSale.objects.create(
+                        employee = member_id,
+                        service = service_id,
+                        new_price=price,
+                        old_price=old_price,
+                        location_id=location,
+                        price_difference = final_price,
+                        status = status
+                    )    
+                    up_and_down_sale.save()    
                     
                 # If a new service is added change the status of 
                 # appointment to started
@@ -5141,8 +5142,9 @@ def get_EmployeeUpAndDownSale(request):
         query &= Q(created_at__range=(start_date,end_date))
         
     employee_sales = EmployeeUpAndDownSale.objects.filter(query) \
-                                .select_related('location', 'employee','service')
-
+                                .select_related('location', 'employee','service') \
+                                .exclude(status="")
+                                
     paginator = AppointmentsPagination()
     paginator.page_size = 10
     page_result = paginator.paginate_queryset(employee_sales, request)
