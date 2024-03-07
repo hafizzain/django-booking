@@ -588,52 +588,54 @@ def get_search_result_analytic(request):
     }
     return Response(data, status=status.HTTP_200_OK)
 
-# @api_view(['GET'])
-# @permission_classes([AllowAny])
-# def get_customer_analytics(request):
-#     location = request.GET.get('location_id', None)
-#     year = request.GET.get('year', None)
-#     month = request.GET.get('month', None)
-#     today = request.GET.get('today', None)
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_customer_analytics(request):
+    location_id = request.GET.get('location_id', None)
+    year = request.GET.get('year', None)
+    month = request.GET.get('month', None)
+    today = request.GET.get('today', None)
     
-#     query = Q()
-#     if location:
-#         query &= Q(sale_record__location__id=location)
-#     if year: 
-#         query &= Q(created_at__year=year)
-#     if month:
-#         query &= Q(created_at__month=month)
-#     if today:
-#         query &= Q(created_at__date=today)
+    query = Q()
+    if location_id:
+        query &= Q(sale_record__location__id=location_id)
+    if year: 
+        query &= Q(created_at__year=year)
+    if month:
+        query &= Q(created_at__month=month)
+    if today:
+        query &= Q(created_at__date=today)
         
         
-#     # Get Sale Records
-#         service = SaleRecordServices.objects.filter(query).aggregate(total_service_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
-#         product = SaleRecordsProducts.objects.filter(query).aggregate(total_product_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
-#         vouchers = SaleRecordVouchers.objects.filter(query).aggregate(total_vouchers_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
-#         membership = SaleRecordMembership.objects.filter(query).aggregate(total_membership_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
-#         gift_card = PurchasedGiftCards.objects.filter(query).aggregate(total_gift_card_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
-#         appointment = SaleRecordsAppointmentServices.objects.filter(query).aggregate(total_appointment_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+    # # Get Sale Records
+    #     service = SaleRecordServices.objects.filter(query).aggregate(total_service_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+    #     product = SaleRecordsProducts.objects.filter(query).aggregate(total_product_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+    #     vouchers = SaleRecordVouchers.objects.filter(query).aggregate(total_vouchers_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+    #     membership = SaleRecordMembership.objects.filter(query).aggregate(total_membership_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+    #     gift_card = PurchasedGiftCards.objects.filter(query).aggregate(total_gift_card_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+    #     appointment = SaleRecordsAppointmentServices.objects.filter(query).aggregate(total_appointment_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
         
-#     # Calculate the total sum
-#     total_sale = (
-#         service['total_service_sale'] +
-#         product['total_product_sale'] +
-#         vouchers['total_vouchers_sale'] +
-#         membership['total_membership_sale'] +
-#         gift_card['total_gift_card_sale'] +
-#         appointment['total_appointment_sale']
-#     )
+    # # Calculate the total sum
+    # total_sale = (
+    #     service['total_service_sale'] +
+    #     product['total_product_sale'] +
+    #     vouchers['total_vouchers_sale'] +
+    #     membership['total_membership_sale'] +
+    #     gift_card['total_gift_card_sale'] +
+    #     appointment['total_appointment_sale']
+    # )
     
-#     data = {
-#             'success': True,
-#             'status_code': status.HTTP_200_OK,
-#             'message': 'Data fetched successfully',
-#             'error_message': None,
-#             'data': {
-#                 'sales_cards':{
-#                     'total_sale': total_sale,
-#                 },
-#             }
-#     }
-#     return Response(data, status=status.HTTP_200_OK)
+    # Total Client ------------------------------
+    total_client = Client.objects.filter(is_deleted=False).count()
+    data = {
+            'success': True,
+            'status_code': status.HTTP_200_OK,
+            'message': 'Data fetched successfully',
+            'error_message': None,
+            'data': {
+                'sales_cards':{
+                    # 'total_sale': total_sale,
+                },
+            }
+    }
+    return Response(data, status=status.HTTP_200_OK)
