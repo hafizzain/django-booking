@@ -5130,6 +5130,14 @@ def get_EmployeeUpAndDownSale(request):
     end_date = request.GET.get('end_date', None)
     
     query = Q()
+    
+    if end_date:
+        end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        # Add one day to end_date
+        end_date += timedelta(days=1)
+        # Convert it back to the desired format
+        end_date = end_date.strftime('%Y-%m-%d')
+        
     if location:
         query &= Q(location_id=location)
         
@@ -5137,7 +5145,7 @@ def get_EmployeeUpAndDownSale(request):
         query &= Q(employee_id=employee)
         
     if start_date and end_date:
-        query &= Q(created_at__gte=start_date, created_at__lte=end_date)
+        query &= Q(created_at__range=(start_date, end_date))
         
     employee_sales = EmployeeUpAndDownSale.objects.filter(query) \
                                 .select_related('location', 'employee','service') \
