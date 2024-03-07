@@ -2502,15 +2502,16 @@ def update_appointment_service(request):
                 # Up and down Sale Logic ------------------------------
                 if old_price != 0:
                     final_price = old_price - price
-                    if old_price != price:
-                        if old_price > price:
-                            up_and_down_sale.price_difference = final_price
-                            up_and_down_sale.status = 'UpSale'
-                            
-                        if old_price < price:
-                            final_price = abs(final_price)
-                            up_and_down_sale.price_difference = final_price
-                            up_and_down_sale.status = 'DownSale'
+                    if price !=abs(final_price): 
+                        if old_price != price:
+                            if old_price > price:
+                                up_and_down_sale.price_difference = final_price
+                                up_and_down_sale.status = 'UpSale'
+                                
+                            if old_price < price:
+                                final_price = abs(final_price)
+                                up_and_down_sale.price_difference = final_price
+                                up_and_down_sale.status = 'DownSale'
                             
                     up_and_down_sale.save()    
                     
