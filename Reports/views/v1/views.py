@@ -550,10 +550,15 @@ def get_search_result_analytic(request):
     end_date = request.GET.get('end_date', None)
     
     query = Q()
-    location = Q()
+    if end_date:
+        end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        # Add one day to end_date
+        end_date += timedelta(days=1)
+        # Convert it back to the desired format
+        end_date = end_date.strftime('%Y-%m-%d')
     
     if location_id:
-        location &= Q(location=location_id)
+        query &= Q(sale_record__location_id=location_id)
     
     if start_date and end_date:
         query &= Q(created_at__range=(start_date, end_date))
