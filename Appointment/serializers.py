@@ -1939,4 +1939,4 @@ class EmployeeUpAndDownSaleSerializer(serializers.ModelSerializer):
     service_name = serializers.CharField(source='service.name')
     class Meta:
         model = EmployeeUpAndDownSale
-        fields = "__all__"
+        fields = "__all__" 
