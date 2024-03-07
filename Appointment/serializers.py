@@ -1217,6 +1217,7 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
             service=obj.service.id,
             employee__is_deleted=False,
             employee__is_active=True,
+            employee__location = obj.business_address
         )
         return ServiceEmployeeSerializer(Employee, many=True).data
 
