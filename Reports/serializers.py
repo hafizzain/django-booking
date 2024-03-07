@@ -19,6 +19,7 @@ from Utility.Constants.Data.months import MONTH_DICT
 from .models import DiscountPromotionSalesReport
 from Invoices.models import SaleInvoice
 from Sale.serializers import SaleInvoiceSerializer, CheckoutSerializer
+from SaleRecords.models import *
 
 class ServiceOrderSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
@@ -1126,3 +1127,14 @@ class AppointmentService_DiscountReportSerializer(serializers.ModelSerializer):
             # 'client','created_at' ,'user',
             #       'duration', 'location', 'member', 'total_price',
             #       'payment_type','tip','gst', 'order_type','created_at'
+            
+class ProductsReportSerializer(serializers.ModelSerializer):
+    product_name = serializers.CharField(source='product.name')
+    channel = serializers.SerializerMethodField(read_only=True)
+    
+    
+    def get_channel(self, obj):
+        return "POS"
+    class Meta:
+        model = SaleRecordsProducts
+        fields = ['product', 'product_name', 'channel', 'quantity', 'created_at']

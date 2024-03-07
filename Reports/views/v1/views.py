@@ -33,6 +33,7 @@ from Reports.models import DiscountPromotionSalesReport
 from Reports.serializers import DiscountPromotionSalesReport_serializer, DiscountPromotionSalesReport_serializerOP
 from TragetControl.models import *
 from SaleRecords.models import *
+from Reports.serializers import *
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -490,7 +491,6 @@ def get_sales_analytics(request):
             
             current_year_pos_sales.append(total_monthly_pos_sale['total'])
             total_pos_sale = total_pos_sale + total_monthly_pos_sale['total']
-            
         data = {
             'success': True,
             'status_code': status.HTTP_200_OK,
@@ -541,6 +541,36 @@ def get_sales_analytics(request):
             'data': None
         }
         return Response(error_data, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_search_result_analytic(request):
+    location_id = request.GET.get('location_id', None)
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
+    
+    query = Q()
+    location = Q()
+    
+    if location_id:
+        location &= Q(location=location_id)
+    
+    if start_date and end_date:
+        query &= Q(created_at__range=(start_date, end_date))
+        
+    product = SaleRecordsProducts.objects.filter(query)
+    product_records = ProductsReportSerializer(product, many=True)
+    
+    data = {
+        'success': True,
+        'status_code': status.HTTP_200_OK,
+        'message': 'Product fetched successfully',
+        'error_message': None,
+        'data': {
+            'product_records': product_records.data
+        }
+    }
+    return Response(data, status=status.HTTP_200_OK)
 
 # @api_view(['GET'])
 # @permission_classes([AllowAny])
