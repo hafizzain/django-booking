@@ -2474,6 +2474,7 @@ def update_appointment_service(request):
                     service_appointment = AppointmentService.objects.get(id=str(id))
                     up_and_down_sale.location = service_appointment.business_address
                     up_and_down_sale.old_price = service_appointment.price
+                    old_price = service_appointment.price
                     up_and_down_sale.save()
 
                     if is_deleted == True:
@@ -2499,18 +2500,19 @@ def update_appointment_service(request):
                 service_appointment.save()
 
                 # Up and down Sale Logic ------------------------------
-                final_price = old_price - price
-                if old_price != price:
-                    if old_price > price:
-                        up_and_down_sale.price_difference = final_price
-                        up_and_down_sale.status = 'UpSale'
-                        
-                    if old_price < price:
-                        final_price = abs(final_price)
-                        up_and_down_sale.price_difference = final_price
-                        up_and_down_sale.status = 'DownSale'
-                        
-                up_and_down_sale.save()    
+                if old_price != 0:
+                    final_price = old_price - price
+                    if old_price != price:
+                        if old_price > price:
+                            up_and_down_sale.price_difference = final_price
+                            up_and_down_sale.status = 'UpSale'
+                            
+                        if old_price < price:
+                            final_price = abs(final_price)
+                            up_and_down_sale.price_difference = final_price
+                            up_and_down_sale.status = 'DownSale'
+                            
+                    up_and_down_sale.save()    
                     
                 # If a new service is added change the status of 
                 # appointment to started
