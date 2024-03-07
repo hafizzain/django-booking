@@ -3666,7 +3666,7 @@ def get_employees_for_selected_service(request):
             status=status.HTTP_400_BAD_REQUEST
         )
         
-        query = Q()
+    query = Q()
     if location_id :
         query &= Q(employee__location=location_id)
     
