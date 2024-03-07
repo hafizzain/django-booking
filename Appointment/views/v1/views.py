@@ -5141,7 +5141,8 @@ def get_EmployeeUpAndDownSale(request):
         
     employee_sales = EmployeeUpAndDownSale.objects.filter(query) \
                                 .select_related('location', 'employee','service') \
-                                .exclude(status="")
+                                .exclude(status="") \
+                                .order_by('-created_at')
                                 
     paginator = AppointmentsPagination()
     paginator.page_size = 10
@@ -5166,19 +5167,4 @@ def get_EmployeeUpAndDownSale(request):
             }
     return Response(data, status=status.HTTP_200_OK)
 
-# @api_view(['DELETE'])
-# @permission_classes([AllowAny])
-# def delete_EmployeeUpAndDownSale(request):
-#     id = request.data.GET.get('id', None)
-#     employee = EmployeeUpAndDownSale.objects.get(id=id)
-#     employee.delete()
-#     data = {
-#         'status': True,
-#         'status_code': 200,
-#         'response': {
-#             'message': 'Employee Up & Down Sale Deleted Successfully',
-#             'error_message': None,
-#         }
-#     }
-#     return Response(data, status=status.HTTP_200_OK)
     
