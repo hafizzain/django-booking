@@ -2466,7 +2466,7 @@ def update_appointment_service(request):
             )
             up_and_down_sale.save()
 
-            old_price = 0
+            old_price = 0.0
             
             try:
                 # below is just a workaround
