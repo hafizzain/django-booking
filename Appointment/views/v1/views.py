@@ -5130,7 +5130,7 @@ def get_EmployeeUpAndDownSale(request):
     start_date = request.GET.get('start_date', None)
     end_date = request.GET.get('end_date', None)
     
-    query = Q()
+    query = Q(status__in=['UpSale', 'DownSale'])
     if location:
         query &= Q(location_id=location)
         
