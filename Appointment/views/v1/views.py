@@ -2500,7 +2500,7 @@ def update_appointment_service(request):
                 service_appointment.save()
 
                 # Up and down Sale Logic ------------------------------
-                if old_price != 0:
+                if old_price != 0.0:
                     final_price = old_price - price
                     if price !=abs(final_price): 
                         if old_price != price:
