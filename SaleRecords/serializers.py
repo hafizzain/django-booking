@@ -360,7 +360,7 @@ class MembershipInstallmentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = MembershipInstallments
         fields = "__all__"
-        read_only_fields = ['membership','purchased_on','payable_amount','next_installement_date','remaining_installments']
+        read_only_fields = ['membership','purchased_on','payable_amount','next_installement_date','installment_paid_on','remaining_installments']
 
 
 class SaleRecordSerializer(serializers.ModelSerializer):
