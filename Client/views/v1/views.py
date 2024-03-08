@@ -3018,7 +3018,7 @@ def get_client_all_memberships(request):
             # created_at__lt = F('end_date'),
             # end_date__gte = today_date,
             sale_record__client__id=client_id,
-            membership__is_installment = installment
+            membership__is_installment = True
         )
     else:
         client_membership = SaleRecordMembership.objects.filter(
@@ -3027,6 +3027,7 @@ def get_client_all_memberships(request):
                 # created_at__lt = F('end_date'),
                 # end_date__gte = today_date,
                 sale_record__client__id=client_id,
+                membership__is_installment = False
             )
 
     # return JsonResponse({'data': client_membership})
