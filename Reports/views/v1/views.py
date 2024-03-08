@@ -680,14 +680,11 @@ def get_customer_analytics(request):
                         'service_yearly_sales': service_year_sales,
                     },
                     'product_spending' : {
-                        'product_yearly_sales': product_year_sales,
                         'product_total_sale': product['total_product_sale'],
+                        'product_yearly_sales': product_year_sales,
+                        
                     },
-                    'service' : {
-                        'total_service_sale': service_avg['total_service_sale'],
-                        'total_appointment_sale': appointment_avg['total_appointment_sale'],
-                        'service_spending_avg': service_spending_avg,
-                    },
+                    
                 }
         }
         return Response(data, status=status.HTTP_200_OK)
