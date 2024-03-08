@@ -596,47 +596,104 @@ def get_customer_analytics(request):
     month = request.GET.get('month', None)
     today = request.GET.get('today', None)
     
-    query = Q()
-    if location_id:
-        query &= Q(sale_record__location_id=location_id)
-    if year: 
-        query &= Q(created_at__year=year)
-    if month:
-        query &= Q(created_at__month=month)
-    if today:
-        query &= Q(created_at__date=today)
+    try:
+        query = Q()
+        if location_id:
+            query &= Q(sale_record__location_id=location_id)
+        if year: 
+            query &= Q(created_at__year=year)
+        if month:
+            query &= Q(created_at__month=month)
+        if today:
+            query &= Q(created_at__date=today)
+            
+            
+        # Get Sale Records Against Client
+        service = SaleRecordServices.objects.filter(query, sale_record__client_type='In_Saloon').aggregate(total_service_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        product = SaleRecordsProducts.objects.filter(query, sale_record__client_type='In_Saloon').aggregate(total_product_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        vouchers = SaleRecordVouchers.objects.filter(query, sale_record__client_type='In_Saloon').aggregate(total_vouchers_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        membership = SaleRecordMembership.objects.filter(query, sale_record__client_type='In_Saloon').aggregate(total_membership_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        gift_card = PurchasedGiftCards.objects.filter(query, sale_record__client_type='In_Saloon').aggregate(total_gift_card_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        appointment = SaleRecordsAppointmentServices.objects.filter(query, sale_record__client_type='In_Saloon').aggregate(total_appointment_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
         
+        # Calculate the total sum -----------------------------
+        total_sale = (
+            service['total_service_sale'] +
+            product['total_product_sale'] +
+            vouchers['total_vouchers_sale'] +
+            membership['total_membership_sale'] +
+            gift_card['total_gift_card_sale'] +
+            appointment['total_appointment_sale']    
+        )
         
-    # Get Sale Records Against Client
-    service = SaleRecordServices.objects.filter(query, sale_record__client_type='In_Saloon').aggregate(total_service_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
-    product = SaleRecordsProducts.objects.filter(query, sale_record__client_type='In_Saloon').aggregate(total_product_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
-    vouchers = SaleRecordVouchers.objects.filter(query, sale_record__client_type='In_Saloon').aggregate(total_vouchers_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
-    membership = SaleRecordMembership.objects.filter(query, sale_record__client_type='In_Saloon').aggregate(total_membership_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
-    gift_card = PurchasedGiftCards.objects.filter(query, sale_record__client_type='In_Saloon').aggregate(total_gift_card_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
-    appointment = SaleRecordsAppointmentServices.objects.filter(query, sale_record__client_type='In_Saloon').aggregate(total_appointment_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        # Service Spending ------------------------------------
+        service_avg = SaleRecordServices.objects.filter(query, sale_record__client_type='In_Saloon').aggregate(total_service_sale=Coalesce(Avg('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        appointment_avg = SaleRecordsAppointmentServices.objects.filter(query, sale_record__client_type='In_Saloon').aggregate(total_appointment_sale=Coalesce(Avg('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        
+        service_spending = (
+            service_avg['total_service_sale'] +
+            appointment_avg['total_appointment_sale']
+        )
+        service_spending_avg = service_spending / 2
+        
+        # Service Spending Monthly Reports ---------------------
+        query = Q()
+        if location_id:
+            query &= Q(sale_record__location_id=location_id)
+            
+        if year:
+            current_year = year
+        else:
+            current_year = date.today().year
+            
+        months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        service_year_sales = []
+        for month in months:
+            total_monthly_service = SaleRecordServices.objects.filter(query, created_at__year=current_year,
+                                                                    created_at__month=month, sale_record__client_type='In_Saloon').aggregate(total_service_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+            total_monthly_appointment = SaleRecordServices.objects.filter(query, created_at__year=current_year,
+                                                                    created_at__month=month, sale_record__client_type='In_Saloon').aggregate(total_service_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+            total_service_sale = total_monthly_service['total_service_sale'] + total_monthly_appointment['total_service_sale']
+            service_year_sales.append(total_service_sale)
+        
+        # Product Spending Monthly Reports ------------------------
+        product_year_sales = []
+        for month in months:
+            total_monthly_product = SaleRecordsProducts.objects.filter(query, created_at__year=current_year,
+                                                                    created_at__month=month, sale_record__client_type='In_Saloon').aggregate(total_product_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+            product_year_sales.append(total_monthly_product['total_product_sale'])
+            
+        # Total Client -----------------------------------------
+        total_client = Client.objects.filter(is_deleted=False).count()
+        data = {
+                'success': True,
+                'status_code': status.HTTP_200_OK,
+                'message': 'Customer analytics Data fetched successfully',
+                'error_message': None,
+                'data': {
+                    'sales_cards':{
+                        'total_customer': total_client,
+                        'total_customer_sale': total_sale,
+                    },
+                    'service_spending' : {
+                        'service_spending_avg': service_spending_avg,
+                        'service_yearly_sales': service_year_sales,
+                    },
+                    'product_spending' : {
+                        'product_yearly_sales': product_year_sales,
+                        'product_total_sale': product['total_product_sale'],
+                    },
+                }
+        }
+        return Response(data, status=status.HTTP_200_OK)
+    except Exception as e:
+        # Handle exceptions and return error response
+        error_data = {
+            'success': False,
+            'status_code': 400,
+            'message': 'Internal Server Error',
+            'error_message': str(e),
+            'data': None
+        }
+        return Response(error_data, status=status.HTTP_400_BAD_REQUEST)
     
-    # Calculate the total sum
-    total_sale = (
-        service['total_service_sale'] +
-        product['total_product_sale'] +
-        vouchers['total_vouchers_sale'] +
-        membership['total_membership_sale'] +
-        gift_card['total_gift_card_sale'] +
-        appointment['total_appointment_sale']    
-    )
-    
-    # Total Client ------------------------------
-    total_client = Client.objects.filter(is_deleted=False).count()
-    data = {
-            'success': True,
-            'status_code': status.HTTP_200_OK,
-            'message': 'Data fetched successfully',
-            'error_message': None,
-            'data': {
-                'sales_cards':{
-                    'total_customer': total_client,
-                    'total_customer_sale': total_sale,
-                },
-            }
-    }
-    return Response(data, status=status.HTTP_200_OK)
