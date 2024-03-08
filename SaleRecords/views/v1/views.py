@@ -95,7 +95,7 @@ class SaleRecordViews(APIView):
                 is_installment_month = sale_record.membership_records.first()
                 if is_installment_month.installment_months:
                     first_installment = MembershipInstallments.objects.create(
-                        membership=is_installment_month.membership_records,
+                        membership=is_installment_month,
                         paid_installment=is_installment_month.price
                     )
                     first_installment.save()
