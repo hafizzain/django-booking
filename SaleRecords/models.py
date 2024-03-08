@@ -247,6 +247,6 @@ class AppliedPromotion(CommonField):
     # promotion = models.ForeignKey(Promotion, on_delete = models.SET_NULL,blank=True, null=True, related_name = "sale_record_promotions")
     promotion = models.CharField(max_length = 150 , blank=True, null=True)
     promotion_type = models.CharField(max_length = 255 , blank=True, null=True)
-    client = models.ForeignKey(Client, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'applied_promotion_client')
+    # client = models.ForeignKey(Client, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'applied_promotion_client')
     
     
