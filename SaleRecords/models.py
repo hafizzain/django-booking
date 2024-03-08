@@ -130,8 +130,7 @@ class SaleRecordMembership(CommonField):
     
     price = models.FloatField(blank=True, null=True) 
     quantity = models.PositiveSmallIntegerField(blank=True, null=True) 
-    
-    
+
 class MembershipInstallments(CommonField):
     membership = models.ForeignKey(SaleRecordMembership, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'installment_memberships')
     paid_installment = models.FloatField(blank=True, null=True)
