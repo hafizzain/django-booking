@@ -4,14 +4,13 @@ from .models import *
 
 
 
-@receiver(post_save, sender = SaleRecordMembership)
-def installment_instance_create(sender, instance, created, **kwargs):
-    # print('coming in signal function')
-    if created:
-        # raise ValueError(f"installment_instance_create function is triggered for SaleRecordMembership instance with ID")
+@receiver(post_save, sender=SaleRecordMembership)
+def create_membership_installment(sender, instance, created, **kwargs):
+    if created and instance.installment_months:
+        # Create a single MembershipInstallments instance
         MembershipInstallments.objects.create(
             membership=instance,
-            paid_installment=instance.price
+            paid_installment=instance.price  # Or any default value you prefer
         )
 
 @receiver(post_save, sender=MembershipInstallments)
