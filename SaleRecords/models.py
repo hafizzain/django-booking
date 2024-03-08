@@ -134,7 +134,7 @@ class SaleRecordMembership(CommonField):
     
 @receiver(post_save, sender = SaleRecordMembership)
 def installment_instance_create(sender, instance, created, **kwargs):
-    if instance and instance.installment_months is not None:
+    if instance.installment_months is not None:
         # raise ValueError(f"installment_instance_create function is triggered for SaleRecordMembership instance with ID")
         MembershipInstallments.objects.create(
             membership=instance.id,
