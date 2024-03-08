@@ -355,6 +355,7 @@ class MembershipInstallmentsSerializer(serializers.ModelSerializer):
     payable_amount = serializers.FloatField(source = 'membership.payable_amount')
     remaining_installments = serializers.IntegerField(source = 'membership.remaining_installments')
     next_installement_date = serializers.DateTimeField(source = 'membership.next_installment_date')
+    installment_paid_on = serializers.DateTimeField(source = 'created_at')
     
     class Meta:
         model = MembershipInstallments
