@@ -7,7 +7,7 @@ from .models import *
 @receiver(post_save, sender = SaleRecordMembership)
 def installment_instance_create(sender, instance, created, **kwargs):
     # print('coming in signal function')
-    if created and instance.installment_months is not None:
+    if created and len(instance.installment_months) > 0:
         # raise ValueError(f"installment_instance_create function is triggered for SaleRecordMembership instance with ID")
         MembershipInstallments.objects.create(
             membership=instance,
