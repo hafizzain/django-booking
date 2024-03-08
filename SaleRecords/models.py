@@ -131,6 +131,7 @@ class SaleRecordMembership(CommonField):
     price = models.FloatField(blank=True, null=True) 
     quantity = models.PositiveSmallIntegerField(blank=True, null=True) 
     
+    
 @receiver(pre_save, sender = SaleRecordMembership)
 def installment_instance_create(sender, instance, created, **kwargs):
     if created and instance.installment_months is not None:
