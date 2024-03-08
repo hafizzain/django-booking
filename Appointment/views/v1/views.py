@@ -4739,7 +4739,15 @@ def create_missed_opportunity(request):
             )
         else:
             # Handle the case where employee is None (skip or provide a default)
-            pass
+            services_list.append(
+                OpportunityEmployeeService(
+                    client_missed_opportunity=client_opportunity,
+                    employee=employee,
+                    service=service,
+                    duration=data['duration'],
+                    time=data['time']
+                )
+            )
 
     OpportunityEmployeeService.objects.bulk_create(services_list)
 
