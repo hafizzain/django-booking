@@ -137,29 +137,39 @@ class MembershipInstallments(CommonField):
     paid_installment = models.FloatField(blank=True, null=True)
     
     
-@receiver(post_save, sender = SaleRecordMembership)
-def installment_instance_create(sender, instance, created, **kwargs):
-    if instance.installment_months is not None:
-        # raise ValueError(f"installment_instance_create function is triggered for SaleRecordMembership instance with ID")
-        MembershipInstallments.objects.create(
-            membership=instance.id,
-            paid_installment=instance.price
-        )
+# @receiver(post_save, sender = SaleRecordMembership)
+# def installment_instance_create(sender, instance, created, **kwargs):
+#     if instance.installment_months is not None:
+#         # raise ValueError(f"installment_instance_create function is triggered for SaleRecordMembership instance with ID")
+#         MembershipInstallments.objects.create(
+#             membership=instance.id,
+#             paid_installment=instance.price
+#         )
 
-@receiver(post_save, sender=MembershipInstallments)
-def next_installment_expiry(sender, instance, created, **kwargs):
-    if created:  # Check if the instance is newly created
-        membership = instance.membership  # Assuming membership is the ForeignKey field in MembershipInstallments
-        if membership.installment_months:
-            # Assuming calculate_validity function is defined elsewhere and correctly calculates the next installment date
-            next_membership_expiry = relativedelta(membership.created_at, instance.created_at).months + 1 
-            membership.next_installment_date = calculate_validity(str(next_membership_expiry)+ ' months')
-            total_paid_installments = MembershipInstallments.objects.filter(membership = instance.membership).count()
-            membership.remaining_installments = membership.installment_months - total_paid_installments
-            memberhsip_instance = CurrencyPriceMembership.objects.get(membership__id = membership.id)
-            membership.payable_amount = memberhsip_instance.price - instance.paid_installment
+@receiver(post_save, sender=SaleRecordMembership)
+def create_membership_installments(sender, instance, created, **kwargs):
+    if created and instance.installment_months is not None:
+        # Create MembershipInstallments for each installment month
+        for _ in range(instance.installment_months):
+            MembershipInstallments.objects.create(
+                membership=instance,
+                paid_installment=0  # Or any default value you prefer
+            )
+
+# @receiver(post_save, sender=MembershipInstallments)
+# def next_installment_expiry(sender, instance, created, **kwargs):
+#     if created:  # Check if the instance is newly created
+#         membership = instance.membership  # Assuming membership is the ForeignKey field in MembershipInstallments
+#         if membership.installment_months:
+#             # Assuming calculate_validity function is defined elsewhere and correctly calculates the next installment date
+#             next_membership_expiry = relativedelta(membership.created_at, instance.created_at).months + 1 
+#             membership.next_installment_date = calculate_validity(str(next_membership_expiry)+ ' months')
+#             total_paid_installments = MembershipInstallments.objects.filter(membership = instance.membership).count()
+#             membership.remaining_installments = membership.installment_months - total_paid_installments
+#             memberhsip_instance = CurrencyPriceMembership.objects.get(membership__id = membership.id)
+#             membership.payable_amount = memberhsip_instance.price - instance.paid_installment
             
-            membership.save()
+#             membership.save()
 
     
     
