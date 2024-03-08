@@ -134,10 +134,11 @@ class SaleRecordMembership(CommonField):
 @receiver(post_save, sender = SaleRecordMembership)
 def installment_instance_create(sender, instance, created, **kwargs):
     if created and instance.installment_months:
-        MembershipInstallments.objects.create(
+        installment = MembershipInstallments.objects.create(
             membership=instance,
             paid_installment=instance.price
         )
+        installment.save()
     
 class MembershipInstallments(CommonField):
     membership = models.ForeignKey(SaleRecordMembership, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'installment_memberships')
