@@ -350,14 +350,16 @@ class RedeemedLoyaltyPointsSerializer(serializers.ModelSerializer):
         # read_only_fields = ['sale_record']
 
 class MembershipInstallmentsSerializer(serializers.ModelSerializer):
+    
     purchased_on = serializers.DateTimeField(source = 'membership.created_at')
     payable_amount = serializers.FloatField(source = 'membership.payable_amount')
+    remaining_installments = serializers.IntegerField(source = 'membership.remaining_installments')
     next_installement_date = serializers.DateTimeField(source = 'membership.next_installment_date')
     
     class Meta:
         model = MembershipInstallments
         fields = "__all__"
-        read_only_fields = ['membership','purchased_on','payable_amount','next_installement_date']
+        read_only_fields = ['membership','purchased_on','payable_amount','next_installement_date','remaining_installments']
 
 
 class SaleRecordSerializer(serializers.ModelSerializer):
