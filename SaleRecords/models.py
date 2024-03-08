@@ -136,11 +136,11 @@ class SaleRecordMembership(CommonField):
 def installment_instance_create(sender, instance, created, **kwargs):
     if created and instance.installment_months is not None:
         # raise ValueError(f"installment_instance_create function is triggered for SaleRecordMembership instance with ID")
-        installment = MembershipInstallments.objects.create(
+        MembershipInstallments.objects.create(
             membership=instance.id,
             paid_installment=instance.price
         )
-        installment.save()
+        instance.save()
     
 class MembershipInstallments(CommonField):
     membership = models.ForeignKey(SaleRecordMembership, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'installment_memberships')
