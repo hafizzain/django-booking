@@ -140,7 +140,7 @@ def installment_instance_create(sender, instance, created, **kwargs):
         )
     
 class MembershipInstallments(CommonField):
-    memberhsip = models.ForeignKey(SaleRecordMembership, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'installment_memberships')
+    membership = models.ForeignKey(SaleRecordMembership, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'installment_memberships')
     paid_installment = models.FloatField(blank=True, null=True)
 
 @receiver(post_save, sender=MembershipInstallments)
@@ -149,7 +149,7 @@ def next_installment_expiry(sender, instance, created, **kwargs):
         membership = instance.membership  # Assuming membership is the ForeignKey field in MembershipInstallments
         if membership.installment_months:
             # Assuming calculate_validity function is defined elsewhere and correctly calculates the next installment date
-            next_membership_expiry = relativedelta(instance.membership.created_at, instance.created_at).months + 1 
+            next_membership_expiry = relativedelta(membership.created_at, instance.created_at).months + 1 
             membership.next_installment_date = calculate_validity(str(next_membership_expiry)+ ' months')
             total_paid_installments = MembershipInstallments.objects.filter(membership = instance.membership).count()
             membership.remaining_installments = membership.installment_months - total_paid_installments
