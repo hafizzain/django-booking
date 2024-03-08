@@ -583,25 +583,27 @@ class AppointmentCheckout(models.Model):
         business_tax = BusinessTax.objects.filter(location=self.appointment.business_address).first()
         parent_tax = business_tax.parent_tax.all()[0]
         parent_taxes = parent_tax.parent_tax.all()
-
+        if tax_setting and business_tax:
+            
         # workaround here
-        if parent_tax.is_individual():
-            parent_taxes = [parent_tax]
+            if parent_tax.is_individual():
+                parent_taxes = [parent_tax]
 
-        if tax_setting.is_combined():
-            gst_price = round((parent_taxes[0].tax_rate * total_price / 100), 2)
-            if parent_tax.is_group():
-                gst_price1 = round((parent_taxes[1].tax_rate * total_price / 100), 2)
+            if tax_setting.is_combined():
+                gst_price = round((parent_taxes[0].tax_rate * total_price / 100), 2)
+                if parent_tax.is_group():
+                    gst_price1 = round((parent_taxes[1].tax_rate * total_price / 100), 2)
 
-        elif tax_setting.is_seperately():
-            gst_price = round((parent_taxes[0].tax_rate * total_price / 100), 2)
-            if parent_tax.is_group():
-                total_price += gst_price
-                gst_price1 = round((parent_taxes[1].tax_rate * total_price / 100), 2)
+            elif tax_setting.is_seperately():
+                gst_price = round((parent_taxes[0].tax_rate * total_price / 100), 2)
+                if parent_tax.is_group():
+                    total_price += gst_price
+                    gst_price1 = round((parent_taxes[1].tax_rate * total_price / 100), 2)
 
-        self.gst_price = gst_price
-        self.gst_price1 = gst_price1
-        self.save()
+            self.gst_price = gst_price
+            self.gst_price1 = gst_price1
+            self.save()
+        pass
 
     def void_excluded_services_price(self):
         """
