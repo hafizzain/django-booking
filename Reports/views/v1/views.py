@@ -684,8 +684,8 @@ def get_customer_analytics(request):
                         'product_total_sale': product['total_product_sale'],
                     },
                     'service' : {
-                        'total_service_sale': service['total_service_sale'],
-                        'total_appointment_sale': appointment['total_appointment_sale'],
+                        'total_service_sale': service_avg['total_service_sale'],
+                        'total_appointment_sale': appointment_avg['total_appointment_sale'],
                         'service_spending_avg': service_spending_avg,
                     },
                 }
