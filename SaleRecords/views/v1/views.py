@@ -92,7 +92,8 @@ class SaleRecordViews(APIView):
                 data=request.data, context={'request': request})
             if serializer.is_valid():
                 sale_record = serializer.save()
-                if sale_record.membership_records.installment_months:
+                is_installment_month = sale_record.membership_records.first()
+                if is_installment_month.installment_months:
                     first_installment = MembershipInstallments.objects.create(
                         membership_id=sale_record.membership_records.id,
                         paid_installment=sale_record.membership_records.price
