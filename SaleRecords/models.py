@@ -146,15 +146,15 @@ class MembershipInstallments(CommonField):
 #             paid_installment=instance.price
 #         )
 
-@receiver(post_save, sender=SaleRecordMembership)
-def create_membership_installments(sender, instance, created, **kwargs):
-    if created and instance.installment_months is not None:
-        # Create MembershipInstallments for each installment month
-        for _ in range(instance.installment_months):
-            MembershipInstallments.objects.create(
-                membership=instance,
-                paid_installment=0  # Or any default value you prefer
-            )
+# @receiver(post_save, sender=SaleRecordMembership)
+# def create_membership_installments(sender, instance, created, **kwargs):
+#     if created and instance.installment_months is not None:
+#         # Create MembershipInstallments for each installment month
+#         for _ in range(instance.installment_months):
+#             MembershipInstallments.objects.create(
+#                 membership=instance,
+#                 paid_installment=0  # Or any default value you prefer
+#             )
 
     
 class PurchasedGiftCards(CommonField):
