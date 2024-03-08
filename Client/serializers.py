@@ -593,7 +593,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     def get_installment_data(self, obj):
         from SaleRecords.serializers import MembershipInstallmentsSerializer
         try:
-            installments = MembershipInstallments.objects.filter(membership_id = obj.membership)
+            installments = MembershipInstallments.objects.filter(membership__membership_id = obj.membership)
             if installments:
                 return MembershipInstallmentsSerializer(installments, many = True).data
             return None
