@@ -3353,6 +3353,18 @@ def update_commision(request):
         )
 
     try:
+        # Check if service_comission is empty and delete existing records
+        if not request.data.get('service_comission'):
+            CategoryCommission.objects.filter(commission=commission_id, category_comission='Service').delete()
+
+        # Check if product_comission is empty and delete existing records
+        if not request.data.get('product_comission'):
+            CategoryCommission.objects.filter(commission=commission_id, category_comission='Retail').delete()
+
+        # Check if voucher_comission is empty and delete existing records
+        if not request.data.get('voucher_comission'):
+            CategoryCommission.objects.filter(commission=commission_id, category_comission='Voucher').delete()
+            
         commission = CommissionSchemeSetting.objects.get(id=commission_id)
     except Exception as err:
         return Response(
@@ -3408,7 +3420,7 @@ def update_commision(request):
                     symbol=symbol,
                     category_comission='Service',
                     comission_choice='percentage' if '%' in symbol else 'currency'
-                )
+                )        
 
     if product_comission is not None:
         if type(product_comission) == str:
