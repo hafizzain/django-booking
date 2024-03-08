@@ -4,14 +4,14 @@ from .models import *
 
 
 
-@receiver(post_save, sender=SaleRecordMembership)
-def create_membership_installment(sender, instance, created, **kwargs):
-    if created and instance.installment_months:
-        # Create a single MembershipInstallments instance
-        MembershipInstallments.objects.create(
-            membership=instance,
-            paid_installment=instance.price  # Or any default value you prefer
-        )
+# @receiver(post_save, sender=SaleRecordMembership)
+# def create_membership_installment(sender, instance, created, **kwargs):
+#     if created and instance.installment_months:
+#         # Create a single MembershipInstallments instance
+#         MembershipInstallments.objects.create(
+#             membership=instance,
+#             paid_installment=instance.price  # Or any default value you prefer
+#         )
 
 @receiver(post_save, sender=MembershipInstallments)
 def next_installment_expiry(sender, instance, created, **kwargs):
