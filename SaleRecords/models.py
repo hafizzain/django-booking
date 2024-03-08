@@ -132,19 +132,29 @@ class SaleRecordMembership(CommonField):
     quantity = models.PositiveSmallIntegerField(blank=True, null=True) 
     
     
-@receiver(post_save, sender = SaleRecordMembership)
-def installment_instance_create(sender, instance, created, **kwargs):
-    if created and instance.installment_months is not None:
-        # raise ValueError(f"installment_instance_create function is triggered for SaleRecordMembership instance with ID")
-        MembershipInstallments.objects.create(
-            membership=instance.id,
-            paid_installment=instance.price
-        )
-        instance.save()
-    
 class MembershipInstallments(CommonField):
     membership = models.ForeignKey(SaleRecordMembership, on_delete = models.SET_NULL, blank=True, null=True, related_name = 'installment_memberships')
     paid_installment = models.FloatField(blank=True, null=True)
+    
+    
+# @receiver(post_save, sender = SaleRecordMembership)
+# def installment_instance_create(sender, instance, created, **kwargs):
+#     if instance.installment_months is not None:
+#         # raise ValueError(f"installment_instance_create function is triggered for SaleRecordMembership instance with ID")
+#         MembershipInstallments.objects.create(
+#             membership=instance.id,
+#             paid_installment=instance.price
+#         )
+
+@receiver(post_save, sender=SaleRecordMembership)
+def create_membership_installments(sender, instance, created, **kwargs):
+    if created and instance.installment_months is not None:
+        # Create MembershipInstallments for each installment month
+        for _ in range(instance.installment_months):
+            MembershipInstallments.objects.create(
+                membership=instance,
+                paid_installment=0  # Or any default value you prefer
+            )
 
 # @receiver(post_save, sender=MembershipInstallments)
 # def next_installment_expiry(sender, instance, created, **kwargs):
