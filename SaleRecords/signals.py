@@ -25,7 +25,7 @@ def next_installment_expiry(sender, instance, created, **kwargs):
             total_paid_installments = MembershipInstallments.objects.filter(membership = instance.membership).count()
             membership.remaining_installments = membership.installment_months - total_paid_installments
             # currency_id = 
-            memberhsip_instance = CurrencyPriceMembership.objects.get(currency_id = membership.membership.location.currency.id)
+            memberhsip_instance = CurrencyPriceMembership.objects.get(currency_id = membership.sale_record.location.currency.id)
             membership.payable_amount = memberhsip_instance.price - instance.paid_installment
             
             membership.save()
