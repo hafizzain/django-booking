@@ -17,6 +17,7 @@ urlpatterns = [
     
     path('get_analytics_optimizedsale-record/', views.get_sales_analytics),
     path('get_product_pos_analytics/', views.get_search_result_analytic),
+    path('get_customer_analytics/', views.get_customer_analytics),
 
     
 ]
