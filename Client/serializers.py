@@ -676,7 +676,12 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
             # 'payment_type', 
             'order_type',
             'price',
+            'remaining_installments',
+            'payable_amount',
+            'next_installment_date',
+            'installment_months',
             'created_at',
+            ''
             # 'discount_percentage', 
             'membership_price', 
             'discount_type' ,
