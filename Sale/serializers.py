@@ -22,6 +22,7 @@ from Utility.models import Language
 from Product.serializers import ProductTranlationsSerializerNew
 from Service.serializers import ServiceTranslationsSerializer
 from MultiLanguage.models import InvoiceTranslation
+from SaleRecords.models import SaleRecordsProducts
 
 
 class PriceServiceSerializers(serializers.ModelSerializer):
@@ -650,7 +651,7 @@ class ServiceTranlationsSerializer(serializers.ModelSerializer):
 
 
 class POSerializerForClientSale(serializers.ModelSerializer):
-    from SaleRecords.models import SaleRecordsProducts
+    
     member = serializers.SerializerMethodField(read_only=True)
     product_name = serializers.SerializerMethodField(read_only=True)
     order_type = serializers.SerializerMethodField(read_only=True)
