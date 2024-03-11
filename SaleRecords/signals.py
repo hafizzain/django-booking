@@ -25,8 +25,9 @@ def next_installment_expiry(sender, instance, created, **kwargs):
                 membership.next_installment_date = calculate_validity(str(next_membership_expiry)+ ' months')
                 total_paid_installments = MembershipInstallments.objects.filter(membership = instance.membership).count()
                 membership.remaining_installments = membership.installment_months - total_paid_installments
-                membership.payable_amount = membership.price * membership.remaining_installments - instance.paid_installment
-                
+                membership.payable_amount = membership.price * membership.remaining_installments
+                membership.save()
+                membership.payable_amount = membership.payable_amount - instance.paid_installment
                 membership.save()
     except Exception as e:
         return Response({'error: error occured in signal'})
