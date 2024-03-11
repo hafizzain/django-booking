@@ -609,7 +609,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
                 query['currency'] = location.currency
         try:
             pro = CurrencyPriceMembership.objects.filter(
-                membership = obj,
+                membership = obj.membership,
                 **query,
             ).distinct()
             return CurrencyPriceMembershipSerializers(pro, many= True).data
