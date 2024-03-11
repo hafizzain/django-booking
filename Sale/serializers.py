@@ -885,7 +885,7 @@ class MOrderSerializerForSale(serializers.ModelSerializer):
 
     def get_member(self, obj):
         try:
-            return obj.member.full_name
+            return obj.employee.full_name
         except:
             return None
     def get_membership(self, obj):
@@ -897,7 +897,7 @@ class MOrderSerializerForSale(serializers.ModelSerializer):
         except:
             return obj.price
     class Meta:
-        model = MemberShipOrder
+        model = SaleRecordMembership
         fields = ['membership', 'order_type', 'member', 'quantity', 'price', 'created_at']
 
 
@@ -1107,7 +1107,7 @@ class VoucherSerializerForClientSale(serializers.ModelSerializer):
         return obj.price
 
     class Meta:
-        model = VoucherOrder
+        model = SaleRecordVouchers
         fields = ['voucher', 'member', 'quantity', 'order_type', 'price', 'created_at', ]
 
 
