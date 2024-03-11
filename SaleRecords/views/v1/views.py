@@ -300,8 +300,9 @@ def single_sale_record(request):
 
 
 @api_view(['POST'])
-@permission_classes('IsAuthenticated')
+@permission_classes([IsAuthenticated])
 def pay_installment(request):
+    
     membership_id = request.data.get('membership')
     paid_installment = request.data.get('paid_installment')
     
