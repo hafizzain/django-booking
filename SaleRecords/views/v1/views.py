@@ -307,7 +307,7 @@ def pay_installment(request):
     
     MembershipInstallments.objects.create(
         membership_id = membership_id,
-        paid_installment = paid_installment
+        paid_installment = float(paid_installment)
     )
     response_data = {
                     'success': True,
