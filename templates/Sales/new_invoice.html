@@ -2,1520 +2,697 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Document</title>
-  <!-- <script src="https://deals.tijarah.ae/static/assets/js/tailwind.js?1"></script> -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+</head>
 
-
-  <style>
-    .-translate-y-1\/2 {
-      -webkit-transform: translateY(-50%);
-    }
-
-    .translate-y-1\/2 {
-      -webkit-transform: translateY(50%);
-    }
-
-    .-translate-x-1\/2 {
-      -webkit-transform: translateX(-50%);
-    }
-
-    .translate-x-1\/2 {
-      -webkit-transform: translateX(50%);
-    }
-
-    [class*="gap-"].gap-x>* {
-      margin-top: 0 !important;
-      margin-bottom: 0 !important;
-    }
-
-    .top-1\/2 {
-      top: 50%;
-    }
-
-    [class*="gap-"].gap-y>* {
-      margin-left: 0 !important;
-      margin-right: 0 !important;
-    }
-
-    :not(.grid)[class*="gap-"] {
-      gap: 0 !important;
-    }
-
-    :not(.grid).gap-1>* {
-      margin: calc(0.25rem / 2.25);
-    }
-
-    :not(.grid).gap-2>* {
-      margin: calc(0.5rem / 2.25);
-    }
-
-    :not(.grid).gap-3>* {
-      margin: calc(0.75rem / 2.25);
-    }
-
-    :not(.grid).gap-4>* {
-      margin: calc(1rem / 2.25);
-    }
-
-    :not(.grid).gap-5>* {
-      margin: calc(1.25rem / 2.25);
-    }
-
-    :not(.grid).gap-6>* {
-      margin: calc(1.5rem / 2.25);
-    }
-
-    :not(.grid).gap-7>* {
-      margin: calc(1.75rem / 2.25);
-    }
-
-    :not(.grid).gap-8>* {
-      margin: calc(2rem / 2.25);
-    }
-
-    :not(.grid).gap-9>* {
-      margin: calc(2.25rem / 2.25);
-    }
-
-    :not(.grid).gap-10>* {
-      margin: calc(2.5rem / 2.25);
-    }
-
-    :not(.grid).gap-11>* {
-      margin: calc(2.75rem / 2.25);
-    }
-
-    :not(.grid).gap-12>* {
-      margin: calc(3rem / 2.25);
-    }
-
-    :not(.grid).gap-13>* {
-      margin: calc(3.25rem / 2.25);
-    }
-
-    :not(.grid).gap-14>* {
-      margin: calc(3.5rem / 2.25);
-    }
-
-    :not(.grid).gap-15>* {
-      margin: calc(4rem / 2.25);
-    }
-
-    :not(.grid).gap-16>* {
-      margin: calc(4.25rem / 2.25);
-    }
-
-    :not(.grid).gap-17>* {
-      margin: calc(4.5rem / 2.25);
-    }
-
-    :not(.grid).gap-18>* {
-      margin: calc(5rem / 2.25);
-    }
-
-    .icon {
-      /* Equivalent basic CSS for PDF */
-      position: relative;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, 50%);
-      border: 2px solid white;
-      background-color: white;
-      border-radius: 50%;
-      display: inline-block;
-      /* Add any other styles you need here */
-
-    }
-
-    .w-full {
-      width: 100% !important;
-    }
-  </style>
-
-  <style>
-    /* ! tailwindcss v3.2.6 | MIT License | https://tailwindcss.com */
-    *,
-    ::after,
-    ::before {
-      box-sizing: border-box;
-      border-width: 0;
-      border-style: solid;
-      border-color: #e5e7eb
-    }
-
-    ::after,
-    ::before {
-      --tw-content: ''
-    }
-
-    html {
-      line-height: 1.5;
-      -webkit-text-size-adjust: 100%;
-      -moz-tab-size: 4;
-      tab-size: 4;
-      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-      font-feature-settings: normal
-    }
-
-    body {
-      margin: 0;
-      line-height: inherit
-    }
-
-    hr {
-      height: 0;
-      color: inherit;
-      border-top-width: 1px
-    }
-
-    abbr:where([title]) {
-      -webkit-text-decoration: underline dotted;
-      text-decoration: underline dotted
-    }
+<style>
+    /* Tailwind CSS styles */
 
     h1,
     h2,
     h3,
     h4,
     h5,
-    h6 {
-      font-size: inherit;
-      font-weight: inherit
+    h6 ,
+    a,p {
+        font-family: "Roboto", sans-serif;
     }
 
-    a {
-      color: inherit;
-      text-decoration: inherit
-    }
-
-    b,
-    strong {
-      font-weight: bolder
-    }
-
-    code,
-    kbd,
-    pre,
-    samp {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 1em
-    }
-
-    small {
-      font-size: 80%
-    }
-
-    sub,
-    sup {
-      font-size: 75%;
-      line-height: 0;
-      position: relative;
-      vertical-align: baseline
-    }
-
-    sub {
-      bottom: -.25em
-    }
-
-    sup {
-      top: -.5em
-    }
-
-    table {
-      text-indent: 0;
-      border-color: inherit;
-      border-collapse: collapse
-    }
-
-    button,
-    input,
-    optgroup,
-    select,
-    textarea {
-      font-family: inherit;
-      font-size: 100%;
-      font-weight: inherit;
-      line-height: inherit;
-      color: inherit;
-      margin: 0;
-      padding: 0
-    }
-
-    button,
-    select {
-      text-transform: none
-    }
-
-    [type=button],
-    [type=reset],
-    [type=submit],
-    button {
-      -webkit-appearance: button;
-      background-color: transparent;
-      background-image: none
-    }
-
-    :-moz-focusring {
-      outline: auto
-    }
-
-    :-moz-ui-invalid {
-      box-shadow: none
-    }
-
-    progress {
-      vertical-align: baseline
-    }
-
-    ::-webkit-inner-spin-button,
-    ::-webkit-outer-spin-button {
-      height: auto
-    }
-
-    [type=search] {
-      -webkit-appearance: textfield;
-      outline-offset: -2px
-    }
-
-    ::-webkit-search-decoration {
-      -webkit-appearance: none
-    }
-
-    ::-webkit-file-upload-button {
-      -webkit-appearance: button;
-      font: inherit
-    }
-
-    summary {
-      display: list-item
-    }
-
-    blockquote,
-    dd,
-    dl,
-    figure,
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    hr,
-    p,
-    pre {
-      margin: 0
-    }
-
-    fieldset {
-      margin: 0;
-      padding: 0
-    }
-
-    legend {
-      padding: 0
-    }
-
-    menu,
-    ol,
-    ul {
-      list-style: none;
-      margin: 0;
-      padding: 0
-    }
-
-    textarea {
-      resize: vertical
-    }
-
-    input::placeholder,
-    textarea::placeholder {
-      opacity: 1;
-      color: #9ca3af
-    }
-
-    [role=button],
-    button {
-      cursor: pointer
-    }
-
-    :disabled {
-      cursor: default
-    }
-
-    audio,
-    canvas,
-    embed,
-    iframe,
-    img,
-    object,
-    svg,
-    video {
-      display: block;
-      vertical-align: middle
-    }
-
-    img,
-    video {
-      max-width: 100%;
-      height: auto
-    }
-
-    [hidden] {
-      display: none
-    }
-
-    *,
-    ::before,
-    ::after {
-      --tw-border-spacing-x: 0;
-      --tw-border-spacing-y: 0;
-      --tw-translate-x: 0;
-      --tw-translate-y: 0;
-      --tw-rotate: 0;
-      --tw-skew-x: 0;
-      --tw-skew-y: 0;
-      --tw-scale-x: 1;
-      --tw-scale-y: 1;
-      --tw-pan-x: ;
-      --tw-pan-y: ;
-      --tw-pinch-zoom: ;
-      --tw-scroll-snap-strictness: proximity;
-      --tw-ordinal: ;
-      --tw-slashed-zero: ;
-      --tw-numeric-figure: ;
-      --tw-numeric-spacing: ;
-      --tw-numeric-fraction: ;
-      --tw-ring-inset: ;
-      --tw-ring-offset-width: 0px;
-      --tw-ring-offset-color: #fff;
-      --tw-ring-color: rgb(59 130 246 / 0.5);
-      --tw-ring-offset-shadow: 0 0 #0000;
-      --tw-ring-shadow: 0 0 #0000;
-      --tw-shadow: 0 0 #0000;
-      --tw-shadow-colored: 0 0 #0000;
-      --tw-blur: ;
-      --tw-brightness: ;
-      --tw-contrast: ;
-      --tw-grayscale: ;
-      --tw-hue-rotate: ;
-      --tw-invert: ;
-      --tw-saturate: ;
-      --tw-sepia: ;
-      --tw-drop-shadow: ;
-      --tw-backdrop-blur: ;
-      --tw-backdrop-brightness: ;
-      --tw-backdrop-contrast: ;
-      --tw-backdrop-grayscale: ;
-      --tw-backdrop-hue-rotate: ;
-      --tw-backdrop-invert: ;
-      --tw-backdrop-opacity: ;
-      --tw-backdrop-saturate: ;
-      --tw-backdrop-sepia:
-    }
-
-    ::-webkit-backdrop {
-      --tw-border-spacing-x: 0;
-      --tw-border-spacing-y: 0;
-      --tw-translate-x: 0;
-      --tw-translate-y: 0;
-      --tw-rotate: 0;
-      --tw-skew-x: 0;
-      --tw-skew-y: 0;
-      --tw-scale-x: 1;
-      --tw-scale-y: 1;
-      --tw-pan-x: ;
-      --tw-pan-y: ;
-      --tw-pinch-zoom: ;
-      --tw-scroll-snap-strictness: proximity;
-      --tw-ordinal: ;
-      --tw-slashed-zero: ;
-      --tw-numeric-figure: ;
-      --tw-numeric-spacing: ;
-      --tw-numeric-fraction: ;
-      --tw-ring-inset: ;
-      --tw-ring-offset-width: 0px;
-      --tw-ring-offset-color: #fff;
-      --tw-ring-color: rgb(59 130 246 / 0.5);
-      --tw-ring-offset-shadow: 0 0 #0000;
-      --tw-ring-shadow: 0 0 #0000;
-      --tw-shadow: 0 0 #0000;
-      --tw-shadow-colored: 0 0 #0000;
-      --tw-blur: ;
-      --tw-brightness: ;
-      --tw-contrast: ;
-      --tw-grayscale: ;
-      --tw-hue-rotate: ;
-      --tw-invert: ;
-      --tw-saturate: ;
-      --tw-sepia: ;
-      --tw-drop-shadow: ;
-      --tw-backdrop-blur: ;
-      --tw-backdrop-brightness: ;
-      --tw-backdrop-contrast: ;
-      --tw-backdrop-grayscale: ;
-      --tw-backdrop-hue-rotate: ;
-      --tw-backdrop-invert: ;
-      --tw-backdrop-opacity: ;
-      --tw-backdrop-saturate: ;
-      --tw-backdrop-sepia:
-    }
-
-    ::backdrop {
-      --tw-border-spacing-x: 0;
-      --tw-border-spacing-y: 0;
-      --tw-translate-x: 0;
-      --tw-translate-y: 0;
-      --tw-rotate: 0;
-      --tw-skew-x: 0;
-      --tw-skew-y: 0;
-      --tw-scale-x: 1;
-      --tw-scale-y: 1;
-      --tw-pan-x: ;
-      --tw-pan-y: ;
-      --tw-pinch-zoom: ;
-      --tw-scroll-snap-strictness: proximity;
-      --tw-ordinal: ;
-      --tw-slashed-zero: ;
-      --tw-numeric-figure: ;
-      --tw-numeric-spacing: ;
-      --tw-numeric-fraction: ;
-      --tw-ring-inset: ;
-      --tw-ring-offset-width: 0px;
-      --tw-ring-offset-color: #fff;
-      --tw-ring-color: rgb(59 130 246 / 0.5);
-      --tw-ring-offset-shadow: 0 0 #0000;
-      --tw-ring-shadow: 0 0 #0000;
-      --tw-shadow: 0 0 #0000;
-      --tw-shadow-colored: 0 0 #0000;
-      --tw-blur: ;
-      --tw-brightness: ;
-      --tw-contrast: ;
-      --tw-grayscale: ;
-      --tw-hue-rotate: ;
-      --tw-invert: ;
-      --tw-saturate: ;
-      --tw-sepia: ;
-      --tw-drop-shadow: ;
-      --tw-backdrop-blur: ;
-      --tw-backdrop-brightness: ;
-      --tw-backdrop-contrast: ;
-      --tw-backdrop-grayscale: ;
-      --tw-backdrop-hue-rotate: ;
-      --tw-backdrop-invert: ;
-      --tw-backdrop-opacity: ;
-      --tw-backdrop-saturate: ;
-      --tw-backdrop-sepia:
-    }
-
-    .absolute {
-      position: absolute
-    }
-
+p{
+    margin:  4px;
+}
     .relative {
-      position: relative
-    }
-
-    .sticky {
-      position: sticky
-    }
-
-    .left-1\/2 {
-      left: 50%
-    }
-
-    .right-0 {
-      right: 0px
-    }
-
-    .top-0 {
-      top: 0px
-    }
-
-    .top-1\/2 {
-      top: 50%
-    }
-
-    .z-\[22\] {
-      z-index: 22
-    }
-
-    .z-\[2\] {
-      z-index: 2
-    }
-
-    .mx-auto {
-      margin-left: auto;
-      margin-right: auto
-    }
-
-    .\!mt-\[2rem\] {
-      margin-top: 2rem !important
-    }
-
-    .flex {
-      display: flex
-    }
-
-    .h-\[1\.125rem\] {
-      height: 1.125rem
-    }
-
-    .h-\[1\.5rem\] {
-      height: 1.5rem
-    }
-
-    .w-\[1\.125rem\] {
-      width: 1.125rem
-    }
-
-    .w-\[1px\] {
-      width: 1px
-    }
-
-    .w-\[90vw\] {
-      width: 90vw
-    }
-
-    .w-fit {
-      width: -moz-fit-content;
-      width: fit-content
-    }
-
-    .min-w-\[30rem\] {
-      min-width: 30rem
-    }
-
-    .max-w-\[80\%\] {
-      max-width: 80%
-    }
-
-    .-translate-x-1\/2 {
-      --tw-translate-x: -50%;
-      transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
-    }
-
-    .translate-y-1\/2 {
-      --tw-translate-y: 50%;
-      transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
-    }
-
-    .cursor-pointer {
-      cursor: pointer
-    }
-
-    .flex-col {
-      flex-direction: column
-    }
-
-    .items-center {
-      align-items: center
-    }
-
-    .justify-center {
-      justify-content: center
-    }
-
-    .justify-between {
-      justify-content: space-between
-    }
-
-    .gap-1 {
-      gap: 0.25rem
-    }
-
-    .gap-2 {
-      gap: 0.5rem
-    }
-
-    .gap-5 {
-      gap: 1.25rem
+        position: relative;
     }
 
     .overflow-hidden {
-      overflow: hidden
-    }
-
-    .overflow-y-auto {
-      overflow-y: auto
-    }
-
-    .overflow-x-hidden {
-      overflow-x: hidden
+        overflow: hidden;
     }
 
     .rounded-2xl {
-      border-radius: 1rem
+        border-radius: 1rem;
     }
 
-    .rounded-full {
-      border-radius: 9999px
+    .flex {
+        display: flex;
     }
 
-    .rounded-md {
-      border-radius: 0.375rem
+    .items-center {
+        align-items: center;
     }
 
-    .rounded-t-2xl {
-      border-top-left-radius: 1rem;
-      border-top-right-radius: 1rem
+    .justify-center {
+        justify-content: center;
     }
 
-    .rounded-bl-2xl {
-      border-bottom-left-radius: 1rem
+    .h-screen {
+        height: 100vh;
     }
 
-    .rounded-tr-2xl {
-      border-top-right-radius: 1rem
+    .w-full {
+        width: 100%;
     }
 
-    .border {
-      border-width: 1px
+    .z-[2] {
+        z-index: 2;
     }
 
-    .border-2 {
-      border-width: 2px
-    }
-
-    .border-l {
-      border-left-width: 1px
-    }
-
-    .border-white {
-      --tw-border-opacity: 1;
-      border-color: rgb(255 255 255 / var(--tw-border-opacity))
-    }
-
-    .bg-\[\#F9F9F9\] {
-      --tw-bg-opacity: 1;
-      background-color: rgb(249 249 249 / var(--tw-bg-opacity))
+    .slide-in-elliptic-top-fwd {
+        animation: slide-in-elliptic-top-fwd 0.75s ease-out both;
     }
 
     .bg-white {
-      --tw-bg-opacity: 1;
-      background-color: rgb(255 255 255 / var(--tw-bg-opacity))
+        background-color: #fff;
     }
 
-    .p-2 {
-      padding: 0.5rem
+    .shadow-2xl {
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     }
 
-    .p-\[1\.2rem\] {
-      padding: 1.2rem
+    .border {
+        border-width: 1px;
     }
 
-    .p-\[1rem\] {
-      padding: 1rem
+    .min-w-\[25rem\] {
+        min-width: 25rem;
     }
 
-    .px-4 {
-      padding-left: 1rem;
-      padding-right: 1rem
+    .pt-4 {
+        padding-top: 1rem;
     }
 
-    .px-\[1\.6rem\] {
-      padding-left: 1.6rem;
-      padding-right: 1.6rem
+    .sticky {
+        position: sticky;
     }
 
-    .py-\[1rem\] {
-      padding-top: 1rem;
-      padding-bottom: 1rem
+    .top-0 {
+        top: 0;
     }
 
-    .text-left {
-      text-align: left
+    .z-[22] {
+        z-index: 22;
     }
 
     .text-center {
-      text-align: center
+        text-align: center;
     }
 
-    .text-right {
-      text-align: right
+    .overflow-y-auto {
+        overflow-y: auto;
     }
 
-    .text-lg {
-      font-size: 1.125rem;
-      line-height: 1.75rem
+    .overflow-x-hidden {
+        overflow-x: hidden;
     }
 
-    .text-sm {
-      font-size: 0.875rem;
-      line-height: 1.25rem
+    .scroll-hidden {
+        scrollbar-width: none;
     }
 
-    .text-xl {
-      font-size: 1.25rem;
-      line-height: 1.75rem
+    .max-h-[65vh] {
+        max-height: 65vh;
     }
 
     .font-bold {
-      font-weight: 700
+        font-weight: 700;
     }
 
-    .font-semibold {
-      font-weight: 600
+    .text-xl {
+        font-size: 1.25rem;
     }
 
     .normal-case {
-      text-transform: none
+        text-transform: none;
     }
 
-    .text-\[\#7B7B7B\] {
-      --tw-text-opacity: 1;
-      color: rgb(123 123 123 / var(--tw-text-opacity))
+    .space-y-3> :not([hidden])~ :not([hidden]) {
+        margin-top: 1rem;
     }
 
-    .text-black {
-      --tw-text-opacity: 1;
-      color: rgb(0 0 0 / var(--tw-text-opacity))
+    .text-sm {
+        font-size: 0.875rem;
     }
 
-    .underline {
-      -webkit-text-decoration-line: underline;
-      text-decoration-line: underline
+    .text-left {
+        text-align: left;
     }
 
-    @media (min-width: 1024px) {
-      .lg\:w-\[26vw\] {
-        width: 26vw
-      }
+    .font-semibold {
+        font-weight: 600;
     }
-  </style>
-</head>
+
+    .py-2 {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .border-t {
+        border-top: 1px solid #888;
+    }
+
+    .text-lg {
+        font-size: 1.125rem;
+    }
+
+    .font-medium {
+        font-weight: 500;
+    }
+
+    .text-[#7B7B7B] {
+        color: #7b7b7b;
+    }
+
+    .text-primary {
+        color: #000;
+    }
+
+    .text-base {
+        font-size: 1rem;
+    }
+
+    .pb-2 {
+        padding-bottom: 0.5rem;
+    }
+
+    .text-base {
+        font-size: 1rem;
+    }
+
+    .text-left {
+        text-align: left;
+    }
+
+    .text-[#000] {
+        color: #000;
+    }
+
+    .text-sm {
+        font-size: 0.875rem;
+    }
+
+    .text-[#7B7B7B] {
+        color: #7b7b7b;
+    }
+
+    .font-medium {
+        font-weight: 500;
+    }
+
+    .font-semibold {
+        font-weight: 600;
+    }
+
+    .sticky {
+        position: sticky;
+    }
+
+    .top-0 {
+        top: 0;
+    }
+
+    .z-[22] {
+        z-index: 22;
+    }
+
+    .h-screen {
+        height: 100vh;
+    }
+
+    .w-full {
+        width: 100%;
+    }
+
+    .pt-[1.2rem] {
+        padding-top: 1.2rem;
+    }
+
+    .scroll-hidden::-webkit-scrollbar {
+        display: none;
+    }
+
+    .font-bold {
+        font-weight: 700;
+    }
+
+    .text-xl {
+        font-size: 1.25rem;
+    }
+
+    .normal-case {
+        text-transform: none;
+    }
+
+    .gap-5> :not([hidden])~ :not([hidden]) {
+        gap: 1.25rem;
+    }
+
+    .text-sm {
+        font-size: 0.875rem;
+    }
+
+    .text-left {
+        text-align: left;
+    }
+
+    .justify-between {
+        justify-content: space-between;
+    }
+
+    .font-semibold {
+        font-weight: 600;
+    }
+
+    .text-lg {
+        font-size: 1.125rem;
+    }
+
+    .text-primary {
+        color: #000;
+    }
+
+    .text-[#7B7B7B] {
+        color: #7b7b7b;
+    }
+
+    .font-medium {
+        font-weight: 500;
+    }
+
+    .py-2 {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .text-base {
+        font-size: 1rem;
+    }
+
+    .pb-2 {
+        padding-bottom: 0.5rem;
+    }
+
+    .text-[#000] {
+        color: #000;
+    }
+
+    .flex-col {
+        flex-direction: column;
+    }
+
+    .text-primary {
+        color: #000;
+    }
+
+    .font-semibold {
+        font-weight: 600;
+    }
+
+    .text-base {
+        font-size: 1rem;
+    }
+
+    .py-2 {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+
+    .text-[#7B7B7B] {
+        color: #7b7b7b;
+    }
+
+    .text-sm {
+        font-size: 0.875rem;
+    }
+
+    .font-medium {
+        font-weight: 500;
+    }
+
+
+    .text-primary {
+        color: #000;
+    }
+
+    .text-sm {
+        font-size: 0.875rem;
+    }
+
+    .font-bold {
+        font-weight: 700;
+    }
+
+
+    .text-[#7B7B7B] {
+        color: #7b7b7b;
+    }
+
+    .text-sm {
+        font-size: 0.875rem;
+    }
+
+    .font-medium {
+        font-weight: 500;
+    }
+
+    .text-primary {
+        color: #000;
+    }
+
+    .font-semibold {
+        font-weight: 600;
+    }
+
+
+    .text-base {
+        font-size: 1rem;
+    }
+
+    .py-2 {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .text-left {
+        text-align: left;
+    }
+
+    .text-[#000] {
+        color: #000;
+    }
+
+    .font-semibold {
+        font-weight: 600;
+    }
+
+    .text-lg {
+        font-size: 1.125rem;
+    }
+
+    .text-left {
+        text-align: left;
+    }
+
+    .text-[#7B7B7B] {
+        color: #7b7b7b;
+    }
+
+    .text-sm {
+        font-size: 0.875rem;
+    }
+
+    .font-medium {
+        font-weight: 500;
+    }
+
+
+    .text-primary {
+        color: #000;
+    }
+
+    .font-bold {
+        font-weight: 700;
+    }
+
+
+    .text-left {
+        text-align: left;
+    }
+
+    .text-[#7B7B7B] {
+        color: #7b7b7b;
+    }
+
+    .text-sm {
+        font-size: 0.875rem;
+    }
+
+    .font-medium {
+        font-weight: 500;
+    }
+
+    .text-base {
+        font-size: 1rem;
+    }
+
+    .font-semibold {
+        font-weight: 600;
+    }
+
+    .text-base {
+        font-size: 1rem;
+    }
+
+    .text-[#7B7B7B] {
+        color: #7b7b7b;
+    }
+
+    .font-semibold {
+        font-weight: 600;
+    }
+
+    .text-base {
+        font-size: 1rem;
+    }
+
+    .text-[#7B7B7B] {
+        color: #7b7b7b;
+    }
+
+    .font-semibold {
+        font-weight: 600;
+    }
+
+    .text-base {
+        font-size: 1rem;
+    }
+
+    .text-[#7B7B7B] {
+        color: #7b7b7b;
+    }
+
+    .font-semibold {
+        font-weight: 600;
+    }
+
+    .text-base {
+        font-size: 1rem;
+    }
+
+    .text-[#7B7B7B] {
+        color: #7b7b7b;
+    }
+
+    .font-semibold {
+        font-weight: 600;
+    }
+
+    .text-base {
+        font-size: 1rem;
+    }
+
+    .text-[#7B7B7B] {
+        color: #7b7b7b;
+    }
+
+    .font-semibold {
+        font-weight: 600;
+    }
+
+    .text-base {
+        font-size: 1rem;
+    }
+
+    .text-[#7B7B7B] {
+        color: #7b7b7b;
+    }
+
+    .font-semibold {
+        font-weight: 600;
+    }
+
+    .text-base {
+        font-size: 1rem;
+    }
+
+    .text-[#7B7B7B] {
+        color: #7b7b7b;
+    }
+
+    .p-4{
+        padding: 1rem;
+    }
+
+    /* Tailwind CSS animations */
+    @keyframes slide-in-elliptic-top-fwd {
+        0% {
+            transform: translateY(-1000px) scaleY(2.5) scaleX(0.2);
+            transform-origin: 50% 0;
+            filter: blur(40px);
+            opacity: 0;
+        }
+
+        100% {
+            transform: translateY(0) scaleY(1) scaleX(1);
+            transform-origin: 50% 50%;
+            filter: blur(0px);
+            opacity: 1;
+        }
+    }
+
+    /* Additional custom styles */
+    @page {
+        size: 25rem;
+        margin: 1cm;
+    }
+
+    .theme-btn.newSuccessBtnFocus {
+        color: #28cd38;
+        background-color: #28CD3826;
+        border: 1px solid #28cd38;
+        text-transform: capitalize;
+        padding-left: 0.8rem;
+        padding-right: 0.8rem;
+        padding-top: 0.6rem;
+        padding-bottom: 0.6rem;
+        font-weight: 500;
+        font-size: 0.7rem;
+        line-height: 1;
+        text-transform: uppercase;
+        border-radius: 0.375rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+            0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: box-shadow 150ms ease-in-out;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+        width: fit-content;
+    }
+
+    @page {
+        size: 25rem;
+        margin: 1cm;
+    }
+</style>
 
 <body>
-  <div class="flex items-center justify-center">
     <div
-      class="relative overflow-hidden rounded-2xl lg:w-[26vw] w-[90vw] min-w-[30rem] z-[2] slide-in-elliptic-top-fwd">
-      <div>
-        <div class="icon">
-          <svg width="5rem" height="5rem" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <g clip-path="url(#clip0_798_1641)">
-              <path fill-rule="evenodd" clip-rule="evenodd"
-                d="M7.9974 0.666504C3.9474 0.666504 0.664062 3.94984 0.664062 7.99984C0.664062 12.0498 3.9474 15.3332 7.9974 15.3332C12.0474 15.3332 15.3307 12.0498 15.3307 7.99984C15.3307 3.94984 12.0474 0.666504 7.9974 0.666504ZM11.1761 6.75984C11.2346 6.69293 11.2792 6.615 11.3071 6.53062C11.3351 6.44624 11.3459 6.35711 11.3389 6.26849C11.3319 6.17987 11.3073 6.09355 11.2664 6.01459C11.2256 5.93563 11.1694 5.86564 11.1011 5.80873C11.0328 5.75182 10.9538 5.70915 10.8688 5.68321C10.7838 5.65728 10.6944 5.64861 10.606 5.65772C10.5176 5.66683 10.4318 5.69354 10.3539 5.73626C10.2759 5.77898 10.2073 5.83687 10.1521 5.9065L7.2854 9.34584L5.80206 7.86184C5.67633 7.7404 5.50793 7.6732 5.33313 7.67472C5.15833 7.67624 4.99112 7.74635 4.86752 7.86996C4.74391 7.99356 4.6738 8.16077 4.67228 8.33557C4.67076 8.51037 4.73796 8.67877 4.8594 8.8045L6.8594 10.8045C6.9249 10.87 7.00333 10.9211 7.08967 10.9545C7.17602 10.988 7.26839 11.0031 7.36091 10.9989C7.45342 10.9947 7.54405 10.9713 7.627 10.9301C7.70996 10.889 7.78343 10.831 7.84273 10.7598L11.1761 6.75984Z"
-                fill="#3CC37A"></path>
-            </g>
-            <defs>
-              <clipPath id="clip0_798_1641">
-                <rect width="16" height="16" fill="white"></rect>
-              </clipPath>
-            </defs>
-          </svg>
-        </div>
-      </div>
-      <div class="bg-white rounded-t-2xl border">
-        <div class="sticky top-0 z-[22]">
-          <div
-            class="absolute top-0 right-0 bg-primary px-[1.6rem] py-[1rem] rounded-bl-2xl rounded-tr-2xl cursor-pointer">
-            <svg class="h-[1.125rem] w-[1.125rem]" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M1.36973 1.42735C1.79418 1.00302 2.36979 0.764648 2.96996 0.764648C3.57014 0.764648 4.14575 1.00302 4.5702 1.42735L12.5736 9.43078L20.5771 1.42735C21.004 1.01505 21.5757 0.786907 22.1692 0.792064C22.7626 0.797221 23.3303 1.03526 23.75 1.45492C24.1696 1.87457 24.4077 2.44227 24.4128 3.03573C24.418 3.62919 24.1898 4.20093 23.7775 4.62782L15.7741 12.6313L23.7775 20.6347C24.1898 21.0616 24.418 21.6333 24.4128 22.2268C24.4077 22.8202 24.1696 23.3879 23.75 23.8076C23.3303 24.2272 22.7626 24.4653 22.1692 24.4704C21.5757 24.4756 21.004 24.2475 20.5771 23.8352L12.5736 15.8317L4.5702 23.8352C4.14331 24.2475 3.57157 24.4756 2.97811 24.4704C2.38465 24.4653 1.81696 24.2272 1.3973 23.8076C0.977645 23.3879 0.739604 22.8202 0.734447 22.2268C0.72929 21.6333 0.957429 21.0616 1.36973 20.6347L9.37317 12.6313L1.36973 4.62782C0.945404 4.20336 0.707031 3.62776 0.707031 3.02758C0.707031 2.4274 0.945404 1.8518 1.36973 1.42735V1.42735Z"
-                fill="white"></path>
-            </svg>
-          </div>
-          <h1 class="p-[1rem] font-semibold text-xl text-left"></h1>
-        </div>
-        <div class="p-[1.2rem] overflow-y-auto overflow-x-hidden scroll-hidden text-center flex flex-col gap-5">
-          <h1 class="font-bold text-xl normal-case">
-            <p>{{ business_address.primary_translation.invoice }} </p>
-              {% if business_address.secondary_translation.invoice %} 
-              <p class="arabic">{{ business_address.secondary_translation.invoices }} 
-                {% endif %}</p>
-            #{{invoice_id}}
-          </h1> 
-
-          <div class="w-full bg-[#F9F9F9] text-[#7B7B7B] border rounded-md mx-auto p-2 px-4 flex justify-between items-center gap-2 text-sm text-center">
-            <div>
-              <p>{{created_at}}</p>
+        class="relative overflow-hidden rounded-2xl flex items-center justify-center h-screen w-full z-[2] slide-in-elliptic-top-fwd">
+        <div class="bg-white rounded-2xl shadow-2xl border min-w-[25rem] p-4">
+            <div class="sticky top-0 z-[22]">
+                <div class="flex justify-center items-center"><svg width="4.4rem" height="4.4rem" viewBox="0 0 71 71"
+                        fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M33.4161 70.9992C32.07 70.8168 30.7153 70.6848 29.3779 70.4469C21.2131 68.9949 14.3769 65.1339 8.88504 58.9421C3.85864 53.2731 0.923394 46.6279 0.188713 39.0988C-0.716177 29.8328 1.63028 21.4004 7.29062 13.9876C12.6123 7.01945 19.6135 2.57142 28.2021 0.775535C30.559 0.282275 33.0044 0.167644 35.4186 0.00611841C36.9141 -0.0946179 38.0708 1.06211 38.1455 2.4759C38.2254 3.9852 37.2649 5.12283 35.7052 5.29999C33.6436 5.53272 31.5472 5.57788 29.5169 5.96693C24.2577 6.97256 19.6221 9.31381 15.6118 12.8761C10.2311 17.6558 6.83731 23.5784 5.75179 30.689C4.35364 39.8508 6.64973 48.0591 12.6835 55.1384C16.6904 59.8383 21.6907 63.0966 27.6863 64.5903C38.1264 67.192 47.5139 65.0071 55.6215 57.86C60.9466 53.1654 64.1077 47.2219 65.2626 40.2294C65.5093 38.7323 65.5266 37.1952 65.6308 35.6755C65.7611 33.7788 67.0151 32.6204 68.7311 32.8618C69.9486 33.0337 70.5843 33.8726 70.9994 34.9373V37.5721C70.9421 38.0706 70.8848 38.5708 70.8292 39.0692C69.9799 46.7096 67.062 53.4502 61.9123 59.1661C56.4447 65.2346 49.6711 69.0227 41.6104 70.4486C40.2748 70.6848 38.9201 70.8185 37.5758 71.0009H33.4143L33.4161 70.9992Z"
+                            fill="#2CAE4A"></path>
+                        <path
+                            d="M33.1105 41.8709C33.3745 41.5201 33.5048 41.296 33.6837 41.1171C44.056 30.7639 54.4336 20.4158 64.8025 10.0591C65.5789 9.28447 66.4091 8.74605 67.5623 8.96489C69.5093 9.3331 70.3969 11.5788 69.2123 13.1663C69.0334 13.406 68.8163 13.6179 68.6044 13.8298C57.4939 24.916 46.3834 36.0022 35.2711 47.0866C33.6837 48.6706 32.1969 48.6481 30.6928 47.0154C26.3699 42.3225 22.0469 37.6313 17.7309 32.9332C16.5811 31.6809 16.5915 30.0084 17.7222 28.9767C18.8233 27.9728 20.4177 28.0301 21.5154 29.1643C22.5593 30.2446 23.5597 31.3666 24.5775 32.4712C27.3164 35.4464 30.0572 38.4233 32.7944 41.402C32.8726 41.4871 32.9264 41.5948 33.1105 41.8727V41.8709Z"
+                            fill="#2CAE4A"></path>
+                    </svg></div>
             </div>
-            <div class="h-[1.5rem] w-[1px] border-l"></div>
-            <div>
-              <p>
-                Billed to
-                <span class="font-bold">
-                  {% if client %} {{ client.full_name }} {% else %} Walk In {% endif %}
-                </span>
-              </p>
-            </div>
-          </div>
-          <div>
-            <div>
-              <div class="text-left flex flex-col gap-1">
-                <div class="flex items-center justify-between text-sm font-semibold">
-                  <p class="text-left">
-                    {{ business_address.primary_translation.items}} 
-                    {% if business_address.secondary_translation.items%}
-                    <span class="arabic">{{ business_address.secondary_translation.items }} 
-                      {% endif %}
-                    </span>
-                  </p>
-                  <p>{{ business_address.primary_translation.amount}} 
-                    {% if business_address.secondary_translation.amount %}<span class="arabic">
-                      {{business_address.secondary_translation.amount}} {% endif %}</span></p>
-                </div>
+            <div
+                class="p-[1.2rem] overflow-y-auto overflow-x-hidden scroll-hidden max-h-[65vh]  text-center flex flex-col gap-5">
+                <h1 class="font-bold text-xl normal-case">
+                    <p>Invoice / jfk</p>#7a80840f
+                </h1>
+                <div class="space-y-3">
 
-                {% comment %}======================================================== checkout_data =============================================={% endcomment %}
-
-                {% comment %} ===============================if there is any product records in the checkout========================{% endcomment %}
-                {% if checkout_data.products_records.all %}
-
-                        {% for item in checkout_data.products_records.all %}
-                                  <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                                    <div>
-                                      <p class="text-left">
-                                        {{item.product.name}}
-                                        {% if item.discount_percentage %}
-                                        (Discount {{ item.discount_percentage}} %)
-                                        {% endif %}
-                                      </p>
-                                      <p class="arabic">{% get_secondary_translation item.id %}</p>
-                                    </div>
-                                    <p class="text-[#7B7B7B]">
-                                      <span>{{item.quantity}} x </span>{{item.price}}
-                                      {{currency_code}}
-                                    </p>
-                                  </div>
-                        {% endfor %}
-                          
-                          
-                {% endif %}
-
-                {% comment %} ===============================if there is any service records in the checkout========================{% endcomment %}
-
-                {% if checkout_data.services_records.all %}
-
-                        {% for item in checkout_data.services_records.all %}
-
-                          <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                            <div>
-                              <h3> {{item.client.full_name}}</h3>
-                              <p class="text-left">
-                                {{item.service.name}}
-                                {% if item.discount_percentage %}
-                                (Discount {{ item.discount_percentage}} %)
-                                {% endif %}
-                              </p>
-                              <p class="arabic">{% get_secondary_translation item.id %}</p>
+                    <div class="w-full flex justify-between items-center gap-2 text-sm text-center">
+                        <div class="flex flex-col justify-between">
+                            <div class="text-left">
+                                <p class="text-sm">07-03-2024</p>
                             </div>
-                            <p class="text-[#7B7B7B]">
-                              <span>{{item.quantity}} x </span>{{item.price}}
-                              {{currency_code}}
-                            </p>
-                          </div>
-
-                          {% endfor %}
-
-                {% endif %}
-                
-                
-                {% comment %} ===============================if there is any appointment_services in the checkout_data ========================{% endcomment %}
-                
-                {% if checkout_data.checkout_type == "Group Appointment" or checkout_data.checkout_type == "Appointment" and checkout_data.client_type == 'In_Saloon' %}
-                  
-                
-                  
-                  {% if checkout_data.appointment_services.all and clients  %}
-                        {% for c in clients %}
-                          <strong><h2>{{c.client.full_name}}</h2></strong>
-                          
-                          {% for data in checkout_data.appointment_services.all %}
-                                {% if data.client.id == c.client.id %}
-                                        {% comment %} <h2>{{data.client}}</h2> {% endcomment %}
-
-                                          <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                                            <div>
-                                                <p class="text-left">
-                                                    {{ data.service.name }}
-                                                    {% if data.discount_percentage %}
-                                                        (Discount {{ data.discount_percentage }} %)
-                                                    {% endif %}
-                                                    
-                                                </p>
-                                                <p class="arabic">{% get_secondary_translation data.id %}</p>
-                                            </div>
-                                            <p class="text-[#7B7B7B]">
-                                                <span>1 x </span>{{ data.price }}
-                                                {{ currency_code }}
-                                            </p>
-                                          </div>
-                                {% endif %}
-                          {% endfor %}
-
-
-                                {% comment %} coupon printing {% endcomment %}
-                                {% if checkout_data.applied_coupons_records.all %}
-                                    
-                                    {% for coupon in checkout_data.applied_coupons_records.all %}
-                                      {% if coupon.client.id == c.client.id %}
-                                      
-                                      
-                                      <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                                        <div>
-                                            <p class="text-left">
-                                              <strong><h2>Coupon Redeemed</h2></strong>
-                                            </p>
-                                        </div>
-                                        <p class="text-[#7B7B7B]">
-                                            <span></span>{{ coupon.coupon_discounted_price }}
-                                            {{ currency_code }}
-                                        </p>
-                                      </div>
-                                  
-                                      {% endif %}
-                                    {% endfor %}
-                                      
-                                
-                                {% endif %}
-
-
-                                {% comment %} membership printing {% endcomment %}
-                                {% if checkout_data.applied_memberships_records.all %}
-                                    
-                                    {% for m in checkout_data.applied_memberships_records.all %}
-                                      {% if m.client.id == c.client.id %}
-                                      
-                                      
-                                      <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                                        <div>
-                                            <p class="text-left">
-                                              <strong><h2>Membership Redeemed</h2></strong>
-                                            </p>
-                                        </div>
-                                        <p class="text-[#7B7B7B]">
-                                            <span></span>{{ m.price }}
-                                            {{ currency_code }}
-                                        </p>
-                                      </div>
-                                  
-                                      {% endif %}
-                                    {% endfor %}
-                                      
-                                
-                                {% endif %}
-                                
-
-
-                                {% if checkout_data.applied_vouchers_records.all %}
-                                    
-                                    {% for v in checkout_data.applied_vouchers_records.all %}
-                                      {% if v.client.id == c.client.id %}
-                                      
-                                      
-                                      <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                                        <div>
-                                            <p class="text-left">
-                                              <strong><h2>Vouchers Redeemed</h2></strong>
-                                            </p>
-                                        </div>
-                                        <p class="text-[#7B7B7B]">
-                                            <span></span>{{ v.price }}
-                                            {{ currency_code }}
-                                        </p>
-                                      </div>
-                                  
-                                      {% endif %}
-                                    {% endfor %}
-                                      
-                                
-                                {% endif %}
-
-                                {% if checkout_data.applied_loyalty_points_records.all %}
-                                    
-                                    {% for l in checkout_data.applied_loyalty_points_records.all %}
-                                      {% if l.client.id == c.client.id %}
-                                      
-                                      
-                                      <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                                        <div>
-                                            <p class="text-left">
-                                              <strong><h2>LoyaltyPoints Redeemed</h2></strong>
-                                            </p>
-                                        </div>
-                                        <p class="text-[#7B7B7B]">
-                                            <span></span>{{ l.redeemed_points }}
-                                        </p>
-                                      </div>
-                                      
-                                      
-                                      
-                                      {% endif %}
-                                    {% endfor %}
-                                      
-                                
-                                {% endif %}
-
-                                {% if checkout_data.applied_gift_cards_records.all %}
-                                    
-                                    {% for g in checkout_data.applied_gift_cards_records.all %}
-                                      {% if g.client.id == c.client.id %}
-                                      
-                                      
-                                      <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                                        <div>
-                                            <p class="text-left">
-                                              <strong><h2>GiftCard Redeemed</h2></strong>
-                                            </p>
-                                        </div>
-                                        <p class="text-[#7B7B7B]">
-                                            <span></span>{{ g.partial_price }}
-                                            {{ currency_code }}
-                                        </p>
-                                      </div>
-                                      
-                                      
-                                      
-                                      {% endif %}
-                                    {% endfor %}
-                                      
-                                
-                                {% endif %}
-
-
-                          
-                        {% endfor %}
-                
-                  {% endif %}
-
-                {% else %}
-                  
-                  {% for data in  checkout_data.appointment_services.all %}
-
-                    <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                                            <div>
-                                                <p class="text-left">
-                                                    {{ data.service.name }}
-                                                    {% if data.discount_percentage %}
-                                                        (Discount {{ data.discount_percentage }} %)
-                                                    {% endif %}
-                                                </p>
-                                                <p class="arabic">{% get_secondary_translation data.id %}</p>
-                                            </div>
-                                            <p class="text-[#7B7B7B]">
-                                                <span>1 x </span>{{ data.price }}
-                                                {{ currency_code }}
-                                            </p>
-                      </div>
-                  {% endfor %}
-                    
-
-                {% endif %}
-
-                
-                {% comment %} ===============================if there is any gift_cards_records in the checkout_data ========================{% endcomment %}
-
-                {% if checkout_data.gift_cards_records.all %}
-
-                {% for item in checkout_data.gift_cards_records.all %}
-                <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                  <div>
-                    <p class="text-left">
-                      {{item.gift_card.title}}/{% get_primary_translation item.id %}
-                      {% if item.discount_percentage %}
-                      (Discount {{ item.discount_percentage}} %)
-                      {% endif %}
-                    </p>
-                    <p class="arabic">{% get_secondary_translation item.id %}</p>
-                  </div>
-                  <p class="text-[#7B7B7B]">
-                    <span>{{item.quantity}} x </span>{{item.price}}
-                    {{currency_code}}
-                  </p>
+                            <div>
+                                <p>Billed to <span class="font-bold">hafeez fourteen </span></p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                {% endfor %}
-
-
-                {% endif %}
-                {% comment %} =============================== if there is any membership_records in the checkout data ========================{% endcomment %}
-
-                {% if checkout_data.membership_records.all %}
-
-                {% for item in checkout_data.membership_records.all %}
-                <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                  <div>
-
-                    <p class="text-left">
-                      {{item.membership.name}} / {% get_primary_translation item.id %}
-                      {% if item.discount_percentage %}
-                      (Discount {{ item.discount_percentage}} %)
-                      {% endif %}
-                    </p>
-                    <p class="arabic">{% get_secondary_translation item.id %}</p>
-                  </div>
-                  <p class="text-[#7B7B7B]">
-                    <span>{{item.quantity}} x </span>{{item.price}}
-                    {{currency_code}}
-                  </p>
-                </div>
-                {% endfor %}
-
-
-                {% endif %}
-
-                {% comment %} =============================== if there is any vouchers_records in the checkout_data ========================{% endcomment %}
-
-                {% if checkout_data.vouchers_records.all %}
-
-                {% for item in checkout_data.vouchers_records.all %}
-                <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                  <div>
-                    <p class="text-left">
-                      {{item.voucher.name}} / {% get_primary_translation item.id %}
-                      {% if item.discount_percentage %}
-                      (Discount {{ item.discount_percentage}} %)
-                      {% endif %}
-                    </p>
-                    <p class="arabic">{% get_secondary_translation item.id %}</p>
-                  </div>
-                  <p class="text-[#7B7B7B]">
-                    <span>{{item.quantity}} x </span>{{item.price}}
-                    {{currency_code}}
-                  </p>
-                </div>
-                {% endfor %}
-
-
-                {% endif %}
-
-
-
-                
-                {% if checkout_data.services_records.all or checkout_data.products_records.all %}
-                              {% if checkout_data.applied_coupons_records.all %}
-                                                              
-                              {% for coupon in checkout_data.applied_coupons_records.all %}
-                                
-                                
-                                
-                                <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                                  <div>
-                                      <p class="text-left">
-                                        <strong><h2>Coupon Redeemed</h2></strong>
-                                      </p>
-                                  </div>
-                                  <p class="text-[#7B7B7B]">
-                                      <span></span>{{ coupon.coupon_discounted_price }}
-                                      {{ currency_code }}
-                                  </p>
-                                </div>
-                            
-                                
-                              {% endfor %}
-                                
-                          
-                          {% endif %}
-
-
-                          {% comment %} membership printing {% endcomment %}
-                          {% if checkout_data.applied_memberships_records.all %}
-                              
-                              {% for m in checkout_data.applied_memberships_records.all %}
-                                {% if m.client.id == checkout_data.client.id %}
-                                
-                                
-                                <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                                  <div>
-                                      <p class="text-left">
-                                        <strong><h2>Membership Redeemed</h2></strong>
-                                      </p>
-                                  </div>
-                                  <p class="text-[#7B7B7B]">
-                                      <span></span>{{ m.price }}
-                                      {{ currency_code }}
-                                  </p>
-                                </div>
-                            
-                                {% endif %}
-                              {% endfor %}
-                                
-                          
-                          {% endif %}
-                          
-
-
-                          {% if checkout_data.applied_vouchers_records.all %}
-                              
-                              {% for v in checkout_data.applied_vouchers_records.all %}
-                                {% if v.client.id == checkout_data.client.id %}
-                                
-                                
-                                <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                                  <div>
-                                      <p class="text-left">
-                                        <strong><h2>Vouchers Redeemed</h2></strong>
-                                      </p>
-                                  </div>
-                                  <p class="text-[#7B7B7B]">
-                                      <span></span>{{ v.price }}
-                                      {{ currency_code }}
-                                  </p>
-                                </div>
-                            
-                                {% endif %}
-                              {% endfor %}
-                                
-                          
-                          {% endif %}
-
-                          {% if checkout_data.applied_loyalty_points_records.all %}
-                              
-                              {% for l in checkout_data.applied_loyalty_points_records.all %}
-                                {% if l.client.id == checkout_data.client.id %}
-                                
-                                
-                                <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                                  <div>
-                                      <p class="text-left">
-                                        <strong><h2>LoyaltyPoints Redeemed</h2></strong>
-                                      </p>
-                                  </div>
-                                  <p class="text-[#7B7B7B]">
-                                      <span></span>{{ l.redeemed_points }}
-                                  </p>
-                                </div>
-                                
-                                
-                                
-                                {% endif %}
-                              {% endfor %}
-                                
-                          
-                          {% endif %}
-
-                          {% if checkout_data.applied_gift_cards_records.all %}
-                              
-                              {% for g in checkout_data.applied_gift_cards_records.all %}
-                                
-                                
-
-                                
-                                <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                                  <div>
-                                      <p class="text-left">
-                                        <strong><h2>GiftCard Redeemed</h2></strong>
-                                      </p>
-                                  </div>
-                                  <p class="text-[#7B7B7B]">
-                                      <span></span>{{ g.partial_price }}
-                                      {{ currency_code }}
-                                  </p>
-                                </div>
-                                
-                                
-                                
-                              
-                              {% endfor %}
-                                
-                          
-                          {% endif %}
-                {% endif %}
-                  
-
-              </div>
-            </div>
-          </div>
-
-          <div class="text-left flex flex-col gap-1">
-            <hr>
-            <div class="flex items-center justify-between text-primary text-sm font-bold">
-              <div>
-                <p>{{ business_address.primary_translation.subtotal}}</p>
-                {% if business_address.secondary_translation.subtotal %}
-                <p class="arabic">
-                  {{business_address.secondary_translation.subtotal }} {% endif %}</p>
-              </div>
-              <p>{{sub_total}} {{currency_code}}</p>
-
-            </div>
-
-            {% comment %}=========================================== total_tip ================================================================={% endcomment %}
-
-            {% if total_tip %}
-            <div class="flex items-center justify-between text-primary text-sm font-bold">
-              <div>
-                <p>{{ business_address.primary_translation.tips }}</p>
-                {% if business_address.secondary_translation.tips %}<p class="arabic">{{business_address.secondary_translation.tips }} {% endif %}</p>
-              </div>
-              <p>{{ total_tip }} {{ currency_code }}</p>
-            </div>
-            {% endif %}
-
-            {% comment %}============================================ tax details ================================================================{% endcomment %}
-
-            {% if tax_applied or tax_applied1 %}
-            <p>{{ business_address.primary_translation.taxes }}</p>
-            {% if business_address.secondary_translation.taxes %}<p class="arabic">
-              {{business_address.secondary_translation.taxes }} {% endif %}</p>
-            {% endif %}
-
-            {% if checkout_data.tax_records.all %}
-
-            {% for tax in checkout_data.tax_records.all %}
-
-            <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
-              <div class="font-semibold text-black">
-                <p>{{tax.name}} ({{tax.tax_rate}}%)</p>
-                <p class="arabic"></p>
-              </div>
-              {% if tax.value %}
-              <p>{{ tax.value }} {{ currency_code }}</p>
-              {% else %}
-              <p>0.00</p>
-              {% endif %}
-            </div>
-            {% endfor %}
-            {% endif %}
-
-            <hr>
-            {% comment %}=================================================== Payment methods Details =========================={% endcomment %}
-
-
-          </div>
-          <div class="flex items-center justify-between text-primary text-sm font-bold">
-            <div>
-              <p class="text-left">{{ business_address.primary_translation.total}}</p>
-              {% if business_address.secondary_translation.total %}<p class="arabic">
-                {{business_address.secondary_translation.total }} {% endif %}</p>
-            </div>
-            <p class="text-sm">{{total}} {{currency_code}}</p>
-          </div>
-
-          {% if change > 0 %}
-          <div class="flex items-center justify-between text-primary text-sm font-bold">
-            <div>
-              <p class="text-left">{{ business_address.primary_translation.change}}</p>
-              {% if business_address.secondary_translation.change %}<p class="arabic">
-                {{business_address.secondary_translation.change }} {% endif %}</p>
-            </div>
-            <p class="text-sm">{{change}} {{currency_code}}</p>
-          </div>
-          {% endif %}
-
-
-          <hr />
-          {% comment %} ======================================================== pyament methods ======================================= {% endcomment %}
-
-          {% comment %} <p class="font-semibold text-black text-left">{{
-            business_address.primary_translation.payment_method}}</p>
-          {% if business_address.secondary_translation.payment_method %}
-          <p class="arabic font-semibold text-black text-left">{{
-            business_address.secondary_translation.payment_method}}</p>
-          {% endif %} {% endcomment %}
-
-          <div class="flex items-center justify-between text-primary text-sm font-bold">
-            <div>
-              <p class="text-left">{{ business_address.primary_translation.payment_method}}</p>
-              {% if business_address.secondary_translation.payment_method %}<p class="arabic">
-                {{business_address.secondary_translation.payment_method }} {% endif %}</p>
-            </div>
-          </div>
-
-          {% if checkout_data.payment_methods_records.all %}
-
-          {% for method in checkout_data.payment_methods_records.all %}
-
-          <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
-            <div class="font-semibold text-black">
-              <p>{{method.payment_method}}</p>
-              <p class="arabic"></p>
-            </div>
-
-            <p class="font-semibold text-black">{{ method.amount }} {{ currency_code }}</p>
-
-          </div>
-          {% endfor %}
-          {% endif %}
-
-          <hr>
-
-          <div class="text-left flex flex-col gap-1">
-            <div class="flex items-center justify-between text-primary text-sm font-bold">
-
-              {% comment %}============================================= Main div for payment methods show ===================================================={% endcomment %}
-              <div class="flex items-center justify-between text-primary text-sm w-full">
                 <div>
+                    <div>
+                        <div class="text-left flex flex-col">
+                            <div class="flex items-center justify-between text-[#000] font-semibold text-sm  pb-2">
+                                <p class="text-left text-lg font-semibold">Items / jkl</p>
+                                <p class="text-lg font-semibold">Amount / j</p>
+                            </div>
+                            <div class="py-2 border-t ">
+                                <div
+                                    class="flex items-center justify-between text-primary text-sm font-medium text-[#7B7B7B]">
+                                    <div>
+                                        <p class="text-left">shampo<br></p>
+                                    </div>
+                                    <p><span class="text-[#7B7B7B]">1 x&nbsp;</span>12.00 EUR</p>
+                                </div>
+    
+                                <div
+                                    class="flex items-center justify-between text-primary text-sm font-medium text-[#7B7B7B] ">
+                                    <div>
+                                        <p class="text-left">Sunsilk Shampoo<br></p>
+                                    </div>
+                                    <p><span class="text-[#7B7B7B]">1 x&nbsp;</span>200.00 EUR</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-left flex flex-col gap-2 border-t py-2">
+                        <div class="flex items-center justify-between text-primary font-semibold text-base">
+                            <div>
+                                <p>Subtotal / klm</p>
+                            </div>
+                            <p class="text-sm font-medium text-[#7B7B7B]">212.00 EUR</p>
+                        </div>
+                        <div class="flex items-center justify-between text-primary text-sm font-medium">
+                            <div>
+                                <p> My Tax (10%) </p>
+                            </div>
+                            <p class="text-sm font-medium text-[#7B7B7B]">21.20 EUR</p>
+                        </div>
+                        <div class="flex items-center justify-between text-primary text-sm font-medium">
+                            <div>
+                                <p> new (10%) </p>
+                            </div>
+                            <p class="text-sm font-medium text-[#7B7B7B]">21.20 EUR</p>
+                        </div>
+                        <div class="flex items-center justify-between text-[#000] font-semibold text-sm">
+                            <div>
+                                <p class="font-semibold">Coupon Redeemed </p>
+                            </div>0
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between text-primary text-base font-bold border-t py-2">
+                        <p class="text-left">Total / mkl</p>
+                        <p class="text-sm ">254.40 EUR</p>
+                    </div>
+                    <div class="text-left flex flex-col gap-2 border-t py-2">
+                        <div class="flex items-center justify-between text-primary font-semibold text-lg">
 
-                  {% comment %} <p>{{ business_address.primary_translation.payment_method}}</p>
-                  {% if business_address.secondary_translation.payment_method %}
-                  <p class="arabic">{{ business_address.secondary_translation.payment_method}}</p>
-                  {% endif %} {% endcomment %}
-                  <p class="text-[#7B7B7B]">Payment on {{created_at|date:"Y-m-d"}} at {{created_at|date:"H:i:s"}} </p>
+                            <p>Payment Method / mk</p>
 
-
+                        </div>
+                        <div class="flex items-center flex-col justify-between text-primary">
+                            <div class="flex items-center justify-between text-[#000] font-semibold w-full text-sm">
+                                <p class="font-semibold">Cash</p>
+                                <p class="text-sm text-[#7B7B7B] font-medium">254.40 EUR </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between text-primary text-sm font-bold border-t py-2">
+                        <div class="flex items-center justify-between text-primary text-sm">
+                            <p class="">Payment on <span class="text-[#7B7B7B]">07-03-2024</span> at <span
+                                    class="text-[#7B7B7B]">10:39:56</span></p>
+                        </div>
+                    </div>
                 </div>
-                {% comment %} <div>
-                  <div class="">
-                    <p class="text-left">
-                      Location:
-                    </p>
-                    <p>
-                      {{location}}
-                    </p>
-                  </div>
-                </div> {% endcomment %}
-              </div>
-
-              {% comment %}=========================================== payment methods ends here ==============================================================={% endcomment %}
             </div>
-          </div>
         </div>
-      </div>
-      <div class="bg-white rounded-t-2xl border !mt-[2rem]">
-        <div class="sticky top-0 z-[22]">
-          <div
-            class="absolute top-0 right-0 bg-primary px-[1.6rem] py-[1rem] rounded-bl-2xl rounded-tr-2xl cursor-pointer">
-            <svg class="h-[1.125rem] w-[1.125rem]" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M1.36973 1.42735C1.79418 1.00302 2.36979 0.764648 2.96996 0.764648C3.57014 0.764648 4.14575 1.00302 4.5702 1.42735L12.5736 9.43078L20.5771 1.42735C21.004 1.01505 21.5757 0.786907 22.1692 0.792064C22.7626 0.797221 23.3303 1.03526 23.75 1.45492C24.1696 1.87457 24.4077 2.44227 24.4128 3.03573C24.418 3.62919 24.1898 4.20093 23.7775 4.62782L15.7741 12.6313L23.7775 20.6347C24.1898 21.0616 24.418 21.6333 24.4128 22.2268C24.4077 22.8202 24.1696 23.3879 23.75 23.8076C23.3303 24.2272 22.7626 24.4653 22.1692 24.4704C21.5757 24.4756 21.004 24.2475 20.5771 23.8352L12.5736 15.8317L4.5702 23.8352C4.14331 24.2475 3.57157 24.4756 2.97811 24.4704C2.38465 24.4653 1.81696 24.2272 1.3973 23.8076C0.977645 23.3879 0.739604 22.8202 0.734447 22.2268C0.72929 21.6333 0.957429 21.0616 1.36973 20.6347L9.37317 12.6313L1.36973 4.62782C0.945404 4.20336 0.707031 3.62776 0.707031 3.02758C0.707031 2.4274 0.945404 1.8518 1.36973 1.42735V1.42735Z"
-                fill="white"></path>
-            </svg>
-          </div>
-        </div>
-        <div class="p-[1.2rem] overflow-y-auto overflow-hidden scroll-hidden text-center flex flex-col gap-5">
-          <hr class="border" />
-
-          <div class="leading-1 text-center font-semibold">
-            <h1>Thankyou &amp; Please come again</h1>
-            {% comment %} <h1>شكرا من فضلك تعال مرة اخرى</h1> {% endcomment %}
-          </div>
-          {% comment %}
-          <hr class="border" />
-          <a href="{{BACKEND_HOST}}" class="text-left text-sm underline">{{BACKEND_HOST}}</a>
-          <hr class="border" />
-          <div class="flex flex-col gap-1">
-            <div>
-              <p class="font-semibold text-lg">{{business_address.address_name |default:"Nstyle Policy"}}</p>
-              <p class="text-left">
-                {{ business_address.privacy_policy|default:"We collect minimal personal information, like client details
-                and transaction data, solely for the purpose of generating and managing invoices to ensure accurate
-                billing for services provided. Your information is securely handled, and we do not share it with third
-                parties unless required by law. You have the right to access and correct your data, and we prioritize
-                its security against unauthorized access. Our policy may be updated, so please check periodically for
-                the latest information. For any concerns or questions, feel free to contact us." }}
-                <br />
-              </p>
-              <!--                <p class="arabic font-semibold text-lg">-->
-              <!--                  طريقة الدفع او السداد-->
-              <!--                </p>-->
-              <!--                <p class="arabic text-right">-->
-              <!--                  في NStyle ، نفخر بأنفسنا على تجربة العملاء و المعايير التي-->
-              <!--                  نقدمها. هل يجب أن تواجه مشكلة في غضون 24 ساعة إلى 48 ساعة من-->
-              <!--                  زيارتك تعتمد على الخدمة ، يسعدنا إصلاحها لك. يرجى زيارة موقع-->
-              <!--                  NStyle الإلكتروني للاطلاع على الشروط والأحكام الكاملة. يُسمح-->
-              <!--                  بإرجاع منتجات التجزئة المشتراة في غضون 7 أيام من شراء باستثناء-->
-              <!--                  أي سلع بيع بالتجزئة مخفضة أو ترويجية. متجر سيتم تقديم الائتمان-->
-              <!--                  للقيمة المرتجعة. لن يتم استرداد نقدي تقدم. يجب تقديم الإيصال-->
-              <!--                  الأصلي مع الإيصال غير المفتوح بيع بالتجزئة. قسائم وحزم الخدمة-->
-              <!--                  غير قابلة للتحويل وغير قابلة للاسترداد-->
-              <!--                </p>-->
-            </div>
-          </div> {% endcomment %}
-        </div>
-      </div>
     </div>
-  </body>
+</body>
+
 </html>
-
-
