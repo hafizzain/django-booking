@@ -601,8 +601,10 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
         if location_id:
             try:
                 location = BusinessAddress.objects.get(id = location_id)
-            except:
-                pass
+                if location:
+                    raise ValueError('location does not exist')
+            except Exception as e:
+                raise ValueError(str(e))
             else:
                 query['currency'] = location.currency
         try:
