@@ -1519,3 +1519,160 @@
   </body>
 </html>
 
+{% comment %} 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<style>
+    
+.theme-btn.newSuccessBtnFocus {
+  color: #28cd38;
+  background-color: #28CD3826;
+  border: 1px solid #28cd38;
+  text-transform: capitalize;
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+  font-weight: 500;
+  font-size: 0.7rem;
+  line-height: 1;
+  text-transform: uppercase;
+  border-radius: 0.375rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 150ms ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  width: fit-content;
+}
+@page{
+    size: 25rem;
+    margin: 1cm;
+}
+</style>
+
+<body>
+    <div
+        class="relative overflow-hidden rounded-2xl flex items-center justify-center h-screen w-full z-[2] slide-in-elliptic-top-fwd">
+        <div class="bg-white rounded-2xl shadow-2xl border sm:min-w-[25rem] min-w-full pt-4">
+            <div class="sticky top-0 z-[22]">
+                <div class="flex justify-center items-center"><svg width="4.4rem" height="4.4rem" viewBox="0 0 71 71"
+                        fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M33.4161 70.9992C32.07 70.8168 30.7153 70.6848 29.3779 70.4469C21.2131 68.9949 14.3769 65.1339 8.88504 58.9421C3.85864 53.2731 0.923394 46.6279 0.188713 39.0988C-0.716177 29.8328 1.63028 21.4004 7.29062 13.9876C12.6123 7.01945 19.6135 2.57142 28.2021 0.775535C30.559 0.282275 33.0044 0.167644 35.4186 0.00611841C36.9141 -0.0946179 38.0708 1.06211 38.1455 2.4759C38.2254 3.9852 37.2649 5.12283 35.7052 5.29999C33.6436 5.53272 31.5472 5.57788 29.5169 5.96693C24.2577 6.97256 19.6221 9.31381 15.6118 12.8761C10.2311 17.6558 6.83731 23.5784 5.75179 30.689C4.35364 39.8508 6.64973 48.0591 12.6835 55.1384C16.6904 59.8383 21.6907 63.0966 27.6863 64.5903C38.1264 67.192 47.5139 65.0071 55.6215 57.86C60.9466 53.1654 64.1077 47.2219 65.2626 40.2294C65.5093 38.7323 65.5266 37.1952 65.6308 35.6755C65.7611 33.7788 67.0151 32.6204 68.7311 32.8618C69.9486 33.0337 70.5843 33.8726 70.9994 34.9373V37.5721C70.9421 38.0706 70.8848 38.5708 70.8292 39.0692C69.9799 46.7096 67.062 53.4502 61.9123 59.1661C56.4447 65.2346 49.6711 69.0227 41.6104 70.4486C40.2748 70.6848 38.9201 70.8185 37.5758 71.0009H33.4143L33.4161 70.9992Z"
+                            fill="#2CAE4A"></path>
+                        <path
+                            d="M33.1105 41.8709C33.3745 41.5201 33.5048 41.296 33.6837 41.1171C44.056 30.7639 54.4336 20.4158 64.8025 10.0591C65.5789 9.28447 66.4091 8.74605 67.5623 8.96489C69.5093 9.3331 70.3969 11.5788 69.2123 13.1663C69.0334 13.406 68.8163 13.6179 68.6044 13.8298C57.4939 24.916 46.3834 36.0022 35.2711 47.0866C33.6837 48.6706 32.1969 48.6481 30.6928 47.0154C26.3699 42.3225 22.0469 37.6313 17.7309 32.9332C16.5811 31.6809 16.5915 30.0084 17.7222 28.9767C18.8233 27.9728 20.4177 28.0301 21.5154 29.1643C22.5593 30.2446 23.5597 31.3666 24.5775 32.4712C27.3164 35.4464 30.0572 38.4233 32.7944 41.402C32.8726 41.4871 32.9264 41.5948 33.1105 41.8727V41.8709Z"
+                            fill="#2CAE4A"></path>
+                    </svg></div>
+            </div>
+            <div
+                class="p-[1.2rem] overflow-y-auto overflow-x-hidden scroll-hidden max-h-[65vh]  text-center flex flex-col gap-5">
+                <h1 class="font-bold text-xl normal-case">
+                    <p><p>{{ business_address.primary_translation.invoice }} </p>
+                    {% if business_address.secondary_translation.invoice %} 
+                    <p class="arabic">{{ business_address.secondary_translation.invoices }} 
+                      {% endif %}</p>
+                  #{{invoice_id}}
+                </h1>
+                <div class="space-y-3">
+                    
+                    <div class="w-full flex justify-between items-center gap-2 text-sm text-center">
+                        <div class="flex flex-col justify-between">
+                            <div class="text-left">
+                                <p class="text-sm">{{created_at}}</p>
+                            </div>
+                            <div>
+                                <p>Billed to <span class="font-bold"> {% if client %} {{ client.full_name }} {% else %} Walk In {% endif %} </span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div>
+                        <div class="text-left flex flex-col">
+                            <div class="flex items-center justify-between text-[#000] font-semibold text-sm  pb-2">
+                                <p class="text-left text-lg font-semibold">Items / jkl</p>
+                                <p class="text-lg font-semibold">Amount / j</p>
+                            </div>
+                            <div
+                                class="flex items-center justify-between text-primary text-sm font-medium text-[#7B7B7B] py-2 border-t">
+                                <div>
+                                    <p class="text-left">shampo<br></p>
+                                </div>
+                                <p><span class="text-[#7B7B7B]">1 x&nbsp;</span>12.00 EUR</p>
+                            </div>
+                            <div
+                                class="flex items-center justify-between text-primary text-sm font-medium text-[#7B7B7B] py-2 border-t">
+                                <div>
+                                    <p class="text-left">Sunsilk Shampoo<br></p>
+                                </div>
+                                <p><span class="text-[#7B7B7B]">1 x&nbsp;</span>200.00 EUR</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-left flex flex-col gap-2 border-t py-2">
+                        <div class="flex items-center justify-between text-primary font-semibold text-base">
+                            <div>
+                                <p>Subtotal / klm</p>
+                            </div>
+                            <p class="text-sm font-medium text-[#7B7B7B]">212.00 EUR</p>
+                        </div>
+                        <div class="flex items-center justify-between text-primary text-sm font-medium">
+                            <div>
+                                <p> My Tax (10%) </p>
+                            </div>
+                            <p class="text-sm font-medium text-[#7B7B7B]">21.20 EUR</p>
+                        </div>
+                        <div class="flex items-center justify-between text-primary text-sm font-medium">
+                            <div>
+                                <p> new (10%) </p>
+                            </div>
+                            <p class="text-sm font-medium text-[#7B7B7B]">21.20 EUR</p>
+                        </div>
+                        <div class="flex items-center justify-between text-[#000] font-semibold text-sm">
+                            <div>
+                                <p class="font-semibold">Coupon Redeemed </p>
+                            </div>0
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between text-primary text-base font-bold border-t py-2">
+                        <p class="text-left">Total / mkl</p>
+                        <p class="text-sm ">254.40 EUR</p>
+                    </div>
+                    <div class="text-left flex flex-col gap-2 border-t py-2">
+                        <div class="flex items-center justify-between text-primary font-semibold text-lg">
+
+                            <p>Payment Method / mk</p>
+                           
+                        </div>
+                        <div class="flex items-center flex-col justify-between text-primary">
+                            <div class="flex items-center justify-between text-[#000] font-semibold w-full text-sm">
+                                <p class="font-semibold">Cash</p>
+                                <p class="text-sm text-[#7B7B7B] font-medium">254.40 EUR </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between text-primary text-sm font-bold border-t py-2">
+                        <div class="flex items-center justify-between text-primary text-sm">
+                            <p class="">Payment on <span class="text-[#7B7B7B]">07-03-2024</span> at <span
+                                    class="text-[#7B7B7B]">10:39:56</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html> {% endcomment %}
