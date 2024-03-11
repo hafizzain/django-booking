@@ -578,6 +578,7 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
                 ]
 
 class ClientMembershipsSerializer(serializers.ModelSerializer):
+    total_membership_price = serializers.SerializerMethodField(read_only = True)
     # membership = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
@@ -588,8 +589,29 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField()
     services = serializers.SerializerMethodField()
     installment_data = serializers.SerializerMethodField(read_only = True)
+    # total_membership_price = serializers.SerializerMethodField(read_only)
     # employee = serializers.SerializerMethodField()
     
+    
+    def get_total_membership_price(self, obj):
+        location_id = self.context.get('location_id', None)
+        query = {}
+        if location_id:
+            try:
+                location = BusinessAddress.objects.get(id = location_id)
+            except:
+                pass
+            else:
+                query['currency'] = location.currency
+        try:
+            pro = CurrencyPriceMembership.objects.filter(
+                membership = obj,
+                **query,
+            ).distinct()
+            return CurrencyPriceMembershipSerializers(pro, many= True).data
+        except Exception as err:
+            print(err)
+        
     def get_installment_data(self, obj):
         from SaleRecords.serializers import MembershipInstallmentsSerializer
         try:
@@ -681,6 +703,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
             'next_installment_date',
             'installment_months',
             'created_at',
+            'total_membership_price'
             ''
             # 'discount_percentage', 
             'membership_price', 
