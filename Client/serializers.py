@@ -595,7 +595,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     
     def get_total_membership_price(self, obj):
         # location_id = self.context.get('location_id', None)
-        request = self.context.get('request')
+        request = self.context.get('request') 
         location_id = request.data.get('location_id')
         query = {}
         if location_id:
