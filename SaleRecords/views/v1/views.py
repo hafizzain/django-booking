@@ -92,13 +92,14 @@ class SaleRecordViews(APIView):
                 data=request.data, context={'request': request})
             if serializer.is_valid():
                 sale_record = serializer.save()
-                is_installment_month = sale_record.membership_records.first()
-                if is_installment_month.installment_months:
-                    first_installment = MembershipInstallments.objects.create(
-                        membership=is_installment_month,
-                        paid_installment=is_installment_month.price
-                    )
-                    first_installment.save()
+                if sale_record.membership_records.all is not None:
+                    is_installment_month = sale_record.membership_records.first()
+                    if is_installment_month.installment_months:
+                        first_installment = MembershipInstallments.objects.create(
+                            membership=is_installment_month,
+                            paid_installment=is_installment_month.price
+                        )
+                        first_installment.save()
                 try:
 
                     invoice = SaleInvoice.objects.create(
