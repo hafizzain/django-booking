@@ -708,8 +708,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
             'installment_months',
             'created_at',
             'total_membership_price',
-            ''
-            # 'discount_percentage', 
+            'expiry', 
             'membership_price', 
             'discount_type' ,
             'installment_data'
