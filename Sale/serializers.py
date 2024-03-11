@@ -870,7 +870,7 @@ class SOSerializerForClientSale(serializers.ModelSerializer):
         model = SaleRecordServices
         fields = ['quantity', 'service', 'user','created_at',
                 'member', 'price',
-                  'payment_type', 'order_type'
+                  , 'order_type'
                   ]
 
 
