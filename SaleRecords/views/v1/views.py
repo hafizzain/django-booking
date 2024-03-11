@@ -92,14 +92,17 @@ class SaleRecordViews(APIView):
                 data=request.data, context={'request': request})
             if serializer.is_valid():
                 sale_record = serializer.save()
-                if len(sale_record.membership_records) > 0:
-                    is_installment_month = sale_record.membership_records.first()
-                    if is_installment_month.installment_months:
-                        first_installment = MembershipInstallments.objects.create(
-                            membership=is_installment_month,
-                            paid_installment=is_installment_month.price
-                        )
-                        first_installment.save()
+                try:
+                    if len(sale_record.membership_records) > 0:
+                        is_installment_month = sale_record.membership_records.first()
+                        if is_installment_month.installment_months:
+                            first_installment = MembershipInstallments.objects.create(
+                                membership=is_installment_month,
+                                paid_installment=is_installment_month.price
+                            )
+                            first_installment.save()
+                except Exception as e:
+                    return Response({'error': str(e), 'error in membership':  'view error occured in membership installment' })
                 try:
 
                     invoice = SaleInvoice.objects.create(
