@@ -601,7 +601,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
         if location_id:
             try:
                 location = BusinessAddress.objects.get(id = location_id)
-                if location:
+                if not location:
                     raise ValueError('location does not exist')
             except Exception as e:
                 raise ValueError(str(e))
