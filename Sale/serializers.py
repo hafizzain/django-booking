@@ -681,7 +681,7 @@ class POSerializerForClientSale(serializers.ModelSerializer):
 
     class Meta:
         model = SaleRecordsProducts
-        fields = ['quantity', 'member', 'created_at', 'payment_type', 'price',
+        fields = ['quantity', 'member', 'created_at','order_type', 'payment_type', 'price',
                   'name', 'product_name', 'product_details']
 
 
