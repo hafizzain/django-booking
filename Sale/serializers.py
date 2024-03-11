@@ -22,7 +22,7 @@ from Utility.models import Language
 from Product.serializers import ProductTranlationsSerializerNew
 from Service.serializers import ServiceTranslationsSerializer
 from MultiLanguage.models import InvoiceTranslation
-from SaleRecords.models import SaleRecordsProducts
+from SaleRecords.models import *
 
 
 class PriceServiceSerializers(serializers.ModelSerializer):
@@ -867,10 +867,10 @@ class SOSerializerForClientSale(serializers.ModelSerializer):
         return obj.price
 
     class Meta:
-        model = ServiceOrder
-        fields = ['quantity', 'service', 'created_at', 'user',
-                  'duration', 'member', 'price',
-                  'payment_type', 'tip', 'gst', 'order_type', 'created_at'
+        model = SaleRecordServices
+        fields = ['quantity', 'service', 'user','created_at',
+                'member', 'price',
+                  'payment_type', 'order_type'
                   ]
 
 
