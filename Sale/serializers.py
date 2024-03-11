@@ -650,6 +650,7 @@ class ServiceTranlationsSerializer(serializers.ModelSerializer):
 
 
 class POSerializerForClientSale(serializers.ModelSerializer):
+    from SaleRecords.models import SaleRecordsProducts
     member = serializers.SerializerMethodField(read_only=True)
     product_name = serializers.SerializerMethodField(read_only=True)
     order_type = serializers.SerializerMethodField(read_only=True)
@@ -661,7 +662,7 @@ class POSerializerForClientSale(serializers.ModelSerializer):
         return obj.product.name if obj.product.name else None
 
     def get_price(self, obj):
-        return obj.product.cost_price
+        return obj.price
 
     def get_product_details(self, obj):
         return obj.product.description if obj.product.description else None
@@ -679,7 +680,7 @@ class POSerializerForClientSale(serializers.ModelSerializer):
             return obj.employee.full_name
 
     class Meta:
-        model = ProductOrder
+        model = SaleRecordsProducts
         fields = ['quantity', 'status', 'member', 'created_at', 'tip', 'payment_type', 'price',
                   'name', 'product_name', 'gst', 'order_type', 'product_details']
 
