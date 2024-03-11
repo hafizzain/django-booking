@@ -92,7 +92,7 @@ class SaleRecordViews(APIView):
                 data=request.data, context={'request': request})
             if serializer.is_valid():
                 sale_record = serializer.save()
-                if sale_record.membership_records.all is not None:
+                if len(sale_record.membership_records.all) > 0:
                     is_installment_month = sale_record.membership_records.first()
                     if is_installment_month.installment_months:
                         first_installment = MembershipInstallments.objects.create(
