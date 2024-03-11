@@ -703,7 +703,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
             'next_installment_date',
             'installment_months',
             'created_at',
-            'total_membership_price'
+            'total_membership_price',
             ''
             # 'discount_percentage', 
             'membership_price', 
