@@ -7693,3 +7693,132 @@ class BrakeTimeView(APIView):
             }
         }
         return Response(data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_employee_training(request):
+    
+    manager = EmployeeProfessionalInfo.objects.filter(designation='Store Manager').first()    
+    if manager:
+        manager = manager.employee
+    else:
+        manager = None
+        
+    user = request.user
+    request.data['manager'] = manager
+    request.data['user'] = user.id
+    
+    serializer = EmployeeTrainingSerializer(data=request.data , context={'request': request})
+    if serializer.is_valid():
+        serializer.save()
+        data = {
+            "success": True,
+            "status_code": 201,
+            "response": {
+                "message": "Employee Training Add successfully",
+                "error_message": None,
+                "data": serializer.data
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)
+    else:
+        data = {
+            "success": False,
+            "status_code": 400,
+            "response": {
+                "message": "Employee Training Not Add",
+                "error_message": serializer.errors,
+                "data": None
+            }
+        }
+        return Response(data, status=status.HTTP_400_BAD_REQUEST) 
+    
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_employee_training(request):
+    id = request.query_params.get('id', None)
+    if id is None:
+        data = {
+            "success": False,
+            "status_code": 400,
+            "response": {
+                "message": "Id is missing in the request",
+                "error_message":'Comment Id missing',
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)
+    
+    employee_training = get_object_or_404(EmployeeTraining, id=id)
+    serializer = EmployeeTrainingSerializer(employee_training, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        data = {
+            "sucess" : True,
+            "status_code" : 200,
+            "response" : {
+                "message" : "Employee Training updated successfully",
+                "error_message" : None,
+                "data" : serializer.data
+            }
+        }
+    else:
+        data = {
+            "success" : False,
+            "status_code" : 400,
+            "response" : {
+                "message" : "Employee Training not updated",
+                "error_message" : serializer.errors,
+                "data" : None
+            }
+        }
+        
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_employee_training(request):
+    no_pagination = request.GET.get('no_pagination', None)
+    employee_id = request.GET.get('employee_id', None)
+    
+    if employee_id is not None:
+        employee_training = EmployeeTraining.objects.filter(employee_id=employee_id)
+        serialized = EmployeeTrainingSerializer(employee_training, many=True)
+        data = {
+            "success": True,
+            "status_code": 200,
+            "response": {
+                "message": "Employee Training Get Successfully",
+                "error_message": None,
+                "data": serialized.data
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)
+    else:
+        user = request.user
+        if user.is_admin:
+            # Admin has access to all training requests
+            employee_training = EmployeeTraining.objects.all()
+            serialized = EmployeeTrainingSerializer(employee_training, many=True)
+            data = {
+                "success": True,
+                "status_code": 200,
+                "response": {
+                    "message": "Employee Training Get Successfully",
+                    "error_message": None,
+                    "data": serialized.data
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        
+        manger = Employee.objects.get(user=user)
+        employee_training = EmployeeTraining.objects.filter(Q(user=user) | Q(manager=manger))
+        if employee_training:
+            serialized = EmployeeTrainingSerializer(employee_training, many=True)
+            data = {
+                "success": True,
+                "status_code": 200,
+                "response": {
+                    "message": "Employee Training Get Successfully",
+                    "error_message": None,
+                    "data": serialized.data
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)

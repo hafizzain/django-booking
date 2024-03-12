@@ -130,4 +130,10 @@ urlpatterns = [
     path('create-employee-brake-time/', BrakeTimeView.as_view()),
     path('update-employee-brake-time/', BrakeTimeView.as_view()),
     path('delete-employee-brake-time/', BrakeTimeView.as_view()),
+    
+    # Employee Training
+    path('create_employee_training/', create_employee_training),
+    path('update_employee_training/', update_employee_training),
+    path('get_employee_training/', get_employee_training)
+    
 ]
