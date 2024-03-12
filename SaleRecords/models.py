@@ -123,6 +123,7 @@ class SaleRecordMembership(CommonField):
     expiry = models.DateTimeField(blank=True, null=True)
     installment_months = models.SmallIntegerField(blank=True, null=True)
     remaining_installments = models.SmallIntegerField(blank=True, null=True)
+    installment_price = models.FloatField(blank=True, null=True)
     payable_amount = models.FloatField(blank=True, null=True)
     next_installment_date =  models.DateTimeField(blank=True, null=True)
     
