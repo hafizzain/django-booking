@@ -402,11 +402,14 @@ def get_sales_analytics(request):
     query = Q()
     location = Q()
     business= Q()
+    sale_record = Q()
     
     try:    
         if location_id:
             location &= Q(location=location_id)
             business &= Q(business_address=location_id)
+            sale_record &= Q(sale_record__location_id=location_id)
+            
             
         if year:
             query &= Q(created_at__year=year)
@@ -424,12 +427,12 @@ def get_sales_analytics(request):
                             .aggregate(total_retail_target=Coalesce(Sum('brand_target', output_field=FloatField()), Value(0, output_field=FloatField())))
         
         # Get Sale Records
-        service = SaleRecordServices.objects.filter(query).aggregate(total_service_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
-        product = SaleRecordsProducts.objects.filter(query).aggregate(total_product_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
-        vouchers = SaleRecordVouchers.objects.filter(query).aggregate(total_vouchers_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
-        membership = SaleRecordMembership.objects.filter(query).aggregate(total_membership_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
-        gift_card = PurchasedGiftCards.objects.filter(query).aggregate(total_gift_card_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
-        appointment = SaleRecordsAppointmentServices.objects.filter(query).aggregate(total_appointment_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        service = SaleRecordServices.objects.filter(query, sale_record).aggregate(total_service_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        product = SaleRecordsProducts.objects.filter(query, sale_record).aggregate(total_product_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        vouchers = SaleRecordVouchers.objects.filter(query, sale_record).aggregate(total_vouchers_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        membership = SaleRecordMembership.objects.filter(query, sale_record).aggregate(total_membership_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        gift_card = PurchasedGiftCards.objects.filter(query, sale_record).aggregate(total_gift_card_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
+        appointment = SaleRecordsAppointmentServices.objects.filter(query, sale_record).aggregate(total_appointment_sale=Coalesce(Sum('price', output_field=FloatField()), Value(0, output_field=FloatField())))
         
         # appointment_average = SaleRecordsAppointmentServices.objects.filter(query) \
         #                         .aggregate(avg_appointment=Coalesce(Avg('price', output_field=FloatField()), Value(0, output_field=FloatField())))
