@@ -652,7 +652,7 @@ class ServiceTranlationsSerializer(serializers.ModelSerializer):
 
 class POSerializerForClientSale(serializers.ModelSerializer):
     
-    member = serializers.SerializerMethodField(source  = 'employee.full_name')
+    member = serializers.CharField(source  = 'employee.full_name')
     product_name = serializers.SerializerMethodField(read_only=True)
     order_type = serializers.SerializerMethodField(read_only=True)
     product_details = serializers.SerializerMethodField(read_only=True)
