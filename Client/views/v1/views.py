@@ -3007,13 +3007,13 @@ def get_client_all_memberships(request):
     location_id = request.GET.get('location_id', None)
     client_id = request.GET.get('client_id', None)
     installment = request.GET.get('installment', None)
-    return Response({'installemt': installment})
+    # return Response({'installemt': installment})
     
 
     today_date = datetime.now()
     today_date = today_date.strftime('%Y-%m-%d')
     try:
-        if installment == "True":
+        if installment == "True" or installment == "true":
             client_membership = SaleRecordMembership.objects.filter(
                 sale_record__location__id=location_id,
                 expiry__gte=timezone.now(),
