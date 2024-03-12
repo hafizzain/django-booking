@@ -3814,7 +3814,7 @@ def get_client_sale(request):
                 'voucher': voucher_membership,
                 'appointment': appointment.data,
                 'membership' : membership.data,
-                'Gift Cards' : gift_cards.data,
+                'gift_cards' : gift_cards.data,
                 'appointments_count': appointment_checkout_all.count(),
                 'total_sales': total_sale,
                 'quick_sale_count': quick_sale_count,
