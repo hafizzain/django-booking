@@ -3012,6 +3012,7 @@ def get_client_all_memberships(request):
     today_date = datetime.now()
     today_date = today_date.strftime('%Y-%m-%d')
     if installment == True:
+        return Response({'eroro': 'coming here'})
         client_membership = SaleRecordMembership.objects.filter(
             sale_record__location__id=location_id,
             expiry__gte=timezone.now(),
