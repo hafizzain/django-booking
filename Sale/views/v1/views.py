@@ -1105,7 +1105,8 @@ def update_servicegroup(request):
     error = []
     service = request.data.get('service', None)
     id = request.data.get('id', None)
-
+    image = request.data.get('image', None)
+    
     is_status = request.data.get('status', None)
     allow_client_to_select_team_member = request.data.get('allow_client_to_select_team_member', None)
 
@@ -1139,7 +1140,23 @@ def update_servicegroup(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-
+        
+    if image is not None :
+        def get_image(request, image):   # get client image url from AWS 
+            if image:
+                try:
+                    # request = self.request
+                    url = tenant_media_base_url(request, is_s3_url=service_id.is_image_uploaded_s3)
+                    return f'{url}{service_id.image}'
+                except:
+                    return f'{service_id.image}'
+            return None
+        
+        image_url = get_image(request, image)
+        if image_url != request.data.get('image'):
+            service_id.image = image
+            service_id.save()
+            
     if is_status is None:
         service_id.is_active = False
     else:
