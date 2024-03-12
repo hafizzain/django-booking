@@ -652,7 +652,7 @@ class ServiceTranlationsSerializer(serializers.ModelSerializer):
 
 class POSerializerForClientSale(serializers.ModelSerializer):
     
-    member = serializers.SerializerMethodField(read_only=True)
+    member = serializers.SerializerMethodField(source  = 'employee.full_name')
     product_name = serializers.SerializerMethodField(read_only=True)
     order_type = serializers.SerializerMethodField(read_only=True)
     product_details = serializers.SerializerMethodField(read_only=True)
@@ -674,9 +674,8 @@ class POSerializerForClientSale(serializers.ModelSerializer):
     def get_product_name(self, obj):
         return obj.product.name
 
-    def get_member(self, obj):
-      
-        return obj.employee.full_name
+    # def get_member(self, obj):
+    #     return obj.employee.full_name
         
 
     class Meta:
@@ -843,7 +842,7 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
 
 class SOSerializerForClientSale(serializers.ModelSerializer):
     service = serializers.SerializerMethodField(read_only=True)
-    member = serializers.SerializerMethodField(read_only=True)
+    member = serializers.CharField(source = 'employee.full_name')
     user = serializers.SerializerMethodField(read_only=True)
     order_type = serializers.SerializerMethodField(read_only=True)
     price = serializers.SerializerMethodField(read_only=True)
@@ -854,9 +853,9 @@ class SOSerializerForClientSale(serializers.ModelSerializer):
     def get_service(self, obj):
         return obj.service.name
 
-    def get_member(self, obj):
-        # return obj.member.full_name
-        return obj.employee.full_name
+    # def get_member(self, obj):
+    #     # return obj.member.full_name
+    #     return obj.employee.full_name
 
     def get_user(self, obj):
         # return obj.user.full_name
@@ -1442,7 +1441,9 @@ class BusinessAddressSerializer(serializers.ModelSerializer):
     def get_tax(self, obj):
         try:
             tax = BusinessTax.objects.get(location=obj)
-            return BusinessTaxSerializer(tax).data
+            if tax:
+                return BusinessTaxSerializer(tax).data
+            return None
         except Exception as err:
             ExceptionRecord.objects.create(
                 text=f'error happen on busiens serializer line 660 {str(err)}'
