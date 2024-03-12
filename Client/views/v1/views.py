@@ -3019,8 +3019,9 @@ def get_client_all_memberships(request):
                 # created_at__lt = F('end_date'),
                 # end_date__gte = today_date,
                 sale_record__client__id=client_id,
-                # membership__is_installment = True
+                is_installment = True
             )
+            # client_membership = [ for membership in client_membership.all()]
         else:
             client_membership = SaleRecordMembership.objects.filter(
                     sale_record__location__id=location_id,
@@ -3028,9 +3029,9 @@ def get_client_all_memberships(request):
                     # created_at__lt = F('end_date'),
                     # end_date__gte = today_date,
                     sale_record__client__id=client_id,
-                    # membership__is_installment = False
+                    is_installment = False
                 )
-            
+        
 
     # return JsonResponse({'data': client_membership})
         serializer = ClientMembershipsSerializer(client_membership, many=True, context = {'request': request})
