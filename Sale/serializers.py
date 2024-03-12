@@ -125,7 +125,7 @@ class ServiceGroupOP(serializers.ModelSerializer):
 class ServiceGroupSerializer(serializers.ModelSerializer):
     services = serializers.SerializerMethodField(read_only=True)
     status = serializers.SerializerMethodField(read_only=True)
-    image = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField(read_only=True)
 
     def get_status(self, obj):
         return obj.is_active
