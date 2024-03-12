@@ -1,119 +1,205 @@
-{% load static %}
-{% load custom_tags %}
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
     <!-- <script src="https://cdn.tailwindcss.com"></script> -->
 </head>
+<style>
+     body {
+            font-family: Arial, sans-serif;
+        }
+        .invoice-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100%;
+        }
+        .invoice-card {
+            background-color: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            min-width: 25rem;
+            padding-top: 1rem;
+        }
+        .invoice-header {
+            position: sticky;
+            top: 0;
+        }
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .logo-svg {
+            width: 4.4rem;
+            height: 4.4rem;
+        }
+        .invoice-details {
+            padding: 1.25rem;
+            overflow-y: auto;
+            overflow-x: hidden;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            min-height: 65vh;
+        }
+        .invoice-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            text-transform: none;
+        }
+        .billing-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.625rem;
+            font-size: 0.875rem;
+        }
+        .items-container {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+        }
+        .items-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1rem;
+            padding-bottom: 0.625rem;
+            border-top: 1px solid #333;
+            padding: 0.625rem 0;
+        }
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+            font-weight: 500;
+            /* border-top: 1px solid #333; */
+            /* padding: 0.625rem 0; */
+        }
+        .subtotal-container {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            border-top: 1px solid #333;
+            padding-top: 0.625rem;
+        }
+        .subtotal-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+        .payment-method {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1rem;
+            font-weight: 600;
+            border-top: 1px solid #333;
+            padding-top: 0.625rem;
+        }
+        .payment-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        .payment-time {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+            border-top: 1px solid #333;
+            padding-top: 0.625rem;
+        }
+    @page {
+        size: 25rem;
+        margin: 1cm;
+    }
+</style>
 
-<body style="font-family: Arial, sans-serif;">
-    <div
-        style="position: relative; overflow: hidden; border-radius: 1rem; display: flex; align-items: center; justify-content: center; height: 100vh; width: 100%;">
-        <div
-            style="background-color: #fff; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); min-width: 25rem; padding-top: 1rem;">
-            <div style="position: sticky; top: 0;">
-                <div style="display: flex; justify-content: center; align-items: center;"><svg width="4.4rem"
-                        height="4.4rem" viewBox="0 0 71 71" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M33.4161 70.9992C32.07 70.8168 30.7153 70.6848 29.3779 70.4469C21.2131 68.9949 14.3769 65.1339 8.88504 58.9421C3.85864 53.2731 0.923394 46.6279 0.188713 39.0988C-0.716177 29.8328 1.63028 21.4004 7.29062 13.9876C12.6123 7.01945 19.6135 2.57142 28.2021 0.775535C30.559 0.282275 33.0044 0.167644 35.4186 0.00611841C36.9141 -0.0946179 38.0708 1.06211 38.1455 2.4759C38.2254 3.9852 37.2649 5.12283 35.7052 5.29999C33.6436 5.53272 31.5472 5.57788 29.5169 5.96693C24.2577 6.97256 19.6221 9.31381 15.6118 12.8761C10.2311 17.6558 6.83731 23.5784 5.75179 30.689C4.35364 39.8508 6.64973 48.0591 12.6835 55.1384C16.6904 59.8383 21.6907 63.0966 27.6863 64.5903C38.1264 67.192 47.5139 65.0071 55.6215 57.86C60.9466 53.1654 64.1077 47.2219 65.2626 40.2294C65.5093 38.7323 65.5266 37.1952 65.6308 35.6755C65.7611 33.7788 67.0151 32.6204 68.7311 32.8618C69.9486 33.0337 70.5843 33.8726 70.9994 34.9373V37.5721C70.9421 38.0706 70.8848 38.5708 70.8292 39.0692C69.9799 46.7096 67.062 53.4502 61.9123 59.1661C56.4447 65.2346 49.6711 69.0227 41.6104 70.4486C40.2748 70.6848 38.9201 70.8185 37.5758 71.0009H33.4143L33.4161 70.9992Z"
+<body>
+    <div class="invoice-container">
+        <div class="invoice-card">
+            <div class="invoice-header">
+                <div class="logo-container">
+                    <svg class="logo-svg" viewBox="0 0 71 71" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M33.4161 70.9992C32.07 70.8168 30.7153 70.6848 29.3779 70.4469C21.2131 68.9949 14.3769 65.1339 8.88504 58.9421C3.85864 53.2731 0.923394 46.6279 0.188713 39.0988C-0.716177 29.8328 1.63028 21.4004 7.29062 13.9876C12.6123 7.01945 19.6135 2.57142 28.2021 0.775535C30.559 0.282275 33.0044 0.167644 35.4186 0.00611841C36.9141 -0.0946179 38.0708 1.06211 38.1455 2.4759C38.2254 3.9852 37.2649 5.12283 35.7052 5.29999C33.6436 5.53272 31.5472 5.57788 29.5169 5.96693C24.2577 6.97256 19.6221 9.31381 15.6118 12.8761C10.2311 17.6558 6.83731 23.5784 5.75179 30.689C4.35364 39.8508 6.64973 48.0591 12.6835 55.1384C16.6904 59.8383 21.6907 63.0966 27.6863 64.5903C38.1264 67.192 47.5139 65.0071 55.6215 57.86C60.9466 53.1654 64.1077 47.2219 65.2626 40.2294C65.5093 38.7323 65.5266 37.1952 65.6308 35.6755C65.7611 33.7788 67.0151 32.6204 68.7311 32.8618C69.9486 33.0337 70.5843 33.8726 70.9994 34.9373V37.5721C70.9421 38.0706 70.8848 38.5708 70.8292 39.0692C69.9799 46.7096 67.062 53.4502 61.9123 59.1661C56.4447 65.2346 49.6711 69.0227 41.6104 70.4486C40.2748 70.6848 38.9201 70.8185 37.5758 71.0009H33.4143L33.4161 70.9992Z"
                             fill="#2CAE4A"></path>
-                        <path
-                            d="M33.1105 41.8709C33.3745 41.5201 33.5048 41.296 33.6837 41.1171C44.056 30.7639 54.4336 20.4158 64.8025 10.0591C65.5789 9.28447 66.4091 8.74605 67.5623 8.96489C69.5093 9.3331 70.3969 11.5788 69.2123 13.1663C69.0334 13.406 68.8163 13.6179 68.6044 13.8298C57.4939 24.916 46.3834 36.0022 35.2711 47.0866C33.6837 48.6706 32.1969 48.6481 30.6928 47.0154C26.3699 42.3225 22.0469 37.6313 17.7309 32.9332C16.5811 31.6809 16.5915 30.0084 17.7222 28.9767C18.8233 27.9728 20.4177 28.0301 21.5154 29.1643C22.5593 30.2446 23.5597 31.3666 24.5775 32.4712C27.3164 35.4464 30.0572 38.4233 32.7944 41.402C32.8726 41.4871 32.9264 41.5948 33.1105 41.8727V41.8709Z"
+                        <path d="M33.1105 41.8709C33.3745 41.5201 33.5048 41.296 33.6837 41.1171C44.056 30.7639 54.4336 20.4158 64.8025 10.0591C65.5789 9.28447 66.4091 8.74605 67.5623 8.96489C69.5093 9.3331 70.3969 11.5788 69.2123 13.1663C69.0334 13.406 68.8163 13.6179 68.6044 13.8298C57.4939 24.916 46.3834 36.0022 35.2711 47.0866C33.6837 48.6706 32.1969 48.6481 30.6928 47.0154C26.3699 42.3225 22.0469 37.6313 17.7309 32.9332C16.5811 31.6809 16.5915 30.0084 17.7222 28.9767C18.8233 27.9728 20.4177 28.0301 21.5154 29.1643C22.5593 30.2446 23.5597 31.3666 24.5775 32.4712C27.3164 35.4464 30.0572 38.4233 32.7944 41.402C32.8726 41.4871 32.9264 41.5948 33.1105 41.8727V41.8709Z"
                             fill="#2CAE4A"></path>
-                    </svg></div>
+                    </svg>
+                </div>
             </div>
-            <div
-                style="padding: 1.25rem; overflow-y: auto; overflow-x: hidden; text-align: center; display: flex; flex-direction: column; gap: 1.25rem; min-height: 65vh;">
-                <h1 style="font-weight: 700; font-size: 1.25rem; text-transform: none;">Invoice / jfk</h1>
-                <div
-                    style="display: flex; justify-content: space-between; align-items: center; gap: 0.625rem; font-size: 0.875rem;">
-                    <div style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div class="invoice-details">
+                <h1 class="invoice-title">Invoice / jfk</h1>
+                <div class="billing-info">
+                    <div>
                         <p style="text-align: left; font-size: 0.875rem;">07-03-2024</p>
                         <p>Billed to <span style="font-weight: 700;">hafeez fourteen </span></p>
                     </div>
                 </div>
-                <div>
-                    <div style="text-align: left; display: flex; flex-direction: column;">
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 1rem; padding-bottom: 0.625rem;">
-                            <p style="text-align: left; font-size: 1.125rem; font-weight: 600;">Items / jkl</p>
-                            <p style="font-size: 1.125rem; font-weight: 600;">Amount / j</p>
-                        </div>
-                        <div style="border-top: 1px solid #333; padding: 0.625rem 0;">
-                            <div
-                                style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; font-weight: 500;">
-                                <div>
-                                    <p style="text-align: left;">shampo<br></p>
-                                </div>
-                                <p><span>1 x&nbsp;</span>12.00 EUR</p>
-                            </div>
-                            <div
-                                style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; font-weight: 500;">
-                                <div>
-                                    <p style="text-align: left;">Sunsilk Shampoo<br></p>
-                                </div>
-                                <p><span>1 x&nbsp;</span>200.00 EUR</p>
-                            </div>
-                        </div>
+                <div class="items-container">
+                    <div class="items-header">
+                        <p style="text-align: left; font-size: 1.125rem; font-weight: 600;">Items / jkl</p>
+                        <p style="font-size: 1.125rem; font-weight: 600;">Amount / j</p>
                     </div>
-                    <div
-                        style="text-align: left; display: flex; flex-direction: column; gap: 0.25rem; border-top: 1px solid #333; padding-top: 0.625rem;">
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; font-weight: 500; font-size: 0.875rem;">
-                            <p style="font-size: 0.875rem; font-weight: 600;">Subtotal / klm</p>
-                            <p style="font-size: 0.875rem; font-weight: 600;">212.00 EUR</p>
+                    <div class="item-row">
+                        <div>
+                            <p style="text-align: left;">shampo</p>
                         </div>
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; font-weight: 500;">
-                            <p style="font-size: 0.85rem; font-weight: 500;"> My Tax (10%) </p>
-                            <p style="font-size: 0.85rem; font-weight: 500;">21.20 EUR</p>
+                        <p><span>1 x&nbsp;</span>12.00 EUR</p>
+                    </div>
+                    <div class="item-row">
+                        <div>
+                            <p style="text-align: left;">Sunsilk Shampoo</p>
                         </div>
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; font-weight: 500;">
-                            <p> new (10%) </p>
-                            <p style="font-size: 0.875rem;">21.20 EUR</p>
-                        </div>
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 0.875rem;">
-                            <p class="font-semibold">Coupon Redeemed </p>
-                            <p>0</p>
-                        </div>
+                        <p><span>1 x&nbsp;</span>200.00 EUR</p>
                     </div>
                 </div>
-                <div
-                    style="display: flex; justify-content: space-between; align-items: center; font-size: 1rem; font-weight: 600; border-top: 1px solid #333; padding-top: 0.625rem;">
-                    <p style="text-align: left;">Total / mkl</p>
-                    <p style="font-size: 0.875rem;">254.40 EUR</p>
+                <div class="subtotal-container">
+                    <div class="subtotal-row">
+                        <p class="font-semibold">Subtotal / klm</p>
+                        <p>212.00 EUR</p>
+                    </div>
+                    <div class="subtotal-row">
+                        <p style="font-size: 0.8rem; font-weight: 500;"> My Tax (10%) </p>
+                        <p style="font-size: 0.85rem; font-weight: 500;">21.20 EUR</p>
+                    </div>
+                    <div class="subtotal-row">
+                        <p style="font-size: 0.8rem; font-weight: 500;"> new (10%) </p>
+                        <p style="font-size: 0.85rem; font-weight: 500;">21.20 EUR</p>
+                    </div>
+                    <div class="subtotal-row">
+                        <p class="font-semibold">Coupon Redeemed </p>
+                        <p>0</p>
+                    </div>
                 </div>
-                <div
-                    style="text-align: left; display: flex; flex-direction: column; gap: 0.625rem; border-top: 1px solid #333; padding-top: 0.625rem;">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 1rem;">
-                        <p>Payment Method / mk</p>
-                    </div>
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; font-weight: 500; font-size: 0.875rem;">
-                        <p class="font-semibold">Cash</p>
-                        <p style="font-size: 0.875rem;">254.40 EUR</p>
-                    </div>
+                <div class="payment-method">
+                    <p>Payment Method / mk</p>
                 </div>
-                <div
-                    style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; border-top: 1px solid #333; padding-top: 0.625rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <p class="">Payment on <span class="">07-03-2024</span> at <span class="">10:39:56</span></p>
-                    </div>
+                <div class="payment-info">
+                    <p class="font-semibold">Cash</p>
+                    <p>254.40 EUR</p>
+                </div>
+                <div class="payment-time">
+                    <p>Payment on <span class="">07-03-2024</span> at <span class="">10:39:56</span></p>
                 </div>
             </div>
         </div>
     </div>
 </body>
-
 </html>
