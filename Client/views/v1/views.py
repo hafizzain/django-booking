@@ -3021,23 +3021,9 @@ def get_client_all_memberships(request):
                 sale_record__client__id=client_id,
                 is_installment = True
             )
-            # client_membership = [ for membership in client_membership.all()]
-        else:
-            client_membership = SaleRecordMembership.objects.filter(
-                    sale_record__location__id=location_id,
-                    expiry__gte=timezone.now(),
-                    # created_at__lt = F('end_date'),
-                    # end_date__gte = today_date,
-                    sale_record__client__id=client_id,
-                    is_installment = False
-                )
-        
-
-    # return JsonResponse({'data': client_membership})
-        serializer = ClientMembershipsSerializer(client_membership, many=True, context = {'request': request})
-    except Exception as e:
-        return Response(
-        {
+            serializer = ClientMembershipsSerializer(client_membership, many=True, context = {'request': request})
+            return Response(
+            {
             'status': True,
             'status_code': 200,
             'response': {
@@ -3047,22 +3033,46 @@ def get_client_all_memberships(request):
 
             }
         },
-        status=status.HTTP_200_OK
-    )
-    else:
-        return Response(
+        status=status.HTTP_200_OK)
+            # client_membership = [ for membership in client_membership.all()]
+        else:
+            serializer = ClientMembershipsSerializer(client_membership, many=True, context = {'request': request})
+            client_membership = SaleRecordMembership.objects.filter(
+                    sale_record__location__id=location_id,
+                    expiry__gte=timezone.now(),
+                    # created_at__lt = F('end_date'),
+                    # end_date__gte = today_date,
+                    sale_record__client__id=client_id,
+                    is_installment = False
+                )
+            return Response(
             {
                 'status': True,
                 'status_code': 200,
                 'response': {
                     'message': 'Client Available Memberships',
-                    'error_message': None,
+                    'error_message': str(e),
                     'client_memberships': serializer.data
 
                 }
-            },
-            status=status.HTTP_200_OK
-        )
+            },status=status.HTTP_200_OK)
+        
+
+    # return JsonResponse({'data': client_membership})
+    except Exception as e:
+        return Response(
+        {
+            'status': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Exception Occured client Memberships',
+                'error_message': str(e),
+                'client_memberships': []
+
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
 
 @api_view(['DELETE'])
