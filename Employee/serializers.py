@@ -2122,3 +2122,10 @@ class BrakeTimeSerializer(serializers.ModelSerializer):
     class Meta:
         model = BrakeTime
         fields = "__all__"        
+        
+class EmployeeTrainingSerializer(serializers.ModelSerializer):
+    teacher_name = serializers.CharField(source='teacher.full_name', read_only=True)
+    student_name = serializers.CharField(source='student.full_name', read_only=True)
+    class Meta:
+        model = EmployeeTraining
+        fields = "__all__"

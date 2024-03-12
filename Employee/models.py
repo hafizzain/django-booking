@@ -761,16 +761,18 @@ class GiftDetail(models.Model):
     is_blocked = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     
-# class EmployeeTraining(CommonField):
-#     teacher = models.ForeignKey(Employee, on_delete=models.SET_NULL, blank=True, null=True, related_name='teacher_employee_training')
-#     student = models.ForeignKey(Employee, on_delete=models.SET_NULL, blank=True, null=True, related_name='student_employee_training')
-#     manger = models.ForeignKey(Employee, on_delete=models.SET_NULL, blank=True, null=True, related_name='manger_employee_training')
-#     location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, blank=True, null=True, related_name='location_employee_training')
+class EmployeeTraining(CommonField):
+    teacher = models.ForeignKey(Employee, on_delete=models.SET_NULL, blank=True, null=True, related_name='teacher_employee_training')
+    student = models.ForeignKey(Employee, on_delete=models.SET_NULL, blank=True, null=True, related_name='student_employee_training')
+    manager = models.ForeignKey(Employee, on_delete=models.SET_NULL, blank=True, null=True, related_name='manger_employee_training')
+    location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, blank=True, null=True, related_name='location_employee_training')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name='user_employee_training')
     
-#     status = models.CharField(choices=Status, max_length=50, default='Pending')
-#     manger_feedback = models.TextField(null=True, blank=True)
-#     teacher_comment = models.TextField(null=True, blank=True)
-#     date_requested = models.DateField(null=True, blank=True)
-#     date_offered = models.DateField(null=True, blank=True)
-#     is_completed = models.BooleanField(default=False)
+    status = models.CharField(choices=Status.choices, max_length=50, default='Pending')
+    skill = models.CharField(choices=Skills.choices, max_length=50)
+    manager_feedback = models.TextField(null=True, blank=True)
+    teacher_comment = models.TextField(null=True, blank=True)
+    date_requested = models.DateField(null=True, blank=True)
+    date_offered = models.DateField(null=True, blank=True)
+    is_completed = models.BooleanField(default=False)
     
