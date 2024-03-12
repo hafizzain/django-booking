@@ -7705,10 +7705,11 @@ def create_employee_training(request):
         manager = None
         
     user = request.user
-    request.data['manager'] = manager
-    request.data['user'] = user.id
+    data_copy = dict(request.data)  # Convert QueryDict to a mutable dictionary
+    data_copy['manager'] = manager
+    data_copy['user'] = user.id
     
-    serializer = EmployeeTrainingSerializer(data=request.data , context={'request': request})
+    serializer = EmployeeTrainingSerializer(data=data_copy, context={'request': request})
     if serializer.is_valid():
         serializer.save()
         data = {
