@@ -124,7 +124,7 @@ class SaleRecordMembership(CommonField):
     installment_months = models.SmallIntegerField(blank=True, null=True)
     remaining_installments = models.SmallIntegerField(blank=True, null=True)
     installment_price = models.FloatField(blank=True, null=True)
-    is_installment = models.BooleanField(blank=True, null=True , default = False)
+    is_installment = models.BooleanField(default = False)
     payable_amount = models.FloatField(blank=True, null=True)
     next_installment_date =  models.DateTimeField(blank=True, null=True)
     
