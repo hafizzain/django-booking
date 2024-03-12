@@ -3019,7 +3019,7 @@ def get_client_all_memberships(request):
                 # created_at__lt = F('end_date'),
                 # end_date__gte = today_date,
                 sale_record__client__id=client_id,
-                # is_installment = True
+                is_installment = True
             )
             # client_membership = [ for membership in client_membership.all()]
         else:
@@ -3029,7 +3029,7 @@ def get_client_all_memberships(request):
                     # created_at__lt = F('end_date'),
                     # end_date__gte = today_date,
                     sale_record__client__id=client_id,
-                    # is_installment = False
+                    is_installment = False
                 )
         
 
