@@ -95,7 +95,7 @@ class SaleRecordViews(APIView):
                 try:
                     if len(sale_record.membership_records.all()) > 0:
                         is_installment_month = sale_record.membership_records.first()
-                        if is_installment_month.installment_months:
+                        if is_installment_month.installment_months is not None:
                             first_installment = MembershipInstallments.objects.create(
                                 membership=is_installment_month,
                                 paid_installment=is_installment_month.installment_price
