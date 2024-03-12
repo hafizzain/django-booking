@@ -98,7 +98,7 @@ class SaleRecordViews(APIView):
                         if is_installment_month.installment_months:
                             first_installment = MembershipInstallments.objects.create(
                                 membership=is_installment_month,
-                                paid_installment=is_installment_month.price
+                                paid_installment=is_installment_month.installment_price
                             )
                             first_installment.save()
                 except Exception as e:
