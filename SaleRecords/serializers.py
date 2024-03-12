@@ -506,9 +506,11 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                 SaleRecordMembership(
                     sale_record=sale_record,
                     membership=data['membership'],
-                    price=float(data['price'] * data['quantity']),
+                    price=float(data['price']),
                     quantity=data['quantity'],
                     installment_months = data['installment_months'],
+                    # installment_price = data['installment_price'],
+                    payable_amount = data['price'],
                     expiry=calculate_validity(data['valid_till']),
                 ) for data in membership_records
             ])
@@ -518,7 +520,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                 SaleRecordVouchers(
                     sale_record=sale_record,
                     voucher=data['voucher'],
-                    price=float(data['price'] * data['quantity']),
+                    price=float(data['price']),
                     quantity=data['quantity'],
                     expiry=calculate_validity(data['valid_till']),
                 ) for data in vouchers_records
@@ -529,7 +531,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                 PurchasedGiftCards(
                     sale_record=sale_record,
                     gift_card=data['gift_card'],
-                    price=float(data['price'] * data['quantity']),
+                    price=float(data['price']),
                     spend_amount=data['spend_amount'],
                     sale_code=data['sale_code'],
                     quantity=data['quantity'],
