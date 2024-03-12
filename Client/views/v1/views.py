@@ -3011,42 +3011,57 @@ def get_client_all_memberships(request):
 
     today_date = datetime.now()
     today_date = today_date.strftime('%Y-%m-%d')
-    if installment == True:
-        return Response({'eroro': 'coming here'})
-        client_membership = SaleRecordMembership.objects.filter(
-            sale_record__location__id=location_id,
-            expiry__gte=timezone.now(),
-            # created_at__lt = F('end_date'),
-            # end_date__gte = today_date,
-            sale_record__client__id=client_id,
-            membership__is_installment = True
-        )
-    else:
-        client_membership = SaleRecordMembership.objects.filter(
+    try:
+        if installment == True:
+            client_membership = SaleRecordMembership.objects.filter(
                 sale_record__location__id=location_id,
                 expiry__gte=timezone.now(),
                 # created_at__lt = F('end_date'),
                 # end_date__gte = today_date,
                 sale_record__client__id=client_id,
-                membership__is_installment = False
+                membership__is_installment = True
             )
+        else:
+            client_membership = SaleRecordMembership.objects.filter(
+                    sale_record__location__id=location_id,
+                    expiry__gte=timezone.now(),
+                    # created_at__lt = F('end_date'),
+                    # end_date__gte = today_date,
+                    sale_record__client__id=client_id,
+                    membership__is_installment = False
+                )
+            
 
     # return JsonResponse({'data': client_membership})
-    serializer = ClientMembershipsSerializer(client_membership, many=True, context = {'request': request})
-
-    return Response(
+        serializer = ClientMembershipsSerializer(client_membership, many=True, context = {'request': request})
+    except Exception as e:
+        return Response(
         {
             'status': True,
             'status_code': 200,
             'response': {
                 'message': 'Client Available Memberships',
-                'error_message': None,
+                'error_message': str(e),
                 'client_memberships': serializer.data
 
             }
         },
         status=status.HTTP_200_OK
     )
+    else:
+        return Response(
+            {
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': 'Client Available Memberships',
+                    'error_message': None,
+                    'client_memberships': serializer.data
+
+                }
+            },
+            status=status.HTTP_200_OK
+        )
 
 
 @api_view(['DELETE'])
