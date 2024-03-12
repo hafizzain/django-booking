@@ -28,11 +28,11 @@ def next_installment_expiry(sender, instance, created, **kwargs):
                 if membership.payable_amount is not None:
                     membership.payable_amount -= instance.paid_installment 
                 else:
-                    membership.payable_amount = membership.price
+                    membership.payable_amount = membership.price - instance.paid_installment
                 membership.save()
-                membership.refresh_from_db()
-                membership.payable_amount -= instance.paid_installment
-                membership.save()
+                # membership.refresh_from_db()
+                # membership.payable_amount -= instance.paid_installment
+                # membership.save()
 
     except Exception as e:
         return Response({'error: error occured in signal'})
