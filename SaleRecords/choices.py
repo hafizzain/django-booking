@@ -16,6 +16,10 @@ class PaymentMethodsChoices(models.TextChoices):
     PAYPAL = 'Paypal','PayPal Payment'
     # GIFT = 'Gift','Gift Payment'
     
+class ActiveInactive(models.TextChoices):
+    ACTIVE = 'Active' ,'Active'
+    INACTIVE = 'In Active','In Active'
+    
 class CheckoutType(models.TextChoices):
     APPOINTMENT_CHECKOUT = 'Appointment', 'Appointment Checkout'
     SALE_CHECKOUT = 'Sale','Sale Checkout'
