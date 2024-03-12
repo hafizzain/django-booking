@@ -233,7 +233,7 @@ class SaleRecordMembershipSerializer(serializers.ModelSerializer):
     class Meta:
         model = SaleRecordMembership
         fields = "__all__"
-        read_only_fields = ['sale_record', 'membership_names']
+        read_only_fields = ['sale_record', 'membership_names','payable_amount']
 
 
 class PaymentMethodsSerializer(serializers.ModelSerializer):
@@ -510,7 +510,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     quantity=data['quantity'],
                     installment_months = data['installment_months'],
                     installment_price = data['installment_price'],
-                    payable_amount = data['price'],
+                    # payable_amount = data['price'],
                     expiry=calculate_validity(data['valid_till']),
                 ) for data in membership_records
             ])
