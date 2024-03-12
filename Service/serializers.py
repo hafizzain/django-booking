@@ -26,8 +26,8 @@ class ServiceTranslationsSerializer(serializers.ModelSerializer):
         fields = ['id', 'service', 'service_name', 'language']
 
 class BasicServiceSerializer(serializers.ModelSerializer):
-    total_count = serializers.IntegerField()
-
+    total_count = serializers.SerializerMethodField()
+    
     def get_total_count(self, obj):
         sale_count = SaleRecordServices.objects.filter(service_id=obj.id).count()
         return obj.total_count+sale_count
