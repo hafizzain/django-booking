@@ -128,6 +128,7 @@ class SaleRecordMembership(CommonField):
     payable_amount = models.FloatField(blank=True, null=True)
     next_installment_date =  models.DateTimeField(blank=True, null=True)
     
+    status = models.CharField(choices = ActiveInactive.choices,max_length = 50, default = ActiveInactive.ACTIVE, blank=False, null=False)
     # employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null = True, related_name='sale_membership_employee')
     
     price = models.FloatField(blank=True, null=True) 
