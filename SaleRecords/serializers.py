@@ -294,7 +294,7 @@ class AppliedMembershipsSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppliedMemberships
         fields = "__all__"
-        read_only_fields = ['sale_record']
+        read_only_fields = ['sale_record','is_installment']
 
 
 class AppliedVouchersSerializer(serializers.ModelSerializer):
@@ -510,7 +510,7 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     quantity=data['quantity'],
                     installment_months = data['installment_months'],
                     installment_price = data['installment_price'] if 'installment_price' in data else None ,
-                    # payable_amount = data['price'],
+                    is_installment = True if 'installment_price' in data else False,
                     expiry=calculate_validity(data['valid_till']),
                 ) for data in membership_records
             ])
