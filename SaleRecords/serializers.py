@@ -233,7 +233,7 @@ class SaleRecordMembershipSerializer(serializers.ModelSerializer):
     class Meta:
         model = SaleRecordMembership
         fields = "__all__"
-        read_only_fields = ['sale_record', 'membership_names','payable_amount','installment_price']
+        read_only_fields = ['sale_record', 'membership_names']
 
 
 class PaymentMethodsSerializer(serializers.ModelSerializer):
