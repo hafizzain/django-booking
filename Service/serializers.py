@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from Service.models import Service, ServiceTranlations
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
+from SaleRecords.models import *
+
 class ServiceSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     
@@ -26,6 +28,9 @@ class ServiceTranslationsSerializer(serializers.ModelSerializer):
 class BasicServiceSerializer(serializers.ModelSerializer):
     total_count = serializers.IntegerField()
 
+    def get_total_count(self, obj):
+        sale_count = SaleRecordServices.objects.filter(service_id=obj.id, sale_record__location_id = obj.location).count()
+        return obj.total_count+sale_count
     class Meta:
         model = Service
         fields = ['id', 'name', 'total_count']
