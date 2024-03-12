@@ -509,8 +509,8 @@ class SaleRecordSerializer(serializers.ModelSerializer):
                     price=float(data['price']),
                     quantity=data['quantity'],
                     installment_months = data['installment_months'],
-                    installment_price = data['installment_price'] if 'installment_price' in data else None ,
-                    payable_amount = data['price'],
+                    installment_price = float(data['installment_price']) if 'installment_price' in data else None ,
+                    # payable_amount = data['price'],
                     expiry=calculate_validity(data['valid_till']),
                 ) for data in membership_records
             ])
