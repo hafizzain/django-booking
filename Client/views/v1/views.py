@@ -3028,7 +3028,7 @@ def get_client_all_memberships(request):
             'status_code': 200,
             'response': {
                 'message': 'Client Available Memberships',
-                'error_message': str(e),
+                'error_message': None,
                 'client_memberships': serializer.data
 
             }
@@ -3051,7 +3051,7 @@ def get_client_all_memberships(request):
                 'status_code': 200,
                 'response': {
                     'message': 'Client Available Memberships',
-                    'error_message': str(e),
+                    'error_message': None,
                     'client_memberships': serializer.data
 
                 }
