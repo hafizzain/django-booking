@@ -29,7 +29,7 @@ class BasicServiceSerializer(serializers.ModelSerializer):
     total_count = serializers.IntegerField()
 
     def get_total_count(self, obj):
-        sale_count = SaleRecordServices.objects.filter(service_id=obj.id, sale_record__location_id = obj.location).count()
+        sale_count = SaleRecordServices.objects.filter(service_id=obj.id).count()
         return obj.total_count+sale_count
     class Meta:
         model = Service
