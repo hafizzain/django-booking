@@ -7700,7 +7700,7 @@ def create_employee_training(request):
     
     manager = EmployeeProfessionalInfo.objects.filter(designation='Store Manager').first()    
     if manager:
-        manager = manager.employee_id
+        manager = manager.employee.id
     else:
         manager = None
         
